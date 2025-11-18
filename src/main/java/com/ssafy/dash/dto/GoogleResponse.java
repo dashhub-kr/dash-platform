@@ -4,11 +4,11 @@ import java.util.Map;
 
 public class GoogleResponse implements OAuth2Response{
 
-    private final Map<String, Object> attribute;
+    private final Map<String, Object> attributes;
 
-    public GoogleResponse(Map<String, Object> attribute) {
+    public GoogleResponse(Map<String, Object> attributes) {
 
-        this.attribute = attribute;
+        this.attributes = attributes;
     }
 
     @Override
@@ -18,17 +18,25 @@ public class GoogleResponse implements OAuth2Response{
 
     @Override
     public String getProviderId() {
-        return attribute.get("sub").toString();
+        Object v = attributes.get("sub");
+        return v == null ? null : v.toString();
     }
 
     @Override
     public String getEmail() {
-        return attribute.get("email").toString();
+        Object v = attributes.get("email");
+        return v == null ? null : v.toString();
     }
 
     @Override
     public String getName() {
-        return attribute.get("name").toString();
+        Object v = attributes.get("name");
+        return v == null ? null : v.toString();
+    }
+
+    @Override
+    public Map<String, Object> getAttributes() {
+        return attributes;
     }
 
 }
