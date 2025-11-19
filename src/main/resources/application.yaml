@@ -1,6 +1,8 @@
 spring:
+
   application:
     name: dash
+
   security:
       oauth2:
         client:
@@ -16,3 +18,21 @@ spring:
               # redirect-uri: {baseUrl}/login/oauth2/code/{registrationId}
               # (기본값 예시: http://localhost:8080/login/oauth2/code/google)
               # ------------------------------------------------------------
+  
+  datasource:
+    url: jdbc:mysql://localhost:3306/dash_db?createDatabaseIfNotExist=true&useSSL=false&serverTimezone=UTC
+    username: ssafy
+    password: ssafy
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  
+  sql:
+    init:
+      mode: always
+
+  jpa:
+    hibernate:
+      ddl-auto: none
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
