@@ -10,11 +10,13 @@ public class GitHubResponse extends AbstractOAuth2Response {
 
     @Override
     public String getProvider() {
+
         return "github";
     }
 
     @Override
     public String getProviderId() {
+
         return valueAsString("id");
     }
 
@@ -48,6 +50,7 @@ public class GitHubResponse extends AbstractOAuth2Response {
     public String getName() {
         String name = valueAsString("name");
         if (name != null && !name.isBlank()) return name;
+        
         return valueAsString("login");
     }
 

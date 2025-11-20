@@ -8,7 +8,6 @@ import org.springframework.stereotype.Service;
 
 import com.ssafy.dash.dto.CustomOAuth2User;
 import com.ssafy.dash.dto.GitHubResponse;
-import com.ssafy.dash.dto.GoogleResponse;
 import com.ssafy.dash.dto.OAuth2Response;
 import com.ssafy.dash.entity.UserEntity;
 import com.ssafy.dash.repository.UserRepository;
@@ -30,17 +29,11 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
 
         String registrationId = userRequest.getClientRegistration().getRegistrationId();
         OAuth2Response oAuth2Response;
-        if ("google".equals(registrationId)) {
-
-            oAuth2Response = new GoogleResponse(oAuth2User.getAttributes());
-        }
-        else if ("github".equals(registrationId)) {
-
+        if ("github".equals(registrationId)) {
             oAuth2Response = new GitHubResponse(oAuth2User.getAttributes());
         }
         else {
-
-            return null;
+            throw new IllegalArgumentException("Unsupported registrationId: " + registrationId);
         }
 
         String username = oAuth2Response.getProvider() + "_" + oAuth2Response.getProviderId();

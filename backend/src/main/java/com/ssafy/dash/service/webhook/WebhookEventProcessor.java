@@ -51,11 +51,11 @@ public class WebhookEventProcessor {
 
                 com.ssafy.dash.entity.OAuthToken token = oauthTokenRepository.findByProviderAndProviderLogin("github", owner).orElse(null);
                 if (token == null) {
-                    continue; // still no token
+                    continue; // 여전히 토큰 없음
                 }
                 String accessToken = token.getAccessToken();
 
-                // Extract sha and changed files similar to controller
+                // sha와 변경된 파일 추출 (컨트롤러와 유사)
                 String sha = null;
                 @SuppressWarnings("unchecked")
                 java.util.Map<String, Object> headCommit = (java.util.Map<String, Object>) payload.get("head_commit");

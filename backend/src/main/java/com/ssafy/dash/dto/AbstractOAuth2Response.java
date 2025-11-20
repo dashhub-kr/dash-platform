@@ -15,11 +15,13 @@ public abstract class AbstractOAuth2Response implements OAuth2Response {
 
     @Override
     public Map<String, Object> getAttributes() {
+
         return attributes;
     }
 
     protected String valueAsString(String key) {
         Object v = attributes.get(key);
+        
         return v == null ? null : v.toString();
     }
     

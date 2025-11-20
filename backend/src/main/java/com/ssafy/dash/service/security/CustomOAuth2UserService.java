@@ -11,7 +11,6 @@ import org.springframework.stereotype.Service;
 
 import com.ssafy.dash.dto.CustomOAuth2User;
 import com.ssafy.dash.dto.GitHubResponse;
-import com.ssafy.dash.dto.GoogleResponse;
 import com.ssafy.dash.dto.OAuth2Response;
 import com.ssafy.dash.entity.OAuthToken;
 import com.ssafy.dash.repository.OAuthTokenRepository;
@@ -36,11 +35,12 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
         OAuth2Response response;
         if ("github".equalsIgnoreCase(registrationId)) {
             response = new GitHubResponse(attributes);
-        } else {
-            response = new GoogleResponse(attributes);
+        }
+        else {
+            throw new IllegalArgumentException("Unsupported registrationId: " + registrationId);
         }
 
-        // Persist access token for later use (webhook processing)
+        // 액세스 토큰을 나중에 사용하기 위해 영속화 (웹훅 처리)
         String provider = response.getProvider();
         String providerId = response.getProviderId();
         String providerLogin = null;
@@ -50,7 +50,8 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
             OAuthToken t = null;
             if (providerLogin != null) {
                 t = tokenRepository.findByProviderAndProviderLogin(provider, providerLogin).orElseGet(OAuthToken::new);
-            } else {
+            }
+            else {
                 t = tokenRepository.findByProviderAndProviderId(provider, providerId).orElseGet(OAuthToken::new);
             }
             t.setProvider(provider);

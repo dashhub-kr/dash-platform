@@ -9,17 +9,6 @@ spring:
       oauth2:
         client:
           registration:
-            google:
-              client-id: ${GOOGLE_CLIENT_ID}
-              client-secret: ${GOOGLE_CLIENT_SECRET}
-              scope: [profile, email]
-              # ------------------------------------------------------------
-              # [Spring Boot가 자동 설정해 주는 기본값]
-              # client-name: Google
-              # authorization-grant-type: authorization_code
-              # redirect-uri: {baseUrl}/login/oauth2/code/{registrationId}
-              # (기본값 예시: http://localhost:8080/login/oauth2/code/google)
-              # ------------------------------------------------------------
             github:
               client-id: ${GITHUB_CLIENT_ID}
               client-secret: ${GITHUB_CLIENT_SECRET}
