@@ -1,6 +1,6 @@
 <template>
   <div class="playground-container">
-      <ProblemStack ref="stackRef" :totalSolved="currentTotalSolved" />
+      <AcornStack ref="stackRef" :totalSolved="currentTotalSolved" />
 
     <div class="controls-panel">
       <h1>도토리 물리 엔진 테스트</h1>
