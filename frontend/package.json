@@ -1,5 +1,6 @@
 {
   "name": "dash-frontend",
+  "type": "module",
   "version": "0.1.0",
   "private": true,
   "scripts": {
@@ -10,7 +11,8 @@
   "dependencies": {
     "@tailwindcss/postcss": "^4.1.17",
     "lucide-vue-next": "^0.554.0",
-    "vue": "^3.3.4"
+    "vue": "^3.3.4",
+    "vue-router": "^4.2.0"
   },
   "devDependencies": {
     "@vitejs/plugin-vue": "^4.0.0",

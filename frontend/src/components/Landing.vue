@@ -1,3 +1,4 @@
+
 <template>
   <div class="min-h-screen bg-slate-950 text-slate-100 flex flex-col selection:bg-indigo-500/30">
 
@@ -9,25 +10,68 @@
     </div>
 
     <header class="border-b border-white/10 bg-slate-950/50 backdrop-blur-md sticky top-0 z-50">
-      <div class="container mx-auto px-6 h-16 flex items-center justify-between">
-        <div class="flex items-center gap-2 group cursor-pointer">
+      <div class="container mx-auto px-6 h-16 flex items-center justify-between relative">
+        <div class="flex items-center gap-4 flex-shrink-0">
+          <div class="flex items-center gap-2 group cursor-pointer flex-shrink-0" @click="goHome">
           <div class="p-1.5 rounded-lg bg-indigo-500/10 group-hover:bg-indigo-500/20 transition-colors">
             <Code2 :size="24" class="text-indigo-400" />
           </div>
           <span class="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-white to-slate-400">DASH</span>
+          </div>
+
+          <!-- 고정 너비(nav)로 중앙에 배치: 좌/우 컨텐츠 변화에 영향받지 않음 -->
+          <nav class="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 hidden sm:flex w-[420px] justify-center items-center gap-6" :class="user ? 'opacity-0 pointer-events-none' : ''">
+            <button @click.prevent="scrollToSection('hero')" class="text-sm text-slate-300 hover:text-white transition text-center">홈</button>
+            <button @click.prevent="scrollToSection('features')" class="text-sm text-slate-300 hover:text-white transition text-center">주요 기능</button>
+            <button @click.prevent="scrollToSection('core')" class="text-sm text-slate-300 hover:text-white transition text-center">핵심 기능</button>
+          </nav>
+
         </div>
-        <button 
-          @click="handleLogin"
-          class="px-4 py-2 rounded-full text-sm font-medium bg-white/5 hover:bg-white/10 border border-white/10 transition-all hover:scale-105 active:scale-95"
-        >
-          로그인
-        </button>
+
+        <div class="flex items-center gap-4 flex-shrink-0 min-w-[240px] justify-end">
+          <template v-if="user">
+            <div class="flex items-center gap-3 min-w-0 relative" ref="profileRef">
+              <div class="flex items-center gap-3 min-w-0">
+                <div class="w-9 h-9 rounded-full bg-indigo-600/20 flex items-center justify-center text-indigo-300 font-semibold">{{ userInitial }}</div>
+                <div class="flex flex-col leading-tight min-w-0">
+                  <span class="text-xs text-slate-300">반갑습니다,</span>
+                  <span class="text-sm text-white font-semibold max-w-[140px] sm:max-w-[180px] block truncate">{{ user.name || user.email }}</span>
+                </div>
+              </div>
+
+              <!-- 삼각형(chevron) 버튼: 클릭으로 메뉴 토글 -->
+              <button @click.stop="toggleProfileMenu" :aria-expanded="profileMenuOpen" class="ml-2 p-1 rounded hover:bg-white/5 transition-colors" aria-label="계정 메뉴">
+                <ChevronDown :size="16" class="text-slate-300" />
+              </button>
+
+              <!-- 드롭다운: 헤더 내부에 절대 포지션으로 렌더 (메인 콘텐츠를 밀지 않음) -->
+              <transition name="slide-down">
+                <div v-if="profileMenuOpen" class="absolute right-0 top-full mt-2 w-40 bg-slate-900/95 border border-white/10 rounded-lg py-1 shadow-lg z-50">
+                  <button @click="goToProfile" class="w-full text-left px-3 py-2 text-sm hover:bg-white/5">마이페이지</button>
+                  <button @click="handleLogout" class="w-full text-left px-3 py-2 text-sm text-rose-400 hover:bg-white/5">로그아웃</button>
+                </div>
+              </transition>
+            </div>
+          </template>
+          
+          <template v-else>
+            <button 
+              @click="handleLogin"
+              class="px-4 py-2 rounded-full text-sm font-medium bg-white/5 hover:bg-white/10 border border-white/10 transition-all hover:scale-105 active:scale-95"
+            >
+              로그인
+            </button>
+          </template>
+        </div>
       </div>
     </header>
 
+    <!-- (대체) 드롭다운은 헤더 내부에 절대 포지션으로 렌더되어 메인 컨텐츠를 밀지 않습니다 -->
+
     <main class="relative z-10 flex-1">
+      <template v-if="!user">
       
-      <section class="container mx-auto px-6 pt-20 pb-16 text-center relative">
+      <section id="hero" class="container mx-auto px-6 pt-20 pb-16 text-center relative">
         <h1 class="text-5xl md:text-7xl font-bold tracking-tight mb-6 text-balance animate-fade-in-up">
           알고리즘 스터디, <br />
           <span class="text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 via-blue-400 to-cyan-400">
@@ -38,8 +82,9 @@
           공통 목표 선정, 설명을 위한 주석, 형식에 맞는 업로드...<br class="hidden md:block" />
           당신의 <span class="text-indigo-400 font-semibold">실패한 코드</span>조차 노력의 증거로 남겨드립니다.
         </p>
-        <div class="flex flex-col sm:flex-row gap-4 justify-center items-center animate-fade-in-up" style="animation-delay: 0.3s">
-          <button 
+        
+          <div class="flex flex-col sm:flex-row gap-4 justify-center items-center animate-fade-in-up" style="animation-delay: 0.3s">
+          <button
             @click="handleLogin"
             class="group relative inline-flex h-12 items-center justify-center overflow-hidden rounded-full bg-indigo-600 px-8 font-medium text-white transition-all duration-300 hover:bg-indigo-700 hover:ring-4 hover:ring-indigo-500/30 hover:scale-105"
           >
@@ -52,7 +97,7 @@
         </div>
       </section>
 
-      <section class="container mx-auto px-6 py-20 relative max-w-7xl">
+      <section id="features" class="container mx-auto px-6 py-20 relative max-w-7xl">
         <div class="text-center mb-16 max-w-3xl mx-auto">
           <h2 class="text-4xl font-bold mb-4 text-white">Dash가 해결하는 3가지 문제</h2>
           <p class="text-lg text-slate-400">스터디원들의 고질적인 페인 포인트를 시원하게 해결했습니다.</p>
@@ -79,7 +124,6 @@
             </div>
 
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                
                 <div class="bg-slate-900/50 rounded-2xl border border-white/10 p-6 relative overflow-hidden">
                     <div class="absolute top-0 right-0 bg-indigo-500/20 text-indigo-300 text-[10px] px-2 py-1 rounded-bl-lg font-bold border-l border-b border-indigo-500/20">
                         Auto Refactoring
@@ -115,15 +159,15 @@
                         Proof of Effort
                     </div>
                     <div class="flex flex-col justify-between h-full gap-4">
-                         <div class="flex justify-between items-center">
+                          <div class="flex justify-between items-center">
                              <div class="flex items-center gap-2">
                                 <div class="w-2 h-2 rounded-full bg-red-500 animate-pulse"></div>
                                 <span class="text-sm text-red-300 font-bold">틀렸습니다 (시간 초과)</span>
                              </div>
                              <span class="text-xs text-slate-500">오늘, 3시간 소요</span>
-                         </div>
-                         
-                         <div class="bg-slate-800/50 rounded-lg p-3 flex items-center gap-3 border border-white/5">
+                          </div>
+                          
+                          <div class="bg-slate-800/50 rounded-lg p-3 flex items-center gap-3 border border-white/5">
                              <div class="bg-green-500/20 p-1.5 rounded-full">
                                  <GitCommit :size="16" class="text-green-400" />
                              </div>
@@ -131,9 +175,9 @@
                                  <p class="text-xs text-slate-300 font-mono">feat: solve BOJ_2580 (Attempt 1)</p>
                                  <p class="text-[10px] text-slate-500">Dash Bot committed 1 min ago</p>
                              </div>
-                         </div>
+                          </div>
 
-                         <div>
+                          <div>
                              <p class="text-[10px] text-slate-400 mb-1">Contribution Graph</p>
                              <div class="flex gap-1">
                                  <div class="w-4 h-4 rounded bg-slate-800"></div>
@@ -142,7 +186,7 @@
                                  <div class="w-4 h-4 rounded bg-slate-800"></div>
                                  <div class="w-4 h-4 rounded bg-slate-800"></div>
                              </div>
-                         </div>
+                          </div>
                     </div>
                 </div>
 
@@ -260,7 +304,7 @@
         </div>
       </section>
 
-      <section class="container mx-auto px-6 py-24 border-t border-white/5">
+      <section id="core" class="container mx-auto px-6 py-24 border-t border-white/5">
         <div class="text-center mb-16">
           <h2 class="text-4xl font-bold mb-4 text-white">Dash의 핵심 기능</h2>
           <p class="text-lg text-slate-400">코딩에만 집중하세요. 나머지는 Dash가 알아서 합니다.</p>
@@ -287,11 +331,12 @@
       <section class="container mx-auto px-6 py-24 border-t border-white/5">
         <div class="relative rounded-3xl bg-gradient-to-b from-indigo-900/20 to-slate-900/50 border border-indigo-500/20 p-12 overflow-hidden text-center">
           <div class="absolute top-0 left-1/2 -translate-x-1/2 w-1/2 h-1/2 bg-indigo-500/20 blur-[100px] rounded-full"></div>
-          <div class="relative z-10 max-w-2xl mx-auto">
+            <div class="relative z-10 max-w-2xl mx-auto">
             <h2 class="text-3xl md:text-4xl font-bold mb-6 text-white">
               코딩에만 집중하세요.<br />나머지는 Dash가 합니다.
             </h2>
-            <button 
+            
+            <button
               @click="handleLogin"
               class="inline-flex items-center justify-center gap-2 px-8 py-4 rounded-full bg-white text-slate-950 hover:bg-slate-200 transition-all font-bold text-lg hover:shadow-[0_0_20px_rgba(255,255,255,0.3)]"
             >
@@ -301,6 +346,30 @@
           </div>
         </div>
       </section>
+
+
+      </template>
+
+      <template v-else>
+        <section class="container mx-auto px-6 py-20">
+          <div class="max-w-3xl mx-auto bg-gradient-to-br from-slate-900/60 to-slate-800/30 border border-white/6 rounded-3xl p-12 shadow-xl text-center">
+            <div class="flex flex-col items-center gap-4">
+              <div class="bg-indigo-700/20 p-4 rounded-full">
+                <ClipboardList :size="48" class="text-indigo-300" />
+              </div>
+              <h2 class="text-3xl md:text-4xl font-extrabold text-white">대시보드</h2>
+              <p class="text-slate-300 max-w-xl">가입된 스터디가 없습니다.</p>
+
+              <div class="mt-6 flex gap-4 justify-center">
+                <button class="px-5 py-3 rounded-full bg-indigo-600 text-white font-semibold shadow-lg hover:bg-indigo-500 transition" @click="goToDashboard">스터디 찾기</button>
+                <button @click="goToDashboard" class="px-5 py-3 rounded-full bg-white/5 text-white border border-white/10 hover:bg-white/10 transition">새 스터디 만들기</button>
+              </div>
+
+              <p class="text-xs text-slate-500 mt-4">Tip: GitHub 연동 후 자동 커밋으로 활동이 기록됩니다.</p>
+            </div>
+          </div>
+        </section>
+      </template>
     </main>
 
     <footer class="border-t border-white/5 py-8 bg-slate-950">
@@ -312,50 +381,80 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, onMounted, onBeforeUnmount, computed } from 'vue'
 import { 
   Code2, Github, UploadCloud, Bot, ClipboardList, 
   ArrowRight, ArrowDown, Search, PieChart, 
   FileCode, FolderTree, GitCommit 
+  , ChevronDown
 } from 'lucide-vue-next'
 
 const detailedFeatures = ref([
-  {
-    icon: UploadCloud,
-    title: '완전 자동화',
-    description: '백준 문제 제출 시 성공/실패 여부 상관없이 코드를 자동으로 GitHub에 커밋하고 Dash 대시보드를 갱신합니다.'
-  },
-  {
-    icon: Bot,
-    title: 'AI 자동 요약',
-    description: '제출된 코드를 Dash AI가 분석하여 풀이의 핵심 요약, 시간/공간 복잡도, 사용 알고리즘 태그를 자동으로 생성합니다.'
-  },
-  {
-    icon: FolderTree,
-    title: '깔끔한 코드 관리',
-    description: 'IDE에서 Main으로 풀어도 괜찮습니다. 자동으로 패키지와 파일명을 스터디 규칙에 맞게 변환하여 저장합니다.'
-  },
-  {
-    icon: PieChart,
-    title: '데이터 기반 목표',
-    description: 'Solved.ac 연동 데이터를 기반으로 스터디원들의 취약한 유형을 분석하고, 효과적인 공통 학습 목표를 추천합니다.'
-  },
-  {
-    icon: Search,
-    title: '통합 검색',
-    description: '스터디원들이 제출한 모든 풀이와 AI가 요약한 내용을 키워드(문제 번호, 태그, 풀이 내용)로 즉시 검색할 수 있습니다.'
-  },
-  {
-    icon: GitCommit,
-    title: '노력의 기록',
-    description: '실패한 제출도 사라지지 않습니다. 당신의 고민과 시도를 잔디(Contribution)와 대시보드에 시각적으로 남겨드립니다.'
-  }
+  { icon: UploadCloud, title: '완전 자동화', description: '백준 문제 제출 시 성공/실패 여부 상관없이 코드를 자동으로 GitHub에 커밋하고 Dash 대시보드를 갱신합니다.' },
+  { icon: Bot, title: 'AI 자동 요약', description: '제출된 코드를 Dash AI가 분석하여 풀이의 핵심 요약, 시간/공간 복잡도, 사용 알고리즘 태그를 자동으로 생성합니다.' },
+  { icon: FolderTree, title: '깔끔한 코드 관리', description: 'IDE에서 Main으로 풀어도 괜찮습니다. 자동으로 패키지와 파일명을 스터디 규칙에 맞게 변환하여 저장합니다.' },
+  { icon: PieChart, title: '데이터 기반 목표', description: 'Solved.ac 연동 데이터를 기반으로 스터디원들의 취약한 유형을 분석하고, 효과적인 공통 학습 목표를 추천합니다.' },
+  { icon: Search, title: '통합 검색', description: '스터디원들이 제출한 모든 풀이와 AI가 요약한 내용을 키워드(문제 번호, 태그, 풀이 내용)로 즉시 검색할 수 있습니다.' },
+  { icon: GitCommit, title: '노력의 기록', description: '실패한 제출도 사라지지 않습니다. 당신의 고민과 시도를 잔디(Contribution)와 대시보드에 시각적으로 남겨드립니다.' }
 ])
 
-const handleLogin = () => {
-  console.log('GitHub 로그인 시작')
-  alert('GitHub OAuth 로그인으로 이동합니다')
+const API_BASE = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080'
+const user = ref(null)
+const profileMenuOpen = ref(false)
+const profileRef = ref(null)
+
+const userInitial = computed(() => {
+  const name = user.value?.name || user.value?.email || ''
+  return name ? String(name).trim().charAt(0).toUpperCase() : 'U'
+})
+
+const scrollToSection = (id) => {
+  const el = document.getElementById(id)
+  if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' })
 }
+
+const goHome = () => { window.location.href = '/' }
+const goToDashboard = () => { window.location.href = '/dashboard' }
+const handleLogin = () => { window.location.href = `${API_BASE}/oauth2/authorization/google` }
+
+const toggleProfileMenu = (evt) => {
+  profileMenuOpen.value = !profileMenuOpen.value
+}
+
+const goToProfile = () => {
+  profileMenuOpen.value = false
+  window.location.href = '/profile'
+}
+
+const onDocClick = (e) => {
+  const el = profileRef.value
+  if (!el) return
+  if (!el.contains(e.target)) profileMenuOpen.value = false
+}
+
+const handleLogout = async () => {
+  try {
+    await fetch(`${API_BASE}/logout`, { method: 'POST', credentials: 'include' })
+  } catch (e) {
+    console.error('Logout failed:', e)
+  } finally {
+    window.location.href = '/' 
+  }
+}
+
+onMounted(async () => {
+  try {
+    const res = await fetch(`${API_BASE}/api/me`, { credentials: 'include' })
+    if (res.ok) user.value = await res.json()
+  } catch (e) {
+    // not authenticated
+  }
+  document.addEventListener('click', onDocClick)
+})
+
+onBeforeUnmount(() => {
+  document.removeEventListener('click', onDocClick)
+})
 </script>
 
 <style scoped>
@@ -373,5 +472,21 @@ const handleLogin = () => {
 .animate-fade-in-up {
   animation: fade-in-up 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
   opacity: 0;
+}
+
+/* slide-down transition for header dropdown */
+.slide-down-enter-from,
+.slide-down-leave-to {
+  opacity: 0;
+  transform: translateY(-6px) scale(0.98);
+}
+.slide-down-enter-to,
+.slide-down-leave-from {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+}
+.slide-down-enter-active,
+.slide-down-leave-active {
+  transition: transform 180ms cubic-bezier(.16,1,.3,1), opacity 160ms ease;
 }
 </style>

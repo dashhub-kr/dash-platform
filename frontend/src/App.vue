@@ -1,9 +1,9 @@
 <template>
-  <Landing />
+  <router-view />
 </template>
 
 <script setup>
-import Landing from './components/Landing.vue'
+// App uses router-view; landing is provided by the router
 </script>
 
 <style>
