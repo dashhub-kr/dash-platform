@@ -2,74 +2,27 @@
 <template>
   <div class="min-h-screen bg-slate-950 text-slate-100 flex flex-col selection:bg-indigo-500/30">
 
-    <div class="fixed inset-0 z-0 pointer-events-none">
+    <!-- Background: 복잡한 랜딩 히어로는 비인증(비로그인) 시만 보이고,
+         로그인 상태일 때는 간소화된 그라디언트 배경을 사용합니다. -->
+    <div v-if="!user" class="fixed inset-0 z-0 pointer-events-none">
       <div class="absolute top-0 left-1/2 -translate-x-1/2 w-[1000px] h-[600px] bg-indigo-600/20 rounded-full blur-[120px] opacity-50 mix-blend-screen"></div>
       <div class="absolute bottom-0 right-0 w-[800px] h-[600px] bg-blue-600/10 rounded-full blur-[100px] opacity-30"></div>
       <div class="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20"></div>
       <div class="absolute inset-0 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:24px_24px]"></div>
     </div>
 
-    <header class="border-b border-white/10 bg-slate-950/50 backdrop-blur-md sticky top-0 z-50">
-      <div class="container mx-auto px-6 h-16 flex items-center justify-between relative">
-        <div class="flex items-center gap-4 flex-shrink-0">
-          <div class="flex items-center gap-2 group cursor-pointer flex-shrink-0" @click="goHome">
-          <div class="p-1.5 rounded-lg bg-indigo-500/10 group-hover:bg-indigo-500/20 transition-colors">
-            <Code2 :size="24" class="text-indigo-400" />
-          </div>
-          <span class="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-white to-slate-400">DASH</span>
-          </div>
+    <div v-else class="fixed inset-0 z-0 pointer-events-none">
+      <!-- 로그인 후: 차분한 다크 그라디언트 + 아주 약한 노이즈 오버레이 -->
+      <div class="absolute inset-0 bg-gradient-to-b from-slate-900 via-slate-850 to-slate-800 opacity-95"></div>
+      <div class="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-5 mix-blend-overlay"></div>
+    </div>
 
-          <!-- 고정 너비(nav)로 중앙에 배치: 좌/우 컨텐츠 변화에 영향받지 않음 -->
-          <nav class="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 hidden sm:flex w-[420px] justify-center items-center gap-6" :class="user ? 'opacity-0 pointer-events-none' : ''">
-            <button @click.prevent="scrollToSection('hero')" class="text-sm text-slate-300 hover:text-white transition text-center">홈</button>
-            <button @click.prevent="scrollToSection('features')" class="text-sm text-slate-300 hover:text-white transition text-center">주요 기능</button>
-            <button @click.prevent="scrollToSection('core')" class="text-sm text-slate-300 hover:text-white transition text-center">핵심 기능</button>
-          </nav>
-
-        </div>
-
-        <div class="flex items-center gap-4 flex-shrink-0 min-w-[240px] justify-end">
-          <template v-if="user">
-            <div class="flex items-center gap-3 min-w-0 relative" ref="profileRef">
-              <div class="flex items-center gap-3 min-w-0">
-                <div class="w-9 h-9 rounded-full bg-indigo-600/20 flex items-center justify-center text-indigo-300 font-semibold">{{ userInitial }}</div>
-                <div class="flex flex-col leading-tight min-w-0">
-                  <span class="text-xs text-slate-300">반갑습니다,</span>
-                  <span class="text-sm text-white font-semibold max-w-[140px] sm:max-w-[180px] block truncate">{{ user.name || user.email }}</span>
-                </div>
-              </div>
-
-              <!-- 삼각형(chevron) 버튼: 클릭으로 메뉴 토글 -->
-              <button @click.stop="toggleProfileMenu" :aria-expanded="profileMenuOpen" class="ml-2 p-1 rounded hover:bg-white/5 transition-colors" aria-label="계정 메뉴">
-                <ChevronDown :size="16" class="text-slate-300" />
-              </button>
-
-              <!-- 드롭다운: 헤더 내부에 절대 포지션으로 렌더 (메인 콘텐츠를 밀지 않음) -->
-              <transition name="slide-down">
-                <div v-if="profileMenuOpen" class="absolute right-0 top-full mt-2 w-40 bg-slate-900/95 border border-white/10 rounded-lg py-1 shadow-lg z-50">
-                  <button @click="goToProfile" class="w-full text-left px-3 py-2 text-sm hover:bg-white/5">마이페이지</button>
-                  <button @click="handleLogout" class="w-full text-left px-3 py-2 text-sm text-rose-400 hover:bg-white/5">로그아웃</button>
-                </div>
-              </transition>
-            </div>
-          </template>
-          
-          <template v-else>
-            <button 
-              @click="handleLogin"
-              class="px-4 py-2 rounded-full text-sm font-medium bg-white/5 hover:bg-white/10 border border-white/10 transition-all hover:scale-105 active:scale-95"
-            >
-              로그인
-            </button>
-          </template>
-        </div>
-      </div>
-    </header>
+    <!-- CommonHeader is provided globally in App.vue -->
 
     <!-- (대체) 드롭다운은 헤더 내부에 절대 포지션으로 렌더되어 메인 컨텐츠를 밀지 않습니다 -->
 
     <main class="relative z-10 flex-1">
-      <template v-if="!user">
+      <template v-if="authChecked && !user">
       
       <section id="hero" class="container mx-auto px-6 pt-20 pb-16 text-center relative">
         <h1 class="text-5xl md:text-7xl font-bold tracking-tight mb-6 text-balance animate-fade-in-up">
@@ -105,7 +58,7 @@
 
         <div class="flex flex-col gap-12">
 
-          <div class="bg-white/[0.03] border border-white/10 rounded-3xl p-8 md:p-10 flex flex-col gap-10">
+          <div class="reveal bg-white/[0.03] border border-white/10 rounded-3xl p-8 md:p-10 flex flex-col gap-10">
             <div class="text-center md:text-left flex flex-col md:flex-row gap-6 items-center md:items-start border-b border-white/5 pb-8">
               <div class="p-4 rounded-2xl bg-red-500/10 text-red-400 flex-shrink-0">
                 <UploadCloud :size="40" />
@@ -194,7 +147,7 @@
           </div>
 
 
-          <div class="bg-white/[0.03] border border-white/10 rounded-3xl p-8 md:p-10 flex flex-col gap-10">
+          <div class="reveal bg-white/[0.03] border border-white/10 rounded-3xl p-8 md:p-10 flex flex-col gap-10">
             <div class="text-center md:text-left flex flex-col md:flex-row gap-6 items-center md:items-start border-b border-white/5 pb-8">
               <div class="p-4 rounded-2xl bg-green-500/10 text-green-400 flex-shrink-0">
                 <Bot :size="40" />
@@ -239,7 +192,7 @@
           </div>
 
 
-          <div class="bg-white/[0.03] border border-white/10 rounded-3xl p-8 md:p-10 flex flex-col gap-10">
+          <div class="reveal bg-white/[0.03] border border-white/10 rounded-3xl p-8 md:p-10 flex flex-col gap-10">
             <div class="text-center md:text-left flex flex-col md:flex-row gap-6 items-center md:items-start border-b border-white/5 pb-8">
               <div class="p-4 rounded-2xl bg-blue-500/10 text-blue-400 flex-shrink-0">
                 <ClipboardList :size="40" />
@@ -350,7 +303,7 @@
 
       </template>
 
-      <template v-else>
+      <template v-else-if="authChecked && user">
         <section class="container mx-auto px-6 py-20">
           <div class="max-w-3xl mx-auto bg-gradient-to-br from-slate-900/60 to-slate-800/30 border border-white/6 rounded-3xl p-12 shadow-xl text-center">
             <div class="flex flex-col items-center gap-4">
@@ -381,12 +334,11 @@
 </template>
 
 <script setup>
-import { ref, onMounted, onBeforeUnmount, computed } from 'vue'
+import { ref, computed, onMounted, onBeforeUnmount, watch, nextTick } from 'vue'
 import { 
   Code2, Github, UploadCloud, Bot, ClipboardList, 
   ArrowRight, ArrowDown, Search, PieChart, 
   FileCode, FolderTree, GitCommit 
-  , ChevronDown
 } from 'lucide-vue-next'
 
 const detailedFeatures = ref([
@@ -398,14 +350,46 @@ const detailedFeatures = ref([
   { icon: GitCommit, title: '노력의 기록', description: '실패한 제출도 사라지지 않습니다. 당신의 고민과 시도를 잔디(Contribution)와 대시보드에 시각적으로 남겨드립니다.' }
 ])
 
+import { useAuth } from '../composables/useAuth'
+const { user, authChecked } = useAuth()
 const API_BASE = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080'
-const user = ref(null)
-const profileMenuOpen = ref(false)
-const profileRef = ref(null)
 
-const userInitial = computed(() => {
-  const name = user.value?.name || user.value?.email || ''
-  return name ? String(name).trim().charAt(0).toUpperCase() : 'U'
+let revealObserver = null
+function initReveal() {
+  const els = document.querySelectorAll('.reveal')
+  if (!els || els.length === 0) return
+
+  // 이미 초기화되어 있으면 중복 초기화 방지
+  if (revealObserver) return
+
+  revealObserver = new IntersectionObserver((entries) => {
+    entries.forEach((entry) => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('reveal-visible')
+        revealObserver.unobserve(entry.target)
+      }
+    })
+  }, { threshold: 0.12 })
+
+  els.forEach((el, i) => {
+    // 골고루 stagger 효과를 주기 위한 딜레이
+    el.style.transitionDelay = `${i * 120}ms`
+    revealObserver.observe(el)
+  })
+}
+
+// authChecked가 false로 시작해서, true가 된 뒤에 섹션이 렌더되는 경우를 처리합니다.
+watch(authChecked, (val) => {
+  if (val) {
+    nextTick(() => initReveal())
+  }
+}, { immediate: true })
+
+onBeforeUnmount(() => {
+  if (revealObserver) {
+    revealObserver.disconnect()
+    revealObserver = null
+  }
 })
 
 const scrollToSection = (id) => {
@@ -417,20 +401,9 @@ const goHome = () => { window.location.href = '/' }
 const goToDashboard = () => { window.location.href = '/dashboard' }
 const handleLogin = () => { window.location.href = `${API_BASE}/oauth2/authorization/google` }
 
-const toggleProfileMenu = (evt) => {
-  profileMenuOpen.value = !profileMenuOpen.value
-}
+const toggleProfileMenu = () => {}
 
-const goToProfile = () => {
-  profileMenuOpen.value = false
-  window.location.href = '/profile'
-}
-
-const onDocClick = (e) => {
-  const el = profileRef.value
-  if (!el) return
-  if (!el.contains(e.target)) profileMenuOpen.value = false
-}
+const goToProfile = () => { window.location.href = '/profile' }
 
 const handleLogout = async () => {
   try {
@@ -441,20 +414,6 @@ const handleLogout = async () => {
     window.location.href = '/' 
   }
 }
-
-onMounted(async () => {
-  try {
-    const res = await fetch(`${API_BASE}/api/me`, { credentials: 'include' })
-    if (res.ok) user.value = await res.json()
-  } catch (e) {
-    // not authenticated
-  }
-  document.addEventListener('click', onDocClick)
-})
-
-onBeforeUnmount(() => {
-  document.removeEventListener('click', onDocClick)
-})
 </script>
 
 <style scoped>
@@ -488,5 +447,17 @@ onBeforeUnmount(() => {
 .slide-down-enter-active,
 .slide-down-leave-active {
   transition: transform 180ms cubic-bezier(.16,1,.3,1), opacity 160ms ease;
+}
+
+/* Reveal on scroll: subtle slide-up + fade with optional stagger */
+.reveal {
+  opacity: 0;
+  transform: translateY(18px);
+  will-change: transform, opacity;
+  transition: opacity 560ms cubic-bezier(.16,1,.3,1), transform 560ms cubic-bezier(.16,1,.3,1);
+}
+.reveal-visible {
+  opacity: 1;
+  transform: translateY(0);
 }
 </style>

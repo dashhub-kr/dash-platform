@@ -1,9 +1,15 @@
 <template>
+  <CommonHeader @scroll="scrollToSection" />
   <router-view />
 </template>
 
 <script setup>
-// App uses router-view; landing is provided by the router
+import CommonHeader from './components/CommonHeader.vue'
+
+const scrollToSection = (id) => {
+  const el = document.getElementById(id)
+  if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' })
+}
 </script>
 
 <style>
