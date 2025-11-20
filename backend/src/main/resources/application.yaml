@@ -1,3 +1,5 @@
+spring.config.import: optional:dotenv:file:.env
+
 spring:
 
   application:
@@ -18,6 +20,10 @@ spring:
               # redirect-uri: {baseUrl}/login/oauth2/code/{registrationId}
               # (기본값 예시: http://localhost:8080/login/oauth2/code/google)
               # ------------------------------------------------------------
+            github:
+              client-id: ${GITHUB_CLIENT_ID}
+              client-secret: ${GITHUB_CLIENT_SECRET}
+              scope: [read:user, user:email, repo]
   
   datasource:
     url: jdbc:mysql://localhost:3306/dash_db?createDatabaseIfNotExist=true&useSSL=false&serverTimezone=UTC
@@ -31,7 +37,7 @@ spring:
 
   jpa:
     hibernate:
-      ddl-auto: none
+      ddl-auto: update
     show-sql: true
     properties:
       hibernate:

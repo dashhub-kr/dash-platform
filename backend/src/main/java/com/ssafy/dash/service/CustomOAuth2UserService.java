@@ -7,6 +7,7 @@ import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
 
 import com.ssafy.dash.dto.CustomOAuth2User;
+import com.ssafy.dash.dto.GitHubResponse;
 import com.ssafy.dash.dto.GoogleResponse;
 import com.ssafy.dash.dto.OAuth2Response;
 import com.ssafy.dash.entity.UserEntity;
@@ -32,6 +33,10 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
         if ("google".equals(registrationId)) {
 
             oAuth2Response = new GoogleResponse(oAuth2User.getAttributes());
+        }
+        else if ("github".equals(registrationId)) {
+
+            oAuth2Response = new GitHubResponse(oAuth2User.getAttributes());
         }
         else {
 

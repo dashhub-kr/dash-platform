@@ -10,7 +10,7 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.web.SecurityFilterChain;
 
-import com.ssafy.dash.service.CustomOAuth2UserService;
+import com.ssafy.dash.service.security.CustomOAuth2UserService;
 
 @Configuration
 @EnableWebSecurity
