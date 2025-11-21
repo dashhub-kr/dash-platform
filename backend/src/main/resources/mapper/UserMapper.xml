@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ssafy.dash.user.mapper.UserMapper">
+
+    <resultMap id="UserResult" type="com.ssafy.dash.user.User">
+        <id property="id" column="id" />
+        <result property="githubId" column="github_id" />
+        <result property="username" column="username" />
+        <result property="avatarUrl" column="avatar_url" />
+        <result property="solvedAcHandle" column="solved_ac_handle" />
+        <result property="accessToken" column="access_token" />
+        <result property="createdAt" column="created_at" />
+        <result property="updatedAt" column="updated_at" />
+    </resultMap>
+
+    <select id="selectUserById" resultMap="UserResult" parameterType="long">
+        SELECT * FROM users WHERE id = #{id}
+    </select>
+
+    <select id="selectUserByGithubId" resultMap="UserResult" parameterType="long">
+        SELECT * FROM users WHERE github_id = #{githubId}
+    </select>
+
+    <select id="selectAllUsers" resultMap="UserResult">
+        SELECT * FROM users ORDER BY id DESC
+    </select>
+
+    <insert id="insertUser" parameterType="com.ssafy.dash.user.User" useGeneratedKeys="true" keyProperty="id" keyColumn="id">
+        INSERT INTO users (github_id, username, avatar_url, solved_ac_handle, access_token)
+        VALUES (#{githubId}, #{username}, #{avatarUrl}, #{solvedAcHandle}, #{accessToken})
+    </insert>
+
+    <update id="updateUser" parameterType="com.ssafy.dash.user.User">
+        UPDATE users
+        SET
+          github_id = #{githubId},
+          username = #{username},
+          avatar_url = #{avatarUrl},
+          solved_ac_handle = #{solvedAcHandle},
+          access_token = #{accessToken}
+        WHERE id = #{id}
+    </update>
+
+    <delete id="deleteUser" parameterType="long">
+        DELETE FROM users WHERE id = #{id}
+    </delete>
+
+</mapper>

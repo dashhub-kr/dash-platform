@@ -399,7 +399,7 @@ const scrollToSection = (id) => {
 
 const goHome = () => { window.location.href = '/' }
 const goToDashboard = () => { window.location.href = '/dashboard' }
-const handleLogin = () => { window.location.href = `${API_BASE}/oauth2/authorization/google` }
+const handleLogin = () => { window.location.href = `${API_BASE}/oauth2/authorization/github` }
 
 const toggleProfileMenu = () => {}
 

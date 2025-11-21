@@ -1,10 +1,20 @@
--- 혹시 기존 테이블이 있다면 날리고 새로 시작 (개발 단계용)
-DROP TABLE IF EXISTS user_entity;
+CREATE TABLE IF NOT EXISTS users (
 
--- 테이블 생성
-CREATE TABLE user_entity (
-    id BIGINT AUTO_INCREMENT PRIMARY KEY,
-    username VARCHAR(50) NOT NULL UNIQUE,
-    email VARCHAR(100) NOT NULL,
-    role VARCHAR(20) NOT NULL
-);
+    `id`               BIGINT          NOT NULL AUTO_INCREMENT COMMENT 'PK',
+    `github_id`        BIGINT          NOT NULL                COMMENT '깃허브 ID (식별용)',
+    `username`         VARCHAR(255)    NOT NULL                COMMENT '사용자 이름',
+    `avatar_url`       VARCHAR(1024)   NULL                    COMMENT '프로필 이미지 URL',
+    `solved_ac_handle` VARCHAR(255)    NULL                    COMMENT '백준 핸들 (Solved.ac 연동)',
+    `access_token`     TEXT            NULL                    COMMENT '액세스 토큰',
+    `created_at`       TIMESTAMP       NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '생성일시',
+    `updated_at`       TIMESTAMP       NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '수정일시',
+    
+    PRIMARY KEY (`id`),
+    
+    /* 성능과 무결성을 위한 제약조건 추가 */
+    UNIQUE KEY `uk_user_github_id` (`github_id`),
+    UNIQUE KEY `uk_user_solved_ac_handle` (`solved_ac_handle`)
+) COMMENT '사용자 정보' ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- 모든 컬럼 정보 조회:
+-- SHOW FULL COLUMNS FROM `users`;
