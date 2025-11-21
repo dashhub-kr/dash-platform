@@ -27,6 +27,7 @@ public class UserController {
 
     @PostMapping
     public ResponseEntity<User> create(@RequestBody User user) {
+    	System.out.println("클라이언트로부터 받은 데이터: " + user);
         User created = userService.create(user);
 
         return ResponseEntity.ok(created);
