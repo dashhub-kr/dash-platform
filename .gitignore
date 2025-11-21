@@ -1,49 +1,45 @@
-.env
+##########################################################
+### Operating System & Editor Files (OS, General Temp) ###
+##########################################################
+
+# MacOS
+.DS_Store
+
+# Windows / Linux (Thumbnails, Temp files)
+Thumbs.db
+*.swp
+*.bak
+*~
+*.log
+*.stackdump
+tmp/
+
+# General / Workspace Files (STS, Eclipse, IntelliJ)
 HELP.md
-
-### Editor / Workspace ###
 .metadata/
+build/
 
-### Backend (Maven) ###
-backend/HELP.md
-backend/target/
-backend/.mvn/wrapper/maven-wrapper.jar
-!backend/**/src/main/**/target/
-!backend/**/src/test/**/target/
 
-### STS ###
-backend/.apt_generated
-backend/.classpath
-backend/.factorypath
-backend/.project
-backend/.settings
-backend/.springBeans
-backend/.sts4-cache
+##########################################################
+###              Environment & Credential              ###
+##########################################################
 
-### IntelliJ IDEA ###
-backend/.idea
-backend/*.iws
-backend/*.iml
-backend/*.ipr
+# Environment Variables
+.env
+.env.*
+.env.local
+.env.*.local
+.envrc
 
-### NetBeans ###
-backend/nbproject/private/
-backend/nbbuild/
-backend/dist/
-backend/nbdist/
-backend/.nb-gradle/
-backend/build/
-!backend/**/src/main/**/build/
-!backend/**/src/test/**/build/
 
-### VS Code ###
-backend/.vscode/
+##########################################################
+###           Build Artifacts & Dependencies           ###
+##########################################################
 
-### Frontend (Vite / Node) ###
+# Frontend (Vite / Node)
 frontend/node_modules/
 frontend/dist/
-frontend/.env
-frontend/.env.local
+frontend/dist-ssr/
 frontend/.vite/
 frontend/.cache/
 frontend/npm-debug.log*
@@ -51,5 +47,35 @@ frontend/yarn-error.log*
 frontend/.parcel-cache/
 frontend/coverage/
 
-# Ignore local build outputs and logs for frontend tooling
-*.log
+# Backend (Maven & Java)
+backend/bin
+backend/out/
+backend/target/
+backend/pom.xml.versionsBackup
+backend/hs_err_pid*.log
+backend/HELP.md
+
+
+#########################################################
+###              IDE Configuration Files              ###
+#########################################################
+
+# IntelliJ IDEA (Root & Modules)
+.idea
+backend/.idea
+backend/*.iws
+backend/*.iml
+backend/*.ipr
+
+# VS Code (Root & Modules)
+.vscode/
+backend/.vscode/
+
+# STS (Spring Tool Suite)
+backend/.apt_generated
+backend/.classpath
+backend/.factorypath
+backend/.project
+backend/.settings
+backend/.springBeans
+backend/.sts4-cache
