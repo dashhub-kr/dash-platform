@@ -11,10 +11,9 @@ CREATE TABLE IF NOT EXISTS users (
     
     PRIMARY KEY (`id`),
     
-    /* 성능과 무결성을 위한 제약조건 추가 */
     UNIQUE KEY `uk_user_github_id` (`github_id`),
     UNIQUE KEY `uk_user_solved_ac_handle` (`solved_ac_handle`)
 ) COMMENT '사용자 정보' ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
--- 모든 컬럼 정보 조회:
 -- SHOW FULL COLUMNS FROM `users`;
+-- SELECT * FROM `users`;
