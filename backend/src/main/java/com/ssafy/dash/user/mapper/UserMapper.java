@@ -3,23 +3,20 @@ package com.ssafy.dash.user.mapper;
 import java.util.List;
 
 import org.apache.ibatis.annotations.Mapper;
-import org.apache.ibatis.annotations.Param;
 
-import com.ssafy.dash.user.User;
+import com.ssafy.dash.user.domain.User;
 
 @Mapper
 public interface UserMapper {
 
-    int insertUser(User user);
+    int insert(User user);
 
-    User selectUserById(@Param("id") Long id);
-
-    User selectUserByGithubId(@Param("githubId") Long githubId);
-
-    List<User> selectAllUsers();
-
-    int updateUser(User user);
-
-    int deleteUser(@Param("id") Long id);
+    User selectById(Long id);
     
+    List<User> selectAll();
+    
+    int update(User user);
+    
+    int delete(Long id);
+
 }

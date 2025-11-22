@@ -1,5 +1,6 @@
 package com.ssafy.dash.user.controller;
 
+import java.net.URI;
 import java.util.List;
 
 import org.springframework.http.ResponseEntity;
@@ -12,61 +13,51 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.ssafy.dash.user.User;
+import com.ssafy.dash.user.dto.UserCreateRequest;
+import com.ssafy.dash.user.dto.UserResponse;
+import com.ssafy.dash.user.dto.UserUpdateRequest;
 import com.ssafy.dash.user.service.UserService;
 
 @RestController
 @RequestMapping("/api/users")
 public class UserController {
 
-    private final UserService userService;
+    private final UserService service;
 
-    public UserController(UserService userService) {
-        this.userService = userService;
+    public UserController(UserService service) {
+        this.service = service;
     }
 
     @PostMapping
-    public ResponseEntity<User> create(@RequestBody User user) {
-    	System.out.println("클라이언트로부터 받은 데이터: " + user);
-        User created = userService.create(user);
-
-        return ResponseEntity.ok(created);
-    }
-
-    @GetMapping
-    public ResponseEntity<List<User>> list() {
-
-        return ResponseEntity.ok(userService.listAll());
+    public ResponseEntity<UserResponse> create(@RequestBody UserCreateRequest req) {
+        UserResponse created = service.create(req);
+        
+        return ResponseEntity.created(URI.create("/api/users/" + created.getId())).body(created);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<User> getById(@PathVariable Long id) {
-        User user = userService.getById(id);
-        if (user == null) return ResponseEntity.notFound().build();
+    public ResponseEntity<UserResponse> get(@PathVariable Long id) {
 
-        return ResponseEntity.ok(user);
+        return ResponseEntity.ok(service.findById(id));
     }
 
-    @GetMapping("/github/{githubId}")
-    public ResponseEntity<User> getByGithubId(@PathVariable Long githubId) {
-        User user = userService.getByGithubId(githubId);
-        if (user == null) return ResponseEntity.notFound().build();
+    @GetMapping
+    public ResponseEntity<List<UserResponse>> list() {
 
-        return ResponseEntity.ok(user);
+        return ResponseEntity.ok(service.findAll());
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<User> update(@PathVariable Long id, @RequestBody User user) {
-        User updated = userService.update(id, user);
+    public ResponseEntity<UserResponse> update(@PathVariable Long id, @RequestBody UserUpdateRequest req) {
 
-        return ResponseEntity.ok(updated);
+        return ResponseEntity.ok(service.update(id, req));
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
-        userService.delete(id);
-        
+        service.delete(id);
+
         return ResponseEntity.noContent().build();
     }
-    
+
 }
