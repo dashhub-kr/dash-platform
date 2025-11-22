@@ -4,14 +4,14 @@
 </template>
 
 <script setup>
-import CommonHeader from './components/CommonHeader.vue'
+import CommonHeader from "./components/CommonHeader.vue";
 
 const scrollToSection = (id) => {
-  const el = document.getElementById(id)
-  if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' })
-}
+  const el = document.getElementById(id);
+  if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
+};
 </script>
 
 <style>
-/* global app styles (if any) */
+/* 전역 앱 스타일 설정 영역 */
 </style>
