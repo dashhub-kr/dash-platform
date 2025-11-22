@@ -65,6 +65,29 @@ public class UserService {
         if (deleted == 0) throw new UserNotFoundException(id);
     }
 
+    @Transactional
+    public User createOrUpdateOAuthUser(String provider, String providerId, String login, String email, String avatarUrl) {
+        User user = mapper.selectByProviderAndProviderId(provider, providerId);
+        
+        if (user == null) {
+            user = new User();
+            user.setUsername(login);
+            user.setEmail(email);
+            user.setProvider(provider);
+            user.setProviderId(providerId);
+            user.setAvatarUrl(avatarUrl);
+            user.setCreatedAt(LocalDateTime.now());
+            mapper.insert(user);
+        } else {
+            user.setUsername(login);
+            user.setEmail(email);
+            user.setAvatarUrl(avatarUrl);
+            mapper.update(user);
+        }
+        
+        return user;
+    }
+
     private UserResponse toResponse(User u) {
         
         return new UserResponse(u.getId(), u.getUsername(), u.getEmail(), u.getCreatedAt(), u.getProvider(), u.getProviderId(), u.getAvatarUrl());

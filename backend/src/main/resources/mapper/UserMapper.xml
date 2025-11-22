@@ -25,6 +25,12 @@
     SELECT id, username, email, created_at, provider, provider_id, avatar_url FROM users ORDER BY id
   </select>
 
+  <select id="selectByProviderAndProviderId" resultMap="UserResult">
+    SELECT id, username, email, created_at, provider, provider_id, avatar_url 
+    FROM users 
+    WHERE provider = #{provider} AND provider_id = #{providerId}
+  </select>
+
   <update id="update" parameterType="com.ssafy.dash.user.domain.User">
     UPDATE users
     SET username = #{username}, email = #{email}, provider = #{provider}, provider_id = #{providerId}, avatar_url = #{avatarUrl}
