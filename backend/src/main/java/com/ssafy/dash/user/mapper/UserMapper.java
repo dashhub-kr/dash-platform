@@ -15,6 +15,8 @@ public interface UserMapper {
     
     List<User> selectAll();
     
+    User selectByProviderAndProviderId(String provider, String providerId);
+    
     int update(User user);
     
     int delete(Long id);

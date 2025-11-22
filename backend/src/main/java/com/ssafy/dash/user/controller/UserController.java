@@ -4,6 +4,8 @@ import java.net.URI;
 import java.util.List;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -13,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.ssafy.dash.oauth.domain.CustomOAuth2User;
 import com.ssafy.dash.user.dto.UserCreateRequest;
 import com.ssafy.dash.user.dto.UserResponse;
 import com.ssafy.dash.user.dto.UserUpdateRequest;
@@ -45,6 +48,16 @@ public class UserController {
     public ResponseEntity<List<UserResponse>> list() {
 
         return ResponseEntity.ok(service.findAll());
+    }
+
+    @GetMapping("/me")
+    public ResponseEntity<UserResponse> me(@AuthenticationPrincipal OAuth2User principal) {
+        if (principal instanceof CustomOAuth2User) {
+            CustomOAuth2User customUser = (CustomOAuth2User) principal;
+            return ResponseEntity.ok(service.findById(customUser.getUserId()));
+        }
+        
+        return ResponseEntity.status(401).build();
     }
 
     @PutMapping("/{id}")
