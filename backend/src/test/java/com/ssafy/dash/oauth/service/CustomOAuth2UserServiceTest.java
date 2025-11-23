@@ -1,18 +1,17 @@
-package com.ssafy.dash.oauth;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.verify;
+package com.ssafy.dash.oauth.service;
 
 import java.util.Collections;
 import java.util.Map;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.BDDMockito.given;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import static org.mockito.Mockito.verify;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.oauth2.client.registration.ClientRegistration;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
@@ -22,11 +21,12 @@ import org.springframework.security.oauth2.core.OAuth2AccessToken;
 import org.springframework.security.oauth2.core.user.DefaultOAuth2User;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 
-import com.ssafy.dash.oauth.service.CustomOAuth2UserService;
+import com.ssafy.dash.common.TestFixtures;
 import com.ssafy.dash.user.domain.User;
 import com.ssafy.dash.user.service.UserService;
 
 @ExtendWith(MockitoExtension.class)
+@DisplayName("CustomOAuth2UserService 단위 테스트")
 class CustomOAuth2UserServiceTest {
 
     @Mock
@@ -39,16 +39,16 @@ class CustomOAuth2UserServiceTest {
     private CustomOAuth2UserService customOAuth2UserService;
 
     @Test
-    @DisplayName("GitHub 로그인 시 유저 서비스가 호출된다")
+    @DisplayName("GitHub 로그인 시 유저 서비스 호출 성공")
     void loadUser_callsUserService() {
         // given
-        String registrationId = "github";
+        String registrationId = TestFixtures.TEST_PROVIDER;
         String userNameAttributeName = "id";
         Map<String, Object> attributes = Map.of(
-            "id", 12345678,
-            "login", "tester",
-            "email", "test@example.com",
-            "avatar_url", "http://avatar.url"
+            "id", Integer.parseInt(TestFixtures.TEST_PROVIDER_ID),
+            "login", TestFixtures.TEST_USERNAME,
+            "email", TestFixtures.TEST_EMAIL,
+            "avatar_url", TestFixtures.TEST_AVATAR_URL
         );
 
         ClientRegistration clientRegistration = ClientRegistration.withRegistrationId(registrationId)
@@ -81,7 +81,7 @@ class CustomOAuth2UserServiceTest {
 
         // then
         assertThat(result).isNotNull();
-        verify(userService).createOrUpdateOAuthUser(registrationId, "12345678", "tester", "test@example.com", "http://avatar.url");
+        verify(userService).createOrUpdateOAuthUser(registrationId, TestFixtures.TEST_PROVIDER_ID, TestFixtures.TEST_USERNAME, TestFixtures.TEST_EMAIL, TestFixtures.TEST_AVATAR_URL);
     }
 
 }
