@@ -1,10 +1,10 @@
 package com.ssafy.dash.board.service;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import static org.mockito.ArgumentMatchers.any;
@@ -19,10 +19,12 @@ import com.ssafy.dash.board.dto.BoardCreateRequest;
 import com.ssafy.dash.board.dto.BoardResponse;
 import com.ssafy.dash.board.dto.BoardUpdateRequest;
 import com.ssafy.dash.board.mapper.BoardMapper;
+import com.ssafy.dash.common.TestFixtures;
 import com.ssafy.dash.user.domain.User;
 import com.ssafy.dash.user.mapper.UserMapper;
 
 @ExtendWith(MockitoExtension.class)
+@DisplayName("BoardService 단위 테스트")
 class BoardServiceTest {
 
     @Mock
@@ -39,15 +41,16 @@ class BoardServiceTest {
 
     @BeforeEach
     void setUp() {
-        user = new User(1L, "tester", "test@example.com", LocalDateTime.now());
-        board = new Board(1L, "Test Title", "Test Content", 1L, LocalDateTime.now(), LocalDateTime.now());
+        user = TestFixtures.createUser();
+        board = TestFixtures.createBoard(user);
     }
 
     @Test
+    @DisplayName("게시글 생성 성공")
     void createBoard_Success() {
         // given
-        BoardCreateRequest req = new BoardCreateRequest("Test Title", "Test Content", 1L);
-        given(userMapper.selectById(1L)).willReturn(user);
+        BoardCreateRequest req = TestFixtures.createBoardCreateRequest();
+        given(userMapper.selectById(req.getUserId())).willReturn(user);
         
         // when
         BoardResponse response = boardService.create(req);
@@ -59,24 +62,26 @@ class BoardServiceTest {
     }
 
     @Test
+    @DisplayName("ID로 게시글 조회 성공")
     void findById_Success() {
         // given
-        given(boardMapper.selectById(1L)).willReturn(board);
-        given(userMapper.selectById(1L)).willReturn(user);
+        given(boardMapper.selectById(board.getId())).willReturn(board);
+        given(userMapper.selectById(user.getId())).willReturn(user);
 
         // when
-        BoardResponse response = boardService.findById(1L);
+        BoardResponse response = boardService.findById(board.getId());
 
         // then
-        assertThat(response.getId()).isEqualTo(1L);
+        assertThat(response.getId()).isEqualTo(board.getId());
         assertThat(response.getAuthorName()).isEqualTo(user.getUsername());
     }
 
     @Test
+    @DisplayName("전체 게시글 조회 성공")
     void findAll_Success() {
         // given
         given(boardMapper.selectAll()).willReturn(List.of(board));
-        given(userMapper.selectById(1L)).willReturn(user);
+        given(userMapper.selectById(user.getId())).willReturn(user);
 
         // when
         List<BoardResponse> responses = boardService.findAll();
@@ -87,14 +92,15 @@ class BoardServiceTest {
     }
 
     @Test
+    @DisplayName("게시글 수정 성공")
     void updateBoard_Success() {
         // given
-        BoardUpdateRequest req = new BoardUpdateRequest("Updated Title", "Updated Content");
-        given(boardMapper.selectById(1L)).willReturn(board);
-        given(userMapper.selectById(1L)).willReturn(user);
+        BoardUpdateRequest req = TestFixtures.createBoardUpdateRequest();
+        given(boardMapper.selectById(board.getId())).willReturn(board);
+        given(userMapper.selectById(user.getId())).willReturn(user);
 
         // when
-        BoardResponse response = boardService.update(1L, req);
+        BoardResponse response = boardService.update(board.getId(), req);
 
         // then
         verify(boardMapper).update(any(Board.class));
@@ -102,15 +108,16 @@ class BoardServiceTest {
     }
 
     @Test
+    @DisplayName("게시글 삭제 성공")
     void deleteBoard_Success() {
         // given
-        given(boardMapper.delete(1L)).willReturn(1);
+        given(boardMapper.delete(board.getId())).willReturn(1);
 
         // when
-        boardService.delete(1L);
+        boardService.delete(board.getId());
 
         // then
-        verify(boardMapper).delete(1L);
+        verify(boardMapper).delete(board.getId());
     }
 
 }

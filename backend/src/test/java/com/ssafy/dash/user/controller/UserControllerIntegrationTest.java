@@ -1,5 +1,6 @@
 package com.ssafy.dash.user.controller;
 
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -15,12 +16,14 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.ssafy.dash.common.TestFixtures;
 import com.ssafy.dash.user.dto.UserCreateRequest;
 import com.ssafy.dash.user.dto.UserUpdateRequest;
 
 @SpringBootTest
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
+@DisplayName("UserController 통합 테스트")
 public class UserControllerIntegrationTest {
 
     @Autowired
@@ -30,9 +33,10 @@ public class UserControllerIntegrationTest {
     ObjectMapper mapper;
 
     @Test
+    @DisplayName("유저 CRUD 전체 흐름 성공")
     public void crudFlow() throws Exception {
         // 유저 생성
-        UserCreateRequest create = new UserCreateRequest("alice", "alice@example.com");
+        UserCreateRequest create = TestFixtures.createUserCreateRequest();
         String createJson = mapper.writeValueAsString(create);
 
         String location = mvc.perform(post("/api/users")
@@ -40,7 +44,7 @@ public class UserControllerIntegrationTest {
                 .content(createJson))
             .andExpect(status().isCreated())
             .andExpect(jsonPath("$.id").isNumber())
-            .andExpect(jsonPath("$.username").value("alice"))
+            .andExpect(jsonPath("$.username").value(TestFixtures.TEST_USERNAME))
             .andReturn()
             .getResponse()
             .getHeader("Location");
@@ -51,17 +55,17 @@ public class UserControllerIntegrationTest {
         // 유저 조회
         mvc.perform(get("/api/users/" + id))
             .andExpect(status().isOk())
-            .andExpect(jsonPath("$.username").value("alice"));
+            .andExpect(jsonPath("$.username").value(TestFixtures.TEST_USERNAME));
 
         // 유저 수정
-        UserUpdateRequest update = new UserUpdateRequest("alice2", "alice2@example.com");
+        UserUpdateRequest update = TestFixtures.createUserUpdateRequest();
         String updateJson = mapper.writeValueAsString(update);
 
         mvc.perform(put("/api/users/" + id)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(updateJson))
             .andExpect(status().isOk())
-            .andExpect(jsonPath("$.username").value("alice2"));
+            .andExpect(jsonPath("$.username").value(update.getUsername()));
 
         // 유저 목록
         mvc.perform(get("/api/users"))
