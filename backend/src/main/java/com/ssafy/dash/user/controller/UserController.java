@@ -21,6 +21,8 @@ import com.ssafy.dash.user.dto.UserResponse;
 import com.ssafy.dash.user.dto.UserUpdateRequest;
 import com.ssafy.dash.user.service.UserService;
 
+import io.swagger.v3.oas.annotations.Parameter;
+
 @RestController
 @RequestMapping("/api/users")
 public class UserController {
@@ -51,7 +53,7 @@ public class UserController {
     }
 
     @GetMapping("/me")
-    public ResponseEntity<UserResponse> me(@AuthenticationPrincipal OAuth2User principal) {
+    public ResponseEntity<UserResponse> me(@Parameter(hidden = true) @AuthenticationPrincipal OAuth2User principal) {
         if (principal instanceof CustomOAuth2User) {
             CustomOAuth2User customUser = (CustomOAuth2User) principal;
             return ResponseEntity.ok(service.findById(customUser.getUserId()));

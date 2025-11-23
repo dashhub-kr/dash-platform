@@ -13,8 +13,15 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler({UserNotFoundException.class, BoardNotFoundException.class})
     public ResponseEntity<String> handleNotFound(RuntimeException ex) {
-        
+
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ex.getMessage());
+    }
+
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<String> handleAll(Exception ex) {
+        ex.printStackTrace();
+        
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ex.getMessage());
     }
 
 }
