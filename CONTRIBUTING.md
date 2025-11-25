@@ -53,5 +53,5 @@ Git Flow를 기반으로 한 간단한 전략을 사용합니다.
 
 자세한 내용은 `docs/` 디렉토리의 문서를 참고해주세요.
 
-- [테스트 가이드](docs/TESTING_GUIDE.md)
-- [아키텍처 가이드](docs/ARCHITECTURE.md)
+- [테스트 가이드](backend/docs/TESTING_GUIDE.md)
+- [아키텍처 가이드](backend/docs/ARCHITECTURE.md)
