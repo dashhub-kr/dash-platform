@@ -36,3 +36,15 @@ CREATE TABLE IF NOT EXISTS algorithm_records (
     FOREIGN KEY (user_id) REFERENCES users(id)
 
 );
+
+CREATE TABLE IF NOT EXISTS user_repositories (
+
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    user_id BIGINT NOT NULL,
+    repository_name VARCHAR(255) NOT NULL,
+    webhook_configured BOOLEAN DEFAULT FALSE,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(id)
+
+);

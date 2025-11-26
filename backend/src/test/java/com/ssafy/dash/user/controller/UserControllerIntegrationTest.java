@@ -21,7 +21,7 @@ import com.ssafy.dash.user.dto.UserCreateRequest;
 import com.ssafy.dash.user.dto.UserUpdateRequest;
 
 @SpringBootTest
-@AutoConfigureMockMvc
+@AutoConfigureMockMvc(addFilters = false)
 @ActiveProfiles("test")
 @DisplayName("UserController 통합 테스트")
 public class UserControllerIntegrationTest {
