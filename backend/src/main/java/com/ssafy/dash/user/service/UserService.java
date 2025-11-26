@@ -7,6 +7,8 @@ import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.ssafy.dash.oauth.dto.AuthFlowType;
+import com.ssafy.dash.oauth.dto.OAuthLoginResult;
 import com.ssafy.dash.user.domain.User;
 import com.ssafy.dash.user.dto.UserCreateRequest;
 import com.ssafy.dash.user.dto.UserResponse;
@@ -66,9 +68,10 @@ public class UserService {
     }
 
     @Transactional
-    public User createOrUpdateOAuthUser(String provider, String providerId, String login, String email, String avatarUrl) {
+    public OAuthLoginResult createOrUpdateOAuthUser(String provider, String providerId, String login, String email, String avatarUrl) {
         User user = mapper.selectByProviderAndProviderId(provider, providerId);
-        
+        AuthFlowType flowType;
+
         if (user == null) {
             user = new User();
             user.setUsername(login);
@@ -78,14 +81,16 @@ public class UserService {
             user.setAvatarUrl(avatarUrl);
             user.setCreatedAt(LocalDateTime.now());
             mapper.insert(user);
+            flowType = AuthFlowType.SIGN_UP;
         } else {
             user.setUsername(login);
             user.setEmail(email);
             user.setAvatarUrl(avatarUrl);
             mapper.update(user);
+            flowType = AuthFlowType.LOGIN;
         }
-        
-        return user;
+
+        return new OAuthLoginResult(user, flowType);
     }
 
     @Transactional(readOnly = true)

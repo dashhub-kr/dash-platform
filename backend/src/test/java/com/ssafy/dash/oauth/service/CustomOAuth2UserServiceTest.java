@@ -22,7 +22,9 @@ import org.springframework.security.oauth2.core.user.DefaultOAuth2User;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 
 import com.ssafy.dash.common.TestFixtures;
-import com.ssafy.dash.user.domain.User;
+import com.ssafy.dash.oauth.domain.CustomOAuth2User;
+import com.ssafy.dash.oauth.dto.AuthFlowType;
+import com.ssafy.dash.oauth.dto.OAuthLoginResult;
 import com.ssafy.dash.user.service.UserService;
 
 @ExtendWith(MockitoExtension.class)
@@ -44,8 +46,9 @@ class CustomOAuth2UserServiceTest {
         // given
         String registrationId = TestFixtures.TEST_PROVIDER;
         String userNameAttributeName = "id";
+        long providerNumericId = Long.parseLong(TestFixtures.TEST_PROVIDER_ID);
         Map<String, Object> attributes = Map.of(
-            "id", Integer.parseInt(TestFixtures.TEST_PROVIDER_ID),
+            "id", providerNumericId,
             "login", TestFixtures.TEST_USERNAME,
             "email", TestFixtures.TEST_EMAIL,
             "avatar_url", TestFixtures.TEST_AVATAR_URL
@@ -74,13 +77,16 @@ class CustomOAuth2UserServiceTest {
 
         given(delegate.loadUser(userRequest)).willReturn(oauth2User);
         given(userService.createOrUpdateOAuthUser(anyString(), anyString(), anyString(), anyString(), anyString()))
-            .willReturn(new User());
+            .willReturn(new OAuthLoginResult(TestFixtures.createUser(), AuthFlowType.LOGIN));
 
         // when
         OAuth2User result = customOAuth2UserService.loadUser(userRequest);
 
         // then
-        assertThat(result).isNotNull();
+        assertThat(result).isInstanceOfSatisfying(CustomOAuth2User.class, customUser -> {
+            assertThat(customUser.getFlowType()).isEqualTo(AuthFlowType.LOGIN);
+            assertThat(customUser.isSignUp()).isFalse();
+        });
         verify(userService).createOrUpdateOAuthUser(registrationId, TestFixtures.TEST_PROVIDER_ID, TestFixtures.TEST_USERNAME, TestFixtures.TEST_EMAIL, TestFixtures.TEST_AVATAR_URL);
     }
 

@@ -12,7 +12,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.ssafy.dash.oauth.domain.CustomOAuth2User;
-import com.ssafy.dash.user.domain.User;
+import com.ssafy.dash.oauth.dto.OAuthLoginResult;
 import com.ssafy.dash.user.service.UserService;
 
 @Service
@@ -50,9 +50,9 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
             email = login + "@github.placeholder";
         }
             
-        User user = userService.createOrUpdateOAuthUser(registrationId, providerId, login, email, avatarUrl);
-    
-        return new CustomOAuth2User(oauth2User, user);
+        OAuthLoginResult loginResult = userService.createOrUpdateOAuthUser(registrationId, providerId, login, email, avatarUrl);
+
+        return new CustomOAuth2User(oauth2User, loginResult);
     }
 
 }
