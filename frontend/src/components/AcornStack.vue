@@ -119,12 +119,16 @@ const createBox = (x, y, type) => {
     restitution: 0.0,
     friction: 1.0,
     frictionStatic: 1.0,
+    friction: 0.8,
+    frictionAir: 0.02,
     label: label,
   });
 
   body.plugin = body.plugin || {};
   body.plugin.acornSpawnOrder = spawnSequence++;
-  Body.setInertia(body, Infinity);
+  body.plugin.acornType = type;
+  body.plugin.createdAt = Date.now();
+  body.plugin.frozen = false;
   Body.setAngularVelocity(body, 0);
 
   return body;
@@ -213,6 +217,11 @@ const initMatter = () => {
     },
   });
 
+  // 중력 증가
+  if (engine.world && engine.world.gravity) {
+    engine.world.gravity.y = 1.4;
+  }
+
   const wallOptions = { isStatic: true, render: { fillStyle: "transparent" } };
   const ground = Bodies.rectangle(
     window.innerWidth / 2,
@@ -249,6 +258,83 @@ const initMatter = () => {
   runner = Runner.create();
   Runner.run(runner, engine);
   Render.run(render);
+
+  // 충돌 처리
+  Events.on(engine, "collisionStart", (event) => {
+    try {
+      for (const pair of event.pairs) {
+        const a = pair.bodyA;
+        const b = pair.bodyB;
+        if (!a || !b) continue;
+        if (a.isStatic || b.isStatic) continue;
+        if (a.label === "Mouse Body" || b.label === "Mouse Body") continue;
+
+        const normal = pair.collision && pair.collision.normal ? pair.collision.normal : { x: 0, y: -1 };
+
+        // 충돌 시 약간의 선형 반발력 적용
+        const relVel = (b.velocity.x - a.velocity.x) * normal.x + (b.velocity.y - a.velocity.y) * normal.y;
+        const mag = Math.min(0.0025, Math.max(0.0005, Math.abs(relVel) * 0.0006 + 0.0005));
+        const biasUp = 0.0002;
+        const forceA = { x: -normal.x * mag, y: -normal.y * mag - biasUp };
+        const forceB = { x: normal.x * mag, y: normal.y * mag - biasUp };
+        Body.applyForce(a, a.position, forceA);
+        Body.applyForce(b, b.position, forceB);
+
+        // 접선 방향 상대 속도를 계산하여 작은 각 충격 유도
+        const tangent = { x: -normal.y, y: normal.x };
+        const relTang = (b.velocity.x - a.velocity.x) * tangent.x + (b.velocity.y - a.velocity.y) * tangent.y;
+
+        // 등급별 민감도: 등급이 낮을수록 더 민감 (더 많은 회전)
+        const sensitivityMap = {
+          bronze: 1.0,
+          silver: 0.85,
+          gold: 0.7,
+          platinum: 0.5,
+        };
+
+        const typeA = (a.plugin && a.plugin.acornType) || null;
+        const typeB = (b.plugin && b.plugin.acornType) || null;
+        const sensA = sensitivityMap[typeA] || 1.0;
+        const sensB = sensitivityMap[typeB] || 1.0;
+
+        // 접선 방향 상대 속도에서 각 델타 계산, 스케일 및 클램프 적용 (전체 민감도 감소)
+        const baseFactor = 0.03; // 전체 민감도 감소를 위한 조정 배율 감소
+        const maxAngular = 0.45; // 충돌당 최대 각 변화 클램프
+
+        const deltaA = Math.max(-maxAngular, Math.min(maxAngular, -relTang * baseFactor * sensA));
+        const deltaB = Math.max(-maxAngular, Math.min(maxAngular, relTang * baseFactor * sensB));
+
+        // 각 속도를 직접 설정하여 적용
+        Body.setAngularVelocity(a, (a.angularVelocity || 0) + deltaA);
+        Body.setAngularVelocity(b, (b.angularVelocity || 0) + deltaB);
+      }
+    } catch (err) {
+      // 충돌 처리 중 오류 무시
+    }
+  });
+
+  // 10초 이상된 바디는 고정: 회전 및 미끄럼 없음
+  Events.on(engine, "beforeUpdate", () => {
+    try {
+      const now = Date.now();
+      const bodies = Composite.allBodies(engine.world);
+      for (const body of bodies) {
+        if (!body || body.isStatic) continue;
+        const created = body.plugin && body.plugin.createdAt;
+        const frozen = body.plugin && body.plugin.frozen;
+        if (!created || frozen) continue;
+        if (now - created >= 10000) {
+          // 속도 0으로 설정하고 위치/회전 고정
+          Body.setVelocity(body, { x: 0, y: 0 });
+          Body.setAngularVelocity(body, 0);
+          Body.setStatic(body, true);
+          body.plugin.frozen = true;
+        }
+      }
+    } catch (e) {
+      // 무시
+    }
+  });
 
   if (DEBUG_DRAW) {
     Events.on(render, "afterRender", () => {
