@@ -72,7 +72,7 @@ class OnboardingControllerTest {
     void setupRepository_success() throws Exception {
         RepositorySetupRequest request = new RepositorySetupRequest("utact/dash-repo");
         RepositorySetupResponse response = new RepositorySetupResponse(TestFixtures.TEST_USER_ID,
-                request.getRepositoryName(), false);
+            request.getRepositoryName(), true);
         given(onboardingService.setupRepository(eq(TestFixtures.TEST_USER_ID), any(RepositorySetupRequest.class)))
                 .willReturn(response);
 
@@ -90,7 +90,8 @@ class OnboardingControllerTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.repositoryName").value(request.getRepositoryName()));
+            .andExpect(jsonPath("$.repositoryName").value(request.getRepositoryName()))
+            .andExpect(jsonPath("$.webhookConfigured").value(true));
     }
     
 }

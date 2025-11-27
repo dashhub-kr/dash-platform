@@ -35,6 +35,9 @@ class CustomOAuth2UserServiceTest {
     private UserService userService;
 
     @Mock
+    private OAuthTokenService oauthTokenService;
+
+    @Mock
     private OAuth2UserService<OAuth2UserRequest, OAuth2User> delegate;
 
     @InjectMocks
@@ -88,6 +91,7 @@ class CustomOAuth2UserServiceTest {
             assertThat(customUser.isSignUp()).isFalse();
         });
         verify(userService).createOrUpdateOAuthUser(registrationId, TestFixtures.TEST_PROVIDER_ID, TestFixtures.TEST_USERNAME, TestFixtures.TEST_EMAIL, TestFixtures.TEST_AVATAR_URL);
+        verify(oauthTokenService).saveAccessToken(TestFixtures.TEST_USER_ID, accessToken);
     }
 
 }

@@ -48,3 +48,17 @@ CREATE TABLE IF NOT EXISTS user_repositories (
     FOREIGN KEY (user_id) REFERENCES users(id)
 
 );
+
+CREATE TABLE IF NOT EXISTS user_oauth_tokens (
+
+    user_id BIGINT PRIMARY KEY,
+    access_token TEXT NOT NULL,
+    token_type VARCHAR(50),
+    expires_at TIMESTAMP,
+    refresh_token TEXT,
+    refresh_token_expires_at TIMESTAMP,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(id)
+
+);

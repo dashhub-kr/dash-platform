@@ -20,15 +20,18 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
 
     private final UserService userService;
     private final OAuth2UserService<OAuth2UserRequest, OAuth2User> delegate;
+    private final OAuthTokenService oauthTokenService;
 
     @Autowired
-    public CustomOAuth2UserService(UserService userService) {
-        this(userService, new DefaultOAuth2UserService());
+    public CustomOAuth2UserService(UserService userService, OAuthTokenService oauthTokenService) {
+        this(userService, oauthTokenService, new DefaultOAuth2UserService());
     }
 
-    public CustomOAuth2UserService(UserService userService, OAuth2UserService<OAuth2UserRequest, OAuth2User> delegate) {
+    public CustomOAuth2UserService(UserService userService, OAuthTokenService oauthTokenService,
+            OAuth2UserService<OAuth2UserRequest, OAuth2User> delegate) {
         this.userService = userService;
         this.delegate = delegate;
+        this.oauthTokenService = oauthTokenService;
     }
 
     @Override
@@ -51,6 +54,8 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
         }
             
         OAuthLoginResult loginResult = userService.createOrUpdateOAuthUser(registrationId, providerId, login, email, avatarUrl);
+
+        oauthTokenService.saveAccessToken(loginResult.getUser().getId(), userRequest.getAccessToken());
 
         return new CustomOAuth2User(oauth2User, loginResult);
     }
