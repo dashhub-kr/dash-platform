@@ -32,7 +32,18 @@ public class SecurityConfig {
             .cors(cors -> cors.configurationSource(corsConfigurationSource()))
             .csrf(csrf -> csrf.disable())
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/", "/login", "/error", "/favicon.ico", "/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html", "/oauth2/**", "/oauth2/authorization/**").permitAll()
+                .requestMatchers(
+                        "/",
+                        "/login",
+                        "/error",
+                        "/favicon.ico",
+                        "/v3/api-docs/**",
+                        "/swagger-ui/**",
+                        "/swagger-ui.html",
+                        "/oauth2/**",
+                        "/oauth2/authorization/**",
+                        "/api/webhooks/github"
+                ).permitAll()
                 .anyRequest().authenticated()
             )
             .exceptionHandling(exception -> exception

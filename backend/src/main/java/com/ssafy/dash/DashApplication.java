@@ -19,6 +19,16 @@ public class DashApplication {
 			System.setProperty("GITHUB_CLIENT_SECRET", githubClientSecret);
 		}
 
+		String githubWebhookSecret = dotenv.get("GITHUB_WEBHOOK_SECRET");
+		if (githubWebhookSecret != null && !githubWebhookSecret.isEmpty()) {
+			System.setProperty("GITHUB_WEBHOOK_SECRET", githubWebhookSecret);
+		}
+
+		String githubWebhookCallback = dotenv.get("GITHUB_WEBHOOK_CALLBACK");
+		if (githubWebhookCallback != null && !githubWebhookCallback.isEmpty()) {
+			System.setProperty("GITHUB_WEBHOOK_CALLBACK", githubWebhookCallback);
+		}
+
 		SpringApplication.run(DashApplication.class, args);
 	}
 
