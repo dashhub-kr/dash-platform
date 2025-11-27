@@ -99,7 +99,7 @@
               />
             </label>
 
-            <p v-if="submitError" class="text-sm text-red-400">
+            <p v-if="submitError" class="text-sm text-red-400 whitespace-pre-line">
               {{ submitError }}
             </p>
 
@@ -250,7 +250,7 @@ const submitRepository = async () => {
       scheduleRedirect();
     } else {
       submitError.value =
-        "웹훅이 아직 활성화되지 않았습니다. 잠시 후 다시 시도하거나 관리자에게 문의해주세요.";
+        "웹훅이 아직 활성화되지 않았습니다.\n잠시 후 다시 시도하거나 관리자에게 문의해주세요.";
     }
   } catch (err) {
     submitError.value = err.message || "저장소 정보를 저장하지 못했습니다.";
