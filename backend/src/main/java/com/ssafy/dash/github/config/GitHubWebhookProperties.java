@@ -1,4 +1,4 @@
-package com.ssafy.dash.onboarding.github;
+package com.ssafy.dash.github.config;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;

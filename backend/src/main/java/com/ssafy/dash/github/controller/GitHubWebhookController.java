@@ -1,4 +1,4 @@
-package com.ssafy.dash.onboarding.github;
+package com.ssafy.dash.github.controller;
 
 import java.nio.charset.StandardCharsets;
 
@@ -16,6 +16,8 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
+
+import com.ssafy.dash.github.config.GitHubWebhookProperties;
 
 @RestController
 @RequestMapping("/api/webhooks/github")
