@@ -7,6 +7,7 @@ import org.springframework.stereotype.Repository;
 
 import com.ssafy.dash.board.domain.Board;
 import com.ssafy.dash.board.domain.BoardRepository;
+import com.ssafy.dash.board.infrastructure.mapper.BoardMapper;
 
 @Repository
 class BoardRepositoryImpl implements BoardRepository {

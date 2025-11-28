@@ -12,28 +12,26 @@ import com.ssafy.dash.board.domain.BoardRepository;
 import com.ssafy.dash.board.application.dto.BoardCreateRequest;
 import com.ssafy.dash.board.application.dto.BoardResponse;
 import com.ssafy.dash.board.application.dto.BoardUpdateRequest;
-import com.ssafy.dash.board.exception.BoardNotFoundException;
+import com.ssafy.dash.board.domain.exception.BoardNotFoundException;
 import com.ssafy.dash.user.domain.User;
-import com.ssafy.dash.user.exception.UserNotFoundException;
-import com.ssafy.dash.user.mapper.UserMapper;
+import com.ssafy.dash.user.domain.UserRepository;
+import com.ssafy.dash.user.domain.exception.UserNotFoundException;
 
 @Service
 public class BoardService {
 
     private final BoardRepository boardRepository;
-    private final UserMapper userMapper;
+    private final UserRepository userRepository;
 
-    public BoardService(BoardRepository boardRepository, UserMapper userMapper) {
+    public BoardService(BoardRepository boardRepository, UserRepository userRepository) {
         this.boardRepository = boardRepository;
-        this.userMapper = userMapper;
+        this.userRepository = userRepository;
     }
 
     @Transactional
     public BoardResponse create(BoardCreateRequest req) {
-        User user = userMapper.selectById(req.getUserId());
-        if (user == null) {
-            throw new UserNotFoundException(req.getUserId());
-        }
+        User user = userRepository.findById(req.getUserId())
+                .orElseThrow(() -> new UserNotFoundException(req.getUserId()));
 
         Board board = new Board();
         board.setTitle(req.getTitle());
@@ -52,7 +50,7 @@ public class BoardService {
         Board board = boardRepository.findById(id)
                 .orElseThrow(() -> new BoardNotFoundException(id));
         
-        User user = userMapper.selectById(board.getUserId());
+        User user = userRepository.findById(board.getUserId()).orElse(null);
 
         return toResponse(board, user);
     }
@@ -61,7 +59,7 @@ public class BoardService {
     public List<BoardResponse> findAll() {
         return boardRepository.findAll().stream()
                 .map(board -> {
-                    User user = userMapper.selectById(board.getUserId());
+                    User user = userRepository.findById(board.getUserId()).orElse(null);
                     return toResponse(board, user);
                 })
                 .collect(Collectors.toList());
@@ -78,7 +76,7 @@ public class BoardService {
 
         boardRepository.update(board);
         
-        User user = userMapper.selectById(board.getUserId());
+        User user = userRepository.findById(board.getUserId()).orElse(null);
 
         return toResponse(board, user);
     }

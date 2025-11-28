@@ -41,20 +41,21 @@ User user = TestFixtures.createUser();
 class BoardServiceTest {
 
     @InjectMocks private BoardService boardService;
-    @Mock private BoardMapper boardMapper;
+    @Mock private BoardRepository boardRepository;
+    @Mock private UserRepository userRepository;
 
     @Test
     @DisplayName("게시글 생성 성공")
     void createBoard_Success() {
         // given
         User user = TestFixtures.createUser();
-        given(userMapper.selectById(any())).willReturn(user);
+        given(userRepository.findById(any())).willReturn(Optional.of(user));
 
         // when
         BoardResponse response = boardService.create(req);
 
         // then
-        verify(boardMapper).insert(any());
+        verify(boardRepository).save(any());
         assertThat(response.getTitle()).isEqualTo(req.getTitle());
     }
 

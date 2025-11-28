@@ -22,7 +22,7 @@ import com.ssafy.dash.board.application.dto.BoardResponse;
 import com.ssafy.dash.board.application.dto.BoardUpdateRequest;
 import com.ssafy.dash.common.TestFixtures;
 import com.ssafy.dash.user.domain.User;
-import com.ssafy.dash.user.mapper.UserMapper;
+import com.ssafy.dash.user.domain.UserRepository;
 
 @ExtendWith(MockitoExtension.class)
 @DisplayName("BoardService 단위 테스트")
@@ -32,7 +32,7 @@ class BoardServiceTest {
     private BoardRepository boardRepository;
 
     @Mock
-    private UserMapper userMapper;
+    private UserRepository userRepository;
 
     @InjectMocks
     private BoardService boardService;
@@ -51,7 +51,7 @@ class BoardServiceTest {
     void createBoard_Success() {
         // given
         BoardCreateRequest req = TestFixtures.createBoardCreateRequest();
-        given(userMapper.selectById(req.getUserId())).willReturn(user);
+        given(userRepository.findById(req.getUserId())).willReturn(Optional.of(user));
         
         // when
         BoardResponse response = boardService.create(req);
@@ -67,7 +67,7 @@ class BoardServiceTest {
     void findById_Success() {
         // given
         given(boardRepository.findById(board.getId())).willReturn(Optional.of(board));
-        given(userMapper.selectById(user.getId())).willReturn(user);
+        given(userRepository.findById(user.getId())).willReturn(Optional.of(user));
 
         // when
         BoardResponse response = boardService.findById(board.getId());
@@ -82,7 +82,7 @@ class BoardServiceTest {
     void findAll_Success() {
         // given
         given(boardRepository.findAll()).willReturn(List.of(board));
-        given(userMapper.selectById(user.getId())).willReturn(user);
+        given(userRepository.findById(user.getId())).willReturn(Optional.of(user));
 
         // when
         List<BoardResponse> responses = boardService.findAll();
@@ -98,7 +98,7 @@ class BoardServiceTest {
         // given
         BoardUpdateRequest req = TestFixtures.createBoardUpdateRequest();
         given(boardRepository.findById(board.getId())).willReturn(Optional.of(board));
-        given(userMapper.selectById(user.getId())).willReturn(user);
+        given(userRepository.findById(user.getId())).willReturn(Optional.of(user));
 
         // when
         BoardResponse response = boardService.update(board.getId(), req);

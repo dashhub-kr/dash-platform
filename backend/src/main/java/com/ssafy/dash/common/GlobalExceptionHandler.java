@@ -6,10 +6,10 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.servlet.resource.NoResourceFoundException;
 
-import com.ssafy.dash.algorithm.exception.AlgorithmRecordNotFoundException;
-import com.ssafy.dash.board.exception.BoardNotFoundException;
-import com.ssafy.dash.onboarding.exception.WebhookRegistrationException;
-import com.ssafy.dash.user.exception.UserNotFoundException;
+import com.ssafy.dash.algorithm.domain.exception.AlgorithmRecordNotFoundException;
+import com.ssafy.dash.board.domain.exception.BoardNotFoundException;
+import com.ssafy.dash.onboarding.domain.exception.WebhookRegistrationException;
+import com.ssafy.dash.user.domain.exception.UserNotFoundException;
 
 @ControllerAdvice
 public class GlobalExceptionHandler {

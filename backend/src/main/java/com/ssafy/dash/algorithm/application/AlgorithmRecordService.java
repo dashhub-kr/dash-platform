@@ -14,10 +14,10 @@ import com.ssafy.dash.algorithm.application.dto.AlgorithmRecordResponse;
 import com.ssafy.dash.algorithm.application.dto.AlgorithmRecordUpdateRequest;
 import com.ssafy.dash.algorithm.domain.AlgorithmRecord;
 import com.ssafy.dash.algorithm.domain.AlgorithmRecordRepository;
-import com.ssafy.dash.algorithm.exception.AlgorithmRecordNotFoundException;
+import com.ssafy.dash.algorithm.domain.exception.AlgorithmRecordNotFoundException;
 import com.ssafy.dash.user.domain.User;
 import com.ssafy.dash.user.domain.UserRepository;
-import com.ssafy.dash.user.exception.UserNotFoundException;
+import com.ssafy.dash.user.domain.exception.UserNotFoundException;
 
 @Service
 public class AlgorithmRecordService {

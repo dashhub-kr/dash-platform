@@ -15,7 +15,7 @@ class ArchitectureTest {
 
     private final JavaClasses importedClasses = new ClassFileImporter()
             .withImportOption(ImportOption.Predefined.DO_NOT_INCLUDE_TESTS)
-            .importPackages("com.ssafy.dash.board", "com.ssafy.dash.github", "com.ssafy.dash.algorithm");
+            .importPackages("com.ssafy.dash");
 
     @Test
     @DisplayName("계층형 아키텍처 의존성 규칙 준수 (Presentation -> Application -> Domain <- Infrastructure)")

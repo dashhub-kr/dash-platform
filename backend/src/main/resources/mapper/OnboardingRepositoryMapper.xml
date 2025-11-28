@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.ssafy.dash.onboarding.mapper.OnboardingRepositoryMapper">
+<mapper namespace="com.ssafy.dash.onboarding.infrastructure.mapper.OnboardingRepositoryMapper">
 
   <resultMap id="OnboardingRepositoryResult" type="com.ssafy.dash.onboarding.domain.OnboardingRepository">
     <id property="id" column="id" />
