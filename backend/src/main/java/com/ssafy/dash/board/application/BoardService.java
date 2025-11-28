@@ -9,9 +9,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.ssafy.dash.board.domain.Board;
 import com.ssafy.dash.board.domain.BoardRepository;
-import com.ssafy.dash.board.presentation.dto.BoardCreateRequest;
-import com.ssafy.dash.board.presentation.dto.BoardResponse;
-import com.ssafy.dash.board.presentation.dto.BoardUpdateRequest;
+import com.ssafy.dash.board.application.dto.BoardCreateRequest;
+import com.ssafy.dash.board.application.dto.BoardResponse;
+import com.ssafy.dash.board.application.dto.BoardUpdateRequest;
 import com.ssafy.dash.board.exception.BoardNotFoundException;
 import com.ssafy.dash.user.domain.User;
 import com.ssafy.dash.user.exception.UserNotFoundException;
@@ -104,5 +104,5 @@ public class BoardService {
             board.getUpdatedAt()
         );
     }
-    
+
 }

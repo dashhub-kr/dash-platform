@@ -17,9 +17,9 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import com.ssafy.dash.board.domain.Board;
 import com.ssafy.dash.board.domain.BoardRepository;
-import com.ssafy.dash.board.presentation.dto.BoardCreateRequest;
-import com.ssafy.dash.board.presentation.dto.BoardResponse;
-import com.ssafy.dash.board.presentation.dto.BoardUpdateRequest;
+import com.ssafy.dash.board.application.dto.BoardCreateRequest;
+import com.ssafy.dash.board.application.dto.BoardResponse;
+import com.ssafy.dash.board.application.dto.BoardUpdateRequest;
 import com.ssafy.dash.common.TestFixtures;
 import com.ssafy.dash.user.domain.User;
 import com.ssafy.dash.user.mapper.UserMapper;

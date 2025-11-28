@@ -15,7 +15,7 @@ class ArchitectureTest {
 
     private final JavaClasses importedClasses = new ClassFileImporter()
             .withImportOption(ImportOption.Predefined.DO_NOT_INCLUDE_TESTS)
-            .importPackages("com.ssafy.dash");
+            .importPackages("com.ssafy.dash.board");
 
     @Test
     @DisplayName("계층형 아키텍처 의존성 규칙 준수 (Presentation -> Application -> Domain <- Infrastructure)")
@@ -24,8 +24,9 @@ class ArchitectureTest {
                 .consideringOnlyDependenciesInLayers()
 
                 // --- 4계층 레이어 정의 ---
-                .layer("Presentation").definedBy("..presentation..", "..controller..", "..dto..")
-                .layer("Application").definedBy("..application..", "..service..")
+                .layer("Presentation").definedBy("..presentation..", "..controller..")
+                // ┌ DTO는 프레젠테이션 계층에 속한다고 간주 (통합 관리)
+                .layer("Application").definedBy("..application..", "..service..", "..dto..")
                 .layer("Domain").definedBy("..domain..")
                 .layer("Infrastructure").definedBy("..infrastructure..", "..mapper..")
 

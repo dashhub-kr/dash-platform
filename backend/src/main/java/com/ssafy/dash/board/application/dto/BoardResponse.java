@@ -1,4 +1,4 @@
-package com.ssafy.dash.board.presentation.dto;
+package com.ssafy.dash.board.application.dto;
 
 import java.time.LocalDateTime;
 

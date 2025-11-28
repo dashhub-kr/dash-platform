@@ -3,9 +3,9 @@ package com.ssafy.dash.common;
 import java.time.LocalDateTime;
 
 import com.ssafy.dash.board.domain.Board;
-import com.ssafy.dash.board.presentation.dto.BoardCreateRequest;
-import com.ssafy.dash.board.presentation.dto.BoardResponse;
-import com.ssafy.dash.board.presentation.dto.BoardUpdateRequest;
+import com.ssafy.dash.board.application.dto.BoardCreateRequest;
+import com.ssafy.dash.board.application.dto.BoardResponse;
+import com.ssafy.dash.board.application.dto.BoardUpdateRequest;
 import com.ssafy.dash.user.domain.User;
 import com.ssafy.dash.user.dto.UserCreateRequest;
 import com.ssafy.dash.user.dto.UserUpdateRequest;

@@ -25,9 +25,9 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.ssafy.dash.board.presentation.dto.BoardCreateRequest;
-import com.ssafy.dash.board.presentation.dto.BoardResponse;
-import com.ssafy.dash.board.presentation.dto.BoardUpdateRequest;
+import com.ssafy.dash.board.application.dto.BoardCreateRequest;
+import com.ssafy.dash.board.application.dto.BoardResponse;
+import com.ssafy.dash.board.application.dto.BoardUpdateRequest;
 import com.ssafy.dash.board.application.BoardService;
 import com.ssafy.dash.common.TestFixtures;
 import com.ssafy.dash.user.domain.User;

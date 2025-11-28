@@ -13,9 +13,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.ssafy.dash.board.presentation.dto.BoardCreateRequest;
-import com.ssafy.dash.board.presentation.dto.BoardResponse;
-import com.ssafy.dash.board.presentation.dto.BoardUpdateRequest;
+import com.ssafy.dash.board.application.dto.BoardCreateRequest;
+import com.ssafy.dash.board.application.dto.BoardResponse;
+import com.ssafy.dash.board.application.dto.BoardUpdateRequest;
 import com.ssafy.dash.board.application.BoardService;
 
 @RestController
