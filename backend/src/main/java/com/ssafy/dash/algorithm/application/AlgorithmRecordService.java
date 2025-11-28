@@ -1,4 +1,4 @@
-package com.ssafy.dash.algorithm.service;
+package com.ssafy.dash.algorithm.application;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -8,34 +8,32 @@ import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import com.ssafy.dash.algorithm.application.dto.AlgorithmRecordCreateRequest;
+import com.ssafy.dash.algorithm.application.dto.AlgorithmRecordResponse;
+import com.ssafy.dash.algorithm.application.dto.AlgorithmRecordUpdateRequest;
 import com.ssafy.dash.algorithm.domain.AlgorithmRecord;
-import com.ssafy.dash.algorithm.dto.AlgorithmRecordCreateRequest;
-import com.ssafy.dash.algorithm.dto.AlgorithmRecordResponse;
-import com.ssafy.dash.algorithm.dto.AlgorithmRecordUpdateRequest;
+import com.ssafy.dash.algorithm.domain.AlgorithmRecordRepository;
 import com.ssafy.dash.algorithm.exception.AlgorithmRecordNotFoundException;
-import com.ssafy.dash.algorithm.mapper.AlgorithmRecordMapper;
 import com.ssafy.dash.user.domain.User;
+import com.ssafy.dash.user.domain.UserRepository;
 import com.ssafy.dash.user.exception.UserNotFoundException;
-import com.ssafy.dash.user.mapper.UserMapper;
 
 @Service
 public class AlgorithmRecordService {
 
-    private final AlgorithmRecordMapper algorithmRecordMapper;
-    private final UserMapper userMapper;
+    private final AlgorithmRecordRepository algorithmRecordRepository;
+    private final UserRepository userRepository;
 
-    public AlgorithmRecordService(AlgorithmRecordMapper algorithmRecordMapper, UserMapper userMapper) {
-        this.algorithmRecordMapper = algorithmRecordMapper;
-        this.userMapper = userMapper;
+    public AlgorithmRecordService(AlgorithmRecordRepository algorithmRecordRepository, UserRepository userRepository) {
+        this.algorithmRecordRepository = algorithmRecordRepository;
+        this.userRepository = userRepository;
     }
 
     @Transactional
     public AlgorithmRecordResponse create(Long userId, AlgorithmRecordCreateRequest req) throws IOException {
-        User user = userMapper.selectById(userId);
-        if (user == null) {
-
-            throw new UserNotFoundException(userId);
-        }
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new UserNotFoundException(userId));
 
         String code = "";
         if (req.getFile() != null && !req.getFile().isEmpty()) {
@@ -51,45 +49,37 @@ public class AlgorithmRecordService {
         record.setCreatedAt(LocalDateTime.now());
         record.setUpdatedAt(LocalDateTime.now());
 
-        algorithmRecordMapper.insert(record);
+        algorithmRecordRepository.save(record);
 
         return toResponse(record);
     }
 
     @Transactional(readOnly = true)
     public AlgorithmRecordResponse findById(Long id) {
-        AlgorithmRecord record = algorithmRecordMapper.selectById(id);
-        if (record == null) {
-            
-            throw new AlgorithmRecordNotFoundException(id);
-        }
+        AlgorithmRecord record = algorithmRecordRepository.findById(id)
+                .orElseThrow(() -> new AlgorithmRecordNotFoundException(id));
 
         return toResponse(record);
     }
 
     @Transactional(readOnly = true)
     public List<AlgorithmRecordResponse> findAll() {
-
-        return algorithmRecordMapper.selectAll().stream()
+        return algorithmRecordRepository.findAll().stream()
                 .map(this::toResponse)
                 .collect(Collectors.toList());
     }
 
     @Transactional(readOnly = true)
     public List<AlgorithmRecordResponse> findByUserId(Long userId) {
-
-        return algorithmRecordMapper.selectByUserId(userId).stream()
+        return algorithmRecordRepository.findByUserId(userId).stream()
                 .map(this::toResponse)
                 .collect(Collectors.toList());
     }
 
     @Transactional
     public AlgorithmRecordResponse update(Long id, AlgorithmRecordUpdateRequest req) throws IOException {
-        AlgorithmRecord record = algorithmRecordMapper.selectById(id);
-        if (record == null) {
-
-            throw new AlgorithmRecordNotFoundException(id);
-        }
+        AlgorithmRecord record = algorithmRecordRepository.findById(id)
+                .orElseThrow(() -> new AlgorithmRecordNotFoundException(id));
 
         if (req.getProblemNumber() != null) record.setProblemNumber(req.getProblemNumber());
         if (req.getTitle() != null) record.setTitle(req.getTitle());
@@ -102,22 +92,20 @@ public class AlgorithmRecordService {
         
         record.setUpdatedAt(LocalDateTime.now());
 
-        algorithmRecordMapper.update(record);
+        algorithmRecordRepository.update(record);
 
         return toResponse(record);
     }
 
     @Transactional
     public void delete(Long id) {
-        int deleted = algorithmRecordMapper.delete(id);
-        if (deleted == 0) {
-
+        boolean deleted = algorithmRecordRepository.delete(id);
+        if (!deleted) {
             throw new AlgorithmRecordNotFoundException(id);
         }
     }
 
     private AlgorithmRecordResponse toResponse(AlgorithmRecord record) {
-
         return new AlgorithmRecordResponse(
             record.getId(),
             record.getUserId(),

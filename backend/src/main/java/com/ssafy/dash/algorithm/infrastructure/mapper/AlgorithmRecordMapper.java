@@ -1,4 +1,4 @@
-package com.ssafy.dash.algorithm.mapper;
+package com.ssafy.dash.algorithm.infrastructure.mapper;
 
 import java.util.List;
 

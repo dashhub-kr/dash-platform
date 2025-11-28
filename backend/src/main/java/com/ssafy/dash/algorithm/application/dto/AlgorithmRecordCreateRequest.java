@@ -1,4 +1,4 @@
-package com.ssafy.dash.algorithm.dto;
+package com.ssafy.dash.algorithm.application.dto;
 
 import org.springframework.web.multipart.MultipartFile;
 

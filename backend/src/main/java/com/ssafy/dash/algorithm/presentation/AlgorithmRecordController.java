@@ -1,4 +1,4 @@
-package com.ssafy.dash.algorithm.controller;
+package com.ssafy.dash.algorithm.presentation;
 
 import java.io.IOException;
 import java.net.URI;
@@ -17,10 +17,10 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.ssafy.dash.algorithm.dto.AlgorithmRecordCreateRequest;
-import com.ssafy.dash.algorithm.dto.AlgorithmRecordResponse;
-import com.ssafy.dash.algorithm.dto.AlgorithmRecordUpdateRequest;
-import com.ssafy.dash.algorithm.service.AlgorithmRecordService;
+import com.ssafy.dash.algorithm.application.AlgorithmRecordService;
+import com.ssafy.dash.algorithm.application.dto.AlgorithmRecordCreateRequest;
+import com.ssafy.dash.algorithm.application.dto.AlgorithmRecordResponse;
+import com.ssafy.dash.algorithm.application.dto.AlgorithmRecordUpdateRequest;
 import com.ssafy.dash.oauth.domain.CustomOAuth2User;
 
 import io.swagger.v3.oas.annotations.Parameter;

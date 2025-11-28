@@ -1,4 +1,4 @@
-package com.ssafy.dash.algorithm.controller;
+package com.ssafy.dash.algorithm.presentation;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
@@ -24,10 +24,10 @@ import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 
-import com.ssafy.dash.algorithm.dto.AlgorithmRecordCreateRequest;
-import com.ssafy.dash.algorithm.dto.AlgorithmRecordResponse;
-import com.ssafy.dash.algorithm.dto.AlgorithmRecordUpdateRequest;
-import com.ssafy.dash.algorithm.service.AlgorithmRecordService;
+import com.ssafy.dash.algorithm.application.AlgorithmRecordService;
+import com.ssafy.dash.algorithm.application.dto.AlgorithmRecordCreateRequest;
+import com.ssafy.dash.algorithm.application.dto.AlgorithmRecordResponse;
+import com.ssafy.dash.algorithm.application.dto.AlgorithmRecordUpdateRequest;
 import com.ssafy.dash.common.TestFixtures;
 import com.ssafy.dash.user.domain.User;
 
@@ -47,7 +47,6 @@ class AlgorithmRecordControllerTest {
     static class TestConfig {
         @Bean
         public AlgorithmRecordService algorithmRecordService() {
-            
             return Mockito.mock(AlgorithmRecordService.class);
         }
     }

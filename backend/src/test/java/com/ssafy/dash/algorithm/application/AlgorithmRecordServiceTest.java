@@ -1,4 +1,4 @@
-package com.ssafy.dash.algorithm.service;
+package com.ssafy.dash.algorithm.application;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
@@ -8,6 +8,7 @@ import static org.mockito.Mockito.verify;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
+import java.util.Optional;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -17,14 +18,14 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.mock.web.MockMultipartFile;
 
+import com.ssafy.dash.algorithm.application.dto.AlgorithmRecordCreateRequest;
+import com.ssafy.dash.algorithm.application.dto.AlgorithmRecordResponse;
+import com.ssafy.dash.algorithm.application.dto.AlgorithmRecordUpdateRequest;
 import com.ssafy.dash.algorithm.domain.AlgorithmRecord;
-import com.ssafy.dash.algorithm.dto.AlgorithmRecordCreateRequest;
-import com.ssafy.dash.algorithm.dto.AlgorithmRecordResponse;
-import com.ssafy.dash.algorithm.dto.AlgorithmRecordUpdateRequest;
-import com.ssafy.dash.algorithm.mapper.AlgorithmRecordMapper;
+import com.ssafy.dash.algorithm.domain.AlgorithmRecordRepository;
 import com.ssafy.dash.common.TestFixtures;
 import com.ssafy.dash.user.domain.User;
-import com.ssafy.dash.user.mapper.UserMapper;
+import com.ssafy.dash.user.domain.UserRepository;
 import org.junit.jupiter.api.DisplayName;
 
 @ExtendWith(MockitoExtension.class)
@@ -32,10 +33,10 @@ import org.junit.jupiter.api.DisplayName;
 class AlgorithmRecordServiceTest {
 
     @Mock
-    private AlgorithmRecordMapper algorithmRecordMapper;
+    private AlgorithmRecordRepository algorithmRecordRepository;
 
     @Mock
-    private UserMapper userMapper;
+    private UserRepository userRepository;
 
     @InjectMocks
     private AlgorithmRecordService algorithmRecordService;
@@ -56,13 +57,13 @@ class AlgorithmRecordServiceTest {
         MockMultipartFile file = new MockMultipartFile("file", "Main.java", "text/plain", TestFixtures.TEST_ALGORITHM_CODE.getBytes(StandardCharsets.UTF_8));
         AlgorithmRecordCreateRequest req = TestFixtures.createAlgorithmRecordCreateRequest(file);
         
-        given(userMapper.selectById(TestFixtures.TEST_USER_ID)).willReturn(user);
+        given(userRepository.findById(TestFixtures.TEST_USER_ID)).willReturn(Optional.of(user));
         
         // when
         AlgorithmRecordResponse response = algorithmRecordService.create(TestFixtures.TEST_USER_ID, req);
 
         // then
-        verify(algorithmRecordMapper).insert(any(AlgorithmRecord.class));
+        verify(algorithmRecordRepository).save(any(AlgorithmRecord.class));
         assertThat(response.getProblemNumber()).isEqualTo(req.getProblemNumber());
         assertThat(response.getCode()).isEqualTo(TestFixtures.TEST_ALGORITHM_CODE);
     }
@@ -71,7 +72,7 @@ class AlgorithmRecordServiceTest {
     @DisplayName("알고리즘 기록 단건 조회 성공")
     void findById_Success() {
         // given
-        given(algorithmRecordMapper.selectById(TestFixtures.TEST_ALGORITHM_RECORD_ID)).willReturn(record);
+        given(algorithmRecordRepository.findById(TestFixtures.TEST_ALGORITHM_RECORD_ID)).willReturn(Optional.of(record));
 
         // when
         AlgorithmRecordResponse response = algorithmRecordService.findById(TestFixtures.TEST_ALGORITHM_RECORD_ID);
@@ -85,7 +86,7 @@ class AlgorithmRecordServiceTest {
     @DisplayName("알고리즘 기록 전체 조회 성공")
     void findAll_Success() {
         // given
-        given(algorithmRecordMapper.selectAll()).willReturn(List.of(record));
+        given(algorithmRecordRepository.findAll()).willReturn(List.of(record));
 
         // when
         List<AlgorithmRecordResponse> responses = algorithmRecordService.findAll();
@@ -101,13 +102,13 @@ class AlgorithmRecordServiceTest {
         MockMultipartFile file = new MockMultipartFile("file", "Main.java", "text/plain", "updated code".getBytes(StandardCharsets.UTF_8));
         AlgorithmRecordUpdateRequest req = TestFixtures.createAlgorithmRecordUpdateRequest(file);
         
-        given(algorithmRecordMapper.selectById(TestFixtures.TEST_ALGORITHM_RECORD_ID)).willReturn(record);
+        given(algorithmRecordRepository.findById(TestFixtures.TEST_ALGORITHM_RECORD_ID)).willReturn(Optional.of(record));
 
         // when
         AlgorithmRecordResponse response = algorithmRecordService.update(TestFixtures.TEST_ALGORITHM_RECORD_ID, req);
 
         // then
-        verify(algorithmRecordMapper).update(any(AlgorithmRecord.class));
+        verify(algorithmRecordRepository).update(any(AlgorithmRecord.class));
         assertThat(response.getTitle()).isEqualTo("Updated Title");
         assertThat(response.getCode()).isEqualTo("updated code");
     }
@@ -116,13 +117,13 @@ class AlgorithmRecordServiceTest {
     @DisplayName("알고리즘 기록 삭제 성공")
     void deleteRecord_Success() {
         // given
-        given(algorithmRecordMapper.delete(TestFixtures.TEST_ALGORITHM_RECORD_ID)).willReturn(1);
+        given(algorithmRecordRepository.delete(TestFixtures.TEST_ALGORITHM_RECORD_ID)).willReturn(true);
 
         // when
         algorithmRecordService.delete(TestFixtures.TEST_ALGORITHM_RECORD_ID);
 
         // then
-        verify(algorithmRecordMapper).delete(TestFixtures.TEST_ALGORITHM_RECORD_ID);
+        verify(algorithmRecordRepository).delete(TestFixtures.TEST_ALGORITHM_RECORD_ID);
     }
     
 }

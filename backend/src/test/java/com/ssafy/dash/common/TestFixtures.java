@@ -10,9 +10,9 @@ import com.ssafy.dash.user.domain.User;
 import com.ssafy.dash.user.dto.UserCreateRequest;
 import com.ssafy.dash.user.dto.UserUpdateRequest;
 import com.ssafy.dash.algorithm.domain.AlgorithmRecord;
-import com.ssafy.dash.algorithm.dto.AlgorithmRecordCreateRequest;
-import com.ssafy.dash.algorithm.dto.AlgorithmRecordResponse;
-import com.ssafy.dash.algorithm.dto.AlgorithmRecordUpdateRequest;
+import com.ssafy.dash.algorithm.application.dto.AlgorithmRecordCreateRequest;
+import com.ssafy.dash.algorithm.application.dto.AlgorithmRecordResponse;
+import com.ssafy.dash.algorithm.application.dto.AlgorithmRecordUpdateRequest;
 import org.springframework.web.multipart.MultipartFile;
 
 public class TestFixtures {
