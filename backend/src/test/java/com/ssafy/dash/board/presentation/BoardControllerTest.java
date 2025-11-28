@@ -1,4 +1,4 @@
-package com.ssafy.dash.board.controller;
+package com.ssafy.dash.board.presentation;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
@@ -25,10 +25,10 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.ssafy.dash.board.dto.BoardCreateRequest;
-import com.ssafy.dash.board.dto.BoardResponse;
-import com.ssafy.dash.board.dto.BoardUpdateRequest;
-import com.ssafy.dash.board.service.BoardService;
+import com.ssafy.dash.board.presentation.dto.BoardCreateRequest;
+import com.ssafy.dash.board.presentation.dto.BoardResponse;
+import com.ssafy.dash.board.presentation.dto.BoardUpdateRequest;
+import com.ssafy.dash.board.application.BoardService;
 import com.ssafy.dash.common.TestFixtures;
 import com.ssafy.dash.user.domain.User;
 

@@ -1,4 +1,4 @@
-package com.ssafy.dash.board.service;
+package com.ssafy.dash.board.application;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -8,11 +8,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.ssafy.dash.board.domain.Board;
-import com.ssafy.dash.board.dto.BoardCreateRequest;
-import com.ssafy.dash.board.dto.BoardResponse;
-import com.ssafy.dash.board.dto.BoardUpdateRequest;
+import com.ssafy.dash.board.domain.BoardRepository;
+import com.ssafy.dash.board.presentation.dto.BoardCreateRequest;
+import com.ssafy.dash.board.presentation.dto.BoardResponse;
+import com.ssafy.dash.board.presentation.dto.BoardUpdateRequest;
 import com.ssafy.dash.board.exception.BoardNotFoundException;
-import com.ssafy.dash.board.mapper.BoardMapper;
 import com.ssafy.dash.user.domain.User;
 import com.ssafy.dash.user.exception.UserNotFoundException;
 import com.ssafy.dash.user.mapper.UserMapper;
@@ -20,11 +20,11 @@ import com.ssafy.dash.user.mapper.UserMapper;
 @Service
 public class BoardService {
 
-    private final BoardMapper boardMapper;
+    private final BoardRepository boardRepository;
     private final UserMapper userMapper;
 
-    public BoardService(BoardMapper boardMapper, UserMapper userMapper) {
-        this.boardMapper = boardMapper;
+    public BoardService(BoardRepository boardRepository, UserMapper userMapper) {
+        this.boardRepository = boardRepository;
         this.userMapper = userMapper;
     }
 
@@ -42,18 +42,16 @@ public class BoardService {
         board.setCreatedAt(LocalDateTime.now());
         board.setUpdatedAt(LocalDateTime.now());
 
-        boardMapper.insert(board);
+        boardRepository.save(board);
 
         return toResponse(board, user);
     }
 
     @Transactional(readOnly = true)
     public BoardResponse findById(Long id) {
-        Board board = boardMapper.selectById(id);
-        if (board == null) {
-
-            throw new BoardNotFoundException(id);
-        }
+        Board board = boardRepository.findById(id)
+                .orElseThrow(() -> new BoardNotFoundException(id));
+        
         User user = userMapper.selectById(board.getUserId());
 
         return toResponse(board, user);
@@ -61,11 +59,9 @@ public class BoardService {
 
     @Transactional(readOnly = true)
     public List<BoardResponse> findAll() {
-
-        return boardMapper.selectAll().stream()
+        return boardRepository.findAll().stream()
                 .map(board -> {
                     User user = userMapper.selectById(board.getUserId());
-
                     return toResponse(board, user);
                 })
                 .collect(Collectors.toList());
@@ -73,16 +69,14 @@ public class BoardService {
 
     @Transactional
     public BoardResponse update(Long id, BoardUpdateRequest req) {
-        Board board = boardMapper.selectById(id);
-        if (board == null) {
-            throw new BoardNotFoundException(id);
-        }
+        Board board = boardRepository.findById(id)
+                .orElseThrow(() -> new BoardNotFoundException(id));
 
         board.setTitle(req.getTitle());
         board.setContent(req.getContent());
         board.setUpdatedAt(LocalDateTime.now());
 
-        boardMapper.update(board);
+        boardRepository.update(board);
         
         User user = userMapper.selectById(board.getUserId());
 
@@ -91,10 +85,10 @@ public class BoardService {
 
     @Transactional
     public void delete(Long id) {
-        int deleted = boardMapper.delete(id);
-        if (deleted == 0) {
+        if (boardRepository.findById(id).isEmpty()) {
             throw new BoardNotFoundException(id);
         }
+        boardRepository.delete(id);
     }
 
     private BoardResponse toResponse(Board board, User user) {
@@ -110,5 +104,5 @@ public class BoardService {
             board.getUpdatedAt()
         );
     }
-
+    
 }

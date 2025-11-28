@@ -1,6 +1,7 @@
-package com.ssafy.dash.board.service;
+package com.ssafy.dash.board.application;
 
 import java.util.List;
+import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import org.junit.jupiter.api.BeforeEach;
@@ -15,10 +16,10 @@ import static org.mockito.Mockito.verify;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import com.ssafy.dash.board.domain.Board;
-import com.ssafy.dash.board.dto.BoardCreateRequest;
-import com.ssafy.dash.board.dto.BoardResponse;
-import com.ssafy.dash.board.dto.BoardUpdateRequest;
-import com.ssafy.dash.board.mapper.BoardMapper;
+import com.ssafy.dash.board.domain.BoardRepository;
+import com.ssafy.dash.board.presentation.dto.BoardCreateRequest;
+import com.ssafy.dash.board.presentation.dto.BoardResponse;
+import com.ssafy.dash.board.presentation.dto.BoardUpdateRequest;
 import com.ssafy.dash.common.TestFixtures;
 import com.ssafy.dash.user.domain.User;
 import com.ssafy.dash.user.mapper.UserMapper;
@@ -28,7 +29,7 @@ import com.ssafy.dash.user.mapper.UserMapper;
 class BoardServiceTest {
 
     @Mock
-    private BoardMapper boardMapper;
+    private BoardRepository boardRepository;
 
     @Mock
     private UserMapper userMapper;
@@ -56,7 +57,7 @@ class BoardServiceTest {
         BoardResponse response = boardService.create(req);
 
         // then
-        verify(boardMapper).insert(any(Board.class));
+        verify(boardRepository).save(any(Board.class));
         assertThat(response.getTitle()).isEqualTo(req.getTitle());
         assertThat(response.getAuthorName()).isEqualTo(user.getUsername());
     }
@@ -65,7 +66,7 @@ class BoardServiceTest {
     @DisplayName("ID로 게시글 조회 성공")
     void findById_Success() {
         // given
-        given(boardMapper.selectById(board.getId())).willReturn(board);
+        given(boardRepository.findById(board.getId())).willReturn(Optional.of(board));
         given(userMapper.selectById(user.getId())).willReturn(user);
 
         // when
@@ -80,7 +81,7 @@ class BoardServiceTest {
     @DisplayName("전체 게시글 조회 성공")
     void findAll_Success() {
         // given
-        given(boardMapper.selectAll()).willReturn(List.of(board));
+        given(boardRepository.findAll()).willReturn(List.of(board));
         given(userMapper.selectById(user.getId())).willReturn(user);
 
         // when
@@ -96,14 +97,14 @@ class BoardServiceTest {
     void updateBoard_Success() {
         // given
         BoardUpdateRequest req = TestFixtures.createBoardUpdateRequest();
-        given(boardMapper.selectById(board.getId())).willReturn(board);
+        given(boardRepository.findById(board.getId())).willReturn(Optional.of(board));
         given(userMapper.selectById(user.getId())).willReturn(user);
 
         // when
         BoardResponse response = boardService.update(board.getId(), req);
 
         // then
-        verify(boardMapper).update(any(Board.class));
+        verify(boardRepository).update(any(Board.class));
         assertThat(response.getTitle()).isEqualTo(req.getTitle());
     }
 
@@ -111,13 +112,13 @@ class BoardServiceTest {
     @DisplayName("게시글 삭제 성공")
     void deleteBoard_Success() {
         // given
-        given(boardMapper.delete(board.getId())).willReturn(1);
+        given(boardRepository.findById(board.getId())).willReturn(Optional.of(board));
 
         // when
         boardService.delete(board.getId());
 
         // then
-        verify(boardMapper).delete(board.getId());
+        verify(boardRepository).delete(board.getId());
     }
 
 }

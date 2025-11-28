@@ -1,4 +1,4 @@
-package com.ssafy.dash.board.mapper;
+package com.ssafy.dash.board.infrastructure.persistence;
 
 import java.util.List;
 
