@@ -25,9 +25,9 @@ import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 
 import com.ssafy.dash.algorithm.application.AlgorithmRecordService;
-import com.ssafy.dash.algorithm.application.dto.AlgorithmRecordCreateRequest;
-import com.ssafy.dash.algorithm.application.dto.AlgorithmRecordResponse;
-import com.ssafy.dash.algorithm.application.dto.AlgorithmRecordUpdateRequest;
+import com.ssafy.dash.algorithm.application.dto.AlgorithmRecordCreateCommand;
+import com.ssafy.dash.algorithm.application.dto.AlgorithmRecordResult;
+import com.ssafy.dash.algorithm.application.dto.AlgorithmRecordUpdateCommand;
 import com.ssafy.dash.common.TestFixtures;
 import com.ssafy.dash.user.domain.User;
 
@@ -47,6 +47,7 @@ class AlgorithmRecordControllerTest {
     static class TestConfig {
         @Bean
         public AlgorithmRecordService algorithmRecordService() {
+            
             return Mockito.mock(AlgorithmRecordService.class);
         }
     }
@@ -57,9 +58,9 @@ class AlgorithmRecordControllerTest {
     void createRecord_Success() throws Exception {
         MockMultipartFile file = new MockMultipartFile("file", "Main.java", "text/plain", TestFixtures.TEST_ALGORITHM_CODE.getBytes());
         User user = TestFixtures.createUser();
-        AlgorithmRecordResponse res = TestFixtures.createAlgorithmRecordResponse(user);
+        AlgorithmRecordResult result = TestFixtures.createAlgorithmRecordResult(user);
 
-        given(algorithmRecordService.create(any(), any(AlgorithmRecordCreateRequest.class))).willReturn(res);
+        given(algorithmRecordService.create(any(AlgorithmRecordCreateCommand.class))).willReturn(result);
 
         mockMvc.perform(multipart("/api/algorithm-records")
                 .file(file)
@@ -75,8 +76,8 @@ class AlgorithmRecordControllerTest {
     @DisplayName("알고리즘 기록 전체 조회 성공")
     void getAllRecords_Success() throws Exception {
         User user = TestFixtures.createUser();
-        AlgorithmRecordResponse res = TestFixtures.createAlgorithmRecordResponse(user);
-        given(algorithmRecordService.findAll()).willReturn(List.of(res));
+        AlgorithmRecordResult result = TestFixtures.createAlgorithmRecordResult(user);
+        given(algorithmRecordService.findAll()).willReturn(List.of(result));
 
         mockMvc.perform(get("/api/algorithm-records"))
                 .andExpect(status().isOk())
@@ -88,8 +89,8 @@ class AlgorithmRecordControllerTest {
     @DisplayName("알고리즘 기록 단건 조회 성공")
     void getRecordById_Success() throws Exception {
         User user = TestFixtures.createUser();
-        AlgorithmRecordResponse res = TestFixtures.createAlgorithmRecordResponse(user);
-        given(algorithmRecordService.findById(TestFixtures.TEST_ALGORITHM_RECORD_ID)).willReturn(res);
+        AlgorithmRecordResult result = TestFixtures.createAlgorithmRecordResult(user);
+        given(algorithmRecordService.findById(TestFixtures.TEST_ALGORITHM_RECORD_ID)).willReturn(result);
 
         mockMvc.perform(get("/api/algorithm-records/" + TestFixtures.TEST_ALGORITHM_RECORD_ID))
                 .andExpect(status().isOk())
@@ -102,9 +103,9 @@ class AlgorithmRecordControllerTest {
     void updateRecord_Success() throws Exception {
         MockMultipartFile file = new MockMultipartFile("file", "Main.java", "text/plain", "updated".getBytes());
         User user = TestFixtures.createUser();
-        AlgorithmRecordResponse res = TestFixtures.createAlgorithmRecordResponse(user);
+        AlgorithmRecordResult result = TestFixtures.createAlgorithmRecordResult(user);
 
-        given(algorithmRecordService.update(eq(TestFixtures.TEST_ALGORITHM_RECORD_ID), any(AlgorithmRecordUpdateRequest.class))).willReturn(res);
+        given(algorithmRecordService.update(eq(TestFixtures.TEST_ALGORITHM_RECORD_ID), any(AlgorithmRecordUpdateCommand.class))).willReturn(result);
 
         mockMvc.perform(multipart("/api/algorithm-records/" + TestFixtures.TEST_ALGORITHM_RECORD_ID)
                 .file(file)

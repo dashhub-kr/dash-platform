@@ -3,6 +3,7 @@ package com.ssafy.dash.algorithm.presentation;
 import java.io.IOException;
 import java.net.URI;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -18,9 +19,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.ssafy.dash.algorithm.application.AlgorithmRecordService;
-import com.ssafy.dash.algorithm.application.dto.AlgorithmRecordCreateRequest;
-import com.ssafy.dash.algorithm.application.dto.AlgorithmRecordResponse;
-import com.ssafy.dash.algorithm.application.dto.AlgorithmRecordUpdateRequest;
+import com.ssafy.dash.algorithm.presentation.dto.request.AlgorithmRecordCreateRequest;
+import com.ssafy.dash.algorithm.presentation.dto.request.AlgorithmRecordUpdateRequest;
+import com.ssafy.dash.algorithm.presentation.dto.response.AlgorithmRecordResponse;
 import com.ssafy.dash.oauth.infrastructure.security.CustomOAuth2User;
 
 import io.swagger.v3.oas.annotations.Parameter;
@@ -45,29 +46,36 @@ public class AlgorithmRecordController {
             userId = customUser.getUserId();
         }
         
-        AlgorithmRecordResponse response = algorithmRecordService.create(userId, req);
+        AlgorithmRecordResponse response = AlgorithmRecordResponse
+            .from(algorithmRecordService.create(req.toCommand(userId)));
 
         return ResponseEntity.created(URI.create("/api/algorithm-records/" + response.getId())).body(response);
     }
 
     @GetMapping
     public ResponseEntity<List<AlgorithmRecordResponse>> findAll() {
-        
-        return ResponseEntity.ok(algorithmRecordService.findAll());
+        List<AlgorithmRecordResponse> responses = algorithmRecordService.findAll().stream()
+            .map(AlgorithmRecordResponse::from)
+            .collect(Collectors.toList());
+
+        return ResponseEntity.ok(responses);
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<AlgorithmRecordResponse> findById(@PathVariable Long id) {
-        
-        return ResponseEntity.ok(algorithmRecordService.findById(id));
+        AlgorithmRecordResponse response = AlgorithmRecordResponse.from(algorithmRecordService.findById(id));
+
+        return ResponseEntity.ok(response);
     }
 
     @PutMapping(value = "/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<AlgorithmRecordResponse> update(
             @PathVariable Long id, 
             @ModelAttribute AlgorithmRecordUpdateRequest req) throws IOException {
+        AlgorithmRecordResponse response = AlgorithmRecordResponse
+            .from(algorithmRecordService.update(id, req.toCommand()));
             
-        return ResponseEntity.ok(algorithmRecordService.update(id, req));
+        return ResponseEntity.ok(response);
     }
 
     @DeleteMapping("/{id}")

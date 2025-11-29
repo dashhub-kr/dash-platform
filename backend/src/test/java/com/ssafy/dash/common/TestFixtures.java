@@ -11,11 +11,10 @@ import com.ssafy.dash.board.presentation.dto.request.BoardUpdateRequest;
 import com.ssafy.dash.user.domain.User;
 import com.ssafy.dash.user.application.dto.UserCreateRequest;
 import com.ssafy.dash.user.application.dto.UserUpdateRequest;
+import com.ssafy.dash.algorithm.application.dto.AlgorithmRecordCreateCommand;
+import com.ssafy.dash.algorithm.application.dto.AlgorithmRecordResult;
+import com.ssafy.dash.algorithm.application.dto.AlgorithmRecordUpdateCommand;
 import com.ssafy.dash.algorithm.domain.AlgorithmRecord;
-import com.ssafy.dash.algorithm.application.dto.AlgorithmRecordCreateRequest;
-import com.ssafy.dash.algorithm.application.dto.AlgorithmRecordResponse;
-import com.ssafy.dash.algorithm.application.dto.AlgorithmRecordUpdateRequest;
-import org.springframework.web.multipart.MultipartFile;
 
 public class TestFixtures {
 
@@ -77,16 +76,20 @@ public class TestFixtures {
         return new AlgorithmRecord(TEST_ALGORITHM_RECORD_ID, user.getId(), TEST_PROBLEM_NUMBER, TEST_ALGORITHM_TITLE, TEST_ALGORITHM_CODE, TEST_ALGORITHM_LANGUAGE, LocalDateTime.now(), LocalDateTime.now());
     }
 
-    public static AlgorithmRecordCreateRequest createAlgorithmRecordCreateRequest(MultipartFile file) {
-        return new AlgorithmRecordCreateRequest(TEST_PROBLEM_NUMBER, TEST_ALGORITHM_TITLE, TEST_ALGORITHM_LANGUAGE, file);
+    public static AlgorithmRecordCreateCommand createAlgorithmRecordCreateCommand(String code) {
+        return new AlgorithmRecordCreateCommand(TEST_USER_ID, TEST_PROBLEM_NUMBER,
+                TEST_ALGORITHM_TITLE, TEST_ALGORITHM_LANGUAGE, code);
     }
 
-    public static AlgorithmRecordUpdateRequest createAlgorithmRecordUpdateRequest(MultipartFile file) {
-        return new AlgorithmRecordUpdateRequest(TEST_PROBLEM_NUMBER, "Updated Title", TEST_ALGORITHM_LANGUAGE, file);
+    public static AlgorithmRecordUpdateCommand createAlgorithmRecordUpdateCommand(String code) {
+        return new AlgorithmRecordUpdateCommand(TEST_PROBLEM_NUMBER, "Updated Title",
+                TEST_ALGORITHM_LANGUAGE, code);
     }
 
-    public static AlgorithmRecordResponse createAlgorithmRecordResponse(User user) {
-        return new AlgorithmRecordResponse(TEST_ALGORITHM_RECORD_ID, user.getId(), TEST_PROBLEM_NUMBER, TEST_ALGORITHM_TITLE, TEST_ALGORITHM_CODE, TEST_ALGORITHM_LANGUAGE, LocalDateTime.now(), LocalDateTime.now());
+    public static AlgorithmRecordResult createAlgorithmRecordResult(User user) {
+        return new AlgorithmRecordResult(TEST_ALGORITHM_RECORD_ID, user.getId(), TEST_PROBLEM_NUMBER,
+                TEST_ALGORITHM_TITLE, TEST_ALGORITHM_CODE, TEST_ALGORITHM_LANGUAGE,
+                LocalDateTime.now(), LocalDateTime.now());
     }
     
 }

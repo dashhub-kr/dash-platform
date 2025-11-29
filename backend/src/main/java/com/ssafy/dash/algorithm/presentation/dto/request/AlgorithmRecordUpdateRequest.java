@@ -1,6 +1,11 @@
-package com.ssafy.dash.algorithm.application.dto;
+package com.ssafy.dash.algorithm.presentation.dto.request;
+
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 
 import org.springframework.web.multipart.MultipartFile;
+
+import com.ssafy.dash.algorithm.application.dto.AlgorithmRecordUpdateCommand;
 
 public class AlgorithmRecordUpdateRequest {
 
@@ -11,7 +16,8 @@ public class AlgorithmRecordUpdateRequest {
 
     public AlgorithmRecordUpdateRequest() {}
 
-    public AlgorithmRecordUpdateRequest(String problemNumber, String title, String language, MultipartFile file) {
+    public AlgorithmRecordUpdateRequest(String problemNumber, String title,
+            String language, MultipartFile file) {
         this.problemNumber = problemNumber;
         this.title = title;
         this.language = language;
@@ -48,6 +54,15 @@ public class AlgorithmRecordUpdateRequest {
 
     public void setFile(MultipartFile file) {
         this.file = file;
+    }
+
+    public AlgorithmRecordUpdateCommand toCommand() throws IOException {
+        String code = null;
+        if (file != null && !file.isEmpty()) {
+            code = new String(file.getBytes(), StandardCharsets.UTF_8);
+        }
+
+        return new AlgorithmRecordUpdateCommand(problemNumber, title, language, code);
     }
     
 }

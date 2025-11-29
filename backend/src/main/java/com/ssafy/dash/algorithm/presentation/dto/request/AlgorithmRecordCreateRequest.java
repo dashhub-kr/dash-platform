@@ -1,9 +1,14 @@
-package com.ssafy.dash.algorithm.application.dto;
+package com.ssafy.dash.algorithm.presentation.dto.request;
+
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 
 import org.springframework.web.multipart.MultipartFile;
 
+import com.ssafy.dash.algorithm.application.dto.AlgorithmRecordCreateCommand;
+
 public class AlgorithmRecordCreateRequest {
-    
+
     private String problemNumber;
     private String title;
     private String language;
@@ -11,7 +16,8 @@ public class AlgorithmRecordCreateRequest {
 
     public AlgorithmRecordCreateRequest() {}
 
-    public AlgorithmRecordCreateRequest(String problemNumber, String title, String language, MultipartFile file) {
+    public AlgorithmRecordCreateRequest(String problemNumber, String title,
+            String language, MultipartFile file) {
         this.problemNumber = problemNumber;
         this.title = title;
         this.language = language;
@@ -49,5 +55,14 @@ public class AlgorithmRecordCreateRequest {
     public void setFile(MultipartFile file) {
         this.file = file;
     }
-    
+
+    public AlgorithmRecordCreateCommand toCommand(Long userId) throws IOException {
+        String code = "";
+        if (file != null && !file.isEmpty()) {
+            code = new String(file.getBytes(), StandardCharsets.UTF_8);
+        }
+        
+        return new AlgorithmRecordCreateCommand(userId, problemNumber, title, language, code);
+    }
+
 }
