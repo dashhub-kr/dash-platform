@@ -1,15 +1,13 @@
 package com.ssafy.dash.onboarding.application.dto;
 
-public class RepositorySetupResponse {
+public class RepositorySetupCommand {
 
     private final Long userId;
     private final String repositoryName;
-    private final boolean webhookConfigured;
 
-    public RepositorySetupResponse(Long userId, String repositoryName, boolean webhookConfigured) {
+    public RepositorySetupCommand(Long userId, String repositoryName) {
         this.userId = userId;
         this.repositoryName = repositoryName;
-        this.webhookConfigured = webhookConfigured;
     }
 
     public Long getUserId() {
@@ -18,10 +16,6 @@ public class RepositorySetupResponse {
 
     public String getRepositoryName() {
         return repositoryName;
-    }
-
-    public boolean isWebhookConfigured() {
-        return webhookConfigured;
     }
     
 }

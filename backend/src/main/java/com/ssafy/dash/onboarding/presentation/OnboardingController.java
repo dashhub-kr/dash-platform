@@ -12,8 +12,10 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.ssafy.dash.oauth.application.security.CustomOAuth2User;
 import com.ssafy.dash.onboarding.application.OnboardingService;
-import com.ssafy.dash.onboarding.application.dto.RepositorySetupRequest;
-import com.ssafy.dash.onboarding.application.dto.RepositorySetupResponse;
+import com.ssafy.dash.onboarding.application.dto.RepositorySetupCommand;
+import com.ssafy.dash.onboarding.application.dto.RepositorySetupResult;
+import com.ssafy.dash.onboarding.presentation.dto.request.RepositorySetupRequest;
+import com.ssafy.dash.onboarding.presentation.dto.response.RepositorySetupResponse;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -34,9 +36,10 @@ public class OnboardingController {
             @Parameter(hidden = true) @AuthenticationPrincipal OAuth2User principal,
             @Validated @RequestBody RepositorySetupRequest request) {
         if (principal instanceof CustomOAuth2User customUser) {
-            RepositorySetupResponse response = onboardingService.setupRepository(customUser.getUserId(), request);
-            
-            return ResponseEntity.ok(response);
+            RepositorySetupCommand command = new RepositorySetupCommand(customUser.getUserId(), request.getRepositoryName());
+            RepositorySetupResult result = onboardingService.setupRepository(command);
+
+            return ResponseEntity.ok(RepositorySetupResponse.from(result));
         }
 
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();

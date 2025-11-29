@@ -1,4 +1,4 @@
-package com.ssafy.dash.onboarding.application.dto;
+package com.ssafy.dash.onboarding.presentation.dto.request;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;

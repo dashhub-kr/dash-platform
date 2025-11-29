@@ -1,7 +1,6 @@
 package com.ssafy.dash.onboarding.presentation;
 
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -33,8 +32,9 @@ import com.ssafy.dash.common.TestFixtures;
 import com.ssafy.dash.oauth.application.security.CustomOAuth2User;
 import com.ssafy.dash.oauth.domain.AuthFlowType;
 import com.ssafy.dash.oauth.application.OAuthLoginResult;
-import com.ssafy.dash.onboarding.application.dto.RepositorySetupRequest;
-import com.ssafy.dash.onboarding.application.dto.RepositorySetupResponse;
+import com.ssafy.dash.onboarding.application.dto.RepositorySetupCommand;
+import com.ssafy.dash.onboarding.application.dto.RepositorySetupResult;
+import com.ssafy.dash.onboarding.presentation.dto.request.RepositorySetupRequest;
 import com.ssafy.dash.onboarding.application.OnboardingService;
 
 import org.mockito.Mockito;
@@ -72,10 +72,10 @@ class OnboardingControllerTest {
     @DisplayName("저장소 설정 성공")
     void setupRepository_success() throws Exception {
         RepositorySetupRequest request = new RepositorySetupRequest("utact/dash-repo");
-        RepositorySetupResponse response = new RepositorySetupResponse(TestFixtures.TEST_USER_ID,
+        RepositorySetupResult result = new RepositorySetupResult(TestFixtures.TEST_USER_ID,
             request.getRepositoryName(), true);
-        given(onboardingService.setupRepository(eq(TestFixtures.TEST_USER_ID), any(RepositorySetupRequest.class)))
-                .willReturn(response);
+        given(onboardingService.setupRepository(any(RepositorySetupCommand.class)))
+                .willReturn(result);
 
         OAuth2User delegate = new DefaultOAuth2User(
                 Collections.singleton(new SimpleGrantedAuthority("ROLE_USER")),
