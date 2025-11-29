@@ -8,42 +8,43 @@ import com.ssafy.dash.github.application.GitHubWebhookService;
 import com.ssafy.dash.github.domain.exception.GitHubWebhookException;
 import com.ssafy.dash.oauth.application.OAuthTokenService;
 import com.ssafy.dash.oauth.domain.UserOAuthToken;
-import com.ssafy.dash.onboarding.application.dto.RepositorySetupRequest;
-import com.ssafy.dash.onboarding.application.dto.RepositorySetupResponse;
+import com.ssafy.dash.onboarding.application.dto.RepositorySetupCommand;
+import com.ssafy.dash.onboarding.application.dto.RepositorySetupResult;
 import com.ssafy.dash.onboarding.domain.OnboardingRepository;
-import com.ssafy.dash.onboarding.domain.OnboardingRepositoryRepository;
+import com.ssafy.dash.onboarding.domain.OnboardingRepositoryPort;
 import com.ssafy.dash.onboarding.domain.exception.WebhookRegistrationException;
 
 @Service
 public class OnboardingService {
 
-    private final OnboardingRepositoryRepository repositoryRepository;
+    private final OnboardingRepositoryPort repositoryPort;
     private final GitHubWebhookService gitHubWebhookService;
     private final OAuthTokenService oauthTokenService;
 
-    public OnboardingService(OnboardingRepositoryRepository repositoryRepository,
+    public OnboardingService(OnboardingRepositoryPort repositoryPort,
             GitHubWebhookService gitHubWebhookService,
             OAuthTokenService oauthTokenService) {
-        this.repositoryRepository = repositoryRepository;
+        this.repositoryPort = repositoryPort;
         this.gitHubWebhookService = gitHubWebhookService;
         this.oauthTokenService = oauthTokenService;
     }
 
     @Transactional
-    public RepositorySetupResponse setupRepository(Long userId, RepositorySetupRequest request) {
-        String repositoryName = request.getRepositoryName().trim();
-        OnboardingRepository repository = repositoryRepository.findByUserId(userId).orElse(null);
+    public RepositorySetupResult setupRepository(RepositorySetupCommand command) {
+        String repositoryName = command.getRepositoryName().trim();
+        Long userId = command.getUserId();
+        OnboardingRepository repository = repositoryPort.findByUserId(userId).orElse(null);
         
         if (repository == null) {
             repository = new OnboardingRepository();
             repository.setUserId(userId);
             repository.setRepositoryName(repositoryName);
             repository.setWebhookConfigured(false);
-            repositoryRepository.save(repository);
+            repositoryPort.save(repository);
         } else {
             repository.setRepositoryName(repositoryName);
             repository.setWebhookConfigured(false);
-            repositoryRepository.save(repository);
+            repositoryPort.save(repository);
         }
 
         UserOAuthToken oauthToken = oauthTokenService.findByUserId(userId);
@@ -55,14 +56,14 @@ public class OnboardingService {
         try {
             gitHubWebhookService.ensureWebhook(repositoryName, oauthToken.getAccessToken());
             repository.setWebhookConfigured(true);
-            repositoryRepository.save(repository);
+            repositoryPort.save(repository);
         } catch (GitHubWebhookException ex) {
-            repositoryRepository.save(repository);
+            repositoryPort.save(repository);
 
             throw new WebhookRegistrationException(ex.getMessage(), ex);
         }
 
-        return new RepositorySetupResponse(userId, repository.getRepositoryName(), repository.isWebhookConfigured());
+        return new RepositorySetupResult(userId, repository.getRepositoryName(), repository.isWebhookConfigured());
     }
     
 }

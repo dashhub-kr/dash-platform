@@ -9,4 +9,5 @@ public class GitHubWebhookException extends RuntimeException {
     public GitHubWebhookException(String message, Throwable cause) {
         super(message, cause);
     }
+    
 }
