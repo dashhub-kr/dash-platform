@@ -1,4 +1,4 @@
-package com.ssafy.dash.oauth.application.security;
+package com.ssafy.dash.oauth.infrastructure.security;
 
 import java.io.Serializable;
 import java.util.Collection;
@@ -7,8 +7,8 @@ import java.util.Map;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 
+import com.ssafy.dash.oauth.application.dto.OAuthLoginResult;
 import com.ssafy.dash.oauth.domain.AuthFlowType;
-import com.ssafy.dash.oauth.application.OAuthLoginResult;
 import com.ssafy.dash.user.domain.User;
 
 public class CustomOAuth2User implements OAuth2User, Serializable {
@@ -39,11 +39,11 @@ public class CustomOAuth2User implements OAuth2User, Serializable {
     public String getName() {
         return delegate.getName();
     }
-    
+
     public User getUser() {
         return user;
     }
-    
+
     public Long getUserId() {
         return user.getId();
     }
@@ -55,5 +55,5 @@ public class CustomOAuth2User implements OAuth2User, Serializable {
     public boolean isSignUp() {
         return AuthFlowType.SIGN_UP.equals(flowType);
     }
-    
+
 }

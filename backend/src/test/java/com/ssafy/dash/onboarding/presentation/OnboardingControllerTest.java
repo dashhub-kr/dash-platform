@@ -29,9 +29,9 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ssafy.dash.common.TestFixtures;
-import com.ssafy.dash.oauth.application.security.CustomOAuth2User;
+import com.ssafy.dash.oauth.infrastructure.security.CustomOAuth2User;
 import com.ssafy.dash.oauth.domain.AuthFlowType;
-import com.ssafy.dash.oauth.application.OAuthLoginResult;
+import com.ssafy.dash.oauth.application.dto.OAuthLoginResult;
 import com.ssafy.dash.onboarding.application.dto.RepositorySetupCommand;
 import com.ssafy.dash.onboarding.application.dto.RepositorySetupResult;
 import com.ssafy.dash.onboarding.presentation.dto.request.RepositorySetupRequest;

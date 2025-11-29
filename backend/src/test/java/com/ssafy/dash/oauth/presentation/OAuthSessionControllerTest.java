@@ -26,9 +26,9 @@ import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Import;
 
 import com.ssafy.dash.common.TestFixtures;
-import com.ssafy.dash.oauth.application.security.CustomOAuth2User;
+import com.ssafy.dash.oauth.infrastructure.security.CustomOAuth2User;
 import com.ssafy.dash.oauth.domain.AuthFlowType;
-import com.ssafy.dash.oauth.application.OAuthLoginResult;
+import com.ssafy.dash.oauth.application.dto.OAuthLoginResult;
 import com.ssafy.dash.user.application.dto.UserResponse;
 import com.ssafy.dash.user.application.UserService;
 import org.mockito.Mockito;

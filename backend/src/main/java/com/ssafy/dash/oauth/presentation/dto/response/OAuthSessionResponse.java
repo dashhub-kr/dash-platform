@@ -1,4 +1,4 @@
-package com.ssafy.dash.oauth.presentation;
+package com.ssafy.dash.oauth.presentation.dto.response;
 
 import com.ssafy.dash.oauth.domain.AuthFlowType;
 import com.ssafy.dash.user.application.dto.UserResponse;
@@ -20,5 +20,5 @@ public class OAuthSessionResponse {
     public AuthFlowType getFlowType() {
         return flowType;
     }
-    
+
 }

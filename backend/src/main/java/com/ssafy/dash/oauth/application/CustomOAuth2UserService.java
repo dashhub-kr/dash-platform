@@ -13,7 +13,8 @@ import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.ssafy.dash.oauth.application.security.CustomOAuth2User;
+import com.ssafy.dash.oauth.infrastructure.security.CustomOAuth2User;
+import com.ssafy.dash.oauth.application.dto.OAuthLoginResult;
 import com.ssafy.dash.user.application.UserService;
 
 @Service

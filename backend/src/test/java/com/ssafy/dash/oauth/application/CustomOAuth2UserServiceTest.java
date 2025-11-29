@@ -22,8 +22,9 @@ import org.springframework.security.oauth2.core.user.DefaultOAuth2User;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 
 import com.ssafy.dash.common.TestFixtures;
-import com.ssafy.dash.oauth.application.security.CustomOAuth2User;
+import com.ssafy.dash.oauth.infrastructure.security.CustomOAuth2User;
 import com.ssafy.dash.oauth.domain.AuthFlowType;
+import com.ssafy.dash.oauth.application.dto.OAuthLoginResult;
 import com.ssafy.dash.user.application.UserService;
 
 @ExtendWith(MockitoExtension.class)

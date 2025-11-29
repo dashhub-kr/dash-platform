@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.ssafy.dash.oauth.application.security.CustomOAuth2User;
+import com.ssafy.dash.oauth.infrastructure.security.CustomOAuth2User;
 import com.ssafy.dash.onboarding.application.OnboardingService;
 import com.ssafy.dash.onboarding.application.dto.RepositorySetupCommand;
 import com.ssafy.dash.onboarding.application.dto.RepositorySetupResult;

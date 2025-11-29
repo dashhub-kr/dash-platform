@@ -21,7 +21,7 @@ import com.ssafy.dash.algorithm.application.AlgorithmRecordService;
 import com.ssafy.dash.algorithm.application.dto.AlgorithmRecordCreateRequest;
 import com.ssafy.dash.algorithm.application.dto.AlgorithmRecordResponse;
 import com.ssafy.dash.algorithm.application.dto.AlgorithmRecordUpdateRequest;
-import com.ssafy.dash.oauth.application.security.CustomOAuth2User;
+import com.ssafy.dash.oauth.infrastructure.security.CustomOAuth2User;
 
 import io.swagger.v3.oas.annotations.Parameter;
 
@@ -41,8 +41,8 @@ public class AlgorithmRecordController {
             @ModelAttribute AlgorithmRecordCreateRequest req) throws IOException {
         
         Long userId = 1L;
-        if (principal instanceof CustomOAuth2User) {
-            userId = ((CustomOAuth2User) principal).getUserId();
+        if (principal instanceof CustomOAuth2User customUser) {
+            userId = customUser.getUserId();
         }
         
         AlgorithmRecordResponse response = algorithmRecordService.create(userId, req);
