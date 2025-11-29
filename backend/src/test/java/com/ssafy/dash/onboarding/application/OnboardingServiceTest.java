@@ -27,6 +27,7 @@ import com.ssafy.dash.onboarding.application.dto.RepositorySetupRequest;
 import com.ssafy.dash.onboarding.application.dto.RepositorySetupResponse;
 import com.ssafy.dash.onboarding.domain.exception.WebhookRegistrationException;
 import com.ssafy.dash.github.application.GitHubWebhookService;
+import com.ssafy.dash.github.domain.exception.GitHubWebhookException;
 import com.ssafy.dash.onboarding.domain.OnboardingRepositoryRepository;
 
 @ExtendWith(MockitoExtension.class)
@@ -81,7 +82,7 @@ class OnboardingServiceTest {
 
         when(repositoryRepository.findByUserId(USER_ID)).thenReturn(Optional.of(existing));
         when(oauthTokenService.findByUserId(USER_ID)).thenReturn(createToken());
-        doThrow(new WebhookRegistrationException("GitHub 오류"))
+        doThrow(new GitHubWebhookException("GitHub 오류"))
             .when(gitHubWebhookService).ensureWebhook(REPOSITORY, "access-token");
 
         assertThatThrownBy(() -> onboardingService.setupRepository(USER_ID,

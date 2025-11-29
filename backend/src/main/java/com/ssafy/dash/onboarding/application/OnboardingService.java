@@ -2,17 +2,17 @@ package com.ssafy.dash.onboarding.application;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
 import org.springframework.util.StringUtils;
 
-import com.ssafy.dash.oauth.domain.UserOAuthToken;
+import com.ssafy.dash.github.application.GitHubWebhookService;
+import com.ssafy.dash.github.domain.exception.GitHubWebhookException;
 import com.ssafy.dash.oauth.application.OAuthTokenService;
+import com.ssafy.dash.oauth.domain.UserOAuthToken;
 import com.ssafy.dash.onboarding.application.dto.RepositorySetupRequest;
 import com.ssafy.dash.onboarding.application.dto.RepositorySetupResponse;
 import com.ssafy.dash.onboarding.domain.OnboardingRepository;
 import com.ssafy.dash.onboarding.domain.OnboardingRepositoryRepository;
 import com.ssafy.dash.onboarding.domain.exception.WebhookRegistrationException;
-import com.ssafy.dash.github.application.GitHubWebhookService;
 
 @Service
 public class OnboardingService {
@@ -56,10 +56,10 @@ public class OnboardingService {
             gitHubWebhookService.ensureWebhook(repositoryName, oauthToken.getAccessToken());
             repository.setWebhookConfigured(true);
             repositoryRepository.save(repository);
-        } catch (WebhookRegistrationException ex) {
+        } catch (GitHubWebhookException ex) {
             repositoryRepository.save(repository);
-            
-            throw ex;
+
+            throw new WebhookRegistrationException(ex.getMessage(), ex);
         }
 
         return new RepositorySetupResponse(userId, repository.getRepositoryName(), repository.isWebhookConfigured());

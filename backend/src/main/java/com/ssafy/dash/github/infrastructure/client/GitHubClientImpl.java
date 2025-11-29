@@ -25,7 +25,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ssafy.dash.github.config.GitHubWebhookProperties;
 import com.ssafy.dash.github.domain.GitHubClient;
-import com.ssafy.dash.onboarding.domain.exception.WebhookRegistrationException;
+import com.ssafy.dash.github.domain.exception.GitHubWebhookException;
 
 @Component
 public class GitHubClientImpl implements GitHubClient {
@@ -90,24 +90,24 @@ public class GitHubClientImpl implements GitHubClient {
                 log.info("GitHub webhook already exists for {}/{}", slug.owner(), slug.repository());
                 return;
             }
-            throw new WebhookRegistrationException(resolveApiError(body, "GitHub 웹훅 생성에 실패했습니다."), ex);
+            throw new GitHubWebhookException(resolveApiError(body, "GitHub 웹훅 생성에 실패했습니다."), ex);
         } catch (HttpClientErrorException ex) {
-            throw new WebhookRegistrationException(resolveApiError(ex.getResponseBodyAsString(),
+            throw new GitHubWebhookException(resolveApiError(ex.getResponseBodyAsString(),
                     "GitHub 웹훅 생성에 실패했습니다."), ex);
         } catch (RestClientException ex) {
-            throw new WebhookRegistrationException("GitHub 웹훅 API 호출 중 오류가 발생했습니다.", ex);
+            throw new GitHubWebhookException("GitHub 웹훅 API 호출 중 오류가 발생했습니다.", ex);
         }
     }
 
     private void validateConfiguration(String accessToken) {
         if (!StringUtils.hasText(accessToken)) {
-            throw new WebhookRegistrationException("GitHub 액세스 토큰이 존재하지 않습니다. 다시 로그인해주세요.");
+            throw new GitHubWebhookException("GitHub 액세스 토큰이 존재하지 않습니다. 다시 로그인해주세요.");
         }
         if (!StringUtils.hasText(callbackUrl)) {
-            throw new WebhookRegistrationException("GitHub 웹훅 콜백 URL이 설정되지 않았습니다.");
+            throw new GitHubWebhookException("GitHub 웹훅 콜백 URL이 설정되지 않았습니다.");
         }
         if (!StringUtils.hasText(secret)) {
-            throw new WebhookRegistrationException("GitHub 웹훅 시크릿이 설정되지 않았습니다.");
+            throw new GitHubWebhookException("GitHub 웹훅 시크릿이 설정되지 않았습니다.");
         }
     }
 
@@ -140,11 +140,11 @@ public class GitHubClientImpl implements GitHubClient {
     private record RepositorySlug(String owner, String repository) {
         static RepositorySlug from(String fullName) {
             if (!StringUtils.hasText(fullName) || !fullName.contains("/")) {
-                throw new WebhookRegistrationException("owner/repository 형식으로 입력해주세요.");
+                throw new GitHubWebhookException("owner/repository 형식으로 입력해주세요.");
             }
             String[] parts = fullName.split("/");
             if (parts.length != 2 || !StringUtils.hasText(parts[0]) || !StringUtils.hasText(parts[1])) {
-                throw new WebhookRegistrationException("owner/repository 형식으로 입력해주세요.");
+                throw new GitHubWebhookException("owner/repository 형식으로 입력해주세요.");
             }
             return new RepositorySlug(parts[0].trim(), parts[1].trim());
         }
