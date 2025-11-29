@@ -1,25 +1,26 @@
 package com.ssafy.dash.board.application;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.verify;
+
 import java.util.List;
 import java.util.Optional;
 
-import static org.assertj.core.api.Assertions.assertThat;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.BDDMockito.given;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import static org.mockito.Mockito.verify;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import com.ssafy.dash.board.application.dto.BoardCreateCommand;
+import com.ssafy.dash.board.application.dto.BoardResult;
+import com.ssafy.dash.board.application.dto.BoardUpdateCommand;
 import com.ssafy.dash.board.domain.Board;
 import com.ssafy.dash.board.domain.BoardRepository;
-import com.ssafy.dash.board.application.dto.BoardCreateRequest;
-import com.ssafy.dash.board.application.dto.BoardResponse;
-import com.ssafy.dash.board.application.dto.BoardUpdateRequest;
 import com.ssafy.dash.common.TestFixtures;
 import com.ssafy.dash.user.domain.User;
 import com.ssafy.dash.user.domain.UserRepository;
@@ -50,15 +51,15 @@ class BoardServiceTest {
     @DisplayName("게시글 생성 성공")
     void createBoard_Success() {
         // given
-        BoardCreateRequest req = TestFixtures.createBoardCreateRequest();
-        given(userRepository.findById(req.getUserId())).willReturn(Optional.of(user));
+        BoardCreateCommand command = TestFixtures.createBoardCreateCommand();
+        given(userRepository.findById(command.getUserId())).willReturn(Optional.of(user));
         
         // when
-        BoardResponse response = boardService.create(req);
+        BoardResult response = boardService.create(command);
 
         // then
         verify(boardRepository).save(any(Board.class));
-        assertThat(response.getTitle()).isEqualTo(req.getTitle());
+        assertThat(response.getTitle()).isEqualTo(command.getTitle());
         assertThat(response.getAuthorName()).isEqualTo(user.getUsername());
     }
 
@@ -70,7 +71,7 @@ class BoardServiceTest {
         given(userRepository.findById(user.getId())).willReturn(Optional.of(user));
 
         // when
-        BoardResponse response = boardService.findById(board.getId());
+        BoardResult response = boardService.findById(board.getId());
 
         // then
         assertThat(response.getId()).isEqualTo(board.getId());
@@ -85,7 +86,7 @@ class BoardServiceTest {
         given(userRepository.findById(user.getId())).willReturn(Optional.of(user));
 
         // when
-        List<BoardResponse> responses = boardService.findAll();
+        List<BoardResult> responses = boardService.findAll();
 
         // then
         assertThat(responses).hasSize(1);
@@ -96,16 +97,16 @@ class BoardServiceTest {
     @DisplayName("게시글 수정 성공")
     void updateBoard_Success() {
         // given
-        BoardUpdateRequest req = TestFixtures.createBoardUpdateRequest();
+        BoardUpdateCommand command = TestFixtures.createBoardUpdateCommand();
         given(boardRepository.findById(board.getId())).willReturn(Optional.of(board));
         given(userRepository.findById(user.getId())).willReturn(Optional.of(user));
 
         // when
-        BoardResponse response = boardService.update(board.getId(), req);
+        BoardResult response = boardService.update(board.getId(), command);
 
         // then
         verify(boardRepository).update(any(Board.class));
-        assertThat(response.getTitle()).isEqualTo(req.getTitle());
+        assertThat(response.getTitle()).isEqualTo(command.getTitle());
     }
 
     @Test

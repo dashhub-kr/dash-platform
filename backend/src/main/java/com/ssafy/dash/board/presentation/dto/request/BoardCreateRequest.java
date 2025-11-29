@@ -1,4 +1,6 @@
-package com.ssafy.dash.board.application.dto;
+package com.ssafy.dash.board.presentation.dto.request;
+
+import com.ssafy.dash.board.application.dto.BoardCreateCommand;
 
 public class BoardCreateRequest {
 
@@ -36,6 +38,10 @@ public class BoardCreateRequest {
 
     public void setUserId(Long userId) {
         this.userId = userId;
+    }
+
+    public BoardCreateCommand toCommand() {
+        return new BoardCreateCommand(title, content, userId);
     }
     
 }

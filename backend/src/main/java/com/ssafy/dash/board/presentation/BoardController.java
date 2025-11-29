@@ -2,6 +2,7 @@ package com.ssafy.dash.board.presentation;
 
 import java.net.URI;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -13,10 +14,10 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.ssafy.dash.board.application.dto.BoardCreateRequest;
-import com.ssafy.dash.board.application.dto.BoardResponse;
-import com.ssafy.dash.board.application.dto.BoardUpdateRequest;
 import com.ssafy.dash.board.application.BoardService;
+import com.ssafy.dash.board.presentation.dto.request.BoardCreateRequest;
+import com.ssafy.dash.board.presentation.dto.request.BoardUpdateRequest;
+import com.ssafy.dash.board.presentation.dto.response.BoardResponse;
 
 @RestController
 @RequestMapping("/api/boards")
@@ -29,28 +30,33 @@ public class BoardController {
     }
 
     @PostMapping
-    public ResponseEntity<BoardResponse> create(@RequestBody BoardCreateRequest req) {
-        BoardResponse response = boardService.create(req);
+    public ResponseEntity<BoardResponse> create(@RequestBody BoardCreateRequest request) {
+        BoardResponse response = BoardResponse.from(boardService.create(request.toCommand()));
 
         return ResponseEntity.created(URI.create("/api/boards/" + response.getId())).body(response);
     }
 
     @GetMapping
     public ResponseEntity<List<BoardResponse>> findAll() {
+        List<BoardResponse> responses = boardService.findAll().stream()
+                .map(BoardResponse::from)
+                .collect(Collectors.toList());
 
-        return ResponseEntity.ok(boardService.findAll());
+        return ResponseEntity.ok(responses);
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<BoardResponse> findById(@PathVariable Long id) {
+        BoardResponse response = BoardResponse.from(boardService.findById(id));
 
-        return ResponseEntity.ok(boardService.findById(id));
+        return ResponseEntity.ok(response);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<BoardResponse> update(@PathVariable Long id, @RequestBody BoardUpdateRequest req) {
-        
-        return ResponseEntity.ok(boardService.update(id, req));
+    public ResponseEntity<BoardResponse> update(@PathVariable Long id, @RequestBody BoardUpdateRequest request) {
+        BoardResponse response = BoardResponse.from(boardService.update(id, request.toCommand()));
+
+        return ResponseEntity.ok(response);
     }
 
     @DeleteMapping("/{id}")

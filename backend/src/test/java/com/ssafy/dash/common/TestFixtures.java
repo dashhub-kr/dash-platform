@@ -2,10 +2,12 @@ package com.ssafy.dash.common;
 
 import java.time.LocalDateTime;
 
+import com.ssafy.dash.board.application.dto.BoardCreateCommand;
+import com.ssafy.dash.board.application.dto.BoardResult;
+import com.ssafy.dash.board.application.dto.BoardUpdateCommand;
 import com.ssafy.dash.board.domain.Board;
-import com.ssafy.dash.board.application.dto.BoardCreateRequest;
-import com.ssafy.dash.board.application.dto.BoardResponse;
-import com.ssafy.dash.board.application.dto.BoardUpdateRequest;
+import com.ssafy.dash.board.presentation.dto.request.BoardCreateRequest;
+import com.ssafy.dash.board.presentation.dto.request.BoardUpdateRequest;
 import com.ssafy.dash.user.domain.User;
 import com.ssafy.dash.user.application.dto.UserCreateRequest;
 import com.ssafy.dash.user.application.dto.UserUpdateRequest;
@@ -58,8 +60,17 @@ public class TestFixtures {
         return new BoardUpdateRequest("Updated Title", "Updated Content");
     }
 
-    public static BoardResponse createBoardResponse(User user) {
-        return new BoardResponse(TEST_BOARD_ID, TEST_BOARD_TITLE, TEST_BOARD_CONTENT, user.getId(), user.getUsername(), LocalDateTime.now(), LocalDateTime.now());
+    public static BoardCreateCommand createBoardCreateCommand() {
+        return new BoardCreateCommand(TEST_BOARD_TITLE, TEST_BOARD_CONTENT, TEST_USER_ID);
+    }
+
+    public static BoardUpdateCommand createBoardUpdateCommand() {
+        return new BoardUpdateCommand("Updated Title", "Updated Content");
+    }
+
+    public static BoardResult createBoardResult(User user) {
+        return new BoardResult(TEST_BOARD_ID, TEST_BOARD_TITLE, TEST_BOARD_CONTENT,
+                user.getId(), user.getUsername(), LocalDateTime.now(), LocalDateTime.now());
     }
 
     public static AlgorithmRecord createAlgorithmRecord(User user) {

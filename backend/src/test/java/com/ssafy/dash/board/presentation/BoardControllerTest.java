@@ -10,6 +10,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 import org.junit.jupiter.api.DisplayName;
@@ -25,10 +26,12 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.ssafy.dash.board.application.dto.BoardCreateRequest;
-import com.ssafy.dash.board.application.dto.BoardResponse;
-import com.ssafy.dash.board.application.dto.BoardUpdateRequest;
 import com.ssafy.dash.board.application.BoardService;
+import com.ssafy.dash.board.application.dto.BoardCreateCommand;
+import com.ssafy.dash.board.application.dto.BoardResult;
+import com.ssafy.dash.board.application.dto.BoardUpdateCommand;
+import com.ssafy.dash.board.presentation.dto.request.BoardCreateRequest;
+import com.ssafy.dash.board.presentation.dto.request.BoardUpdateRequest;
 import com.ssafy.dash.common.TestFixtures;
 import com.ssafy.dash.user.domain.User;
 
@@ -61,9 +64,9 @@ class BoardControllerTest {
     void createBoard_Success() throws Exception {
         BoardCreateRequest req = TestFixtures.createBoardCreateRequest();
         User user = TestFixtures.createUser();
-        BoardResponse res = TestFixtures.createBoardResponse(user);
+        BoardResult result = TestFixtures.createBoardResult(user);
 
-        given(boardService.create(any(BoardCreateRequest.class))).willReturn(res);
+        given(boardService.create(any(BoardCreateCommand.class))).willReturn(result);
 
         mockMvc.perform(post("/api/boards")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -77,8 +80,8 @@ class BoardControllerTest {
     @DisplayName("전체 게시글 조회 성공")
     void getAllBoards_Success() throws Exception {
         User user = TestFixtures.createUser();
-        BoardResponse res = TestFixtures.createBoardResponse(user);
-        given(boardService.findAll()).willReturn(List.of(res));
+        BoardResult result = TestFixtures.createBoardResult(user);
+        given(boardService.findAll()).willReturn(List.of(result));
 
         mockMvc.perform(get("/api/boards"))
                 .andExpect(status().isOk())
@@ -89,8 +92,8 @@ class BoardControllerTest {
     @DisplayName("ID로 게시글 조회 성공")
     void getBoardById_Success() throws Exception {
         User user = TestFixtures.createUser();
-        BoardResponse res = TestFixtures.createBoardResponse(user);
-        given(boardService.findById(TestFixtures.TEST_BOARD_ID)).willReturn(res);
+        BoardResult result = TestFixtures.createBoardResult(user);
+        given(boardService.findById(TestFixtures.TEST_BOARD_ID)).willReturn(result);
 
         mockMvc.perform(get("/api/boards/1"))
                 .andExpect(status().isOk())
@@ -102,10 +105,10 @@ class BoardControllerTest {
     void updateBoard_Success() throws Exception {
         BoardUpdateRequest req = TestFixtures.createBoardUpdateRequest();
         User user = TestFixtures.createUser();
-        BoardResponse res = TestFixtures.createBoardResponse(user);
-        res.setTitle(req.getTitle());
+        BoardResult result = new BoardResult(TestFixtures.TEST_BOARD_ID, req.getTitle(), req.getContent(),
+            user.getId(), user.getUsername(), LocalDateTime.now(), LocalDateTime.now());
 
-        given(boardService.update(eq(TestFixtures.TEST_BOARD_ID), any(BoardUpdateRequest.class))).willReturn(res);
+        given(boardService.update(eq(TestFixtures.TEST_BOARD_ID), any(BoardUpdateCommand.class))).willReturn(result);
 
         mockMvc.perform(put("/api/boards/1")
                 .contentType(MediaType.APPLICATION_JSON)

@@ -1,4 +1,6 @@
-package com.ssafy.dash.board.application.dto;
+package com.ssafy.dash.board.presentation.dto.request;
+
+import com.ssafy.dash.board.application.dto.BoardUpdateCommand;
 
 public class BoardUpdateRequest {
 
@@ -26,6 +28,10 @@ public class BoardUpdateRequest {
 
     public void setContent(String content) {
         this.content = content;
+    }
+
+    public BoardUpdateCommand toCommand() {
+        return new BoardUpdateCommand(title, content);
     }
     
 }

@@ -9,9 +9,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.ssafy.dash.board.domain.Board;
 import com.ssafy.dash.board.domain.BoardRepository;
-import com.ssafy.dash.board.application.dto.BoardCreateRequest;
-import com.ssafy.dash.board.application.dto.BoardResponse;
-import com.ssafy.dash.board.application.dto.BoardUpdateRequest;
+import com.ssafy.dash.board.application.dto.BoardCreateCommand;
+import com.ssafy.dash.board.application.dto.BoardResult;
+import com.ssafy.dash.board.application.dto.BoardUpdateCommand;
 import com.ssafy.dash.board.domain.exception.BoardNotFoundException;
 import com.ssafy.dash.user.domain.User;
 import com.ssafy.dash.user.domain.UserRepository;
@@ -29,70 +29,73 @@ public class BoardService {
     }
 
     @Transactional
-    public BoardResponse create(BoardCreateRequest req) {
-        User user = userRepository.findById(req.getUserId())
-                .orElseThrow(() -> new UserNotFoundException(req.getUserId()));
+    public BoardResult create(BoardCreateCommand command) {
+        User user = userRepository.findById(command.getUserId())
+                .orElseThrow(() -> new UserNotFoundException(command.getUserId()));
 
         Board board = new Board();
-        board.setTitle(req.getTitle());
-        board.setContent(req.getContent());
-        board.setUserId(req.getUserId());
+        board.setTitle(command.getTitle());
+        board.setContent(command.getContent());
+        board.setUserId(command.getUserId());
         board.setCreatedAt(LocalDateTime.now());
         board.setUpdatedAt(LocalDateTime.now());
 
         boardRepository.save(board);
 
-        return toResponse(board, user);
+        return toResult(board, user);
     }
 
     @Transactional(readOnly = true)
-    public BoardResponse findById(Long id) {
+    public BoardResult findById(Long id) {
         Board board = boardRepository.findById(id)
                 .orElseThrow(() -> new BoardNotFoundException(id));
         
         User user = userRepository.findById(board.getUserId()).orElse(null);
 
-        return toResponse(board, user);
+        return toResult(board, user);
     }
 
     @Transactional(readOnly = true)
-    public List<BoardResponse> findAll() {
+    public List<BoardResult> findAll() {
+        
         return boardRepository.findAll().stream()
                 .map(board -> {
                     User user = userRepository.findById(board.getUserId()).orElse(null);
-                    return toResponse(board, user);
+                    
+                    return toResult(board, user);
                 })
                 .collect(Collectors.toList());
     }
 
     @Transactional
-    public BoardResponse update(Long id, BoardUpdateRequest req) {
+    public BoardResult update(Long id, BoardUpdateCommand command) {
         Board board = boardRepository.findById(id)
                 .orElseThrow(() -> new BoardNotFoundException(id));
 
-        board.setTitle(req.getTitle());
-        board.setContent(req.getContent());
+        board.setTitle(command.getTitle());
+        board.setContent(command.getContent());
         board.setUpdatedAt(LocalDateTime.now());
 
         boardRepository.update(board);
         
         User user = userRepository.findById(board.getUserId()).orElse(null);
 
-        return toResponse(board, user);
+        return toResult(board, user);
     }
 
     @Transactional
     public void delete(Long id) {
         if (boardRepository.findById(id).isEmpty()) {
+            
             throw new BoardNotFoundException(id);
         }
         boardRepository.delete(id);
     }
 
-    private BoardResponse toResponse(Board board, User user) {
+    private BoardResult toResult(Board board, User user) {
         String authorName = (user != null) ? user.getUsername() : "Unknown";
         
-        return new BoardResponse(
+        return new BoardResult(
             board.getId(),
             board.getTitle(),
             board.getContent(),
