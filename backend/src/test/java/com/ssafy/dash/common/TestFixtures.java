@@ -2,19 +2,22 @@ package com.ssafy.dash.common;
 
 import java.time.LocalDateTime;
 
+import com.ssafy.dash.algorithm.application.dto.AlgorithmRecordCreateCommand;
+import com.ssafy.dash.algorithm.application.dto.AlgorithmRecordResult;
+import com.ssafy.dash.algorithm.application.dto.AlgorithmRecordUpdateCommand;
+import com.ssafy.dash.algorithm.domain.AlgorithmRecord;
 import com.ssafy.dash.board.application.dto.BoardCreateCommand;
 import com.ssafy.dash.board.application.dto.BoardResult;
 import com.ssafy.dash.board.application.dto.BoardUpdateCommand;
 import com.ssafy.dash.board.domain.Board;
 import com.ssafy.dash.board.presentation.dto.request.BoardCreateRequest;
 import com.ssafy.dash.board.presentation.dto.request.BoardUpdateRequest;
+import com.ssafy.dash.user.application.dto.UserCreateCommand;
+import com.ssafy.dash.user.application.dto.UserResult;
+import com.ssafy.dash.user.application.dto.UserUpdateCommand;
 import com.ssafy.dash.user.domain.User;
-import com.ssafy.dash.user.application.dto.UserCreateRequest;
-import com.ssafy.dash.user.application.dto.UserUpdateRequest;
-import com.ssafy.dash.algorithm.application.dto.AlgorithmRecordCreateCommand;
-import com.ssafy.dash.algorithm.application.dto.AlgorithmRecordResult;
-import com.ssafy.dash.algorithm.application.dto.AlgorithmRecordUpdateCommand;
-import com.ssafy.dash.algorithm.domain.AlgorithmRecord;
+import com.ssafy.dash.user.presentation.dto.request.UserCreateRequest;
+import com.ssafy.dash.user.presentation.dto.request.UserUpdateRequest;
 
 public class TestFixtures {
 
@@ -45,6 +48,19 @@ public class TestFixtures {
 
     public static UserUpdateRequest createUserUpdateRequest() {
         return new UserUpdateRequest("Updated User", "updated@example.com");
+    }
+
+    public static UserCreateCommand createUserCreateCommand() {
+        return new UserCreateCommand(TEST_USERNAME, TEST_EMAIL);
+    }
+
+    public static UserUpdateCommand createUserUpdateCommand() {
+        return new UserUpdateCommand("Updated User", "updated@example.com");
+    }
+
+    public static UserResult createUserResult() {
+        return new UserResult(TEST_USER_ID, TEST_USERNAME, TEST_EMAIL, LocalDateTime.now(),
+                TEST_PROVIDER, TEST_PROVIDER_ID, TEST_AVATAR_URL);
     }
 
     public static Board createBoard(User user) {

@@ -9,8 +9,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.ssafy.dash.oauth.infrastructure.security.CustomOAuth2User;
-import com.ssafy.dash.user.application.dto.UserResponse;
 import com.ssafy.dash.user.application.UserService;
+import com.ssafy.dash.user.presentation.dto.response.UserResponse;
 import com.ssafy.dash.oauth.presentation.dto.response.OAuthSessionResponse;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -31,7 +31,7 @@ public class OAuthSessionController {
     public ResponseEntity<OAuthSessionResponse> session(
             @Parameter(hidden = true) @AuthenticationPrincipal OAuth2User principal) {
         if (principal instanceof CustomOAuth2User customUser) {
-            UserResponse userResponse = userService.findById(customUser.getUserId());
+            UserResponse userResponse = UserResponse.from(userService.findById(customUser.getUserId()));
             OAuthSessionResponse response = new OAuthSessionResponse(userResponse, customUser.getFlowType());
             
             return ResponseEntity.ok(response);

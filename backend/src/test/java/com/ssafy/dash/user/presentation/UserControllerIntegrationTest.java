@@ -17,8 +17,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ssafy.dash.common.TestFixtures;
-import com.ssafy.dash.user.application.dto.UserCreateRequest;
-import com.ssafy.dash.user.application.dto.UserUpdateRequest;
+import com.ssafy.dash.user.presentation.dto.request.UserCreateRequest;
+import com.ssafy.dash.user.presentation.dto.request.UserUpdateRequest;
 
 @SpringBootTest
 @AutoConfigureMockMvc(addFilters = false)

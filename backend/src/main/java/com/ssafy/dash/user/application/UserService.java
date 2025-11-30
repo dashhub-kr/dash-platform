@@ -11,9 +11,9 @@ import com.ssafy.dash.oauth.domain.AuthFlowType;
 import com.ssafy.dash.oauth.application.dto.OAuthLoginResult;
 import com.ssafy.dash.user.domain.User;
 import com.ssafy.dash.user.domain.UserRepository;
-import com.ssafy.dash.user.application.dto.UserCreateRequest;
-import com.ssafy.dash.user.application.dto.UserResponse;
-import com.ssafy.dash.user.application.dto.UserUpdateRequest;
+import com.ssafy.dash.user.application.dto.UserCreateCommand;
+import com.ssafy.dash.user.application.dto.UserResult;
+import com.ssafy.dash.user.application.dto.UserUpdateCommand;
 import com.ssafy.dash.user.domain.exception.UserNotFoundException;
 
 @Service
@@ -26,42 +26,42 @@ public class UserService {
     }
 
     @Transactional
-    public UserResponse create(UserCreateRequest req) {
+    public UserResult create(UserCreateCommand command) {
         User u = new User();
-        u.setUsername(req.getUsername());
-        u.setEmail(req.getEmail());
+        u.setUsername(command.getUsername());
+        u.setEmail(command.getEmail());
         u.setCreatedAt(LocalDateTime.now());
         userRepository.save(u);
 
-        return toResponse(u);
+        return toResult(u);
     }
 
     @Transactional(readOnly = true)
-    public UserResponse findById(Long id) {
+    public UserResult findById(Long id) {
         User u = userRepository.findById(id)
                 .orElseThrow(() -> new UserNotFoundException(id));
 
-        return toResponse(u);
+        return toResult(u);
     }
 
     @Transactional(readOnly = true)
-    public List<UserResponse> findAll() {
+    public List<UserResult> findAll() {
         
         return userRepository.findAll().stream()
-                .map(this::toResponse)
+                .map(this::toResult)
                 .collect(Collectors.toList());
     }
 
     @Transactional
-    public UserResponse update(Long id, UserUpdateRequest req) {
+    public UserResult update(Long id, UserUpdateCommand command) {
         User u = userRepository.findById(id)
                 .orElseThrow(() -> new UserNotFoundException(id));
         
-        u.setUsername(req.getUsername());
-        u.setEmail(req.getEmail());
+        u.setUsername(command.getUsername());
+        u.setEmail(command.getEmail());
         userRepository.update(u);
 
-        return toResponse(u);
+        return toResult(u);
     }
 
     @Transactional
@@ -97,16 +97,16 @@ public class UserService {
     }
 
     @Transactional(readOnly = true)
-    public UserResponse findByProviderAndId(String provider, String providerId) {
+    public UserResult findByProviderAndId(String provider, String providerId) {
         User u = userRepository.findByProviderAndProviderId(provider, providerId).orElse(null);
         if (u == null) return null;
         
-        return toResponse(u);
+        return toResult(u);
     }
 
-    private UserResponse toResponse(User u) {
+    private UserResult toResult(User u) {
 
-        return new UserResponse(u.getId(), u.getUsername(), u.getEmail(), u.getCreatedAt(), u.getProvider(), u.getProviderId(), u.getAvatarUrl());
+        return new UserResult(u.getId(), u.getUsername(), u.getEmail(), u.getCreatedAt(), u.getProvider(), u.getProviderId(), u.getAvatarUrl());
     }
 
 }

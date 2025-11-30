@@ -2,6 +2,7 @@ package com.ssafy.dash.user.presentation;
 
 import java.net.URI;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -17,9 +18,9 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.ssafy.dash.oauth.infrastructure.security.CustomOAuth2User;
 import com.ssafy.dash.user.application.UserService;
-import com.ssafy.dash.user.application.dto.UserCreateRequest;
-import com.ssafy.dash.user.application.dto.UserResponse;
-import com.ssafy.dash.user.application.dto.UserUpdateRequest;
+import com.ssafy.dash.user.presentation.dto.request.UserCreateRequest;
+import com.ssafy.dash.user.presentation.dto.request.UserUpdateRequest;
+import com.ssafy.dash.user.presentation.dto.response.UserResponse;
 
 import io.swagger.v3.oas.annotations.Parameter;
 
@@ -35,7 +36,7 @@ public class UserController {
 
     @PostMapping
     public ResponseEntity<UserResponse> create(@RequestBody UserCreateRequest req) {
-        UserResponse created = service.create(req);
+        UserResponse created = UserResponse.from(service.create(req.toCommand()));
         
         return ResponseEntity.created(URI.create("/api/users/" + created.getId())).body(created);
     }
@@ -43,13 +44,17 @@ public class UserController {
     @GetMapping("/{id}")
     public ResponseEntity<UserResponse> get(@PathVariable Long id) {
 
-        return ResponseEntity.ok(service.findById(id));
+        return ResponseEntity.ok(UserResponse.from(service.findById(id)));
     }
 
     @GetMapping
     public ResponseEntity<List<UserResponse>> list() {
 
-        return ResponseEntity.ok(service.findAll());
+        List<UserResponse> responses = service.findAll().stream()
+                .map(UserResponse::from)
+                .collect(Collectors.toList());
+
+        return ResponseEntity.ok(responses);
     }
 
     @GetMapping("/me")
@@ -57,7 +62,7 @@ public class UserController {
         if (principal instanceof CustomOAuth2User) {
             CustomOAuth2User customUser = (CustomOAuth2User) principal;
             
-            return ResponseEntity.ok(service.findById(customUser.getUserId()));
+            return ResponseEntity.ok(UserResponse.from(service.findById(customUser.getUserId())));
         }
         
         return ResponseEntity.status(401).build();
@@ -66,7 +71,7 @@ public class UserController {
     @PutMapping("/{id}")
     public ResponseEntity<UserResponse> update(@PathVariable Long id, @RequestBody UserUpdateRequest req) {
 
-        return ResponseEntity.ok(service.update(id, req));
+        return ResponseEntity.ok(UserResponse.from(service.update(id, req.toCommand())));
     }
 
     @DeleteMapping("/{id}")

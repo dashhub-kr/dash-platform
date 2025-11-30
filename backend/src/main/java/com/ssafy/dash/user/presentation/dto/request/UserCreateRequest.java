@@ -1,13 +1,15 @@
-package com.ssafy.dash.user.application.dto;
+package com.ssafy.dash.user.presentation.dto.request;
 
-public class UserUpdateRequest {
+import com.ssafy.dash.user.application.dto.UserCreateCommand;
+
+public class UserCreateRequest {
 
     private String username;
     private String email;
 
-    public UserUpdateRequest() {}
+    public UserCreateRequest() {}
 
-    public UserUpdateRequest(String username, String email) {
+    public UserCreateRequest(String username, String email) {
         this.username = username;
         this.email = email;
     }
@@ -27,5 +29,10 @@ public class UserUpdateRequest {
     public void setEmail(String email) {
         this.email = email;
     }
-    
+
+    public UserCreateCommand toCommand() {
+        
+        return new UserCreateCommand(username, email);
+    }
+
 }

@@ -26,11 +26,11 @@ import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Import;
 
 import com.ssafy.dash.common.TestFixtures;
-import com.ssafy.dash.oauth.infrastructure.security.CustomOAuth2User;
-import com.ssafy.dash.oauth.domain.AuthFlowType;
 import com.ssafy.dash.oauth.application.dto.OAuthLoginResult;
-import com.ssafy.dash.user.application.dto.UserResponse;
+import com.ssafy.dash.oauth.domain.AuthFlowType;
+import com.ssafy.dash.oauth.infrastructure.security.CustomOAuth2User;
 import com.ssafy.dash.user.application.UserService;
+import com.ssafy.dash.user.application.dto.UserResult;
 import org.mockito.Mockito;
 
 @WebMvcTest(OAuthSessionController.class)
@@ -61,9 +61,8 @@ class OAuthSessionControllerTest {
     @Test
     @DisplayName("세션 조회 시 로그인 흐름 정보를 반환한다")
     void sessionReturnsFlowType() throws Exception {
-        UserResponse userResponse = new UserResponse(TestFixtures.TEST_USER_ID, TestFixtures.TEST_USERNAME,
-                TestFixtures.TEST_EMAIL, TestFixtures.createUser().getCreatedAt());
-        given(userService.findById(TestFixtures.TEST_USER_ID)).willReturn(userResponse);
+        UserResult userResult = TestFixtures.createUserResult();
+        given(userService.findById(TestFixtures.TEST_USER_ID)).willReturn(userResult);
 
         OAuth2User delegate = new DefaultOAuth2User(
                 Collections.singleton(new SimpleGrantedAuthority("ROLE_USER")),
