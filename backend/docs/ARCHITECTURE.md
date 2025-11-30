@@ -1,68 +1,59 @@
 # 아키텍처 가이드 (ARCHITECTURE)
 
-이 프로젝트는 **DDD(Domain Driven Design)** 개념을 차용한 계층형 아키텍처(Layered Architecture)를 따릅니다.  
-도메인별로 패키지를 분리하여 응집도를 높이고 결합도를 낮추는 것을 목표로 합니다.
+이 프로젝트는 **DDD(Domain Driven Design)** 를 바탕으로 한 계층형 아키텍처를 사용하며, 각 도메인은 동일한 네 개의 레이어(`presentation → application → domain → infrastructure`)로 구성됩니다. 도메인별 패키지를 나누고, 각 레이어 간 의존 방향을 단방향으로 유지해 응집도를 높이는 것이 목표입니다.
 
 ## 1. 패키지 구조
 
-기능(도메인) 중심으로 최상위 패키지를 구성합니다.
-
 ```
 com.ssafy.dash
-├── algorithm/       # 알고리즘 도메인
-│   ├── controller/  # 웹 계층 (REST API)
-│   ├── service/     # 비즈니스 로직
-│   ├── domain/      # 도메인 엔티티 (POJO)
-│   ├── dto/         # 데이터 전송 객체 (Request/Response)
-│   ├── mapper/      # 데이터 접근 계층 (MyBatis)
-│   └── exception/   # 도메인별 예외
-├── board/           # 게시판 도메인
-├── user/            # 사용자 도메인
-├── common/          # 공통 유틸리티 및 설정
-└── config/          # Spring 설정 (Security, Swagger 등)
+├── algorithm/
+│   ├── presentation/    # HTTP · UI 어댑터 (Controller, DTO, security adapter)
+│   ├── application/     # Use case (Command/Result, 서비스)
+│   ├── domain/          # Aggregate, VO, Repository Port
+│   └── infrastructure/  # MyBatis Mapper, 외부 연동 어댑터
+├── board/
+├── oauth/
+│   └── presentation/security/  # Spring Security 어댑터 (CustomOAuth2User 등)
+├── user/
+├── common/              # 테스트 픽스처, 공용 유틸리티
+└── config/              # 전역 설정 (SecurityConfig, Swagger 등)
 ```
 
-## 2. 계층별 역할
+- 모든 계층 간 의존은 **같은 도메인 내부에서 상위 레이어 → 하위 레이어 방향으로만 허용**됩니다.
+- `common`, `config` 패키지는 도메인에 속하지 않는 공유 모듈이며, 도메인 계층에서 `config` 를 직접 참조하지 않습니다.
 
-### 2.1. Controller (Web Layer)
+## 2. 레이어 역할
 
-- **역할**: HTTP 요청을 받아 적절한 Service를 호출하고, 결과를 응답으로 변환합니다.
-- **특징**:
-  - 비즈니스 로직을 포함하지 않습니다.
-  - DTO를 통해 데이터를 주고받습니다.
-  - `@RestController`, `@RequestMapping` 등을 사용합니다.
+### 2.1. Presentation Layer
 
-### 2.2. Service (Business Layer)
+- REST Controller, HTTP DTO, Spring Security 어댑터 등 인터페이스 어댑터 역할을 담당합니다.
+- 프레임워크에 강하게 의존할 수 있는 영역으로, `oauth.presentation.security.CustomOAuth2User` / `CustomOAuth2UserService` 같이 OAuth2 사용자 정보를 애플리케이션 계층 DTO(`OAuthLoginResult`)로 투영하는 어댑터가 포함됩니다.
+- 비즈니스 의사결정 로직은 넣지 않으며, 요청/응답 변환과 인증 컨텍스트 확립에 집중합니다.
 
-- **역할**: 실제 비즈니스 로직을 수행합니다. (트랜잭션 관리, 데이터 가공 등)
-- **특징**:
-  - `@Transactional`을 사용하여 데이터 무결성을 보장합니다.
-  - Mapper를 호출하여 DB 작업을 수행합니다.
-  - 도메인 객체를 DTO로 변환하여 반환합니다.
+### 2.2. Application Layer
 
-### 2.3. Domain (Entity)
+- 도메인 모델을 활용해 유스케이스를 조합하는 서비스, Command/Result DTO, 이벤트 퍼블리셔 등이 위치합니다.
+- 트랜잭션 경계를 선언하고, 필요한 Port를 주입받아 도메인/인프라를 호출합니다.
+- `UserService`, `OAuthTokenService` 등이 여기에 해당합니다.
 
-- **역할**: 핵심 비즈니스 데이터를 담고 있는 객체입니다.
-- **특징**:
-  - 데이터베이스 테이블과 1:1로 매핑되는 경우가 많습니다.
-  - 비즈니스 로직을 가질 수 있으나, 현재는 주로 데이터 홀더(POJO) 역할을 합니다.
-  - Lombok 사용을 지양하고 Getter/Setter를 명시적으로 작성하는 스타일을 유지합니다.
+### 2.3. Domain Layer
 
-### 2.4. Mapper (Persistence Layer)
+- 순수 자바 객체로 구성된 엔티티, VO, 정책 로직, 도메인 서비스가 들어갑니다.
+- 외부 기술 스택에 의존하지 않으며, 필요 시 Repository Port 인터페이스만 정의합니다.
 
-- **역할**: 데이터베이스와 상호작용합니다.
-- **특징**:
-  - MyBatis 인터페이스를 사용합니다.
-  - SQL 쿼리는 XML 파일이나 어노테이션으로 관리됩니다.
+### 2.4. Infrastructure Layer
 
-### 2.5. DTO (Data Transfer Object)
+- MyBatis Mapper, 외부 API 클라이언트, 파일 시스템 어댑터 등 실제 구현체가 위치합니다.
+- 도메인에서 정의한 Port를 구현해 Application Layer에 주입됩니다.
 
-- **역할**: 계층 간 데이터 교환을 담당합니다.
-- **특징**:
-  - `CreateRequest`, `UpdateRequest`, `Response` 등으로 명확히 구분하여 사용합니다.
-  - 엔티티가 외부로 직접 노출되는 것을 방지합니다.
+## 3. 보안 어댑터 설계
 
-## 3. 데이터 흐름 예시 (알고리즘 기록 생성)
+- Spring Security는 인터페이스 어댑터에 해당하므로 **OAuth 관련 커스텀 사용자/서비스 구현은 `oauth.presentation.security` 패키지**에서 관리합니다.
+- `CustomOAuth2User` 는 `OAuth2User` 를 감싼 뒤 애플리케이션 계층의 `OAuthLoginResult` 를 보존해 컨트롤러가 도메인 식별자와 흐름(`AuthFlowType`)을 안전하게 읽도록 합니다.
+- `CustomOAuth2UserService` 는 OAuth provider 응답을 파싱해 `OAuthLoginResult` 로 변환하고, `AuthenticationPrincipal` 로 주입될 수 있는 `CustomOAuth2User` 를 반환합니다.
+- 이 구조 덕분에 Presentation Layer가 인프라 구현에 직접 의존하지 않고도 인증 정보를 활용할 수 있으며, ArchUnit 규칙도 자연스럽게 충족합니다.
+
+## 4. 데이터 흐름 예시 (알고리즘 기록 생성)
 
 ```mermaid
 sequenceDiagram
@@ -94,3 +85,14 @@ sequenceDiagram
     Controller-->>Client: 201 Created (JSON)
     deactivate Controller
 ```
+
+## 5. 아키텍처 규칙 검증
+
+- `ArchitectureRulesTest` (테스트 로그에 "아키텍처 규칙 테스트"로 표시) 가 모든 계층 의존성/패키지 명명 규칙을 ArchUnit으로 검사합니다.
+- 전체 테스트를 실행하면 자동으로 검증되며, 단독 실행이 필요하다면 아래 명령을 사용할 수 있습니다.
+
+```powershell
+PS C:\dash\backend> .\mvnw.cmd test -Dtest=*ArchitectureRulesTest
+```
+
+- 새 클래스를 추가할 때는 레이어 패키지를 올바르게 지정하고, Presentation Layer에서 Infrastructure 클래스를 직접 참조하지 않도록 주의하세요. 위반 시 테스트가 즉시 실패합니다.

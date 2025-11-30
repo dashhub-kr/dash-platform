@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.ssafy.dash.oauth.mapper.UserOAuthTokenMapper">
+<mapper namespace="com.ssafy.dash.oauth.infrastructure.mapper.UserOAuthTokenMapper">
 
   <resultMap id="UserOAuthTokenResult" type="com.ssafy.dash.oauth.domain.UserOAuthToken">
     <id property="userId" column="user_id" />

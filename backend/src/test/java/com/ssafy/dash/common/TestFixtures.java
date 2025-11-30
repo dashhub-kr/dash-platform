@@ -2,18 +2,22 @@ package com.ssafy.dash.common;
 
 import java.time.LocalDateTime;
 
-import com.ssafy.dash.board.domain.Board;
-import com.ssafy.dash.board.dto.BoardCreateRequest;
-import com.ssafy.dash.board.dto.BoardResponse;
-import com.ssafy.dash.board.dto.BoardUpdateRequest;
-import com.ssafy.dash.user.domain.User;
-import com.ssafy.dash.user.dto.UserCreateRequest;
-import com.ssafy.dash.user.dto.UserUpdateRequest;
+import com.ssafy.dash.algorithm.application.dto.AlgorithmRecordCreateCommand;
+import com.ssafy.dash.algorithm.application.dto.AlgorithmRecordResult;
+import com.ssafy.dash.algorithm.application.dto.AlgorithmRecordUpdateCommand;
 import com.ssafy.dash.algorithm.domain.AlgorithmRecord;
-import com.ssafy.dash.algorithm.dto.AlgorithmRecordCreateRequest;
-import com.ssafy.dash.algorithm.dto.AlgorithmRecordResponse;
-import com.ssafy.dash.algorithm.dto.AlgorithmRecordUpdateRequest;
-import org.springframework.web.multipart.MultipartFile;
+import com.ssafy.dash.board.application.dto.BoardCreateCommand;
+import com.ssafy.dash.board.application.dto.BoardResult;
+import com.ssafy.dash.board.application.dto.BoardUpdateCommand;
+import com.ssafy.dash.board.domain.Board;
+import com.ssafy.dash.board.presentation.dto.request.BoardCreateRequest;
+import com.ssafy.dash.board.presentation.dto.request.BoardUpdateRequest;
+import com.ssafy.dash.user.application.dto.UserCreateCommand;
+import com.ssafy.dash.user.application.dto.UserResult;
+import com.ssafy.dash.user.application.dto.UserUpdateCommand;
+import com.ssafy.dash.user.domain.User;
+import com.ssafy.dash.user.presentation.dto.request.UserCreateRequest;
+import com.ssafy.dash.user.presentation.dto.request.UserUpdateRequest;
 
 public class TestFixtures {
 
@@ -46,6 +50,19 @@ public class TestFixtures {
         return new UserUpdateRequest("Updated User", "updated@example.com");
     }
 
+    public static UserCreateCommand createUserCreateCommand() {
+        return new UserCreateCommand(TEST_USERNAME, TEST_EMAIL);
+    }
+
+    public static UserUpdateCommand createUserUpdateCommand() {
+        return new UserUpdateCommand("Updated User", "updated@example.com");
+    }
+
+    public static UserResult createUserResult() {
+        return new UserResult(TEST_USER_ID, TEST_USERNAME, TEST_EMAIL, LocalDateTime.now(),
+                TEST_PROVIDER, TEST_PROVIDER_ID, TEST_AVATAR_URL);
+    }
+
     public static Board createBoard(User user) {
         return new Board(TEST_BOARD_ID, TEST_BOARD_TITLE, TEST_BOARD_CONTENT, user.getId(), LocalDateTime.now(), LocalDateTime.now());
     }
@@ -58,24 +75,37 @@ public class TestFixtures {
         return new BoardUpdateRequest("Updated Title", "Updated Content");
     }
 
-    public static BoardResponse createBoardResponse(User user) {
-        return new BoardResponse(TEST_BOARD_ID, TEST_BOARD_TITLE, TEST_BOARD_CONTENT, user.getId(), user.getUsername(), LocalDateTime.now(), LocalDateTime.now());
+    public static BoardCreateCommand createBoardCreateCommand() {
+        return new BoardCreateCommand(TEST_BOARD_TITLE, TEST_BOARD_CONTENT, TEST_USER_ID);
+    }
+
+    public static BoardUpdateCommand createBoardUpdateCommand() {
+        return new BoardUpdateCommand("Updated Title", "Updated Content");
+    }
+
+    public static BoardResult createBoardResult(User user) {
+        return new BoardResult(TEST_BOARD_ID, TEST_BOARD_TITLE, TEST_BOARD_CONTENT,
+                user.getId(), user.getUsername(), LocalDateTime.now(), LocalDateTime.now());
     }
 
     public static AlgorithmRecord createAlgorithmRecord(User user) {
         return new AlgorithmRecord(TEST_ALGORITHM_RECORD_ID, user.getId(), TEST_PROBLEM_NUMBER, TEST_ALGORITHM_TITLE, TEST_ALGORITHM_CODE, TEST_ALGORITHM_LANGUAGE, LocalDateTime.now(), LocalDateTime.now());
     }
 
-    public static AlgorithmRecordCreateRequest createAlgorithmRecordCreateRequest(MultipartFile file) {
-        return new AlgorithmRecordCreateRequest(TEST_PROBLEM_NUMBER, TEST_ALGORITHM_TITLE, TEST_ALGORITHM_LANGUAGE, file);
+    public static AlgorithmRecordCreateCommand createAlgorithmRecordCreateCommand(String code) {
+        return new AlgorithmRecordCreateCommand(TEST_USER_ID, TEST_PROBLEM_NUMBER,
+                TEST_ALGORITHM_TITLE, TEST_ALGORITHM_LANGUAGE, code);
     }
 
-    public static AlgorithmRecordUpdateRequest createAlgorithmRecordUpdateRequest(MultipartFile file) {
-        return new AlgorithmRecordUpdateRequest(TEST_PROBLEM_NUMBER, "Updated Title", TEST_ALGORITHM_LANGUAGE, file);
+    public static AlgorithmRecordUpdateCommand createAlgorithmRecordUpdateCommand(String code) {
+        return new AlgorithmRecordUpdateCommand(TEST_PROBLEM_NUMBER, "Updated Title",
+                TEST_ALGORITHM_LANGUAGE, code);
     }
 
-    public static AlgorithmRecordResponse createAlgorithmRecordResponse(User user) {
-        return new AlgorithmRecordResponse(TEST_ALGORITHM_RECORD_ID, user.getId(), TEST_PROBLEM_NUMBER, TEST_ALGORITHM_TITLE, TEST_ALGORITHM_CODE, TEST_ALGORITHM_LANGUAGE, LocalDateTime.now(), LocalDateTime.now());
+    public static AlgorithmRecordResult createAlgorithmRecordResult(User user) {
+        return new AlgorithmRecordResult(TEST_ALGORITHM_RECORD_ID, user.getId(), TEST_PROBLEM_NUMBER,
+                TEST_ALGORITHM_TITLE, TEST_ALGORITHM_CODE, TEST_ALGORITHM_LANGUAGE,
+                LocalDateTime.now(), LocalDateTime.now());
     }
     
 }
