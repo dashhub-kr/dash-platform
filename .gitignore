@@ -79,3 +79,6 @@ backend/.project
 backend/.settings
 backend/.springBeans
 backend/.sts4-cache
+
+# Copilot Instructions
+.github/copilot-instructions.md
