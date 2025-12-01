@@ -2,7 +2,7 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.ssafy.dash.user.infrastructure.mapper.UserMapper">
 
-  <resultMap id="UserResult" type="com.ssafy.dash.user.domain.User">
+  <resultMap id="UserResult" type="User">
     <id property="id" column="id" />
     <result property="username" column="username" />
     <result property="email" column="email" />
@@ -12,7 +12,7 @@
     <result property="avatarUrl" column="avatar_url" />
   </resultMap>
 
-  <insert id="insert" parameterType="com.ssafy.dash.user.domain.User" useGeneratedKeys="true" keyProperty="id">
+  <insert id="insert" parameterType="User" useGeneratedKeys="true" keyProperty="id">
     INSERT INTO users (username, email, created_at, provider, provider_id, avatar_url)
     VALUES (#{username}, #{email}, #{createdAt}, #{provider}, #{providerId}, #{avatarUrl})
   </insert>
@@ -31,7 +31,7 @@
     WHERE provider = #{provider} AND provider_id = #{providerId}
   </select>
 
-  <update id="update" parameterType="com.ssafy.dash.user.domain.User">
+  <update id="update" parameterType="User">
     UPDATE users
     SET username = #{username}, email = #{email}, provider = #{provider}, provider_id = #{providerId}, avatar_url = #{avatarUrl}
     WHERE id = #{id}

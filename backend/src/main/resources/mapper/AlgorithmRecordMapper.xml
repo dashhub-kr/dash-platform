@@ -2,7 +2,7 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.ssafy.dash.algorithm.infrastructure.mapper.AlgorithmRecordMapper">
 
-  <resultMap id="AlgorithmRecordResult" type="com.ssafy.dash.algorithm.domain.AlgorithmRecord">
+  <resultMap id="AlgorithmRecordResult" type="AlgorithmRecord">
     <id property="id" column="id" />
     <result property="userId" column="user_id" />
     <result property="problemNumber" column="problem_number" />
@@ -13,7 +13,7 @@
     <result property="updatedAt" column="updated_at" />
   </resultMap>
 
-  <insert id="insert" parameterType="com.ssafy.dash.algorithm.domain.AlgorithmRecord" useGeneratedKeys="true" keyProperty="id">
+  <insert id="insert" parameterType="AlgorithmRecord" useGeneratedKeys="true" keyProperty="id">
     INSERT INTO algorithm_records (user_id, problem_number, title, code, language, created_at, updated_at)
     VALUES (#{userId}, #{problemNumber}, #{title}, #{code}, #{language}, #{createdAt}, #{updatedAt})
   </insert>
@@ -37,7 +37,7 @@
     ORDER BY id DESC
   </select>
 
-  <update id="update" parameterType="com.ssafy.dash.algorithm.domain.AlgorithmRecord">
+  <update id="update" parameterType="AlgorithmRecord">
     UPDATE algorithm_records
     SET problem_number = #{problemNumber}, title = #{title}, code = #{code}, language = #{language}, updated_at = #{updatedAt}
     WHERE id = #{id}
