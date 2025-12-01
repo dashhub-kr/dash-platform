@@ -7,9 +7,9 @@ import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.ssafy.dash.algorithm.application.dto.AlgorithmRecordCreateCommand;
-import com.ssafy.dash.algorithm.application.dto.AlgorithmRecordResult;
-import com.ssafy.dash.algorithm.application.dto.AlgorithmRecordUpdateCommand;
+import com.ssafy.dash.algorithm.application.dto.command.AlgorithmRecordCreateCommand;
+import com.ssafy.dash.algorithm.application.dto.command.AlgorithmRecordUpdateCommand;
+import com.ssafy.dash.algorithm.application.dto.result.AlgorithmRecordResult;
 import com.ssafy.dash.algorithm.domain.AlgorithmRecord;
 import com.ssafy.dash.algorithm.domain.AlgorithmRecordRepository;
 import com.ssafy.dash.algorithm.domain.exception.AlgorithmRecordNotFoundException;
@@ -30,20 +30,14 @@ public class AlgorithmRecordService {
     @Transactional
     public AlgorithmRecordResult create(AlgorithmRecordCreateCommand command) {
         userRepository.findById(command.getUserId())
-            .orElseThrow(() -> new UserNotFoundException(command.getUserId()));
+                .orElseThrow(() -> new UserNotFoundException(command.getUserId()));
 
-        AlgorithmRecord record = new AlgorithmRecord();
-        record.setUserId(command.getUserId());
-        record.setProblemNumber(command.getProblemNumber());
-        record.setTitle(command.getTitle());
-        record.setCode(command.getCode());
-        record.setLanguage(command.getLanguage());
-        record.setCreatedAt(LocalDateTime.now());
-        record.setUpdatedAt(LocalDateTime.now());
+        LocalDateTime now = LocalDateTime.now();
+        AlgorithmRecord record = AlgorithmRecord.create(command.getUserId(), command.getProblemNumber(), command.getTitle(), command.getLanguage(), command.getCode(), now);
 
         algorithmRecordRepository.save(record);
 
-        return toResult(record);
+        return AlgorithmRecordResult.from(record);
     }
 
     @Transactional(readOnly = true)
@@ -51,14 +45,14 @@ public class AlgorithmRecordService {
         AlgorithmRecord record = algorithmRecordRepository.findById(id)
                 .orElseThrow(() -> new AlgorithmRecordNotFoundException(id));
 
-        return toResult(record);
+        return AlgorithmRecordResult.from(record);
     }
 
     @Transactional(readOnly = true)
     public List<AlgorithmRecordResult> findAll() {
 
         return algorithmRecordRepository.findAll().stream()
-                .map(this::toResult)
+                .map(AlgorithmRecordResult::from)
                 .collect(Collectors.toList());
     }
 
@@ -66,7 +60,7 @@ public class AlgorithmRecordService {
     public List<AlgorithmRecordResult> findByUserId(Long userId) {
 
         return algorithmRecordRepository.findByUserId(userId).stream()
-                .map(this::toResult)
+                .map(AlgorithmRecordResult::from)
                 .collect(Collectors.toList());
     }
 
@@ -75,47 +69,20 @@ public class AlgorithmRecordService {
         AlgorithmRecord record = algorithmRecordRepository.findById(id)
                 .orElseThrow(() -> new AlgorithmRecordNotFoundException(id));
 
-        if (command.getProblemNumber() != null) {
-            record.setProblemNumber(command.getProblemNumber());
-        }
-        if (command.getTitle() != null) {
-            record.setTitle(command.getTitle());
-        }
-        if (command.getLanguage() != null) {
-            record.setLanguage(command.getLanguage());
-        }
-        if (command.getCode() != null) {
-            record.setCode(command.getCode());
-        }
-        
-        record.setUpdatedAt(LocalDateTime.now());
+        LocalDateTime now = LocalDateTime.now();
+        record.applyUpdate(command.getProblemNumber(), command.getTitle(), command.getLanguage(), command.getCode(), now);
 
         algorithmRecordRepository.update(record);
 
-        return toResult(record);
+        return AlgorithmRecordResult.from(record);
     }
 
     @Transactional
     public void delete(Long id) {
         boolean deleted = algorithmRecordRepository.delete(id);
         if (!deleted) {
-
             throw new AlgorithmRecordNotFoundException(id);
         }
     }
 
-    private AlgorithmRecordResult toResult(AlgorithmRecord record) {
-        
-        return new AlgorithmRecordResult(
-            record.getId(),
-            record.getUserId(),
-            record.getProblemNumber(),
-            record.getTitle(),
-            record.getCode(),
-            record.getLanguage(),
-            record.getCreatedAt(),
-            record.getUpdatedAt()
-        );
-    }
-    
 }
