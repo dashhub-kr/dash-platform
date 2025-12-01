@@ -1,8 +1,10 @@
 package com.ssafy.dash.algorithm.presentation;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.verify;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
@@ -11,23 +13,25 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import java.util.List;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
-import org.mockito.Mockito;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 
 import com.ssafy.dash.algorithm.application.AlgorithmRecordService;
-import com.ssafy.dash.algorithm.application.dto.AlgorithmRecordCreateCommand;
-import com.ssafy.dash.algorithm.application.dto.AlgorithmRecordResult;
-import com.ssafy.dash.algorithm.application.dto.AlgorithmRecordUpdateCommand;
+import com.ssafy.dash.algorithm.application.dto.command.AlgorithmRecordCreateCommand;
+import com.ssafy.dash.algorithm.application.dto.command.AlgorithmRecordUpdateCommand;
+import com.ssafy.dash.algorithm.application.dto.result.AlgorithmRecordResult;
 import com.ssafy.dash.common.TestFixtures;
 import com.ssafy.dash.user.domain.User;
 
@@ -43,6 +47,8 @@ class AlgorithmRecordControllerTest {
     @Autowired
     private AlgorithmRecordService algorithmRecordService;
 
+    private AlgorithmRecordResult recordResult;
+
     @TestConfiguration
     static class TestConfig {
         @Bean
@@ -52,15 +58,18 @@ class AlgorithmRecordControllerTest {
         }
     }
 
+    @BeforeEach
+    void setUp() {
+        User user = TestFixtures.createUser();
+        this.recordResult = TestFixtures.createAlgorithmRecordResult(user);
+    }
+
     @Test
     @WithMockUser
     @DisplayName("알고리즘 기록 생성 성공")
     void createRecord_Success() throws Exception {
         MockMultipartFile file = new MockMultipartFile("file", "Main.java", "text/plain", TestFixtures.TEST_ALGORITHM_CODE.getBytes());
-        User user = TestFixtures.createUser();
-        AlgorithmRecordResult result = TestFixtures.createAlgorithmRecordResult(user);
-
-        given(algorithmRecordService.create(any(AlgorithmRecordCreateCommand.class))).willReturn(result);
+        given(algorithmRecordService.create(any(AlgorithmRecordCreateCommand.class))).willReturn(recordResult);
 
         mockMvc.perform(multipart("/api/algorithm-records")
                 .file(file)
@@ -69,15 +78,17 @@ class AlgorithmRecordControllerTest {
                 .param("language", TestFixtures.TEST_ALGORITHM_LANGUAGE))
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.id").value(TestFixtures.TEST_ALGORITHM_RECORD_ID));
+
+        ArgumentCaptor<AlgorithmRecordCreateCommand> captor = ArgumentCaptor.forClass(AlgorithmRecordCreateCommand.class);
+        verify(algorithmRecordService).create(captor.capture());
+        assertThat(captor.getValue().getCode()).contains(TestFixtures.TEST_ALGORITHM_CODE);
     }
 
     @Test
     @WithMockUser
     @DisplayName("알고리즘 기록 전체 조회 성공")
     void getAllRecords_Success() throws Exception {
-        User user = TestFixtures.createUser();
-        AlgorithmRecordResult result = TestFixtures.createAlgorithmRecordResult(user);
-        given(algorithmRecordService.findAll()).willReturn(List.of(result));
+        given(algorithmRecordService.findAll()).willReturn(List.of(recordResult));
 
         mockMvc.perform(get("/api/algorithm-records"))
                 .andExpect(status().isOk())
@@ -88,9 +99,7 @@ class AlgorithmRecordControllerTest {
     @WithMockUser
     @DisplayName("알고리즘 기록 단건 조회 성공")
     void getRecordById_Success() throws Exception {
-        User user = TestFixtures.createUser();
-        AlgorithmRecordResult result = TestFixtures.createAlgorithmRecordResult(user);
-        given(algorithmRecordService.findById(TestFixtures.TEST_ALGORITHM_RECORD_ID)).willReturn(result);
+        given(algorithmRecordService.findById(TestFixtures.TEST_ALGORITHM_RECORD_ID)).willReturn(recordResult);
 
         mockMvc.perform(get("/api/algorithm-records/" + TestFixtures.TEST_ALGORITHM_RECORD_ID))
                 .andExpect(status().isOk())
@@ -102,16 +111,16 @@ class AlgorithmRecordControllerTest {
     @DisplayName("알고리즘 기록 수정 성공")
     void updateRecord_Success() throws Exception {
         MockMultipartFile file = new MockMultipartFile("file", "Main.java", "text/plain", "updated".getBytes());
-        User user = TestFixtures.createUser();
-        AlgorithmRecordResult result = TestFixtures.createAlgorithmRecordResult(user);
-
-        given(algorithmRecordService.update(eq(TestFixtures.TEST_ALGORITHM_RECORD_ID), any(AlgorithmRecordUpdateCommand.class))).willReturn(result);
+        given(algorithmRecordService.update(eq(TestFixtures.TEST_ALGORITHM_RECORD_ID), any(AlgorithmRecordUpdateCommand.class))).willReturn(recordResult);
 
         mockMvc.perform(multipart("/api/algorithm-records/" + TestFixtures.TEST_ALGORITHM_RECORD_ID)
                 .file(file)
                 .param("title", "Updated")
                 .with(request -> { request.setMethod("PUT"); return request; }))
-                .andExpect(status().isOk());
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.id").value(TestFixtures.TEST_ALGORITHM_RECORD_ID));
+
+        verify(algorithmRecordService).update(eq(TestFixtures.TEST_ALGORITHM_RECORD_ID), any(AlgorithmRecordUpdateCommand.class));
     }
 
     @Test
@@ -120,6 +129,8 @@ class AlgorithmRecordControllerTest {
     void deleteRecord_Success() throws Exception {
         mockMvc.perform(delete("/api/algorithm-records/" + TestFixtures.TEST_ALGORITHM_RECORD_ID))
                 .andExpect(status().isNoContent());
+
+        verify(algorithmRecordService).delete(TestFixtures.TEST_ALGORITHM_RECORD_ID);
     }
     
 }
