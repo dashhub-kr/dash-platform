@@ -22,9 +22,14 @@
 	<licenses>
 		<license/>
 	</licenses>
-	
+
 	<developers>
-		<developer/>
+		<developer>
+			<id>utact</id>
+			<name>Yoo Seung-jun</name>
+			<organization>SSAFY</organization>
+			<organizationUrl>https://github.com/utact</organizationUrl>
+		</developer>
 	</developers>
 	
 	<scm>
