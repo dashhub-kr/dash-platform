@@ -30,6 +30,7 @@ build/
 .env.local
 .env.*.local
 .envrc
+*.properties.local
 
 
 ##########################################################
