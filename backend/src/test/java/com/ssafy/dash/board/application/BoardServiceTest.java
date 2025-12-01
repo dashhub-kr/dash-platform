@@ -1,8 +1,11 @@
 package com.ssafy.dash.board.application;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 
 import java.util.List;
@@ -16,14 +19,16 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import com.ssafy.dash.board.application.dto.BoardCreateCommand;
-import com.ssafy.dash.board.application.dto.BoardResult;
-import com.ssafy.dash.board.application.dto.BoardUpdateCommand;
+import com.ssafy.dash.board.application.dto.command.BoardCreateCommand;
+import com.ssafy.dash.board.application.dto.result.BoardResult;
+import com.ssafy.dash.board.application.dto.command.BoardUpdateCommand;
 import com.ssafy.dash.board.domain.Board;
 import com.ssafy.dash.board.domain.BoardRepository;
+import com.ssafy.dash.board.domain.exception.BoardNotFoundException;
 import com.ssafy.dash.common.TestFixtures;
 import com.ssafy.dash.user.domain.User;
 import com.ssafy.dash.user.domain.UserRepository;
+import com.ssafy.dash.user.domain.exception.UserNotFoundException;
 
 @ExtendWith(MockitoExtension.class)
 @DisplayName("BoardService 단위 테스트")
@@ -48,78 +53,104 @@ class BoardServiceTest {
     }
 
     @Test
-    @DisplayName("게시글 생성 성공")
+    @DisplayName("사용자가 존재할 때 게시글을 생성한다")
     void createBoard_Success() {
-        // given
         BoardCreateCommand command = TestFixtures.createBoardCreateCommand();
         given(userRepository.findById(command.getUserId())).willReturn(Optional.of(user));
         
-        // when
         BoardResult response = boardService.create(command);
 
-        // then
         verify(boardRepository).save(any(Board.class));
-        assertThat(response.getTitle()).isEqualTo(command.getTitle());
-        assertThat(response.getAuthorName()).isEqualTo(user.getUsername());
+        assertThat(response.title()).isEqualTo(command.getTitle());
+        assertThat(response.authorName()).isEqualTo(user.getUsername());
     }
 
     @Test
-    @DisplayName("ID로 게시글 조회 성공")
+    @DisplayName("존재하지 않는 사용자로 게시글을 생성하면 예외가 발생한다")
+    void createBoard_UserMissing_Throws() {
+        BoardCreateCommand command = TestFixtures.createBoardCreateCommand();
+        given(userRepository.findById(command.getUserId())).willReturn(Optional.empty());
+
+        assertThatThrownBy(() -> boardService.create(command))
+                .isInstanceOf(UserNotFoundException.class);
+        verify(boardRepository, never()).save(any());
+    }
+
+    @Test
+    @DisplayName("ID로 게시글을 조회한다")
     void findById_Success() {
-        // given
         given(boardRepository.findById(board.getId())).willReturn(Optional.of(board));
         given(userRepository.findById(user.getId())).willReturn(Optional.of(user));
 
-        // when
         BoardResult response = boardService.findById(board.getId());
 
-        // then
-        assertThat(response.getId()).isEqualTo(board.getId());
-        assertThat(response.getAuthorName()).isEqualTo(user.getUsername());
+        assertThat(response.id()).isEqualTo(board.getId());
+        assertThat(response.authorName()).isEqualTo(user.getUsername());
     }
 
     @Test
-    @DisplayName("전체 게시글 조회 성공")
+    @DisplayName("없는 ID로 게시글을 조회하면 예외가 발생한다")
+    void findById_NotFound_Throws() {
+        given(boardRepository.findById(board.getId())).willReturn(Optional.empty());
+
+        assertThatThrownBy(() -> boardService.findById(board.getId()))
+                .isInstanceOf(BoardNotFoundException.class);
+    }
+
+    @Test
+    @DisplayName("전체 게시글을 조회한다")
     void findAll_Success() {
-        // given
         given(boardRepository.findAll()).willReturn(List.of(board));
         given(userRepository.findById(user.getId())).willReturn(Optional.of(user));
 
-        // when
         List<BoardResult> responses = boardService.findAll();
 
-        // then
         assertThat(responses).hasSize(1);
-        assertThat(responses.get(0).getAuthorName()).isEqualTo(user.getUsername());
+        assertThat(responses.get(0).authorName()).isEqualTo(user.getUsername());
     }
 
     @Test
-    @DisplayName("게시글 수정 성공")
+    @DisplayName("게시글을 수정하면 변경 내용이 반영된다")
     void updateBoard_Success() {
-        // given
         BoardUpdateCommand command = TestFixtures.createBoardUpdateCommand();
         given(boardRepository.findById(board.getId())).willReturn(Optional.of(board));
         given(userRepository.findById(user.getId())).willReturn(Optional.of(user));
 
-        // when
         BoardResult response = boardService.update(board.getId(), command);
 
-        // then
         verify(boardRepository).update(any(Board.class));
-        assertThat(response.getTitle()).isEqualTo(command.getTitle());
+        assertThat(response.title()).isEqualTo(command.getTitle());
     }
 
     @Test
-    @DisplayName("게시글 삭제 성공")
+    @DisplayName("없는 게시글을 수정하면 예외가 발생한다")
+    void updateBoard_NotFound_Throws() {
+        BoardUpdateCommand command = TestFixtures.createBoardUpdateCommand();
+        given(boardRepository.findById(board.getId())).willReturn(Optional.empty());
+
+        assertThatThrownBy(() -> boardService.update(board.getId(), command))
+                .isInstanceOf(BoardNotFoundException.class);
+        verify(boardRepository, never()).update(any(Board.class));
+    }
+
+    @Test
+    @DisplayName("게시글을 삭제하면 저장소에 삭제 명령을 전달한다")
     void deleteBoard_Success() {
-        // given
         given(boardRepository.findById(board.getId())).willReturn(Optional.of(board));
 
-        // when
         boardService.delete(board.getId());
 
-        // then
         verify(boardRepository).delete(board.getId());
+    }
+
+    @Test
+    @DisplayName("없는 게시글을 삭제하면 예외가 발생한다")
+    void deleteBoard_NotFound_Throws() {
+        given(boardRepository.findById(board.getId())).willReturn(Optional.empty());
+
+        assertThatThrownBy(() -> boardService.delete(board.getId()))
+                .isInstanceOf(BoardNotFoundException.class);
+        verify(boardRepository, never()).delete(anyLong());
     }
 
 }
