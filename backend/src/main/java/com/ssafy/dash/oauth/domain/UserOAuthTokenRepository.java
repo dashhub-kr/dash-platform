@@ -7,5 +7,4 @@ public interface UserOAuthTokenRepository {
     Optional<UserOAuthToken> findByUserId(Long userId);
 
     void save(UserOAuthToken token);
-    
 }

@@ -1,7 +1,15 @@
 package com.ssafy.dash.oauth.domain;
 
-import java.time.LocalDateTime;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
+import java.time.LocalDateTime;
+import java.util.Objects;
+
+@Getter
+@Setter
+@NoArgsConstructor
 public class UserOAuthToken {
 
     private Long userId;
@@ -13,68 +21,43 @@ public class UserOAuthToken {
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
-    public Long getUserId() {
-        return userId;
+    public static UserOAuthToken issued(Long userId, String accessToken, String tokenType, LocalDateTime expiresAt, String refreshToken, LocalDateTime refreshTokenExpiresAt, LocalDateTime issuedAt) {
+        UserOAuthToken token = new UserOAuthToken();
+        token.setUserId(requirePositive(userId));
+        token.updateAccessToken(accessToken, tokenType, expiresAt, issuedAt);
+        token.setRefreshToken(refreshToken);
+        token.setRefreshTokenExpiresAt(refreshTokenExpiresAt);
+        token.setCreatedAt(issuedAt);
+        token.setUpdatedAt(issuedAt);
+        return token;
     }
 
-    public void setUserId(Long userId) {
-        this.userId = userId;
-    }
-
-    public String getAccessToken() {
-        return accessToken;
-    }
-
-    public void setAccessToken(String accessToken) {
-        this.accessToken = accessToken;
-    }
-
-    public String getTokenType() {
-        return tokenType;
-    }
-
-    public void setTokenType(String tokenType) {
+    public void updateAccessToken(String accessToken, String tokenType, LocalDateTime expiresAt, LocalDateTime updatedAt) {
+        this.accessToken = requireText(accessToken);
         this.tokenType = tokenType;
-    }
-
-    public LocalDateTime getExpiresAt() {
-        return expiresAt;
-    }
-
-    public void setExpiresAt(LocalDateTime expiresAt) {
         this.expiresAt = expiresAt;
+        this.updatedAt = Objects.requireNonNullElse(updatedAt, LocalDateTime.now());
     }
 
-    public String getRefreshToken() {
-        return refreshToken;
+    public boolean isAccessTokenExpired(LocalDateTime referenceTime) {
+        if (expiresAt == null) {
+            return false;
+        }
+        return expiresAt.isBefore(Objects.requireNonNullElse(referenceTime, LocalDateTime.now()));
     }
 
-    public void setRefreshToken(String refreshToken) {
-        this.refreshToken = refreshToken;
+    private static Long requirePositive(Long value) {
+        if (value == null || value <= 0) {
+            throw new IllegalArgumentException("userId" + " must be positive");
+        }
+        return value;
     }
 
-    public LocalDateTime getRefreshTokenExpiresAt() {
-        return refreshTokenExpiresAt;
-    }
-
-    public void setRefreshTokenExpiresAt(LocalDateTime refreshTokenExpiresAt) {
-        this.refreshTokenExpiresAt = refreshTokenExpiresAt;
-    }
-
-    public LocalDateTime getCreatedAt() {
-        return createdAt;
-    }
-
-    public void setCreatedAt(LocalDateTime createdAt) {
-        this.createdAt = createdAt;
-    }
-
-    public LocalDateTime getUpdatedAt() {
-        return updatedAt;
-    }
-
-    public void setUpdatedAt(LocalDateTime updatedAt) {
-        this.updatedAt = updatedAt;
+    private static String requireText(String value) {
+        if (value == null || value.isBlank()) {
+            throw new IllegalArgumentException("accessToken" + " must not be blank");
+        }
+        return value;
     }
 
 }
