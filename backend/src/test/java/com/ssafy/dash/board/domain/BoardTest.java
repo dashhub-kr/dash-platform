@@ -1,14 +1,14 @@
 package com.ssafy.dash.board.domain;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-
 import java.time.LocalDateTime;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import com.ssafy.dash.common.fixtures.FixtureTime;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 class BoardTest {
 
@@ -51,4 +51,5 @@ class BoardTest {
         assertThatThrownBy(() -> Board.create(0L, "", "", FixtureTime.now()))
                 .isInstanceOf(IllegalArgumentException.class);
     }
+    
 }

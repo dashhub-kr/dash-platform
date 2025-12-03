@@ -1,41 +1,40 @@
 package com.ssafy.dash.board.presentation;
 
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.verify;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-
-import java.util.List;
-
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.ssafy.dash.board.application.BoardService;
+import com.ssafy.dash.board.application.dto.command.BoardCreateCommand;
+import com.ssafy.dash.board.application.dto.command.BoardUpdateCommand;
+import com.ssafy.dash.board.application.dto.result.BoardResult;
+import com.ssafy.dash.board.domain.exception.BoardNotFoundException;
+import com.ssafy.dash.board.presentation.dto.request.BoardCreateRequest;
+import com.ssafy.dash.board.presentation.dto.request.BoardUpdateRequest;
+import com.ssafy.dash.common.TestFixtures;
+import com.ssafy.dash.common.fixtures.FixtureTime;
+import com.ssafy.dash.user.domain.User;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
-import org.mockito.Mockito;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.ssafy.dash.board.application.BoardService;
-import com.ssafy.dash.board.application.dto.command.BoardCreateCommand;
-import com.ssafy.dash.board.application.dto.result.BoardResult;
-import com.ssafy.dash.board.application.dto.command.BoardUpdateCommand;
-import com.ssafy.dash.board.presentation.dto.request.BoardCreateRequest;
-import com.ssafy.dash.board.presentation.dto.request.BoardUpdateRequest;
-import com.ssafy.dash.common.TestFixtures;
-import com.ssafy.dash.common.fixtures.FixtureTime;
-import com.ssafy.dash.user.domain.User;
+import java.util.List;
+
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.BDDMockito.willThrow;
+import static org.mockito.Mockito.verify;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(BoardController.class)
 @AutoConfigureMockMvc(addFilters = false)
@@ -59,7 +58,6 @@ class BoardControllerTest {
     static class TestConfig {
         @Bean
         public BoardService boardService() {
-            
             return Mockito.mock(BoardService.class);
         }
     }
@@ -70,6 +68,11 @@ class BoardControllerTest {
         boardResult = TestFixtures.createBoardResult(user);
     }
 
+    @AfterEach
+    void tearDown() {
+        Mockito.reset(boardService);
+    }
+
     @Test
     @DisplayName("게시글 생성 성공")
     void createBoard_Success() throws Exception {
@@ -77,8 +80,8 @@ class BoardControllerTest {
         given(boardService.create(any(BoardCreateCommand.class))).willReturn(boardResult);
 
         mockMvc.perform(post("/api/boards")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(req)))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(req)))
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.id").value(TestFixtures.TEST_BOARD_ID))
                 .andExpect(jsonPath("$.title").value(TestFixtures.TEST_BOARD_TITLE));
@@ -111,19 +114,46 @@ class BoardControllerTest {
     }
 
     @Test
+    @DisplayName("ID로 게시글 조회 실패_없으면 404")
+    void getBoardById_Failure_NotFound() throws Exception {
+        given(boardService.findById(TestFixtures.TEST_BOARD_ID))
+                .willThrow(new BoardNotFoundException(TestFixtures.TEST_BOARD_ID));
+
+        mockMvc.perform(get("/api/boards/" + TestFixtures.TEST_BOARD_ID))
+                .andExpect(status().isNotFound());
+
+        verify(boardService).findById(TestFixtures.TEST_BOARD_ID);
+    }
+
+    @Test
     @DisplayName("게시글 수정 성공")
     void updateBoard_Success() throws Exception {
         BoardUpdateRequest req = TestFixtures.createBoardUpdateRequest();
         BoardResult updatedResult = new BoardResult(TestFixtures.TEST_BOARD_ID, req.getTitle(), req.getContent(),
-            user.getId(), user.getUsername(), FixtureTime.now(), FixtureTime.now());
+                user.getId(), user.getUsername(), FixtureTime.now(), FixtureTime.now());
 
         given(boardService.update(eq(TestFixtures.TEST_BOARD_ID), any(BoardUpdateCommand.class))).willReturn(updatedResult);
 
         mockMvc.perform(put("/api/boards/" + TestFixtures.TEST_BOARD_ID)
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(req)))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(req)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.title").value(req.getTitle()));
+
+        verify(boardService).update(eq(TestFixtures.TEST_BOARD_ID), any(BoardUpdateCommand.class));
+    }
+
+    @Test
+    @DisplayName("게시글 수정 실패_대상이 없으면 404")
+    void updateBoard_Failure_NotFound() throws Exception {
+        BoardUpdateRequest req = TestFixtures.createBoardUpdateRequest();
+        given(boardService.update(eq(TestFixtures.TEST_BOARD_ID), any(BoardUpdateCommand.class)))
+                .willThrow(new BoardNotFoundException(TestFixtures.TEST_BOARD_ID));
+
+        mockMvc.perform(put("/api/boards/" + TestFixtures.TEST_BOARD_ID)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(req)))
+                .andExpect(status().isNotFound());
 
         verify(boardService).update(eq(TestFixtures.TEST_BOARD_ID), any(BoardUpdateCommand.class));
     }
@@ -133,6 +163,18 @@ class BoardControllerTest {
     void deleteBoard_Success() throws Exception {
         mockMvc.perform(delete("/api/boards/" + TestFixtures.TEST_BOARD_ID))
                 .andExpect(status().isNoContent());
+
+        verify(boardService).delete(TestFixtures.TEST_BOARD_ID);
+    }
+
+    @Test
+    @DisplayName("게시글 삭제 실패_이미 없으면 404")
+    void deleteBoard_Failure_NotFound() throws Exception {
+        willThrow(new BoardNotFoundException(TestFixtures.TEST_BOARD_ID))
+                .given(boardService).delete(TestFixtures.TEST_BOARD_ID);
+
+        mockMvc.perform(delete("/api/boards/" + TestFixtures.TEST_BOARD_ID))
+                .andExpect(status().isNotFound());
 
         verify(boardService).delete(TestFixtures.TEST_BOARD_ID);
     }
