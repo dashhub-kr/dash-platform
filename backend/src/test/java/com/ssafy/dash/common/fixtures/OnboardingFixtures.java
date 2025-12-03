@@ -38,7 +38,10 @@ public final class OnboardingFixtures {
     ) {
 
         public Onboarding toDomain(LocalDateTime createdAt, LocalDateTime updatedAt) {
-            return new Onboarding(id, userId, repositoryName, webhookConfigured, createdAt, updatedAt);
+            Onboarding onboarding = Onboarding.create(userId, repositoryName, createdAt);
+            onboarding.setId(id);
+            onboarding.markWebhookConfigured(webhookConfigured, updatedAt);
+            return onboarding;
         }
 
         public Onboarding toDomain() {
