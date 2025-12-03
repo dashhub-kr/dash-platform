@@ -1,17 +1,17 @@
 package com.ssafy.dash.board.domain;
 
-import java.time.LocalDateTime;
-import java.util.Objects;
-
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+
+import java.time.LocalDateTime;
+import java.util.Objects;
 
 @Getter
 @Setter
 @NoArgsConstructor
 public class Board {
-    
+
     private Long id;
     private String title;
     private String content;
@@ -20,7 +20,7 @@ public class Board {
     private LocalDateTime updatedAt;
 
     private Board(Long userId, String title, String content, LocalDateTime createdAt, LocalDateTime updatedAt) {
-        this.userId = requirePositive(userId, "userId");
+        this.userId = requirePositive(userId);
         this.title = requireText(title, "title");
         this.content = requireText(content, "content");
         this.createdAt = requireTimestamp(createdAt, "createdAt");
@@ -41,9 +41,9 @@ public class Board {
         this.updatedAt = requireTimestamp(updatedAt, "updatedAt");
     }
 
-    private static Long requirePositive(Long value, String fieldName) {
+    private static Long requirePositive(Long value) {
         if (value == null || value <= 0) {
-            throw new IllegalArgumentException(fieldName + " must be positive");
+            throw new IllegalArgumentException("userId" + " must be positive");
         }
         return value;
     }

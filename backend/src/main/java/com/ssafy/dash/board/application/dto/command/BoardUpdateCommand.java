@@ -1,13 +1,7 @@
 package com.ssafy.dash.board.application.dto.command;
 
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
+public record BoardUpdateCommand(
+        String title, String content
+) {
 
-@Getter
-@RequiredArgsConstructor
-public class BoardUpdateCommand {
-
-    private final String title;
-    private final String content;
-    
 }
