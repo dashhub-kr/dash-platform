@@ -62,7 +62,9 @@ public final class UserFixtures {
     ) {
 
         public User toDomain(LocalDateTime createdAt) {
-            return new User(id, username, email, createdAt, provider, providerId, avatarUrl);
+            User user = User.create(username, email, createdAt, provider, providerId, avatarUrl);
+            user.setId(id);
+            return user;
         }
 
         public UserResult toResult(LocalDateTime createdAt) {

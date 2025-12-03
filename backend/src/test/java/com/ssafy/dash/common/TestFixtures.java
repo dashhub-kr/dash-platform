@@ -15,8 +15,10 @@ import com.ssafy.dash.board.presentation.dto.request.BoardUpdateRequest;
 import com.ssafy.dash.common.fixtures.AlgorithmRecordFixtures;
 import com.ssafy.dash.common.fixtures.BoardFixtures;
 import com.ssafy.dash.common.fixtures.FixtureTime;
+import com.ssafy.dash.common.fixtures.OAuthTokenFixtures;
 import com.ssafy.dash.common.fixtures.OnboardingFixtures;
 import com.ssafy.dash.common.fixtures.UserFixtures;
+import com.ssafy.dash.oauth.domain.UserOAuthToken;
 import com.ssafy.dash.onboarding.application.dto.command.RepositorySetupCommand;
 import com.ssafy.dash.onboarding.application.dto.result.RepositorySetupResult;
 import com.ssafy.dash.onboarding.domain.Onboarding;
@@ -55,6 +57,9 @@ public final class TestFixtures {
 
     public static final Long TEST_ONBOARDING_ID = OnboardingFixtures.TEST_ONBOARDING_ID;
     public static final String TEST_REPOSITORY_NAME = OnboardingFixtures.TEST_REPOSITORY_NAME;
+
+    public static final String TEST_ACCESS_TOKEN = OAuthTokenFixtures.TEST_ACCESS_TOKEN;
+    public static final String UPDATED_ACCESS_TOKEN = OAuthTokenFixtures.UPDATED_ACCESS_TOKEN;
 
     // Fixture Time
     public static LocalDateTime fixedNow() {
@@ -163,6 +168,19 @@ public final class TestFixtures {
 
     public static OnboardingFixtures.OnboardingFixture onboardingFixture(Long userId, boolean webhookConfigured) {
         return OnboardingFixtures.onboardingFixture(userId, webhookConfigured);
+    }
+
+    // OAuth Token Fixtures
+    public static UserOAuthToken createUserOAuthToken(Long userId) {
+        return OAuthTokenFixtures.userOAuthTokenFixture(userId).toDomain();
+    }
+
+    public static UserOAuthToken createExpiredUserOAuthToken(Long userId) {
+        return OAuthTokenFixtures.userOAuthTokenFixture(userId).expiredToken();
+    }
+
+    public static OAuthTokenFixtures.UserOAuthTokenFixture userOAuthTokenFixture(Long userId) {
+        return OAuthTokenFixtures.userOAuthTokenFixture(userId);
     }
 
 }
