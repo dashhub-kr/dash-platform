@@ -1,11 +1,11 @@
 package com.ssafy.dash.algorithm.domain;
 
-import java.time.LocalDateTime;
-import java.util.Objects;
-
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+
+import java.time.LocalDateTime;
+import java.util.Objects;
 
 @Getter
 @Setter
@@ -22,7 +22,7 @@ public class AlgorithmRecord {
     private LocalDateTime updatedAt;
 
     private AlgorithmRecord(Long userId, String problemNumber, String title, String language, String code, LocalDateTime createdAt, LocalDateTime updatedAt) {
-        this.userId = requirePositive(userId, "userId");
+        this.userId = requirePositive(userId);
         this.problemNumber = requireText(problemNumber, "problemNumber");
         this.title = requireText(title, "title");
         this.language = requireText(language, "language");
@@ -51,9 +51,9 @@ public class AlgorithmRecord {
         this.updatedAt = requireTimestamp(updatedAt, "updatedAt");
     }
 
-    private static Long requirePositive(Long value, String fieldName) {
+    private static Long requirePositive(Long value) {
         if (value == null || value <= 0) {
-            throw new IllegalArgumentException(fieldName + " must be positive");
+            throw new IllegalArgumentException("userId" + " must be positive");
         }
         return value;
     }
