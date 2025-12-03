@@ -1,8 +1,8 @@
 package com.ssafy.dash.algorithm.application.dto.result;
 
-import java.time.LocalDateTime;
-
 import com.ssafy.dash.algorithm.domain.AlgorithmRecord;
+
+import java.time.LocalDateTime;
 
 public record AlgorithmRecordResult(
         Long id,

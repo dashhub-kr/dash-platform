@@ -1,12 +1,5 @@
 package com.ssafy.dash.algorithm.application;
 
-import java.time.LocalDateTime;
-import java.util.List;
-import java.util.stream.Collectors;
-
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
 import com.ssafy.dash.algorithm.application.dto.command.AlgorithmRecordCreateCommand;
 import com.ssafy.dash.algorithm.application.dto.command.AlgorithmRecordUpdateCommand;
 import com.ssafy.dash.algorithm.application.dto.result.AlgorithmRecordResult;
@@ -15,6 +8,12 @@ import com.ssafy.dash.algorithm.domain.AlgorithmRecordRepository;
 import com.ssafy.dash.algorithm.domain.exception.AlgorithmRecordNotFoundException;
 import com.ssafy.dash.user.domain.UserRepository;
 import com.ssafy.dash.user.domain.exception.UserNotFoundException;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class AlgorithmRecordService {
@@ -29,11 +28,11 @@ public class AlgorithmRecordService {
 
     @Transactional
     public AlgorithmRecordResult create(AlgorithmRecordCreateCommand command) {
-        userRepository.findById(command.getUserId())
-                .orElseThrow(() -> new UserNotFoundException(command.getUserId()));
+        userRepository.findById(command.userId())
+                .orElseThrow(() -> new UserNotFoundException(command.userId()));
 
         LocalDateTime now = LocalDateTime.now();
-        AlgorithmRecord record = AlgorithmRecord.create(command.getUserId(), command.getProblemNumber(), command.getTitle(), command.getLanguage(), command.getCode(), now);
+        AlgorithmRecord record = AlgorithmRecord.create(command.userId(), command.problemNumber(), command.title(), command.language(), command.code(), now);
 
         algorithmRecordRepository.save(record);
 
@@ -70,7 +69,7 @@ public class AlgorithmRecordService {
                 .orElseThrow(() -> new AlgorithmRecordNotFoundException(id));
 
         LocalDateTime now = LocalDateTime.now();
-        record.applyUpdate(command.getProblemNumber(), command.getTitle(), command.getLanguage(), command.getCode(), now);
+        record.applyUpdate(command.problemNumber(), command.title(), command.language(), command.code(), now);
 
         algorithmRecordRepository.update(record);
 
