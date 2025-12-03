@@ -1,12 +1,11 @@
 package com.ssafy.dash.oauth.infrastructure.persistence;
 
-import java.util.Optional;
-
-import org.springframework.stereotype.Repository;
-
 import com.ssafy.dash.oauth.domain.UserOAuthToken;
 import com.ssafy.dash.oauth.domain.UserOAuthTokenRepository;
 import com.ssafy.dash.oauth.infrastructure.mapper.UserOAuthTokenMapper;
+import org.springframework.stereotype.Repository;
+
+import java.util.Optional;
 
 @Repository
 public class UserOAuthTokenRepositoryImpl implements UserOAuthTokenRepository {
@@ -19,7 +18,6 @@ public class UserOAuthTokenRepositoryImpl implements UserOAuthTokenRepository {
 
     @Override
     public Optional<UserOAuthToken> findByUserId(Long userId) {
-        
         return Optional.ofNullable(userOAuthTokenMapper.selectByUserId(userId));
     }
 
