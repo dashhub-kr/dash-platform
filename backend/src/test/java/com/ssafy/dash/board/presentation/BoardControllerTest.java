@@ -74,7 +74,7 @@ class BoardControllerTest {
     }
 
     @Test
-    @DisplayName("게시글 생성 성공")
+    @DisplayName("게시글 생성 요청이 성공하면 201을 반환한다")
     void createBoard_Success() throws Exception {
         BoardCreateRequest req = TestFixtures.createBoardCreateRequest();
         given(boardService.create(any(BoardCreateCommand.class))).willReturn(boardResult);
@@ -90,7 +90,7 @@ class BoardControllerTest {
     }
 
     @Test
-    @DisplayName("전체 게시글 조회 성공")
+    @DisplayName("전체 게시글을 조회하면 200과 목록을 반환한다")
     void getAllBoards_Success() throws Exception {
         given(boardService.findAll()).willReturn(List.of(boardResult));
 
@@ -102,7 +102,7 @@ class BoardControllerTest {
     }
 
     @Test
-    @DisplayName("ID로 게시글 조회 성공")
+    @DisplayName("ID로 게시글을 조회하면 단일 결과를 반환한다")
     void getBoardById_Success() throws Exception {
         given(boardService.findById(TestFixtures.TEST_BOARD_ID)).willReturn(boardResult);
 
@@ -114,7 +114,7 @@ class BoardControllerTest {
     }
 
     @Test
-    @DisplayName("ID로 게시글 조회 실패_없으면 404")
+    @DisplayName("존재하지 않는 ID로 조회하면 404를 반환한다")
     void getBoardById_Failure_NotFound() throws Exception {
         given(boardService.findById(TestFixtures.TEST_BOARD_ID))
                 .willThrow(new BoardNotFoundException(TestFixtures.TEST_BOARD_ID));
@@ -126,7 +126,7 @@ class BoardControllerTest {
     }
 
     @Test
-    @DisplayName("게시글 수정 성공")
+    @DisplayName("게시글 수정 요청이 성공하면 변경 내용이 반영된다")
     void updateBoard_Success() throws Exception {
         BoardUpdateRequest req = TestFixtures.createBoardUpdateRequest();
         BoardResult updatedResult = new BoardResult(TestFixtures.TEST_BOARD_ID, req.getTitle(), req.getContent(),
@@ -144,7 +144,7 @@ class BoardControllerTest {
     }
 
     @Test
-    @DisplayName("게시글 수정 실패_대상이 없으면 404")
+    @DisplayName("없는 게시글을 수정하면 404를 반환한다")
     void updateBoard_Failure_NotFound() throws Exception {
         BoardUpdateRequest req = TestFixtures.createBoardUpdateRequest();
         given(boardService.update(eq(TestFixtures.TEST_BOARD_ID), any(BoardUpdateCommand.class)))
@@ -159,7 +159,7 @@ class BoardControllerTest {
     }
 
     @Test
-    @DisplayName("게시글 삭제 성공")
+    @DisplayName("게시글 삭제에 성공하면 204를 반환한다")
     void deleteBoard_Success() throws Exception {
         mockMvc.perform(delete("/api/boards/" + TestFixtures.TEST_BOARD_ID))
                 .andExpect(status().isNoContent());
@@ -168,7 +168,7 @@ class BoardControllerTest {
     }
 
     @Test
-    @DisplayName("게시글 삭제 실패_이미 없으면 404")
+    @DisplayName("삭제 대상이 없으면 404를 반환한다")
     void deleteBoard_Failure_NotFound() throws Exception {
         willThrow(new BoardNotFoundException(TestFixtures.TEST_BOARD_ID))
                 .given(boardService).delete(TestFixtures.TEST_BOARD_ID);

@@ -37,7 +37,7 @@ class BoardTest {
     }
 
     @Test
-    @DisplayName("시간 정보 없이 업데이트하면 예외가 발생한다")
+    @DisplayName("시간 정보 없이 업데이트하면 NullPointerException이 발생한다")
     void applyUpdate_ShouldValidateTimestamp() {
         Board board = Board.create(1L, "Title", "Content", FixtureTime.now());
 
@@ -46,7 +46,7 @@ class BoardTest {
     }
 
     @Test
-    @DisplayName("잘못된 파라미터로 생성 시 예외가 발생한다")
+    @DisplayName("잘못된 파라미터로 생성하면 IllegalArgumentException이 발생한다")
     void create_ShouldValidateArguments() {
         assertThatThrownBy(() -> Board.create(0L, "", "", FixtureTime.now()))
                 .isInstanceOf(IllegalArgumentException.class);

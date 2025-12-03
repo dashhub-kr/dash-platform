@@ -66,7 +66,7 @@ class BoardServiceTest {
     }
 
     @Test
-    @DisplayName("존재하지 않는 사용자로 게시글을 생성하면 예외가 발생한다")
+    @DisplayName("존재하지 않는 사용자로 게시글을 생성하면 UserNotFoundException이 발생한다")
     void createBoard_UserMissing_Throws() {
         BoardCreateCommand command = TestFixtures.createBoardCreateCommand();
         given(userRepository.findById(command.userId())).willReturn(Optional.empty());
@@ -77,7 +77,7 @@ class BoardServiceTest {
     }
 
     @Test
-    @DisplayName("ID로 게시글을 조회한다")
+    @DisplayName("ID로 게시글을 조회하면 작성자 정보를 포함해 반환한다")
     void findById_Success() {
         given(boardRepository.findById(board.getId())).willReturn(Optional.of(board));
         given(userRepository.findById(user.getId())).willReturn(Optional.of(user));
@@ -89,7 +89,7 @@ class BoardServiceTest {
     }
 
     @Test
-    @DisplayName("없는 ID로 게시글을 조회하면 예외가 발생한다")
+    @DisplayName("없는 ID로 게시글을 조회하면 BoardNotFoundException이 발생한다")
     void findById_NotFound_Throws() {
         given(boardRepository.findById(board.getId())).willReturn(Optional.empty());
 
@@ -98,7 +98,7 @@ class BoardServiceTest {
     }
 
     @Test
-    @DisplayName("전체 게시글을 조회한다")
+    @DisplayName("전체 게시글을 조회하면 리스트를 반환한다")
     void findAll_Success() {
         given(boardRepository.findAll()).willReturn(List.of(board));
         given(userRepository.findById(user.getId())).willReturn(Optional.of(user));
@@ -110,7 +110,7 @@ class BoardServiceTest {
     }
 
     @Test
-    @DisplayName("게시글을 수정하면 변경 내용이 반영된다")
+    @DisplayName("게시글을 수정하면 변경 내용이 반영된 결과를 반환한다")
     void updateBoard_Success() {
         BoardUpdateCommand command = TestFixtures.createBoardUpdateCommand();
         given(boardRepository.findById(board.getId())).willReturn(Optional.of(board));
@@ -123,7 +123,7 @@ class BoardServiceTest {
     }
 
     @Test
-    @DisplayName("없는 게시글을 수정하면 예외가 발생한다")
+    @DisplayName("없는 게시글을 수정하면 BoardNotFoundException이 발생한다")
     void updateBoard_NotFound_Throws() {
         BoardUpdateCommand command = TestFixtures.createBoardUpdateCommand();
         given(boardRepository.findById(board.getId())).willReturn(Optional.empty());
@@ -144,7 +144,7 @@ class BoardServiceTest {
     }
 
     @Test
-    @DisplayName("없는 게시글을 삭제하면 예외가 발생한다")
+    @DisplayName("없는 게시글을 삭제하면 BoardNotFoundException이 발생한다")
     void deleteBoard_NotFound_Throws() {
         given(boardRepository.findById(board.getId())).willReturn(Optional.empty());
 
