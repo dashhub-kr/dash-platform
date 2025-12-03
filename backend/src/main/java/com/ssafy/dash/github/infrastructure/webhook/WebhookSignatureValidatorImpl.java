@@ -1,18 +1,16 @@
 package com.ssafy.dash.github.infrastructure.webhook;
 
-import java.nio.charset.StandardCharsets;
-
-import javax.crypto.Mac;
-import javax.crypto.spec.SecretKeySpec;
-
+import com.ssafy.dash.github.config.GitHubWebhookProperties;
+import com.ssafy.dash.github.domain.WebhookSignatureValidator;
+import com.ssafy.dash.github.domain.exception.GitHubWebhookException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
-import com.ssafy.dash.github.config.GitHubWebhookProperties;
-import com.ssafy.dash.github.domain.WebhookSignatureValidator;
-import com.ssafy.dash.github.domain.exception.GitHubWebhookException;
+import javax.crypto.Mac;
+import javax.crypto.spec.SecretKeySpec;
+import java.nio.charset.StandardCharsets;
 
 @Component
 public class WebhookSignatureValidatorImpl implements WebhookSignatureValidator {
@@ -30,15 +28,13 @@ public class WebhookSignatureValidatorImpl implements WebhookSignatureValidator 
         String secret = properties.getSecret();
         if (!StringUtils.hasText(secret)) {
             log.error("GitHub webhook secret is not configured");
-
             return false;
         }
         if (!StringUtils.hasText(signature) || !signature.startsWith("sha256=")) {
-            
             return false;
         }
         String computed = "sha256=" + hmacSha256Hex(secret, payload);
-        
+
         return constantTimeEquals(computed, signature);
     }
 
@@ -47,11 +43,9 @@ public class WebhookSignatureValidatorImpl implements WebhookSignatureValidator 
             Mac mac = Mac.getInstance("HmacSHA256");
             mac.init(new SecretKeySpec(secret.getBytes(StandardCharsets.UTF_8), "HmacSHA256"));
             byte[] digest = mac.doFinal(payload.getBytes(StandardCharsets.UTF_8));
-            
             return toHex(digest);
         } catch (Exception ex) {
             log.error("Failed to verify GitHub webhook signature", ex);
-            
             throw new GitHubWebhookException("웹훅 서명 검증 중 오류가 발생했습니다.", ex);
         }
     }
@@ -69,7 +63,6 @@ public class WebhookSignatureValidatorImpl implements WebhookSignatureValidator 
         byte[] a = expected.getBytes(StandardCharsets.UTF_8);
         byte[] b = actual.getBytes(StandardCharsets.UTF_8);
         if (a.length != b.length) {
-
             return false;
         }
         int result = 0;
@@ -79,5 +72,5 @@ public class WebhookSignatureValidatorImpl implements WebhookSignatureValidator 
 
         return result == 0;
     }
-    
+
 }
