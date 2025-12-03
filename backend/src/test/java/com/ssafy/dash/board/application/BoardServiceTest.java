@@ -1,16 +1,16 @@
 package com.ssafy.dash.board.application;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.verify;
 
-import java.util.List;
-import java.util.Optional;
-
+import com.ssafy.dash.board.application.dto.command.BoardCreateCommand;
+import com.ssafy.dash.board.application.dto.command.BoardUpdateCommand;
+import com.ssafy.dash.board.application.dto.result.BoardResult;
+import com.ssafy.dash.board.domain.Board;
+import com.ssafy.dash.board.domain.BoardRepository;
+import com.ssafy.dash.board.domain.exception.BoardNotFoundException;
+import com.ssafy.dash.common.TestFixtures;
+import com.ssafy.dash.user.domain.User;
+import com.ssafy.dash.user.domain.UserRepository;
+import com.ssafy.dash.user.domain.exception.UserNotFoundException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -19,16 +19,16 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import com.ssafy.dash.board.application.dto.command.BoardCreateCommand;
-import com.ssafy.dash.board.application.dto.result.BoardResult;
-import com.ssafy.dash.board.application.dto.command.BoardUpdateCommand;
-import com.ssafy.dash.board.domain.Board;
-import com.ssafy.dash.board.domain.BoardRepository;
-import com.ssafy.dash.board.domain.exception.BoardNotFoundException;
-import com.ssafy.dash.common.TestFixtures;
-import com.ssafy.dash.user.domain.User;
-import com.ssafy.dash.user.domain.UserRepository;
-import com.ssafy.dash.user.domain.exception.UserNotFoundException;
+import java.util.List;
+import java.util.Optional;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
 
 @ExtendWith(MockitoExtension.class)
 @DisplayName("BoardService 단위 테스트")
@@ -56,12 +56,12 @@ class BoardServiceTest {
     @DisplayName("사용자가 존재할 때 게시글을 생성한다")
     void createBoard_Success() {
         BoardCreateCommand command = TestFixtures.createBoardCreateCommand();
-        given(userRepository.findById(command.getUserId())).willReturn(Optional.of(user));
-        
+        given(userRepository.findById(command.userId())).willReturn(Optional.of(user));
+
         BoardResult response = boardService.create(command);
 
         verify(boardRepository).save(any(Board.class));
-        assertThat(response.title()).isEqualTo(command.getTitle());
+        assertThat(response.title()).isEqualTo(command.title());
         assertThat(response.authorName()).isEqualTo(user.getUsername());
     }
 
@@ -69,7 +69,7 @@ class BoardServiceTest {
     @DisplayName("존재하지 않는 사용자로 게시글을 생성하면 예외가 발생한다")
     void createBoard_UserMissing_Throws() {
         BoardCreateCommand command = TestFixtures.createBoardCreateCommand();
-        given(userRepository.findById(command.getUserId())).willReturn(Optional.empty());
+        given(userRepository.findById(command.userId())).willReturn(Optional.empty());
 
         assertThatThrownBy(() -> boardService.create(command))
                 .isInstanceOf(UserNotFoundException.class);
@@ -119,7 +119,7 @@ class BoardServiceTest {
         BoardResult response = boardService.update(board.getId(), command);
 
         verify(boardRepository).update(any(Board.class));
-        assertThat(response.title()).isEqualTo(command.getTitle());
+        assertThat(response.title()).isEqualTo(command.title());
     }
 
     @Test
