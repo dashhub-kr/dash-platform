@@ -1,8 +1,7 @@
 package com.ssafy.dash.github.application;
 
-import org.springframework.stereotype.Service;
-
 import com.ssafy.dash.github.domain.GitHubClient;
+import org.springframework.stereotype.Service;
 
 @Service
 public class GitHubWebhookService {
@@ -16,4 +15,5 @@ public class GitHubWebhookService {
     public void ensureWebhook(String repositoryFullName, String accessToken) {
         gitHubClient.registerWebhook(repositoryFullName, accessToken);
     }
+
 }
