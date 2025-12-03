@@ -32,17 +32,7 @@ Git Flow를 기반으로 한 간단한 전략을 사용합니다.
 
 예시: `feat(BE): 알고리즘 기록 CRUD API 구현`
 
-## 4. 코드 스타일
-
-- **Java Version**: 17
-- **Framework**: Spring Boot 3.x
-- **Naming**:
-  - Class: PascalCase
-  - Method/Variable: camelCase
-  - Constant: UPPER_SNAKE_CASE
-  - DB Table/Column: snake_case
-
-## 5. 개발 프로세스 (TDD & DDD)
+## 4. 개발 프로세스 (TDD & DDD)
 
 우리는 **TDD(Test Driven Development)**, **DDD(Domain Driven Design)** 스타일의 계층형 아키텍처를 지향합니다.
 
@@ -51,7 +41,7 @@ Git Flow를 기반으로 한 간단한 전략을 사용합니다.
 3. **기능 구현**: 테스트를 통과하기 위한 최소한의 코드 구현
 4. **리팩토링**: 중복 제거, 가독성 향상 (`TestFixtures` 활용 등)
 
-자세한 내용은 `docs/` 디렉토리의 문서를 참고해주세요.
+자세한 아키텍처/코딩 규칙과 테스트 컨벤션은 아래 문서를 참고하세요.
 
+- [백엔드 아키텍처 & 코딩 규칙](backend/docs/ARCHITECTURE.md)
 - [테스트 가이드](backend/docs/TESTING_GUIDE.md)
-- [아키텍처 가이드](backend/docs/ARCHITECTURE.md)
