@@ -53,7 +53,6 @@ class AlgorithmRecordControllerTest {
     static class TestConfig {
         @Bean
         public AlgorithmRecordService algorithmRecordService() {
-
             return Mockito.mock(AlgorithmRecordService.class);
         }
     }
