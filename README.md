@@ -37,3 +37,8 @@ SSAFY 14기 1학기 관통 프로젝트를 위한 DASH 저장소입니다.
 - [백엔드 아키텍처 & 코딩 규칙](backend/docs/ARCHITECTURE.md)
 - [테스트 가이드](backend/docs/TESTING_GUIDE.md)
 - [기여 가이드](CONTRIBUTING.md)
+
+## ✅ 헬스 체크
+
+- `GET /actuator/health`: 기본 애플리케이션 상태
+- `GET /actuator/health/dash`: GitHub 웹훅 설정, OAuth 토큰 저장소 등 DASH 전용 지표

@@ -8,12 +8,12 @@ Algorithm, Board, User, OAuth, Onboarding, GitHub)은 동일한 규칙을 공유
 
 ## 2. 계층 규칙
 
-| Layer          | 책임                                                   | 허용 의존성                       | 대표 패키지                                                                                                           |
-|----------------|------------------------------------------------------|------------------------------|------------------------------------------------------------------------------------------------------------------|
-| Presentation   | REST Endpoint, Request/Response DTO, 인증 컨텍스트 해석      | Application, Application DTO | `..presentation..`, `..presentation.security..`, `..presentation.dto..`                                          |
-| Application    | Use Case 조합, 트랜잭션 경계, Domain↔DTO 변환, 외부 Port 호출      | Domain, Application DTO      | `..application..`, `..application.dto..`                                                                         |
-| Domain         | 엔티티, 밸류, Repository Port, 비즈니스 예외                    | (없음)                         | `..domain..`                                                                                                     |
-| Infrastructure | Repository/Client Adapter, MyBatis Mapper, 외부 API 연동 | Domain(Port 구현), 외부 라이브러리    | `..infrastructure..`, `..infrastructure.persistence..`, `..infrastructure.mapper..`, `..github.infrastructure..` |
+| Layer          | 책임                                                          | 허용 의존성                        | 대표 패키지                                                                                                      |
+| -------------- | ------------------------------------------------------------- | ---------------------------------- | ---------------------------------------------------------------------------------------------------------------- |
+| Presentation   | REST Endpoint, Request/Response DTO, 인증 컨텍스트 해석       | Application, Application DTO       | `..presentation..`, `..presentation.security..`, `..presentation.dto..`                                          |
+| Application    | Use Case 조합, 트랜잭션 경계, Domain↔DTO 변환, 외부 Port 호출 | Domain, Application DTO            | `..application..`, `..application.dto..`                                                                         |
+| Domain         | 엔티티, 밸류, Repository Port, 비즈니스 예외                  | (없음)                             | `..domain..`                                                                                                     |
+| Infrastructure | Repository/Client Adapter, MyBatis Mapper, 외부 API 연동      | Domain(Port 구현), 외부 라이브러리 | `..infrastructure..`, `..infrastructure.persistence..`, `..infrastructure.mapper..`, `..github.infrastructure..` |
 
 핵심 원칙
 
@@ -69,11 +69,11 @@ cd backend
 
 ## 4. DTO & 데이터 경계
 
-| 종류           | 위치                              | 용도                           | 생성 위치      |
-|--------------|---------------------------------|------------------------------|------------|
-| Request DTO  | `..presentation.dto.request..`  | HTTP 입력 역직렬화, Command 변환     | Controller |
-| Response DTO | `..presentation.dto.response..` | HTTP 응답 직렬화, Result 변환       | Controller |
-| Command DTO  | `..application.dto.command..`   | Use Case 입력, 불변 record       | Service    |
+| 종류         | 위치                            | 용도                              | 생성 위치  |
+| ------------ | ------------------------------- | --------------------------------- | ---------- |
+| Request DTO  | `..presentation.dto.request..`  | HTTP 입력 역직렬화, Command 변환  | Controller |
+| Response DTO | `..presentation.dto.response..` | HTTP 응답 직렬화, Result 변환     | Controller |
+| Command DTO  | `..application.dto.command..`   | Use Case 입력, 불변 record        | Service    |
 | Result DTO   | `..application.dto.result..`    | Domain → Presentation 데이터 전달 | Service    |
 
 규칙
@@ -120,6 +120,9 @@ Spotless 또는 IDE `Optimize Imports` 설정으로 동일한 순서를 유지�
 - **보안**: `presentation.security.CustomOAuth2UserService`가 GitHub OAuth 로그인 결과를 Application 계층에 위임한다.
 - **에러 처리**: `GlobalExceptionHandler`가 `UserNotFoundException`, `AlgorithmRecordNotFoundException` 등을 HTTP 404/502 등으로
   변환한다.
+- **헬스 체크**: Spring Boot Actuator(`/actuator/health`, `/actuator/health/dash`)가 DB/디스크 기본 지표와 `githubWebhook`,
+  `oauthTokenStore` 커스텀 인디케이터를 노출한다. 운영 환경에서는 `management.endpoint.health.show-details=when_authorized`
+  설정으로 인증된 사용자만 세부 정보를 조회할 수 있다.
 - **아키텍처 검증**: ArchUnit 테스트를 CI에 포함해 레이어/DTO 규칙 위반을 즉시 탐지한다.
 
 ## 7. 문서 & 운영 팁
