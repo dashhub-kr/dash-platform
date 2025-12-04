@@ -42,7 +42,9 @@ public class SecurityConfig {
                                 "/swagger-ui.html",
                                 "/oauth2/**",
                                 "/oauth2/authorization/**",
-                                "/api/webhooks/github"
+                                "/api/webhooks/github",
+                                "/actuator/health",
+                                "/actuator/health/**"
                         ).permitAll()
                         .anyRequest().authenticated()
                 )
