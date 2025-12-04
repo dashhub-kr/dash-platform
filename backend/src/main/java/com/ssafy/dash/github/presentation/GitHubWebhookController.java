@@ -1,12 +1,19 @@
 package com.ssafy.dash.github.presentation;
 
-import com.ssafy.dash.github.domain.WebhookSignatureValidator;
-import com.ssafy.dash.github.domain.exception.GitHubWebhookException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.util.StringUtils;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.ssafy.dash.github.application.GitHubPushService;
+import com.ssafy.dash.github.domain.WebhookSignatureValidator;
+import com.ssafy.dash.github.domain.exception.GitHubWebhookException;
 
 @RestController
 @RequestMapping("/api/webhooks/github")
@@ -15,13 +22,16 @@ public class GitHubWebhookController {
     private static final Logger log = LoggerFactory.getLogger(GitHubWebhookController.class);
 
     private final WebhookSignatureValidator signatureValidator;
+    private final GitHubPushService pushService;
 
-    public GitHubWebhookController(WebhookSignatureValidator signatureValidator) {
+    public GitHubWebhookController(WebhookSignatureValidator signatureValidator, GitHubPushService pushService) {
         this.signatureValidator = signatureValidator;
+        this.pushService = pushService;
     }
 
     @PostMapping
     public ResponseEntity<?> handleWebhook(
+            @RequestHeader(name = "X-GitHub-Delivery", required = false) String deliveryId,
             @RequestHeader(name = "X-GitHub-Event", required = false) String event,
             @RequestHeader(name = "X-Hub-Signature-256", required = false) String signature,
             @RequestBody(required = false) String payload) {
@@ -42,7 +52,18 @@ public class GitHubWebhookController {
             return ResponseEntity.ok().build();
         }
 
-        log.info("Received GitHub webhook event: {}", event);
+        if (!"push".equalsIgnoreCase(event)) {
+            log.info("Unsupported GitHub event {}, ignoring", event);
+            return ResponseEntity.accepted().build();
+        }
+
+        if (!StringUtils.hasText(deliveryId)) {
+            log.warn("Missing X-GitHub-Delivery header for push event");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Delivery ID가 필요합니다.");
+        }
+
+        log.info("Accepted GitHub push event {}", deliveryId);
+        pushService.handlePushEvent(deliveryId, body);
         return ResponseEntity.accepted().build();
     }
 
