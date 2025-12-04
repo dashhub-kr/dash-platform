@@ -124,6 +124,9 @@ Spotless 또는 IDE `Optimize Imports` 설정으로 동일한 순서를 유지�
   `oauthTokenStore` 커스텀 인디케이터를 노출한다. 운영 환경에서는 `management.endpoint.health.show-details=when_authorized`
   설정으로 인증된 사용자만 세부 정보를 조회할 수 있다.
 - **아키텍처 검증**: ArchUnit 테스트를 CI에 포함해 레이어/DTO 규칙 위반을 즉시 탐지한다.
+- **로깅**: `src/main/resources/logback-spring.xml`에서 콘솔(INFO) + 롤링 파일(WARN 이상) 출력을 정의한다. `com.ssafy.dash` 패키지
+  이하에서는 SLF4J를 사용하고, 도메인/서비스 로그 레벨은 기본적으로 INFO, 인프라/외부 연동 실패는 WARN/ERROR로 표준화한다. 로그 파일
+  위치는 `${LOG_PATH}` 환경 변수로 오버라이드 가능하다 (기본 `logs/`).
 
 ## 7. 문서 & 운영 팁
 
