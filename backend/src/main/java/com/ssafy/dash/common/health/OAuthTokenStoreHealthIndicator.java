@@ -6,7 +6,7 @@ import org.springframework.stereotype.Component;
 
 import com.ssafy.dash.oauth.domain.UserOAuthTokenRepository;
 
-@Component
+@Component("oauthTokenStore")
 public class OAuthTokenStoreHealthIndicator implements HealthIndicator {
 
     private static final long PROBE_USER_ID = -1L;
