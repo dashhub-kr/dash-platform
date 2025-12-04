@@ -10,7 +10,7 @@ import org.springframework.util.StringUtils;
 
 import com.ssafy.dash.github.config.GitHubWebhookProperties;
 
-@Component
+@Component("githubWebhook")
 public class GitHubWebhookHealthIndicator implements HealthIndicator {
 
     private final GitHubWebhookProperties properties;
