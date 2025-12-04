@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ssafy.dash.github.infrastructure.mapper.GitHubPushEventMapper">
+
+    <resultMap id="GitHubPushEventResultMap" type="com.ssafy.dash.github.domain.GitHubPushEvent">
+        <id property="id" column="id" />
+        <result property="deliveryId" column="delivery_id" />
+        <result property="repositoryName" column="repository_name" />
+        <result property="reference" column="ref" />
+        <result property="headCommitSha" column="head_commit_sha" />
+        <result property="authorLogin" column="author_login" />
+        <result property="authorEmail" column="author_email" />
+        <result property="commitMessage" column="commit_message" />
+        <result property="filesJson" column="files_json" />
+        <result property="rawPayload" column="raw_payload" />
+        <result property="status" column="status" javaType="com.ssafy.dash.github.domain.PushEventStatus" typeHandler="org.apache.ibatis.type.EnumTypeHandler" />
+        <result property="failureReason" column="failure_reason" />
+        <result property="createdAt" column="created_at" />
+        <result property="updatedAt" column="updated_at" />
+    </resultMap>
+
+    <insert id="insert" parameterType="com.ssafy.dash.github.domain.GitHubPushEvent" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO github_push_event (
+            delivery_id,
+            repository_name,
+            ref,
+            head_commit_sha,
+            author_login,
+            author_email,
+            commit_message,
+            files_json,
+            raw_payload,
+            status,
+            failure_reason,
+            created_at,
+            updated_at
+        ) VALUES (
+            #{deliveryId},
+            #{repositoryName},
+            #{reference},
+            #{headCommitSha},
+            #{authorLogin},
+            #{authorEmail},
+            #{commitMessage},
+            #{filesJson},
+            #{rawPayload},
+            #{status, typeHandler=org.apache.ibatis.type.EnumTypeHandler},
+            #{failureReason},
+            #{createdAt},
+            #{updatedAt}
+        )
+    </insert>
+
+    <select id="selectByDeliveryId" parameterType="string" resultMap="GitHubPushEventResultMap">
+        SELECT
+            id,
+            delivery_id,
+            repository_name,
+            ref,
+            head_commit_sha,
+            author_login,
+            author_email,
+            commit_message,
+            files_json,
+            raw_payload,
+            status,
+            failure_reason,
+            created_at,
+            updated_at
+        FROM github_push_event
+        WHERE delivery_id = #{deliveryId}
+    </select>
+</mapper>

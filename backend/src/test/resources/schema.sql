@@ -34,3 +34,23 @@ CREATE TABLE IF NOT EXISTS user_oauth_tokens (
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 
 );
+
+CREATE TABLE IF NOT EXISTS github_push_event (
+
+  id BIGINT AUTO_INCREMENT PRIMARY KEY,
+  delivery_id VARCHAR(100) NOT NULL,
+  repository_name VARCHAR(255) NOT NULL,
+  ref VARCHAR(255) NOT NULL,
+  head_commit_sha VARCHAR(100) NOT NULL,
+  author_login VARCHAR(100),
+  author_email VARCHAR(255),
+  commit_message CLOB,
+  files_json CLOB,
+  raw_payload CLOB,
+  status VARCHAR(20) NOT NULL,
+  failure_reason CLOB,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  UNIQUE (delivery_id)
+
+);

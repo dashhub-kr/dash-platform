@@ -62,3 +62,23 @@ CREATE TABLE IF NOT EXISTS user_oauth_tokens (
     FOREIGN KEY (user_id) REFERENCES users(id)
 
 );
+
+CREATE TABLE IF NOT EXISTS github_push_event (
+
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    delivery_id VARCHAR(100) NOT NULL,
+    repository_name VARCHAR(255) NOT NULL,
+    ref VARCHAR(255) NOT NULL,
+    head_commit_sha VARCHAR(100) NOT NULL,
+    author_login VARCHAR(100),
+    author_email VARCHAR(255),
+    commit_message TEXT,
+    files_json LONGTEXT,
+    raw_payload LONGTEXT,
+    status VARCHAR(20) NOT NULL,
+    failure_reason TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    UNIQUE KEY uk_github_push_event_delivery (delivery_id)
+
+);
