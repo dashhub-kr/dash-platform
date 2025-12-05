@@ -1,8 +1,9 @@
 package com.ssafy.dash.oauth.application;
 
-import com.ssafy.dash.oauth.domain.UserOAuthToken;
-import com.ssafy.dash.oauth.domain.UserOAuthTokenRepository;
-import com.ssafy.dash.oauth.domain.exception.OAuthAccessTokenUnavailableException;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.oauth2.core.OAuth2AccessToken;
@@ -10,9 +11,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
-import java.time.Instant;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
+import com.ssafy.dash.oauth.domain.UserOAuthToken;
+import com.ssafy.dash.oauth.domain.UserOAuthTokenRepository;
+import com.ssafy.dash.oauth.domain.exception.OAuthAccessTokenUnavailableException;
 
 @Service
 public class OAuthTokenService {
@@ -34,10 +35,17 @@ public class OAuthTokenService {
 
         String tokenValue = accessToken.getTokenValue();
         String masked = mask(tokenValue);
-        log.debug("Persisting OAuth token for userId={} tokenMasked={}", userId, masked);
+        Instant issuedAtInstant = accessToken.getIssuedAt();
+        Instant expiresAtInstant = accessToken.getExpiresAt();
+        log.info("Persisting OAuth token for userId={} tokenMasked={} issuedAtUTC={} expiresAtUTC={} diffSeconds={}",
+            userId,
+            masked,
+            issuedAtInstant,
+            expiresAtInstant,
+            (issuedAtInstant != null && expiresAtInstant != null) ? expiresAtInstant.getEpochSecond() - issuedAtInstant.getEpochSecond() : null);
 
         LocalDateTime now = LocalDateTime.now();
-        LocalDateTime expiresAt = toLocalDateTime(accessToken.getExpiresAt());
+        LocalDateTime expiresAt = toLocalDateTime(expiresAtInstant);
         String tokenType = accessToken.getTokenType() != null ? accessToken.getTokenType().getValue() : null;
 
         UserOAuthToken token = tokenRepository.findByUserId(userId)
