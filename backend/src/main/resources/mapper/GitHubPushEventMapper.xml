@@ -70,4 +70,35 @@
         FROM github_push_event
         WHERE delivery_id = #{deliveryId}
     </select>
+
+    <select id="selectNextQueued" resultMap="GitHubPushEventResultMap">
+        SELECT
+            id,
+            delivery_id,
+            repository_name,
+            ref,
+            head_commit_sha,
+            author_login,
+            author_email,
+            commit_message,
+            files_json,
+            raw_payload,
+            status,
+            failure_reason,
+            created_at,
+            updated_at
+        FROM github_push_event
+        WHERE status = 'QUEUED'
+        ORDER BY id
+        LIMIT 1
+    </select>
+
+    <update id="update" parameterType="GitHubPushEvent">
+        UPDATE github_push_event
+        SET
+            status = #{status, typeHandler=org.apache.ibatis.type.EnumTypeHandler},
+            failure_reason = #{failureReason},
+            updated_at = #{updatedAt}
+        WHERE id = #{id}
+    </update>
 </mapper>

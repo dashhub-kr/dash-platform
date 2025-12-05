@@ -18,6 +18,13 @@
     LIMIT 1
   </select>
 
+  <select id="selectByRepositoryName" parameterType="string" resultMap="OnboardingRepositoryResult">
+    SELECT id, user_id, repository_name, webhook_configured, created_at, updated_at
+    FROM user_repositories
+    WHERE repository_name = #{repositoryName}
+    LIMIT 1
+  </select>
+
   <insert id="insert" parameterType="Onboarding" useGeneratedKeys="true" keyProperty="id">
     INSERT INTO user_repositories (user_id, repository_name, webhook_configured)
     VALUES (#{userId}, #{repositoryName}, #{webhookConfigured})

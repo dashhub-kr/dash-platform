@@ -53,8 +53,15 @@ public class GitHubPushEvent {
         this.updatedAt = requireTimestamp(updatedAt, "updatedAt");
     }
 
+    public void markProcessing(LocalDateTime updatedAt) {
+        this.status = PushEventStatus.PROCESSING;
+        this.failureReason = null;
+        this.updatedAt = requireTimestamp(updatedAt, "updatedAt");
+    }
+
     public void markCompleted(LocalDateTime updatedAt) {
         this.status = PushEventStatus.COMPLETED;
+        this.failureReason = null;
         this.updatedAt = requireTimestamp(updatedAt, "updatedAt");
     }
 
