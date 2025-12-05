@@ -1,11 +1,12 @@
 package com.ssafy.dash.onboarding.infrastructure.persistence;
 
+import java.util.Optional;
+
+import org.springframework.stereotype.Repository;
+
 import com.ssafy.dash.onboarding.domain.Onboarding;
 import com.ssafy.dash.onboarding.domain.OnboardingRepository;
 import com.ssafy.dash.onboarding.infrastructure.mapper.OnboardingMapper;
-import org.springframework.stereotype.Repository;
-
-import java.util.Optional;
 
 @Repository
 public class OnboardingRepositoryImpl implements OnboardingRepository {
@@ -19,6 +20,11 @@ public class OnboardingRepositoryImpl implements OnboardingRepository {
     @Override
     public Optional<Onboarding> findByUserId(Long userId) {
         return Optional.ofNullable(mapper.selectByUserId(userId));
+    }
+
+    @Override
+    public Optional<Onboarding> findByRepositoryName(String repositoryName) {
+        return Optional.ofNullable(mapper.selectByRepositoryName(repositoryName));
     }
 
     @Override

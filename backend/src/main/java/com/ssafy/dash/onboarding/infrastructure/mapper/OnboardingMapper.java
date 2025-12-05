@@ -9,6 +9,8 @@ public interface OnboardingMapper {
 
     Onboarding selectByUserId(Long userId);
 
+    Onboarding selectByRepositoryName(String repositoryName);
+
     int insert(Onboarding repository);
 
     int update(Onboarding repository);
