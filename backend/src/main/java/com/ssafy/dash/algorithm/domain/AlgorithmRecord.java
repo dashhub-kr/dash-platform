@@ -1,11 +1,11 @@
 package com.ssafy.dash.algorithm.domain;
 
+import java.time.LocalDateTime;
+import java.util.Objects;
+
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-
-import java.time.LocalDateTime;
-import java.util.Objects;
 
 @Getter
 @Setter
@@ -18,6 +18,15 @@ public class AlgorithmRecord {
     private String title;
     private String language;
     private String code;
+    private String platform;
+    private String difficulty;
+    private Integer runtimeMs;
+    private Integer memoryKb;
+    private String repositoryName;
+    private String filePath;
+    private String commitSha;
+    private String commitMessage;
+    private LocalDateTime committedAt;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
@@ -27,12 +36,21 @@ public class AlgorithmRecord {
         this.title = requireText(title, "title");
         this.language = requireText(language, "language");
         this.code = code == null ? "" : code;
+        this.platform = "UNKNOWN";
         this.createdAt = requireTimestamp(createdAt, "createdAt");
         this.updatedAt = requireTimestamp(updatedAt, "updatedAt");
     }
 
     public static AlgorithmRecord create(Long userId, String problemNumber, String title, String language, String code, LocalDateTime createdAt) {
-        return new AlgorithmRecord(userId, problemNumber, title, language, code, createdAt, createdAt);
+        return new AlgorithmRecord(
+                userId,
+                problemNumber,
+                title,
+                language,
+                code,
+                createdAt,
+                createdAt
+            );
     }
 
     public void applyUpdate(String problemNumber, String title, String language, String code, LocalDateTime updatedAt) {
@@ -49,6 +67,20 @@ public class AlgorithmRecord {
             this.code = code;
         }
         this.updatedAt = requireTimestamp(updatedAt, "updatedAt");
+    }
+
+    public void enrichMetadata(String platform, String difficulty, Integer runtimeMs, Integer memoryKb, String repositoryName, String filePath, String commitSha, String commitMessage, LocalDateTime committedAt) {
+        if (platform != null && !platform.isBlank()) {
+            this.platform = platform;
+        }
+        this.difficulty = difficulty;
+        this.runtimeMs = runtimeMs;
+        this.memoryKb = memoryKb;
+        this.repositoryName = repositoryName;
+        this.filePath = filePath;
+        this.commitSha = commitSha;
+        this.commitMessage = commitMessage;
+        this.committedAt = committedAt;
     }
 
     private static Long requirePositive(Long value) {
