@@ -11,12 +11,39 @@ public record AlgorithmRecordResponse(
         String title,
         String code,
         String language,
+        String platform,
+        String difficulty,
+        Integer runtimeMs,
+        Integer memoryKb,
+        String repositoryName,
+        String filePath,
+        String commitSha,
+        String commitMessage,
+        LocalDateTime committedAt,
         LocalDateTime createdAt,
         LocalDateTime updatedAt
 ) {
 
     public static AlgorithmRecordResponse from(AlgorithmRecordResult result) {
-        return new AlgorithmRecordResponse(result.id(), result.userId(), result.problemNumber(), result.title(), result.code(), result.language(), result.createdAt(), result.updatedAt());
+        return new AlgorithmRecordResponse(
+                result.id(),
+                result.userId(),
+                result.problemNumber(),
+                result.title(),
+                result.code(),
+                result.language(),
+                result.platform(),
+                result.difficulty(),
+                result.runtimeMs(),
+                result.memoryKb(),
+                result.repositoryName(),
+                result.filePath(),
+                result.commitSha(),
+                result.commitMessage(),
+                result.committedAt(),
+                result.createdAt(),
+                result.updatedAt()
+            );
     }
 
 }

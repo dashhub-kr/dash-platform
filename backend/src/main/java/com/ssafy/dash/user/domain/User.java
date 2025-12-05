@@ -1,11 +1,11 @@
 package com.ssafy.dash.user.domain;
 
+import java.time.LocalDateTime;
+import java.util.Objects;
+
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-
-import java.time.LocalDateTime;
-import java.util.Objects;
 
 @Getter
 @Setter
@@ -19,6 +19,7 @@ public class User {
     private String provider;
     private String providerId;
     private String avatarUrl;
+    private LocalDateTime deletedAt;
 
     private User(Long id, String username, String email, LocalDateTime createdAt,
                  String provider, String providerId, String avatarUrl) {
@@ -29,6 +30,10 @@ public class User {
         this.provider = provider;
         this.providerId = providerId;
         this.avatarUrl = avatarUrl;
+    }
+
+    public void markDeleted(LocalDateTime deletedAt) {
+        this.deletedAt = Objects.requireNonNullElse(deletedAt, LocalDateTime.now());
     }
 
     public static User create(String username, String email, LocalDateTime createdAt,

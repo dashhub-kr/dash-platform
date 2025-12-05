@@ -1,6 +1,6 @@
 package com.ssafy.dash.github.domain.exception;
 
-public class GitHubWebhookException extends RuntimeException {
+public class GitHubWebhookException extends GitHubClientException {
 
     public GitHubWebhookException(String message) {
         super(message);

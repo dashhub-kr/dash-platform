@@ -1,0 +1,22 @@
+{
+  "properties": [
+    {
+      "name": "github.push-worker.enabled",
+      "type": "java.lang.Boolean",
+      "description": "Enable GitHub push event worker scheduling.",
+      "defaultValue": true
+    },
+    {
+      "name": "github.push-worker.fixed-delay",
+      "type": "java.lang.Long",
+      "description": "Fixed delay in milliseconds between worker executions.",
+      "defaultValue": 10000
+    },
+    {
+      "name": "github.push-worker.max-batch",
+      "type": "java.lang.Integer",
+      "description": "Maximum number of events the worker processes per run.",
+      "defaultValue": 3
+    }
+  ]
+}

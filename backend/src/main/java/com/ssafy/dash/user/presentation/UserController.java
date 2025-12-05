@@ -59,8 +59,7 @@ public class UserController {
 
     @GetMapping("/me")
     public ResponseEntity<UserResponse> me(@Parameter(hidden = true) @AuthenticationPrincipal OAuth2User principal) {
-        if (principal instanceof CustomOAuth2User) {
-            CustomOAuth2User customUser = (CustomOAuth2User) principal;
+        if (principal instanceof CustomOAuth2User customUser) {
             
             return ResponseEntity.ok(UserResponse.from(service.findById(customUser.getUserId())));
         }

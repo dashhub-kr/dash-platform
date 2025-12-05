@@ -10,6 +10,7 @@
     <result property="provider" column="provider" />
     <result property="providerId" column="provider_id" />
     <result property="avatarUrl" column="avatar_url" />
+    <result property="deletedAt" column="deleted_at" />
   </resultMap>
 
   <insert id="insert" parameterType="User" useGeneratedKeys="true" keyProperty="id">
@@ -18,27 +19,35 @@
   </insert>
 
   <select id="selectById" resultMap="UserResult" parameterType="long">
-    SELECT id, username, email, created_at, provider, provider_id, avatar_url FROM users WHERE id = #{id}
+    SELECT id, username, email, created_at, provider, provider_id, avatar_url, deleted_at
+    FROM users
+    WHERE id = #{id} AND deleted_at IS NULL
   </select>
 
   <select id="selectAll" resultMap="UserResult">
-    SELECT id, username, email, created_at, provider, provider_id, avatar_url FROM users ORDER BY id
+    SELECT id, username, email, created_at, provider, provider_id, avatar_url, deleted_at
+    FROM users
+    WHERE deleted_at IS NULL
+    ORDER BY id
   </select>
 
   <select id="selectByProviderAndProviderId" resultMap="UserResult">
-    SELECT id, username, email, created_at, provider, provider_id, avatar_url 
+    SELECT id, username, email, created_at, provider, provider_id, avatar_url, deleted_at
     FROM users 
     WHERE provider = #{provider} AND provider_id = #{providerId}
+      AND deleted_at IS NULL
   </select>
 
   <update id="update" parameterType="User">
     UPDATE users
     SET username = #{username}, email = #{email}, provider = #{provider}, provider_id = #{providerId}, avatar_url = #{avatarUrl}
-    WHERE id = #{id}
+    WHERE id = #{id} AND deleted_at IS NULL
   </update>
 
-  <delete id="delete" parameterType="long">
-    DELETE FROM users WHERE id = #{id}
-  </delete>
+  <update id="delete" parameterType="long">
+    UPDATE users
+    SET deleted_at = CURRENT_TIMESTAMP
+    WHERE id = #{id} AND deleted_at IS NULL
+  </update>
 
 </mapper>

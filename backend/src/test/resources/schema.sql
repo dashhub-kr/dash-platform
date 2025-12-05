@@ -34,3 +34,46 @@ CREATE TABLE IF NOT EXISTS user_oauth_tokens (
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 
 );
+
+CREATE TABLE IF NOT EXISTS algorithm_records (
+
+  id BIGINT AUTO_INCREMENT PRIMARY KEY,
+  user_id BIGINT NOT NULL,
+  problem_number VARCHAR(50) NOT NULL,
+  title VARCHAR(255) NOT NULL,
+  code LONGTEXT,
+  language VARCHAR(50),
+  platform VARCHAR(50) NOT NULL DEFAULT 'UNKNOWN',
+  difficulty VARCHAR(50),
+  runtime_ms INT,
+  memory_kb INT,
+  repository_name VARCHAR(255),
+  file_path VARCHAR(512),
+  commit_sha VARCHAR(100),
+  commit_message TEXT,
+  committed_at TIMESTAMP,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  FOREIGN KEY (user_id) REFERENCES users(id)
+
+);
+
+CREATE TABLE IF NOT EXISTS github_push_event (
+
+  id BIGINT AUTO_INCREMENT PRIMARY KEY,
+  delivery_id VARCHAR(100) NOT NULL,
+  repository_name VARCHAR(255) NOT NULL,
+  ref VARCHAR(255) NOT NULL,
+  head_commit_sha VARCHAR(100) NOT NULL,
+  author_login VARCHAR(100),
+  author_email VARCHAR(255),
+  commit_message CLOB,
+  files_json CLOB,
+  raw_payload CLOB,
+  status VARCHAR(20) NOT NULL,
+  failure_reason CLOB,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  UNIQUE (delivery_id)
+
+);

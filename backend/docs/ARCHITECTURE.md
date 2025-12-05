@@ -8,12 +8,12 @@ Algorithm, Board, User, OAuth, Onboarding, GitHub)은 동일한 규칙을 공유
 
 ## 2. 계층 규칙
 
-| Layer          | 책임                                                          | 허용 의존성                        | 대표 패키지                                                                                                      |
-| -------------- | ------------------------------------------------------------- | ---------------------------------- | ---------------------------------------------------------------------------------------------------------------- |
-| Presentation   | REST Endpoint, Request/Response DTO, 인증 컨텍스트 해석       | Application, Application DTO       | `..presentation..`, `..presentation.security..`, `..presentation.dto..`                                          |
-| Application    | Use Case 조합, 트랜잭션 경계, Domain↔DTO 변환, 외부 Port 호출 | Domain, Application DTO            | `..application..`, `..application.dto..`                                                                         |
-| Domain         | 엔티티, 밸류, Repository Port, 비즈니스 예외                  | (없음)                             | `..domain..`                                                                                                     |
-| Infrastructure | Repository/Client Adapter, MyBatis Mapper, 외부 API 연동      | Domain(Port 구현), 외부 라이브러리 | `..infrastructure..`, `..infrastructure.persistence..`, `..infrastructure.mapper..`, `..github.infrastructure..` |
+| Layer          | 책임                                                   | 허용 의존성                       | 대표 패키지                                                                                                           |
+|----------------|------------------------------------------------------|------------------------------|------------------------------------------------------------------------------------------------------------------|
+| Presentation   | REST Endpoint, Request/Response DTO, 인증 컨텍스트 해석      | Application, Application DTO | `..presentation..`, `..presentation.security..`, `..presentation.dto..`                                          |
+| Application    | Use Case 조합, 트랜잭션 경계, Domain↔DTO 변환, 외부 Port 호출      | Domain, Application DTO      | `..application..`, `..application.dto..`                                                                         |
+| Domain         | 엔티티, 밸류, Repository Port, 비즈니스 예외                    | (없음)                         | `..domain..`                                                                                                     |
+| Infrastructure | Repository/Client Adapter, MyBatis Mapper, 외부 API 연동 | Domain(Port 구현), 외부 라이브러리    | `..infrastructure..`, `..infrastructure.persistence..`, `..infrastructure.mapper..`, `..github.infrastructure..` |
 
 핵심 원칙
 
@@ -127,6 +127,10 @@ Spotless 또는 IDE `Optimize Imports` 설정으로 동일한 순서를 유지�
 - **로깅**: `src/main/resources/logback-spring.xml`에서 콘솔(INFO) + 롤링 파일(WARN 이상) 출력을 정의한다. `com.ssafy.dash` 패키지
   이하에서는 SLF4J를 사용하고, 도메인/서비스 로그 레벨은 기본적으로 INFO, 인프라/외부 연동 실패는 WARN/ERROR로 표준화한다. 로그 파일
   위치는 `${LOG_PATH}` 환경 변수로 오버라이드 가능하다 (기본 `logs/`).
+- **GitHub Push 파이프라인(Planning)**: `/api/webhooks/github`는 GitHub 서명 검증 후 push payload에서 커밋/파일 메타만 추출하고 즉시
+  응답한다. 추출된 이벤트는 큐/테이블에 저장되며, 백그라운드 워커가 대상 커밋의 README는 건너뛰고 자바 풀이 파일만 GitHub API로 가져와
+  전처리한다. 전처리 결과(커밋 메타, 파일 경로, 소스, 문제 식별자)는 DB에 저장되고, 이후 AI 서버에 전달되어 요약/분석을 만든 뒤 다시 동일
+  엔트리에 저장된다. 이렇게 웹훅 처리·전처리·AI 연동·대시보드 갱신을 분리해 재시도와 장애 복구가 용이하도록 설계한다.
 
 ## 7. 문서 & 운영 팁
 
