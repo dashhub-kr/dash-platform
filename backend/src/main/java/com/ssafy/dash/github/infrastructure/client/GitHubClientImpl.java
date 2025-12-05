@@ -1,5 +1,6 @@
 package com.ssafy.dash.github.infrastructure.client;
 
+import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.Base64;
@@ -21,7 +22,7 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
-import org.springframework.web.util.UriUtils;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -112,16 +113,11 @@ public class GitHubClientImpl implements GitHubClient {
         headers.setAccept(Collections.singletonList(MediaType.APPLICATION_JSON));
         HttpEntity<Void> requestEntity = new HttpEntity<>(headers);
 
-        String encodedPath = UriUtils.encodePath(filePath, StandardCharsets.UTF_8);
         String ref = StringUtils.hasText(reference) ? reference : "main";
 
         try {
             ResponseEntity<String> response = restTemplate.exchange(
-                    String.format("/repos/%s/%s/contents/%s?ref=%s",
-                            slug.owner(),
-                            slug.repository(),
-                            encodedPath,
-                            UriUtils.encode(ref, StandardCharsets.UTF_8)),
+                buildContentsUri(slug, filePath, ref),
                     HttpMethod.GET,
                     requestEntity,
                     String.class);
@@ -185,6 +181,19 @@ public class GitHubClientImpl implements GitHubClient {
         }
 
         return defaultMessage;
+    }
+
+    private URI buildContentsUri(RepositorySlug slug, String filePath, String ref) {
+        UriComponentsBuilder builder = UriComponentsBuilder
+                .fromUriString(ROOT_URI)
+                .pathSegment("repos", slug.owner(), slug.repository(), "contents");
+
+        Arrays.stream(filePath.split("/"))
+                .filter(StringUtils::hasText)
+                .forEach(builder::pathSegment);
+
+        builder.queryParam("ref", ref);
+        return builder.build().encode().toUri();
     }
 
     private record RepositorySlug(String owner, String repository) {
