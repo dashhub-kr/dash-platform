@@ -7,7 +7,8 @@ CREATE TABLE IF NOT EXISTS users (
 	
     provider VARCHAR(50),
 	provider_id VARCHAR(255),
-	avatar_url VARCHAR(512)
+    avatar_url VARCHAR(512),
+    deleted_at TIMESTAMP NULL DEFAULT NULL
     
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
