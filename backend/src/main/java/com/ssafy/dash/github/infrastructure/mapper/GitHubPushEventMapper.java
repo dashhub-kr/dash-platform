@@ -11,5 +11,9 @@ public interface GitHubPushEventMapper {
     void insert(GitHubPushEvent event);
 
     GitHubPushEvent selectByDeliveryId(@Param("deliveryId") String deliveryId);
+
+    GitHubPushEvent selectNextQueued();
+
+    void update(GitHubPushEvent event);
     
 }

@@ -17,7 +17,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ssafy.dash.github.domain.GitHubPushEvent;
 import com.ssafy.dash.github.domain.GitHubPushEventRepository;
-import com.ssafy.dash.github.domain.exception.GitHubWebhookException;
+import com.ssafy.dash.github.domain.exception.GitHubPayloadProcessingException;
 
 @Service
 public class GitHubPushService {
@@ -45,7 +45,7 @@ public class GitHubPushService {
             GitHubPushEvent event = buildEvent(deliveryId, root, payload);
             pushEventRepository.save(event);
         } catch (JsonProcessingException ex) {
-            throw new GitHubWebhookException("GitHub push payload 파싱에 실패했습니다.", ex);
+            throw new GitHubPayloadProcessingException("GitHub push payload 파싱에 실패했습니다.", ex);
         }
     }
 
@@ -110,7 +110,7 @@ public class GitHubPushService {
         try {
             return objectMapper.writeValueAsString(files);
         } catch (JsonProcessingException ex) {
-            throw new GitHubWebhookException("파일 메타데이터 직렬화에 실패했습니다.", ex);
+            throw new GitHubPayloadProcessingException("파일 메타데이터 직렬화에 실패했습니다.", ex);
         }
     }
 

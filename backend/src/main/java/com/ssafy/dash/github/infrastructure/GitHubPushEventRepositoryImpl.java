@@ -26,5 +26,15 @@ public class GitHubPushEventRepositoryImpl implements GitHubPushEventRepository 
     public Optional<GitHubPushEvent> findByDeliveryId(String deliveryId) {
         return Optional.ofNullable(mapper.selectByDeliveryId(deliveryId));
     }
+
+    @Override
+    public Optional<GitHubPushEvent> findNextQueued() {
+        return Optional.ofNullable(mapper.selectNextQueued());
+    }
+
+    @Override
+    public void update(GitHubPushEvent event) {
+        mapper.update(event);
+    }
     
 }
