@@ -6,6 +6,8 @@ public interface OnboardingRepository {
 
     Optional<Onboarding> findByUserId(Long userId);
 
+    Optional<Onboarding> findByRepositoryName(String repositoryName);
+
     void save(Onboarding repository);
     
 }

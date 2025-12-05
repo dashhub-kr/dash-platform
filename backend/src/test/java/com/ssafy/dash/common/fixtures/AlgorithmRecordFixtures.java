@@ -56,8 +56,25 @@ public final class AlgorithmRecordFixtures {
         }
 
         public AlgorithmRecordResult toResult(LocalDateTime createdAt, LocalDateTime updatedAt) {
-            return new AlgorithmRecordResult(id, userId, problemNumber, title, code, language,
-                    createdAt, updatedAt);
+            return new AlgorithmRecordResult(
+                id,
+                userId,
+                problemNumber,
+                title,
+                code,
+                language,
+                "UNKNOWN",
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                createdAt,
+                updatedAt
+            );
         }
 
         public AlgorithmRecordCreateCommand toCreateCommand(String codeOverride) {
