@@ -171,6 +171,8 @@
 
 <script setup>
 import { ref, onMounted, computed } from "vue";
+import { authApi } from "../api/auth";
+import { onboardingApi } from "../api/onboarding";
 
 const loading = ref(true);
 const error = ref(null);
@@ -190,16 +192,13 @@ const scheduleRedirect = () => {
 
 onMounted(async () => {
   try {
+    // Artificial delay tailored to match original UX
     const [res] = await Promise.all([
-      fetch(`/api/oauth/session`, { credentials: "include" }),
+      authApi.getSession(),
       new Promise((resolve) => setTimeout(resolve, 600)),
     ]);
 
-    if (!res.ok) {
-      const message = await res.text();
-      throw new Error(message || `세션 정보 조회 실패 (${res.status})`);
-    }
-    const data = await res.json();
+    const data = res.data;
     user.value = data.user;
     flowType.value = data.flowType;
 
@@ -230,19 +229,9 @@ const submitRepository = async () => {
   saving.value = true;
   submitError.value = null;
   try {
-    const res = await fetch(`/api/onboarding/repository`, {
-      method: "POST",
-      credentials: "include",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ repositoryName: repositoryName.value.trim() }),
-    });
+    const res = await onboardingApi.submitRepository(repositoryName.value.trim());
 
-    if (!res.ok) {
-      const message = await res.text();
-      throw new Error(message || `저장소 등록 실패 (${res.status})`);
-    }
-
-    const data = await res.json();
+    const data = res.data;
     repositoryName.value = data.repositoryName;
     success.value = !!data.webhookConfigured;
 

@@ -603,8 +603,10 @@ const detailedFeatures = ref([
 ]);
 
 import { useAuth } from "../composables/useAuth";
+import { authApi } from "../api/auth";
+
 const { user, authChecked } = useAuth();
-const API_BASE = import.meta.env.VITE_API_BASE_URL || "http://localhost:8080";
+// const API_BASE = import.meta.env.VITE_API_BASE_URL || "http://localhost:8080";
 
 let revealObserver = null;
 function initReveal() {
@@ -660,7 +662,7 @@ const goToDashboard = () => {
   window.location.href = "/dashboard";
 };
 const handleLogin = () => {
-  window.location.href = `${API_BASE}/oauth2/authorization/github`;
+  window.location.href = `/oauth2/authorization/github`;
 };
 
 const toggleProfileMenu = () => {};
@@ -671,10 +673,7 @@ const goToProfile = () => {
 
 const handleLogout = async () => {
   try {
-    await fetch(`${API_BASE}/logout`, {
-      method: "POST",
-      credentials: "include",
-    });
+    await authApi.logout();
   } catch (e) {
     console.error("Logout failed:", e);
   } finally {

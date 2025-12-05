@@ -1,4 +1,5 @@
 import { ref, onMounted } from "vue";
+import { userApi } from "../api/user";
 
 const user = ref(null);
 const authChecked = ref(false);
@@ -6,11 +7,8 @@ const authChecked = ref(false);
 export function useAuth() {
   const refresh = async () => {
     try {
-      const res = await fetch(`/api/users/me`, {
-        credentials: "include",
-      });
-      if (res.ok) user.value = await res.json();
-      else user.value = null;
+      const res = await userApi.getMyProfile();
+      user.value = res.data;
     } catch (e) {
       user.value = null;
     } finally {
@@ -24,3 +22,4 @@ export function useAuth() {
 
   return { user, authChecked, refresh };
 }
+
