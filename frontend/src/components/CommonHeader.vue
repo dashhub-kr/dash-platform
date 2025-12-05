@@ -127,6 +127,7 @@ import { ref, computed, onMounted, onBeforeUnmount } from "vue";
 import { ChevronDown } from "lucide-vue-next";
 
 import { useAuth } from "../composables/useAuth";
+import { authApi } from "../api/auth";
 
 const { user, authChecked, refresh } = useAuth();
 
@@ -137,8 +138,6 @@ const visible = computed(() => {
 });
 
 const emit = defineEmits(["scroll"]);
-
-const API_BASE = import.meta.env.VITE_API_BASE_URL || "http://localhost:8080";
 
 const profileMenuOpen = ref(false);
 const profileRef = ref(null);
@@ -152,7 +151,7 @@ const goHome = () => {
   window.location.href = "/";
 };
 const handleLogin = () => {
-  window.location.href = `/oauth2/authorization/github`;
+  window.location.href = `/oauth2/authorization/github`; // This is OAuth entry, keep as simple link
 };
 
 const toggleProfileMenu = () => {
@@ -171,10 +170,7 @@ const onDocClick = (e) => {
 
 const handleLogout = async () => {
   try {
-    await fetch(`${API_BASE}/logout`, {
-      method: "POST",
-      credentials: "include",
-    });
+    await authApi.logout();
   } catch (e) {
     console.error("Logout failed:", e);
   } finally {
