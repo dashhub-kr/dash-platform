@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserService;
+import org.springframework.security.oauth2.core.OAuth2AccessToken;
 import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
@@ -59,15 +60,32 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
         OAuthLoginResult loginResult = oauthUserService.createOrUpdateOAuthUser(registrationId, providerId, login, email, avatarUrl);
 
         try {
-            boolean hasToken = userRequest.getAccessToken() != null && userRequest.getAccessToken().getTokenValue() != null;
+            OAuth2AccessToken accessToken = userRequest.getAccessToken();
+            boolean hasToken = accessToken != null && accessToken.getTokenValue() != null;
+            if (hasToken && log.isInfoEnabled()) {
+                log.info("GitHub token details userId={} issuedAtUTC={} expiresAtUTC={} scopes={} tokenType={} tokenSnippet={}",
+                        loginResult.user().getId(),
+                        accessToken.getIssuedAt(),
+                        accessToken.getExpiresAt(),
+                        accessToken.getScopes(),
+                        accessToken.getTokenType() != null ? accessToken.getTokenType().getValue() : null,
+                        mask(accessToken.getTokenValue()));
+            }
             log.debug("Saving access token for userId={} tokenPresent={}", loginResult.user().getId(), hasToken);
-            oauthTokenService.saveAccessToken(loginResult.user().getId(), userRequest.getAccessToken());
+            oauthTokenService.saveAccessToken(loginResult.user().getId(), accessToken);
             log.debug("Access token save attempted for userId={}", loginResult.user().getId());
         } catch (Exception ex) {
             log.error("Failed to save access token for userId={}: {}", loginResult.user().getId(), ex.getMessage(), ex);
         }
 
         return new CustomOAuth2User(oauth2User, loginResult);
+    }
+
+    private String mask(String tokenValue) {
+        if (tokenValue == null) {
+            return "null";
+        }
+        return tokenValue.length() > 8 ? tokenValue.substring(0, 6) + "..." : "***";
     }
 
 }
