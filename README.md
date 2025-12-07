@@ -46,9 +46,9 @@ cd backend
 ### 테스트/패키징
 
 ```bash
-./mvnw test                # 전체 테스트
+./mvnw test                 # 전체 테스트
 ./mvnw -Dtest=클래스명 test # 특정 테스트만
-./mvnw package             # 패키징
+./mvnw package              # 패키징
 ```
 
 ---
@@ -90,7 +90,7 @@ npm run preview    # 빌드 결과 미리보기
 
 ## 커밋/PR/테스트 가이드
 
-- **커밋**: `feat|fix|docs|style|refactor|test|chore` + 선택적 범위, 예) `feat(BE): 로그인 구현`
+- **커밋**: `feat|fix|docs|style|refactor|test|chore` + 선택적 범위, 예) `refactor(user): 도메인 강화`
 - **PR**: 이슈 링크, 변경 요약, 테스트 결과(스크린샷/테스트 로그) 첨부 권장
 - **백엔드 테스트**: JUnit5 + Mockito + AssertJ, 상세 가이드는 [`backend/docs/TESTING_GUIDE.md`](backend/docs/TESTING_GUIDE.md)
 - **프론트엔드 테스트**: (Vitest/Cypress 미도입, 추후 필요시 추가)
