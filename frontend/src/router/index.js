@@ -9,6 +9,7 @@ const BoardList = () => import("../views/BoardList.vue");
 const BoardForm = () => import("../views/BoardForm.vue");
 const BoardDetail = () => import("../views/BoardDetail.vue");
 const Profile = () => import("../views/Profile.vue");
+const YouTubeSearch = () => import("../views/YouTubeSearch.vue");
 const StudySimCity = () => import("../views/StudySimCity.vue");
 
 const routes = [
@@ -21,6 +22,7 @@ const routes = [
   { path: "/boards/:id", name: "BoardDetail", component: BoardDetail },
   { path: "/boards/edit/:id", name: "BoardEdit", component: BoardForm },
   { path: "/profile", name: "Profile", component: Profile },
+  { path: "/youtube", name: "YouTubeSearch", component: YouTubeSearch },
   { path: "/simcity", name: "StudySimCity", component: StudySimCity },
 ];
 

@@ -77,6 +77,15 @@
               <h3 class="text-lg font-semibold text-white mb-1">마이페이지</h3>
               <p class="text-sm text-slate-400">내 정보와 설정을 관리하세요.</p>
             </button>
+
+            <button @click="$router.push('/youtube')" class="p-6 bg-slate-800/50 border border-white/5 rounded-xl hover:bg-slate-800 hover:border-red-500/50 transition-all text-left group">
+              <div class="flex justify-between items-start mb-4">
+                <Youtube :size="28" class="text-slate-400 group-hover:text-red-500 transition-colors" />
+                <ArrowRight :size="20" class="text-slate-600 group-hover:translate-x-1 transition-transform" />
+              </div>
+              <h3 class="text-lg font-semibold text-white mb-1">영상 학습</h3>
+              <p class="text-sm text-slate-400">유튜브에서 학습 영상을 검색하세요.</p>
+            </button>
           </div>
         </section>
 
@@ -117,7 +126,8 @@ import {
   MessageSquare, 
   User, 
   ArrowRight,
-  Bell
+  Bell,
+  Youtube
 } from 'lucide-vue-next';
 import { algorithmApi } from '../api/algorithm';
 
