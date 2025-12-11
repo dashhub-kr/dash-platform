@@ -1,0 +1,6153 @@
+[
+  {
+    "problemId": "1000",
+    "title": "A+B",
+    "level": 1,
+    "class": 1,
+    "essential": false,
+    "sprout": true,
+    "tags": [
+      "implementation",
+      "arithmetic",
+      "math"
+    ]
+  },
+  {
+    "problemId": "1001",
+    "title": "A-B",
+    "level": 1,
+    "class": 1,
+    "essential": false,
+    "sprout": true,
+    "tags": [
+      "implementation",
+      "arithmetic",
+      "math"
+    ]
+  },
+  {
+    "problemId": "1003",
+    "title": "피보나치 함수",
+    "level": 8,
+    "class": 3,
+    "essential": true,
+    "sprout": false,
+    "tags": [
+      "dp"
+    ]
+  },
+  {
+    "problemId": "1005",
+    "title": "ACM Craft",
+    "level": 13,
+    "class": 5,
+    "essential": true,
+    "sprout": false,
+    "tags": [
+      "dp",
+      "graphs",
+      "dag",
+      "topological_sorting"
+    ]
+  },
+  {
+    "problemId": "1006",
+    "title": "습격자 초라기",
+    "level": 18,
+    "class": 6,
+    "essential": true,
+    "sprout": false,
+    "tags": [
+      "dp"
+    ]
+  },
+  {
+    "problemId": "1008",
+    "title": "A/B",
+    "level": 1,
+    "class": 1,
+    "essential": true,
+    "sprout": true,
+    "tags": [
+      "implementation",
+      "arithmetic",
+      "math"
+    ]
+  },
+  {
+    "problemId": "1012",
+    "title": "유기농 배추",
+    "level": 9,
+    "class": 3,
+    "essential": true,
+    "sprout": false,
+    "tags": [
+      "graphs",
+      "graph_traversal",
+      "bfs",
+      "dfs",
+      "grid_graph",
+      "flood_fill"
+    ]
+  },
+  {
+    "problemId": "1014",
+    "title": "컨닝",
+    "level": 17,
+    "class": 6,
+    "essential": false,
+    "sprout": false,
+    "tags": [
+      "bitmask",
+      "dp",
+      "flow",
+      "dp_bitfield",
+      "graphs"
+    ]
+  },
+  {
+    "problemId": "1017",
+    "title": "소수 쌍",
+    "level": 18,
+    "class": 7,
+    "essential": false,
+    "sprout": false,
+    "tags": [
+      "math",
+      "number_theory",
+      "primality_test",
+      "sieve",
+      "bipartite_matching"
+    ]
+  },
+  {
+    "problemId": "1018",
+    "title": "체스판 다시 칠하기",
+    "level": 8,
+    "class": 2,
+    "essential": true,
+    "sprout": false,
+    "tags": [
+      "implementation",
+      "bruteforcing"
+    ]
+  },
+  {
+    "problemId": "1019",
+    "title": "책 페이지",
+    "level": 16,
+    "class": 6,
+    "essential": true,
+    "sprout": false,
+    "tags": [
+      "math",
+      "implementation"
+    ]
+  },
+  {
+    "problemId": "1043",
+    "title": "거짓말",
+    "level": 12,
+    "class": 4,
+    "essential": false,
+    "sprout": false,
+    "tags": [
+      "graphs",
+      "data_structures",
+      "graph_traversal",
+      "disjoint_set"
+    ]
+  },
+  {
+    "problemId": "1067",
+    "title": "이동",
+    "level": 20,
+    "class": 8,
+    "essential": true,
+    "sprout": false,
+    "tags": [
+      "math",
+      "fft"
+    ]
+  },
+  {
+    "problemId": "1074",
+    "title": "Z",
+    "level": 11,
+    "class": 3,
+    "essential": true,
+    "sprout": false,
+    "tags": [
+      "divide_and_conquer",
+      "recursion"
+    ]
+  },
+  {
+    "problemId": "1086",
+    "title": "박성원",
+    "level": 16,
+    "class": 6,
+    "essential": false,
+    "sprout": false,
+    "tags": [
+      "bitmask",
+      "dp",
+      "dp_bitfield"
+    ]
+  },
+  {
+    "problemId": "1106",
+    "title": "호텔",
+    "level": 12,
+    "class": 5,
+    "essential": true,
+    "sprout": false,
+    "tags": [
+      "dp",
+      "knapsack"
+    ]
+  },
+  {
+    "problemId": "1126",
+    "title": "같은 탑",
+    "level": 18,
+    "class": 7,
+    "essential": true,
+    "sprout": false,
+    "tags": [
+      "dp"
+    ]
+  },
+  {
+    "problemId": "1144",
+    "title": "싼 비용",
+    "level": 23,
+    "class": 9,
+    "essential": false,
+    "sprout": false,
+    "tags": [
+      "dp",
+      "dp_connection_profile"
+    ]
+  },
+  {
+    "problemId": "1149",
+    "title": "RGB거리",
+    "level": 10,
+    "class": 4,
+    "essential": true,
+    "sprout": false,
+    "tags": [
+      "dp"
+    ]
+  },
+  {
+    "problemId": "1150",
+    "title": "백업",
+    "level": 22,
+    "class": 9,
+    "essential": true,
+    "sprout": false,
+    "tags": [
+      "data_structures",
+      "greedy",
+      "priority_queue"
+    ]
+  },
+  {
+    "problemId": "1152",
+    "title": "단어의 개수",
+    "level": 4,
+    "class": 1,
+    "essential": false,
+    "sprout": false,
+    "tags": [
+      "implementation",
+      "string"
+    ]
+  },
+  {
+    "problemId": "1167",
+    "title": "트리의 지름",
+    "level": 14,
+    "class": 4,
+    "essential": true,
+    "sprout": false,
+    "tags": [
+      "graphs",
+      "graph_traversal",
+      "trees",
+      "dfs",
+      "tree_diameter"
+    ]
+  },
+  {
+    "problemId": "1181",
+    "title": "단어 정렬",
+    "level": 6,
+    "class": 2,
+    "essential": true,
+    "sprout": false,
+    "tags": [
+      "string",
+      "sorting"
+    ]
+  },
+  {
+    "problemId": "1197",
+    "title": "최소 스패닝 트리",
+    "level": 12,
+    "class": 5,
+    "essential": true,
+    "sprout": false,
+    "tags": [
+      "mst",
+      "graphs"
+    ]
+  },
+  {
+    "problemId": "1202",
+    "title": "보석 도둑",
+    "level": 14,
+    "class": 5,
+    "essential": true,
+    "sprout": false,
+    "tags": [
+      "data_structures",
+      "greedy",
+      "sorting",
+      "priority_queue"
+    ]
+  },
+  {
+    "problemId": "1210",
+    "title": "마피아",
+    "level": 20,
+    "class": 8,
+    "essential": false,
+    "sprout": false,
+    "tags": [
+      "graphs",
+      "flow",
+      "mfmc"
+    ]
+  },
+  {
+    "problemId": "1214",
+    "title": "쿨한 물건 구매",
+    "level": 16,
+    "class": 7,
+    "essential": false,
+    "sprout": false,
+    "tags": [
+      "math",
+      "bruteforcing",
+      "number_theory"
+    ]
+  },
+  {
+    "problemId": "1238",
+    "title": "파티",
+    "level": 13,
+    "class": 4,
+    "essential": true,
+    "sprout": false,
+    "tags": [
+      "graphs",
+      "shortest_path",
+      "dijkstra"
+    ]
+  },
+  {
+    "problemId": "1259",
+    "title": "팰린드롬수",
+    "level": 5,
+    "class": 2,
+    "essential": true,
+    "sprout": false,
+    "tags": [
+      "implementation",
+      "string"
+    ]
+  },
+  {
+    "problemId": "1260",
+    "title": "DFS와 BFS",
+    "level": 9,
+    "class": 3,
+    "essential": false,
+    "sprout": false,
+    "tags": [
+      "graphs",
+      "graph_traversal",
+      "bfs",
+      "dfs"
+    ]
+  },
+  {
+    "problemId": "1330",
+    "title": "두 수 비교하기",
+    "level": 1,
+    "class": 1,
+    "essential": true,
+    "sprout": true,
+    "tags": [
+      "implementation"
+    ]
+  },
+  {
+    "problemId": "1389",
+    "title": "케빈 베이컨의 6단계 법칙",
+    "level": 10,
+    "class": 3,
+    "essential": false,
+    "sprout": false,
+    "tags": [
+      "graphs",
+      "graph_traversal",
+      "bfs",
+      "shortest_path",
+      "floyd_warshall"
+    ]
+  },
+  {
+    "problemId": "1420",
+    "title": "학교 가지마!",
+    "level": 19,
+    "class": 7,
+    "essential": true,
+    "sprout": false,
+    "tags": [
+      "graphs",
+      "flow",
+      "grid_graph",
+      "mfmc"
+    ]
+  },
+  {
+    "problemId": "1436",
+    "title": "영화감독 숌",
+    "level": 6,
+    "class": 2,
+    "essential": false,
+    "sprout": false,
+    "tags": [
+      "bruteforcing"
+    ]
+  },
+  {
+    "problemId": "1463",
+    "title": "1로 만들기",
+    "level": 8,
+    "class": 3,
+    "essential": true,
+    "sprout": false,
+    "tags": [
+      "dp"
+    ]
+  },
+  {
+    "problemId": "1504",
+    "title": "특정한 최단 경로",
+    "level": 12,
+    "class": 4,
+    "essential": false,
+    "sprout": false,
+    "tags": [
+      "graphs",
+      "shortest_path",
+      "dijkstra"
+    ]
+  },
+  {
+    "problemId": "1509",
+    "title": "팰린드롬 분할",
+    "level": 15,
+    "class": 5,
+    "essential": false,
+    "sprout": false,
+    "tags": [
+      "dp"
+    ]
+  },
+  {
+    "problemId": "1533",
+    "title": "길의 개수",
+    "level": 18,
+    "class": 6,
+    "essential": true,
+    "sprout": false,
+    "tags": [
+      "math",
+      "graphs",
+      "exponentiation_by_squaring"
+    ]
+  },
+  {
+    "problemId": "1541",
+    "title": "잃어버린 괄호",
+    "level": 9,
+    "class": 3,
+    "essential": false,
+    "sprout": false,
+    "tags": [
+      "math",
+      "greedy",
+      "string",
+      "parsing"
+    ]
+  },
+  {
+    "problemId": "1546",
+    "title": "평균",
+    "level": 5,
+    "class": 2,
+    "essential": true,
+    "sprout": false,
+    "tags": [
+      "math",
+      "arithmetic"
+    ]
+  },
+  {
+    "problemId": "1562",
+    "title": "계단 수",
+    "level": 15,
+    "class": 5,
+    "essential": true,
+    "sprout": false,
+    "tags": [
+      "dp",
+      "bitmask",
+      "dp_bitfield"
+    ]
+  },
+  {
+    "problemId": "1605",
+    "title": "반복 부분문자열",
+    "level": 18,
+    "class": 7,
+    "essential": true,
+    "sprout": false,
+    "tags": [
+      "string",
+      "hashing",
+      "suffix_array",
+      "rabin_karp"
+    ]
+  },
+  {
+    "problemId": "1620",
+    "title": "나는야 포켓몬 마스터 이다솜",
+    "level": 7,
+    "class": 3,
+    "essential": false,
+    "sprout": false,
+    "tags": [
+      "data_structures",
+      "set",
+      "hash_set"
+    ]
+  },
+  {
+    "problemId": "1629",
+    "title": "곱셈",
+    "level": 10,
+    "class": 4,
+    "essential": true,
+    "sprout": false,
+    "tags": [
+      "math",
+      "exponentiation_by_squaring"
+    ]
+  },
+  {
+    "problemId": "1644",
+    "title": "소수의 연속합",
+    "level": 13,
+    "class": 5,
+    "essential": false,
+    "sprout": false,
+    "tags": [
+      "math",
+      "number_theory",
+      "two_pointer",
+      "primality_test",
+      "sieve"
+    ]
+  },
+  {
+    "problemId": "1647",
+    "title": "도시 분할 계획",
+    "level": 12,
+    "class": 5,
+    "essential": false,
+    "sprout": false,
+    "tags": [
+      "graphs",
+      "mst"
+    ]
+  },
+  {
+    "problemId": "1648",
+    "title": "격자판 채우기",
+    "level": 18,
+    "class": 7,
+    "essential": false,
+    "sprout": false,
+    "tags": [
+      "dp",
+      "bitmask",
+      "dp_bitfield"
+    ]
+  },
+  {
+    "problemId": "1654",
+    "title": "랜선 자르기",
+    "level": 9,
+    "class": 3,
+    "essential": false,
+    "sprout": false,
+    "tags": [
+      "binary_search",
+      "parametric_search"
+    ]
+  },
+  {
+    "problemId": "1659",
+    "title": "수 (Hard)",
+    "level": 25,
+    "class": 10,
+    "essential": true,
+    "sprout": false,
+    "tags": [
+      "dp",
+      "greedy",
+      "prefix_sum"
+    ]
+  },
+  {
+    "problemId": "1671",
+    "title": "상어의 저녁식사",
+    "level": 18,
+    "class": 7,
+    "essential": false,
+    "sprout": false,
+    "tags": [
+      "bipartite_matching"
+    ]
+  },
+  {
+    "problemId": "1676",
+    "title": "팩토리얼 0의 개수",
+    "level": 6,
+    "class": 2,
+    "essential": false,
+    "sprout": false,
+    "tags": [
+      "math"
+    ]
+  },
+  {
+    "problemId": "1697",
+    "title": "숨바꼭질",
+    "level": 10,
+    "class": 3,
+    "essential": true,
+    "sprout": false,
+    "tags": [
+      "graphs",
+      "graph_traversal",
+      "bfs"
+    ]
+  },
+  {
+    "problemId": "1708",
+    "title": "볼록 껍질",
+    "level": 16,
+    "class": 6,
+    "essential": true,
+    "sprout": false,
+    "tags": [
+      "geometry",
+      "convex_hull",
+      "angle_sorting"
+    ]
+  },
+  {
+    "problemId": "1753",
+    "title": "최단경로",
+    "level": 12,
+    "class": 4,
+    "essential": true,
+    "sprout": false,
+    "tags": [
+      "graphs",
+      "shortest_path",
+      "dijkstra"
+    ]
+  },
+  {
+    "problemId": "1761",
+    "title": "정점들의 거리",
+    "level": 16,
+    "class": 6,
+    "essential": true,
+    "sprout": false,
+    "tags": [
+      "data_structures",
+      "trees",
+      "lca",
+      "sparse_table"
+    ]
+  },
+  {
+    "problemId": "1763",
+    "title": "트리 색칠",
+    "level": 24,
+    "class": 10,
+    "essential": true,
+    "sprout": false,
+    "tags": [
+      "data_structures",
+      "greedy",
+      "trees",
+      "disjoint_set",
+      "priority_queue"
+    ]
+  },
+  {
+    "problemId": "1764",
+    "title": "듣보잡",
+    "level": 7,
+    "class": 3,
+    "essential": true,
+    "sprout": false,
+    "tags": [
+      "data_structures",
+      "string",
+      "sorting",
+      "set",
+      "hash_set"
+    ]
+  },
+  {
+    "problemId": "1766",
+    "title": "문제집",
+    "level": 14,
+    "class": 5,
+    "essential": false,
+    "sprout": false,
+    "tags": [
+      "data_structures",
+      "graphs",
+      "priority_queue",
+      "dag",
+      "topological_sorting"
+    ]
+  },
+  {
+    "problemId": "1786",
+    "title": "찾기",
+    "level": 16,
+    "class": 6,
+    "essential": true,
+    "sprout": false,
+    "tags": [
+      "string",
+      "kmp"
+    ]
+  },
+  {
+    "problemId": "1799",
+    "title": "비숍",
+    "level": 16,
+    "class": 5,
+    "essential": false,
+    "sprout": false,
+    "tags": [
+      "backtracking"
+    ]
+  },
+  {
+    "problemId": "1806",
+    "title": "부분합",
+    "level": 12,
+    "class": 5,
+    "essential": true,
+    "sprout": false,
+    "tags": [
+      "prefix_sum",
+      "two_pointer"
+    ]
+  },
+  {
+    "problemId": "1865",
+    "title": "웜홀",
+    "level": 13,
+    "class": 4,
+    "essential": true,
+    "sprout": false,
+    "tags": [
+      "graphs",
+      "shortest_path",
+      "bellman_ford"
+    ]
+  },
+  {
+    "problemId": "1874",
+    "title": "스택 수열",
+    "level": 9,
+    "class": 2,
+    "essential": false,
+    "sprout": false,
+    "tags": [
+      "data_structures",
+      "stack"
+    ]
+  },
+  {
+    "problemId": "1916",
+    "title": "최소비용 구하기",
+    "level": 11,
+    "class": 4,
+    "essential": false,
+    "sprout": false,
+    "tags": [
+      "graphs",
+      "shortest_path",
+      "dijkstra"
+    ]
+  },
+  {
+    "problemId": "1918",
+    "title": "후위 표기식",
+    "level": 14,
+    "class": 4,
+    "essential": true,
+    "sprout": false,
+    "tags": [
+      "data_structures",
+      "stack"
+    ]
+  },
+  {
+    "problemId": "1920",
+    "title": "수 찾기",
+    "level": 7,
+    "class": 2,
+    "essential": true,
+    "sprout": false,
+    "tags": [
+      "data_structures",
+      "sorting",
+      "binary_search",
+      "set",
+      "hash_set"
+    ]
+  },
+  {
+    "problemId": "1927",
+    "title": "최소 힙",
+    "level": 9,
+    "class": 3,
+    "essential": true,
+    "sprout": false,
+    "tags": [
+      "data_structures",
+      "priority_queue"
+    ]
+  },
+  {
+    "problemId": "1929",
+    "title": "소수 구하기",
+    "level": 8,
+    "class": 2,
+    "essential": false,
+    "sprout": false,
+    "tags": [
+      "math",
+      "number_theory",
+      "primality_test",
+      "sieve"
+    ]
+  },
+  {
+    "problemId": "1931",
+    "title": "회의실 배정",
+    "level": 11,
+    "class": 3,
+    "essential": true,
+    "sprout": false,
+    "tags": [
+      "greedy",
+      "sorting"
+    ]
+  },
+  {
+    "problemId": "1932",
+    "title": "정수 삼각형",
+    "level": 10,
+    "class": 4,
+    "essential": true,
+    "sprout": false,
+    "tags": [
+      "dp"
+    ]
+  },
+  {
+    "problemId": "1948",
+    "title": "임계경로",
+    "level": 16,
+    "class": 6,
+    "essential": false,
+    "sprout": false,
+    "tags": [
+      "graphs",
+      "graph_traversal",
+      "dag",
+      "topological_sorting",
+      "traceback"
+    ]
+  },
+  {
+    "problemId": "1966",
+    "title": "프린터 큐",
+    "level": 8,
+    "class": 2,
+    "essential": false,
+    "sprout": false,
+    "tags": [
+      "implementation",
+      "data_structures",
+      "simulation",
+      "queue"
+    ]
+  },
+  {
+    "problemId": "1967",
+    "title": "트리의 지름",
+    "level": 12,
+    "class": 4,
+    "essential": true,
+    "sprout": false,
+    "tags": [
+      "graphs",
+      "graph_traversal",
+      "trees",
+      "dfs",
+      "tree_diameter"
+    ]
+  },
+  {
+    "problemId": "1978",
+    "title": "소수 찾기",
+    "level": 4,
+    "class": 2,
+    "essential": true,
+    "sprout": false,
+    "tags": [
+      "primality_test",
+      "number_theory",
+      "math"
+    ]
+  },
+  {
+    "problemId": "1987",
+    "title": "알파벳",
+    "level": 12,
+    "class": 4,
+    "essential": false,
+    "sprout": false,
+    "tags": [
+      "graphs",
+      "graph_traversal",
+      "dfs",
+      "backtracking",
+      "grid_graph"
+    ]
+  },
+  {
+    "problemId": "1991",
+    "title": "트리 순회",
+    "level": 10,
+    "class": 4,
+    "essential": true,
+    "sprout": false,
+    "tags": [
+      "trees",
+      "recursion"
+    ]
+  },
+  {
+    "problemId": "2042",
+    "title": "구간 합 구하기",
+    "level": 15,
+    "class": 6,
+    "essential": true,
+    "sprout": false,
+    "tags": [
+      "segtree",
+      "data_structures"
+    ]
+  },
+  {
+    "problemId": "2096",
+    "title": "내려가기",
+    "level": 11,
+    "class": 4,
+    "essential": false,
+    "sprout": false,
+    "tags": [
+      "dp",
+      "sliding_window"
+    ]
+  },
+  {
+    "problemId": "2098",
+    "title": "외판원 순회",
+    "level": 15,
+    "class": 5,
+    "essential": true,
+    "sprout": false,
+    "tags": [
+      "bitmask",
+      "dp",
+      "dp_bitfield",
+      "tsp"
+    ]
+  },
+  {
+    "problemId": "2108",
+    "title": "통계학",
+    "level": 9,
+    "class": 2,
+    "essential": false,
+    "sprout": false,
+    "tags": [
+      "math",
+      "implementation",
+      "sorting"
+    ]
+  },
+  {
+    "problemId": "2143",
+    "title": "두 배열의 합",
+    "level": 13,
+    "class": 5,
+    "essential": false,
+    "sprout": false,
+    "tags": [
+      "data_structures",
+      "binary_search",
+      "set",
+      "prefix_sum",
+      "hash_set"
+    ]
+  },
+  {
+    "problemId": "2150",
+    "title": "Strongly Connected Component",
+    "level": 16,
+    "class": 6,
+    "essential": true,
+    "sprout": false,
+    "tags": [
+      "graphs",
+      "scc"
+    ]
+  },
+  {
+    "problemId": "2162",
+    "title": "선분 그룹",
+    "level": 16,
+    "class": 5,
+    "essential": false,
+    "sprout": false,
+    "tags": [
+      "data_structures",
+      "geometry",
+      "disjoint_set",
+      "line_intersection"
+    ]
+  },
+  {
+    "problemId": "2164",
+    "title": "카드2",
+    "level": 7,
+    "class": 2,
+    "essential": true,
+    "sprout": false,
+    "tags": [
+      "data_structures",
+      "queue"
+    ]
+  },
+  {
+    "problemId": "2166",
+    "title": "다각형의 면적",
+    "level": 11,
+    "class": 5,
+    "essential": true,
+    "sprout": false,
+    "tags": [
+      "geometry",
+      "polygon_area"
+    ]
+  },
+  {
+    "problemId": "2178",
+    "title": "미로 탐색",
+    "level": 10,
+    "class": 3,
+    "essential": false,
+    "sprout": false,
+    "tags": [
+      "graphs",
+      "graph_traversal",
+      "bfs",
+      "grid_graph"
+    ]
+  },
+  {
+    "problemId": "2206",
+    "title": "벽 부수고 이동하기",
+    "level": 13,
+    "class": 4,
+    "essential": true,
+    "sprout": false,
+    "tags": [
+      "graphs",
+      "graph_traversal",
+      "bfs",
+      "grid_graph"
+    ]
+  },
+  {
+    "problemId": "2231",
+    "title": "분해합",
+    "level": 4,
+    "class": 2,
+    "essential": false,
+    "sprout": false,
+    "tags": [
+      "bruteforcing"
+    ]
+  },
+  {
+    "problemId": "2239",
+    "title": "스도쿠",
+    "level": 12,
+    "class": 5,
+    "essential": true,
+    "sprout": false,
+    "tags": [
+      "implementation",
+      "backtracking"
+    ]
+  },
+  {
+    "problemId": "2243",
+    "title": "사탕상자",
+    "level": 16,
+    "class": 6,
+    "essential": false,
+    "sprout": false,
+    "tags": [
+      "binary_search",
+      "segtree",
+      "data_structures"
+    ]
+  },
+  {
+    "problemId": "2252",
+    "title": "줄 세우기",
+    "level": 13,
+    "class": 5,
+    "essential": true,
+    "sprout": false,
+    "tags": [
+      "graphs",
+      "dag",
+      "topological_sorting"
+    ]
+  },
+  {
+    "problemId": "2261",
+    "title": "가장 가까운 두 점",
+    "level": 19,
+    "class": 7,
+    "essential": false,
+    "sprout": false,
+    "tags": [
+      "geometry",
+      "sweeping",
+      "divide_and_conquer"
+    ]
+  },
+  {
+    "problemId": "2263",
+    "title": "트리의 순회",
+    "level": 15,
+    "class": 5,
+    "essential": false,
+    "sprout": false,
+    "tags": [
+      "trees",
+      "divide_and_conquer",
+      "recursion"
+    ]
+  },
+  {
+    "problemId": "2292",
+    "title": "벌집",
+    "level": 4,
+    "class": 2,
+    "essential": false,
+    "sprout": false,
+    "tags": [
+      "math"
+    ]
+  },
+  {
+    "problemId": "2316",
+    "title": "도시 왕복하기 2",
+    "level": 18,
+    "class": 7,
+    "essential": true,
+    "sprout": false,
+    "tags": [
+      "graphs",
+      "flow"
+    ]
+  },
+  {
+    "problemId": "2336",
+    "title": "굉장한 학생",
+    "level": 19,
+    "class": 8,
+    "essential": true,
+    "sprout": false,
+    "tags": [
+      "data_structures",
+      "segtree"
+    ]
+  },
+  {
+    "problemId": "2342",
+    "title": "Dance Dance Revolution",
+    "level": 13,
+    "class": 5,
+    "essential": false,
+    "sprout": false,
+    "tags": [
+      "dp"
+    ]
+  },
+  {
+    "problemId": "2357",
+    "title": "최솟값과 최댓값",
+    "level": 15,
+    "class": 6,
+    "essential": true,
+    "sprout": false,
+    "tags": [
+      "segtree",
+      "data_structures"
+    ]
+  },
+  {
+    "problemId": "2419",
+    "title": "사수아탕",
+    "level": 20,
+    "class": 8,
+    "essential": true,
+    "sprout": false,
+    "tags": [
+      "dp"
+    ]
+  },
+  {
+    "problemId": "2438",
+    "title": "별 찍기 - 1",
+    "level": 1,
+    "class": 1,
+    "essential": true,
+    "sprout": true,
+    "tags": [
+      "implementation"
+    ]
+  },
+  {
+    "problemId": "2439",
+    "title": "별 찍기 - 2",
+    "level": 2,
+    "class": 1,
+    "essential": false,
+    "sprout": false,
+    "tags": [
+      "implementation"
+    ]
+  },
+  {
+    "problemId": "2448",
+    "title": "별 찍기 - 11",
+    "level": 12,
+    "class": 4,
+    "essential": false,
+    "sprout": false,
+    "tags": [
+      "recursion"
+    ]
+  },
+  {
+    "problemId": "2467",
+    "title": "용액",
+    "level": 11,
+    "class": 5,
+    "essential": true,
+    "sprout": false,
+    "tags": [
+      "binary_search",
+      "two_pointer"
+    ]
+  },
+  {
+    "problemId": "2473",
+    "title": "세 용액",
+    "level": 13,
+    "class": 5,
+    "essential": true,
+    "sprout": false,
+    "tags": [
+      "sorting",
+      "binary_search",
+      "two_pointer"
+    ]
+  },
+  {
+    "problemId": "2475",
+    "title": "검증수",
+    "level": 1,
+    "class": 1,
+    "essential": false,
+    "sprout": true,
+    "tags": [
+      "implementation",
+      "arithmetic",
+      "math"
+    ]
+  },
+  {
+    "problemId": "2533",
+    "title": "사회망 서비스(SNS)",
+    "level": 13,
+    "class": 6,
+    "essential": true,
+    "sprout": false,
+    "tags": [
+      "dp",
+      "dp_tree",
+      "trees"
+    ]
+  },
+  {
+    "problemId": "2557",
+    "title": "Hello World",
+    "level": 1,
+    "class": 1,
+    "essential": true,
+    "sprout": true,
+    "tags": [
+      "implementation"
+    ]
+  },
+  {
+    "problemId": "2562",
+    "title": "최댓값",
+    "level": 3,
+    "class": 1,
+    "essential": true,
+    "sprout": false,
+    "tags": [
+      "implementation"
+    ]
+  },
+  {
+    "problemId": "2568",
+    "title": "전깃줄 - 2",
+    "level": 16,
+    "class": 5,
+    "essential": false,
+    "sprout": false,
+    "tags": [
+      "traceback",
+      "lis"
+    ]
+  },
+  {
+    "problemId": "2577",
+    "title": "숫자의 개수",
+    "level": 4,
+    "class": 1,
+    "essential": false,
+    "sprout": false,
+    "tags": [
+      "math",
+      "implementation",
+      "arithmetic"
+    ]
+  },
+  {
+    "problemId": "2579",
+    "title": "계단 오르기",
+    "level": 8,
+    "class": 3,
+    "essential": false,
+    "sprout": false,
+    "tags": [
+      "dp"
+    ]
+  },
+  {
+    "problemId": "2606",
+    "title": "바이러스",
+    "level": 8,
+    "class": 3,
+    "essential": true,
+    "sprout": false,
+    "tags": [
+      "graphs",
+      "graph_traversal",
+      "bfs",
+      "dfs"
+    ]
+  },
+  {
+    "problemId": "2609",
+    "title": "최대공약수와 최소공배수",
+    "level": 5,
+    "class": 2,
+    "essential": true,
+    "sprout": false,
+    "tags": [
+      "math",
+      "number_theory",
+      "euclidean"
+    ]
+  },
+  {
+    "problemId": "2618",
+    "title": "경찰차",
+    "level": 17,
+    "class": 6,
+    "essential": true,
+    "sprout": false,
+    "tags": [
+      "dp",
+      "traceback"
+    ]
+  },
+  {
+    "problemId": "2623",
+    "title": "음악프로그램",
+    "level": 13,
+    "class": 5,
+    "essential": true,
+    "sprout": false,
+    "tags": [
+      "graphs",
+      "dag",
+      "topological_sorting"
+    ]
+  },
+  {
+    "problemId": "2630",
+    "title": "색종이 만들기",
+    "level": 9,
+    "class": 3,
+    "essential": true,
+    "sprout": false,
+    "tags": [
+      "divide_and_conquer",
+      "recursion"
+    ]
+  },
+  {
+    "problemId": "2638",
+    "title": "치즈",
+    "level": 13,
+    "class": 4,
+    "essential": false,
+    "sprout": false,
+    "tags": [
+      "implementation",
+      "graphs",
+      "graph_traversal",
+      "simulation",
+      "bfs",
+      "dfs",
+      "grid_graph"
+    ]
+  },
+  {
+    "problemId": "2667",
+    "title": "단지번호붙이기",
+    "level": 10,
+    "class": 3,
+    "essential": false,
+    "sprout": false,
+    "tags": [
+      "graphs",
+      "graph_traversal",
+      "bfs",
+      "dfs",
+      "grid_graph",
+      "flood_fill"
+    ]
+  },
+  {
+    "problemId": "2673",
+    "title": "교차하지 않는 원의 현들의 최대집합",
+    "level": 17,
+    "class": 7,
+    "essential": false,
+    "sprout": false,
+    "tags": [
+      "dp"
+    ]
+  },
+  {
+    "problemId": "2675",
+    "title": "문자열 반복",
+    "level": 4,
+    "class": 1,
+    "essential": true,
+    "sprout": false,
+    "tags": [
+      "implementation",
+      "string"
+    ]
+  },
+  {
+    "problemId": "2739",
+    "title": "구구단",
+    "level": 1,
+    "class": 1,
+    "essential": true,
+    "sprout": true,
+    "tags": [
+      "implementation",
+      "math"
+    ]
+  },
+  {
+    "problemId": "2741",
+    "title": "N 찍기",
+    "level": 1,
+    "class": 1,
+    "essential": false,
+    "sprout": true,
+    "tags": [
+      "implementation"
+    ]
+  },
+  {
+    "problemId": "2751",
+    "title": "수 정렬하기 2",
+    "level": 6,
+    "class": 2,
+    "essential": true,
+    "sprout": false,
+    "tags": [
+      "sorting"
+    ]
+  },
+  {
+    "problemId": "2753",
+    "title": "윤년",
+    "level": 1,
+    "class": 1,
+    "essential": false,
+    "sprout": true,
+    "tags": [
+      "implementation",
+      "arithmetic",
+      "math"
+    ]
+  },
+  {
+    "problemId": "2775",
+    "title": "부녀회장이 될테야",
+    "level": 5,
+    "class": 2,
+    "essential": false,
+    "sprout": false,
+    "tags": [
+      "math",
+      "implementation",
+      "dp"
+    ]
+  },
+  {
+    "problemId": "2798",
+    "title": "블랙잭",
+    "level": 4,
+    "class": 2,
+    "essential": true,
+    "sprout": false,
+    "tags": [
+      "bruteforcing"
+    ]
+  },
+  {
+    "problemId": "2805",
+    "title": "나무 자르기",
+    "level": 9,
+    "class": 3,
+    "essential": true,
+    "sprout": false,
+    "tags": [
+      "binary_search",
+      "parametric_search"
+    ]
+  },
+  {
+    "problemId": "2839",
+    "title": "설탕 배달",
+    "level": 7,
+    "class": 2,
+    "essential": false,
+    "sprout": false,
+    "tags": [
+      "dp",
+      "greedy",
+      "math"
+    ]
+  },
+  {
+    "problemId": "2869",
+    "title": "달팽이는 올라가고 싶다",
+    "level": 5,
+    "class": 2,
+    "essential": false,
+    "sprout": false,
+    "tags": [
+      "math"
+    ]
+  },
+  {
+    "problemId": "2884",
+    "title": "알람 시계",
+    "level": 3,
+    "class": 1,
+    "essential": false,
+    "sprout": false,
+    "tags": [
+      "math",
+      "arithmetic"
+    ]
+  },
+  {
+    "problemId": "2887",
+    "title": "행성 터널",
+    "level": 16,
+    "class": 5,
+    "essential": false,
+    "sprout": false,
+    "tags": [
+      "graphs",
+      "sorting",
+      "mst"
+    ]
+  },
+  {
+    "problemId": "2912",
+    "title": "백설공주와 난쟁이",
+    "level": 19,
+    "class": 7,
+    "essential": false,
+    "sprout": false,
+    "tags": [
+      "data_structures",
+      "offline_queries",
+      "randomization",
+      "mo"
+    ]
+  },
+  {
+    "problemId": "2920",
+    "title": "음계",
+    "level": 4,
+    "class": 1,
+    "essential": false,
+    "sprout": false,
+    "tags": [
+      "implementation"
+    ]
+  },
+  {
+    "problemId": "2927",
+    "title": "남극 탐험",
+    "level": 21,
+    "class": 8,
+    "essential": true,
+    "sprout": false,
+    "tags": [
+      "data_structures",
+      "trees",
+      "segtree",
+      "disjoint_set",
+      "offline_queries",
+      "hld"
+    ]
+  },
+  {
+    "problemId": "3015",
+    "title": "오아시스 재결합",
+    "level": 16,
+    "class": 6,
+    "essential": false,
+    "sprout": false,
+    "tags": [
+      "data_structures",
+      "stack"
+    ]
+  },
+  {
+    "problemId": "3052",
+    "title": "나머지",
+    "level": 4,
+    "class": 1,
+    "essential": false,
+    "sprout": false,
+    "tags": [
+      "math",
+      "set",
+      "arithmetic"
+    ]
+  },
+  {
+    "problemId": "3176",
+    "title": "도로 네트워크",
+    "level": 17,
+    "class": 6,
+    "essential": true,
+    "sprout": false,
+    "tags": [
+      "data_structures",
+      "trees",
+      "lca",
+      "sparse_table"
+    ]
+  },
+  {
+    "problemId": "3295",
+    "title": "단방향 링크 네트워크",
+    "level": 19,
+    "class": 7,
+    "essential": true,
+    "sprout": false,
+    "tags": [
+      "bipartite_matching"
+    ]
+  },
+  {
+    "problemId": "3311",
+    "title": "Traffic",
+    "level": 22,
+    "class": 10,
+    "essential": false,
+    "sprout": false,
+    "tags": [
+      "graphs",
+      "graph_traversal",
+      "bfs",
+      "dfs",
+      "dag",
+      "scc",
+      "planar_graph"
+    ]
+  },
+  {
+    "problemId": "3319",
+    "title": "전령들",
+    "level": 23,
+    "class": 9,
+    "essential": false,
+    "sprout": false,
+    "tags": [
+      "dp",
+      "data_structures",
+      "trees",
+      "cht"
+    ]
+  },
+  {
+    "problemId": "3408",
+    "title": "Non-boring sequences",
+    "level": 21,
+    "class": 9,
+    "essential": true,
+    "sprout": false,
+    "tags": [
+      "data_structures",
+      "segtree",
+      "divide_and_conquer"
+    ]
+  },
+  {
+    "problemId": "3419",
+    "title": "Racing Car Trail",
+    "level": 23,
+    "class": 10,
+    "essential": true,
+    "sprout": false,
+    "tags": [
+      "graphs",
+      "graph_traversal",
+      "dfs",
+      "game_theory",
+      "bipartite_matching"
+    ]
+  },
+  {
+    "problemId": "3444",
+    "title": "Robotic Sort",
+    "level": 23,
+    "class": 10,
+    "essential": false,
+    "sprout": false,
+    "tags": [
+      "data_structures",
+      "trees",
+      "splay_tree"
+    ]
+  },
+  {
+    "problemId": "3527",
+    "title": "Jungle Outpost",
+    "level": 25,
+    "class": 10,
+    "essential": true,
+    "sprout": false,
+    "tags": [
+      "geometry",
+      "binary_search",
+      "parametric_search",
+      "half_plane_intersection"
+    ]
+  },
+  {
+    "problemId": "3611",
+    "title": "팀의 난이도",
+    "level": 24,
+    "class": 9,
+    "essential": false,
+    "sprout": false,
+    "tags": [
+      "graphs",
+      "binary_search",
+      "parametric_search",
+      "flow",
+      "mfmc"
+    ]
+  },
+  {
+    "problemId": "3640",
+    "title": "제독",
+    "level": 19,
+    "class": 7,
+    "essential": true,
+    "sprout": false,
+    "tags": [
+      "graphs",
+      "flow",
+      "mcmf"
+    ]
+  },
+  {
+    "problemId": "3648",
+    "title": "아이돌",
+    "level": 18,
+    "class": 6,
+    "essential": false,
+    "sprout": false,
+    "tags": [
+      "graphs",
+      "scc",
+      "2_sat"
+    ]
+  },
+  {
+    "problemId": "3653",
+    "title": "영화 수집",
+    "level": 17,
+    "class": 6,
+    "essential": false,
+    "sprout": false,
+    "tags": [
+      "data_structures",
+      "segtree"
+    ]
+  },
+  {
+    "problemId": "3654",
+    "title": "L퍼즐",
+    "level": 22,
+    "class": 9,
+    "essential": false,
+    "sprout": false,
+    "tags": [
+      "graphs",
+      "scc",
+      "2_sat"
+    ]
+  },
+  {
+    "problemId": "3679",
+    "title": "단순 다각형",
+    "level": 17,
+    "class": 6,
+    "essential": false,
+    "sprout": false,
+    "tags": [
+      "sorting",
+      "geometry",
+      "convex_hull",
+      "angle_sorting"
+    ]
+  },
+  {
+    "problemId": "3683",
+    "title": "고양이와 개",
+    "level": 19,
+    "class": 7,
+    "essential": true,
+    "sprout": false,
+    "tags": [
+      "bipartite_matching"
+    ]
+  },
+  {
+    "problemId": "3830",
+    "title": "교수님은 기다리지 않는다",
+    "level": 18,
+    "class": 6,
+    "essential": false,
+    "sprout": false,
+    "tags": [
+      "data_structures",
+      "disjoint_set"
+    ]
+  },
+  {
+    "problemId": "3878",
+    "title": "점 분리",
+    "level": 19,
+    "class": 7,
+    "essential": false,
+    "sprout": false,
+    "tags": [
+      "geometry",
+      "convex_hull",
+      "line_intersection",
+      "point_in_convex_polygon"
+    ]
+  },
+  {
+    "problemId": "4001",
+    "title": "미노타우르스 미궁",
+    "level": 22,
+    "class": 9,
+    "essential": false,
+    "sprout": false,
+    "tags": [
+      "graphs",
+      "graph_traversal",
+      "binary_search",
+      "prefix_sum",
+      "grid_graph"
+    ]
+  },
+  {
+    "problemId": "4008",
+    "title": "특공대",
+    "level": 21,
+    "class": 7,
+    "essential": true,
+    "sprout": false,
+    "tags": [
+      "dp",
+      "cht"
+    ]
+  },
+  {
+    "problemId": "4012",
+    "title": "컨벤션 센터",
+    "level": 22,
+    "class": 9,
+    "essential": false,
+    "sprout": false,
+    "tags": [
+      "data_structures",
+      "greedy",
+      "set",
+      "tree_set",
+      "sparse_table"
+    ]
+  },
+  {
+    "problemId": "4149",
+    "title": "큰 수 소인수분해",
+    "level": 20,
+    "class": 8,
+    "essential": true,
+    "sprout": false,
+    "tags": [
+      "miller_rabin",
+      "pollard_rho",
+      "number_theory",
+      "math",
+      "primality_test",
+      "prime_factorization"
+    ]
+  },
+  {
+    "problemId": "4153",
+    "title": "직각삼각형",
+    "level": 3,
+    "class": 2,
+    "essential": true,
+    "sprout": false,
+    "tags": [
+      "math",
+      "geometry",
+      "pythagoras"
+    ]
+  },
+  {
+    "problemId": "4225",
+    "title": "쓰레기 슈트",
+    "level": 18,
+    "class": 6,
+    "essential": false,
+    "sprout": false,
+    "tags": [
+      "geometry",
+      "convex_hull"
+    ]
+  },
+  {
+    "problemId": "4792",
+    "title": "레드 블루 스패닝 트리",
+    "level": 18,
+    "class": 8,
+    "essential": false,
+    "sprout": false,
+    "tags": [
+      "data_structures",
+      "graphs",
+      "disjoint_set",
+      "mst"
+    ]
+  },
+  {
+    "problemId": "4949",
+    "title": "균형잡힌 세상",
+    "level": 7,
+    "class": 2,
+    "essential": false,
+    "sprout": false,
+    "tags": [
+      "data_structures",
+      "string",
+      "stack"
+    ]
+  },
+  {
+    "problemId": "5250",
+    "title": "최단 경로들",
+    "level": 23,
+    "class": 9,
+    "essential": true,
+    "sprout": false,
+    "tags": [
+      "graphs",
+      "data_structures",
+      "trees",
+      "segtree",
+      "shortest_path",
+      "dijkstra",
+      "lazyprop"
+    ]
+  },
+  {
+    "problemId": "5430",
+    "title": "AC",
+    "level": 11,
+    "class": 3,
+    "essential": false,
+    "sprout": false,
+    "tags": [
+      "deque",
+      "parsing",
+      "implementation",
+      "string",
+      "data_structures"
+    ]
+  },
+  {
+    "problemId": "5466",
+    "title": "상인",
+    "level": 22,
+    "class": 8,
+    "essential": true,
+    "sprout": false,
+    "tags": [
+      "dp",
+      "data_structures",
+      "greedy",
+      "segtree"
+    ]
+  },
+  {
+    "problemId": "5525",
+    "title": "IOIOI",
+    "level": 10,
+    "class": 3,
+    "essential": false,
+    "sprout": false,
+    "tags": [
+      "string"
+    ]
+  },
+  {
+    "problemId": "5542",
+    "title": "JOI 국가의 행사",
+    "level": 21,
+    "class": 9,
+    "essential": true,
+    "sprout": false,
+    "tags": [
+      "graphs",
+      "data_structures",
+      "binary_search",
+      "shortest_path",
+      "dijkstra",
+      "disjoint_set",
+      "pbs"
+    ]
+  },
+  {
+    "problemId": "5639",
+    "title": "이진 검색 트리",
+    "level": 12,
+    "class": 4,
+    "essential": false,
+    "sprout": false,
+    "tags": [
+      "graphs",
+      "graph_traversal",
+      "trees",
+      "recursion"
+    ]
+  },
+  {
+    "problemId": "5670",
+    "title": "휴대폰 자판",
+    "level": 17,
+    "class": 6,
+    "essential": true,
+    "sprout": false,
+    "tags": [
+      "data_structures",
+      "string",
+      "trees",
+      "trie"
+    ]
+  },
+  {
+    "problemId": "5719",
+    "title": "거의 최단 경로",
+    "level": 16,
+    "class": 6,
+    "essential": true,
+    "sprout": false,
+    "tags": [
+      "graphs",
+      "graph_traversal",
+      "shortest_path",
+      "dijkstra",
+      "traceback"
+    ]
+  },
+  {
+    "problemId": "5820",
+    "title": "경주",
+    "level": 22,
+    "class": 8,
+    "essential": true,
+    "sprout": false,
+    "tags": [
+      "trees",
+      "divide_and_conquer",
+      "centroid",
+      "centroid_decomposition"
+    ]
+  },
+  {
+    "problemId": "6171",
+    "title": "땅따먹기",
+    "level": 21,
+    "class": 8,
+    "essential": false,
+    "sprout": false,
+    "tags": [
+      "dp",
+      "cht"
+    ]
+  },
+  {
+    "problemId": "6549",
+    "title": "히스토그램에서 가장 큰 직사각형",
+    "level": 16,
+    "class": 6,
+    "essential": true,
+    "sprout": false,
+    "tags": [
+      "data_structures",
+      "segtree",
+      "divide_and_conquer",
+      "stack"
+    ]
+  },
+  {
+    "problemId": "7453",
+    "title": "합이 0인 네 정수",
+    "level": 14,
+    "class": 5,
+    "essential": true,
+    "sprout": false,
+    "tags": [
+      "sorting",
+      "binary_search",
+      "two_pointer",
+      "mitm"
+    ]
+  },
+  {
+    "problemId": "7568",
+    "title": "덩치",
+    "level": 6,
+    "class": 2,
+    "essential": false,
+    "sprout": false,
+    "tags": [
+      "implementation",
+      "bruteforcing"
+    ]
+  },
+  {
+    "problemId": "7569",
+    "title": "토마토",
+    "level": 11,
+    "class": 3,
+    "essential": false,
+    "sprout": false,
+    "tags": [
+      "bfs",
+      "graphs",
+      "graph_traversal",
+      "grid_graph",
+      "shortest_path"
+    ]
+  },
+  {
+    "problemId": "7576",
+    "title": "토마토",
+    "level": 11,
+    "class": 3,
+    "essential": true,
+    "sprout": false,
+    "tags": [
+      "bfs",
+      "graphs",
+      "graph_traversal",
+      "grid_graph",
+      "shortest_path"
+    ]
+  },
+  {
+    "problemId": "7578",
+    "title": "공장",
+    "level": 16,
+    "class": 6,
+    "essential": false,
+    "sprout": false,
+    "tags": [
+      "data_structures",
+      "segtree"
+    ]
+  },
+  {
+    "problemId": "7662",
+    "title": "이중 우선순위 큐",
+    "level": 12,
+    "class": 3,
+    "essential": false,
+    "sprout": false,
+    "tags": [
+      "data_structures",
+      "set",
+      "tree_set",
+      "priority_queue"
+    ]
+  },
+  {
+    "problemId": "7907",
+    "title": "Bytean Road Race",
+    "level": 23,
+    "class": 10,
+    "essential": true,
+    "sprout": false,
+    "tags": [
+      "graphs",
+      "data_structures",
+      "dag",
+      "topological_sorting",
+      "planar_graph"
+    ]
+  },
+  {
+    "problemId": "8131",
+    "title": "Ploughing",
+    "level": 23,
+    "class": 9,
+    "essential": true,
+    "sprout": false,
+    "tags": [
+      "greedy",
+      "prefix_sum",
+      "two_pointer"
+    ]
+  },
+  {
+    "problemId": "8177",
+    "title": "Ice Skates",
+    "level": 23,
+    "class": 9,
+    "essential": false,
+    "sprout": false,
+    "tags": [
+      "data_structures",
+      "segtree",
+      "maximum_subarray",
+      "hall"
+    ]
+  },
+  {
+    "problemId": "8202",
+    "title": "Conspiracy",
+    "level": 22,
+    "class": 9,
+    "essential": false,
+    "sprout": false,
+    "tags": [
+      "math",
+      "graphs"
+    ]
+  },
+  {
+    "problemId": "8217",
+    "title": "유성",
+    "level": 22,
+    "class": 9,
+    "essential": true,
+    "sprout": false,
+    "tags": [
+      "data_structures",
+      "segtree",
+      "binary_search",
+      "difference_array",
+      "pbs"
+    ]
+  },
+  {
+    "problemId": "8227",
+    "title": "Cloakroom",
+    "level": 22,
+    "class": 9,
+    "essential": false,
+    "sprout": false,
+    "tags": [
+      "dp",
+      "offline_queries",
+      "knapsack"
+    ]
+  },
+  {
+    "problemId": "8235",
+    "title": "Prefixuffix",
+    "level": 24,
+    "class": 10,
+    "essential": false,
+    "sprout": false,
+    "tags": [
+      "string",
+      "hashing",
+      "manacher"
+    ]
+  },
+  {
+    "problemId": "8462",
+    "title": "배열의 힘",
+    "level": 19,
+    "class": 7,
+    "essential": false,
+    "sprout": false,
+    "tags": [
+      "offline_queries",
+      "mo"
+    ]
+  },
+  {
+    "problemId": "8872",
+    "title": "빌라봉",
+    "level": 19,
+    "class": 8,
+    "essential": false,
+    "sprout": false,
+    "tags": [
+      "dp",
+      "graphs",
+      "greedy",
+      "graph_traversal",
+      "trees",
+      "dfs",
+      "dp_tree",
+      "rerooting",
+      "tree_diameter"
+    ]
+  },
+  {
+    "problemId": "8885",
+    "title": "Pirate Chest",
+    "level": 22,
+    "class": 9,
+    "essential": false,
+    "sprout": false,
+    "tags": [
+      "data_structures",
+      "stack"
+    ]
+  },
+  {
+    "problemId": "8958",
+    "title": "OX퀴즈",
+    "level": 4,
+    "class": 1,
+    "essential": false,
+    "sprout": false,
+    "tags": [
+      "implementation",
+      "string"
+    ]
+  },
+  {
+    "problemId": "8987",
+    "title": "수족관 3",
+    "level": 22,
+    "class": 9,
+    "essential": true,
+    "sprout": false,
+    "tags": [
+      "data_structures",
+      "greedy",
+      "trees",
+      "segtree",
+      "divide_and_conquer",
+      "lazyprop",
+      "cartesian_tree"
+    ]
+  },
+  {
+    "problemId": "9012",
+    "title": "괄호",
+    "level": 7,
+    "class": 2,
+    "essential": true,
+    "sprout": false,
+    "tags": [
+      "data_structures",
+      "string",
+      "stack"
+    ]
+  },
+  {
+    "problemId": "9019",
+    "title": "DSLR",
+    "level": 12,
+    "class": 3,
+    "essential": false,
+    "sprout": false,
+    "tags": [
+      "graphs",
+      "graph_traversal",
+      "bfs",
+      "traceback"
+    ]
+  },
+  {
+    "problemId": "9095",
+    "title": "1, 2, 3 더하기",
+    "level": 8,
+    "class": 3,
+    "essential": true,
+    "sprout": false,
+    "tags": [
+      "dp"
+    ]
+  },
+  {
+    "problemId": "9208",
+    "title": "링월드",
+    "level": 23,
+    "class": 10,
+    "essential": false,
+    "sprout": false,
+    "tags": [
+      "data_structures",
+      "greedy",
+      "hall"
+    ]
+  },
+  {
+    "problemId": "9244",
+    "title": "핀볼",
+    "level": 22,
+    "class": 9,
+    "essential": true,
+    "sprout": false,
+    "tags": [
+      "data_structures",
+      "geometry",
+      "set",
+      "sweeping",
+      "tree_set"
+    ]
+  },
+  {
+    "problemId": "9248",
+    "title": "Suffix Array",
+    "level": 18,
+    "class": 7,
+    "essential": true,
+    "sprout": false,
+    "tags": [
+      "string",
+      "suffix_array"
+    ]
+  },
+  {
+    "problemId": "9250",
+    "title": "문자열 집합 판별",
+    "level": 19,
+    "class": 8,
+    "essential": true,
+    "sprout": false,
+    "tags": [
+      "data_structures",
+      "string",
+      "trees",
+      "trie",
+      "aho_corasick"
+    ]
+  },
+  {
+    "problemId": "9251",
+    "title": "LCS",
+    "level": 11,
+    "class": 4,
+    "essential": true,
+    "sprout": false,
+    "tags": [
+      "dp",
+      "string",
+      "lcs"
+    ]
+  },
+  {
+    "problemId": "9252",
+    "title": "LCS 2",
+    "level": 13,
+    "class": 5,
+    "essential": true,
+    "sprout": false,
+    "tags": [
+      "dp",
+      "string",
+      "traceback",
+      "lcs"
+    ]
+  },
+  {
+    "problemId": "9328",
+    "title": "열쇠",
+    "level": 15,
+    "class": 5,
+    "essential": true,
+    "sprout": false,
+    "tags": [
+      "implementation",
+      "graphs",
+      "graph_traversal",
+      "bfs",
+      "grid_graph"
+    ]
+  },
+  {
+    "problemId": "9375",
+    "title": "패션왕 신해빈",
+    "level": 8,
+    "class": 3,
+    "essential": false,
+    "sprout": false,
+    "tags": [
+      "math",
+      "data_structures",
+      "set",
+      "combinatorics",
+      "hash_set"
+    ]
+  },
+  {
+    "problemId": "9461",
+    "title": "파도반 수열",
+    "level": 8,
+    "class": 3,
+    "essential": false,
+    "sprout": false,
+    "tags": [
+      "math",
+      "dp"
+    ]
+  },
+  {
+    "problemId": "9465",
+    "title": "스티커",
+    "level": 10,
+    "class": 4,
+    "essential": true,
+    "sprout": false,
+    "tags": [
+      "dp"
+    ]
+  },
+  {
+    "problemId": "9466",
+    "title": "텀 프로젝트",
+    "level": 13,
+    "class": 5,
+    "essential": true,
+    "sprout": false,
+    "tags": [
+      "graphs",
+      "graph_traversal",
+      "dfs"
+    ]
+  },
+  {
+    "problemId": "9498",
+    "title": "시험 성적",
+    "level": 1,
+    "class": 1,
+    "essential": false,
+    "sprout": true,
+    "tags": [
+      "implementation"
+    ]
+  },
+  {
+    "problemId": "9527",
+    "title": "1의 개수 세기",
+    "level": 14,
+    "class": 5,
+    "essential": false,
+    "sprout": false,
+    "tags": [
+      "math",
+      "prefix_sum",
+      "bitmask"
+    ]
+  },
+  {
+    "problemId": "9539",
+    "title": "Escape",
+    "level": 26,
+    "class": 10,
+    "essential": true,
+    "sprout": false,
+    "tags": [
+      "data_structures",
+      "greedy",
+      "trees",
+      "set",
+      "disjoint_set",
+      "priority_queue",
+      "smaller_to_larger"
+    ]
+  },
+  {
+    "problemId": "9663",
+    "title": "N-Queen",
+    "level": 12,
+    "class": 4,
+    "essential": true,
+    "sprout": false,
+    "tags": [
+      "bruteforcing",
+      "backtracking"
+    ]
+  },
+  {
+    "problemId": "9935",
+    "title": "문자열 폭발",
+    "level": 12,
+    "class": 4,
+    "essential": false,
+    "sprout": false,
+    "tags": [
+      "data_structures",
+      "string",
+      "stack"
+    ]
+  },
+  {
+    "problemId": "10026",
+    "title": "적록색약",
+    "level": 11,
+    "class": 3,
+    "essential": false,
+    "sprout": false,
+    "tags": [
+      "graphs",
+      "graph_traversal",
+      "bfs",
+      "dfs",
+      "grid_graph"
+    ]
+  },
+  {
+    "problemId": "10076",
+    "title": "휴가",
+    "level": 24,
+    "class": 9,
+    "essential": true,
+    "sprout": false,
+    "tags": [
+      "dp",
+      "data_structures",
+      "segtree",
+      "divide_and_conquer",
+      "pst",
+      "divide_and_conquer_optimization"
+    ]
+  },
+  {
+    "problemId": "10167",
+    "title": "금광",
+    "level": 21,
+    "class": 8,
+    "essential": true,
+    "sprout": false,
+    "tags": [
+      "data_structures",
+      "segtree",
+      "sweeping",
+      "coordinate_compression",
+      "maximum_subarray"
+    ]
+  },
+  {
+    "problemId": "10171",
+    "title": "고양이",
+    "level": 1,
+    "class": 1,
+    "essential": false,
+    "sprout": true,
+    "tags": [
+      "implementation"
+    ]
+  },
+  {
+    "problemId": "10172",
+    "title": "개",
+    "level": 1,
+    "class": 1,
+    "essential": false,
+    "sprout": true,
+    "tags": [
+      "implementation"
+    ]
+  },
+  {
+    "problemId": "10250",
+    "title": "ACM 호텔",
+    "level": 3,
+    "class": 1,
+    "essential": false,
+    "sprout": false,
+    "tags": [
+      "math",
+      "implementation",
+      "arithmetic"
+    ]
+  },
+  {
+    "problemId": "10254",
+    "title": "고속도로",
+    "level": 19,
+    "class": 7,
+    "essential": true,
+    "sprout": false,
+    "tags": [
+      "geometry",
+      "convex_hull",
+      "rotating_calipers"
+    ]
+  },
+  {
+    "problemId": "10538",
+    "title": "빅 픽쳐",
+    "level": 20,
+    "class": 7,
+    "essential": false,
+    "sprout": false,
+    "tags": [
+      "data_structures",
+      "string",
+      "trees",
+      "hashing",
+      "trie",
+      "kmp",
+      "aho_corasick"
+    ]
+  },
+  {
+    "problemId": "10746",
+    "title": "Fencing the Herd",
+    "level": 23,
+    "class": 10,
+    "essential": true,
+    "sprout": false,
+    "tags": [
+      "geometry",
+      "binary_search",
+      "set",
+      "convex_hull",
+      "sqrt_decomposition"
+    ]
+  },
+  {
+    "problemId": "10773",
+    "title": "제로",
+    "level": 7,
+    "class": 2,
+    "essential": false,
+    "sprout": false,
+    "tags": [
+      "implementation",
+      "data_structures",
+      "stack"
+    ]
+  },
+  {
+    "problemId": "10775",
+    "title": "공항",
+    "level": 14,
+    "class": 5,
+    "essential": false,
+    "sprout": false,
+    "tags": [
+      "data_structures",
+      "greedy",
+      "disjoint_set"
+    ]
+  },
+  {
+    "problemId": "10806",
+    "title": "공중도시",
+    "level": 22,
+    "class": 9,
+    "essential": true,
+    "sprout": false,
+    "tags": [
+      "graphs",
+      "trees",
+      "constructive",
+      "articulation",
+      "bcc"
+    ]
+  },
+  {
+    "problemId": "10809",
+    "title": "알파벳 찾기",
+    "level": 4,
+    "class": 1,
+    "essential": false,
+    "sprout": false,
+    "tags": [
+      "implementation",
+      "string"
+    ]
+  },
+  {
+    "problemId": "10814",
+    "title": "나이순 정렬",
+    "level": 6,
+    "class": 2,
+    "essential": true,
+    "sprout": false,
+    "tags": [
+      "sorting",
+      "set"
+    ]
+  },
+  {
+    "problemId": "10816",
+    "title": "숫자 카드 2",
+    "level": 7,
+    "class": 2,
+    "essential": true,
+    "sprout": false,
+    "tags": [
+      "data_structures",
+      "sorting",
+      "binary_search",
+      "hash_set"
+    ]
+  },
+  {
+    "problemId": "10818",
+    "title": "최소, 최대",
+    "level": 3,
+    "class": 1,
+    "essential": true,
+    "sprout": false,
+    "tags": [
+      "math",
+      "implementation"
+    ]
+  },
+  {
+    "problemId": "10828",
+    "title": "스택",
+    "level": 7,
+    "class": 2,
+    "essential": true,
+    "sprout": false,
+    "tags": [
+      "implementation",
+      "data_structures",
+      "stack"
+    ]
+  },
+  {
+    "problemId": "10830",
+    "title": "행렬 제곱",
+    "level": 12,
+    "class": 4,
+    "essential": false,
+    "sprout": false,
+    "tags": [
+      "math",
+      "divide_and_conquer",
+      "exponentiation_by_squaring",
+      "linear_algebra"
+    ]
+  },
+  {
+    "problemId": "10845",
+    "title": "큐",
+    "level": 7,
+    "class": 2,
+    "essential": true,
+    "sprout": false,
+    "tags": [
+      "data_structures",
+      "queue"
+    ]
+  },
+  {
+    "problemId": "10869",
+    "title": "사칙연산",
+    "level": 1,
+    "class": 1,
+    "essential": true,
+    "sprout": true,
+    "tags": [
+      "implementation",
+      "arithmetic",
+      "math"
+    ]
+  },
+  {
+    "problemId": "10871",
+    "title": "X보다 작은 수",
+    "level": 1,
+    "class": 1,
+    "essential": false,
+    "sprout": true,
+    "tags": [
+      "implementation"
+    ]
+  },
+  {
+    "problemId": "10942",
+    "title": "팰린드롬?",
+    "level": 12,
+    "class": 5,
+    "essential": true,
+    "sprout": false,
+    "tags": [
+      "dp"
+    ]
+  },
+  {
+    "problemId": "10950",
+    "title": "A+B - 3",
+    "level": 1,
+    "class": 1,
+    "essential": true,
+    "sprout": true,
+    "tags": [
+      "implementation",
+      "arithmetic",
+      "math"
+    ]
+  },
+  {
+    "problemId": "10951",
+    "title": "A+B - 4",
+    "level": 1,
+    "class": 1,
+    "essential": true,
+    "sprout": true,
+    "tags": [
+      "implementation",
+      "arithmetic",
+      "math"
+    ]
+  },
+  {
+    "problemId": "10952",
+    "title": "A+B - 5",
+    "level": 1,
+    "class": 1,
+    "essential": true,
+    "sprout": true,
+    "tags": [
+      "implementation",
+      "arithmetic",
+      "math"
+    ]
+  },
+  {
+    "problemId": "10989",
+    "title": "수 정렬하기 3",
+    "level": 5,
+    "class": 2,
+    "essential": false,
+    "sprout": false,
+    "tags": [
+      "sorting"
+    ]
+  },
+  {
+    "problemId": "10998",
+    "title": "A×B",
+    "level": 1,
+    "class": 1,
+    "essential": false,
+    "sprout": true,
+    "tags": [
+      "implementation",
+      "arithmetic",
+      "math"
+    ]
+  },
+  {
+    "problemId": "10999",
+    "title": "구간 합 구하기 2",
+    "level": 17,
+    "class": 7,
+    "essential": true,
+    "sprout": false,
+    "tags": [
+      "segtree",
+      "lazyprop",
+      "data_structures"
+    ]
+  },
+  {
+    "problemId": "11001",
+    "title": "김치",
+    "level": 20,
+    "class": 8,
+    "essential": false,
+    "sprout": false,
+    "tags": [
+      "dp",
+      "divide_and_conquer",
+      "divide_and_conquer_optimization"
+    ]
+  },
+  {
+    "problemId": "11012",
+    "title": "Egg",
+    "level": 19,
+    "class": 8,
+    "essential": true,
+    "sprout": false,
+    "tags": [
+      "data_structures",
+      "segtree",
+      "sweeping",
+      "offline_queries",
+      "pst"
+    ]
+  },
+  {
+    "problemId": "11047",
+    "title": "동전 0",
+    "level": 7,
+    "class": 3,
+    "essential": false,
+    "sprout": false,
+    "tags": [
+      "greedy"
+    ]
+  },
+  {
+    "problemId": "11049",
+    "title": "행렬 곱셈 순서",
+    "level": 13,
+    "class": 5,
+    "essential": true,
+    "sprout": false,
+    "tags": [
+      "dp"
+    ]
+  },
+  {
+    "problemId": "11050",
+    "title": "이항 계수 1",
+    "level": 5,
+    "class": 2,
+    "essential": true,
+    "sprout": false,
+    "tags": [
+      "math",
+      "implementation",
+      "combinatorics"
+    ]
+  },
+  {
+    "problemId": "11053",
+    "title": "가장 긴 증가하는 부분 수열",
+    "level": 9,
+    "class": 4,
+    "essential": true,
+    "sprout": false,
+    "tags": [
+      "dp",
+      "lis"
+    ]
+  },
+  {
+    "problemId": "11054",
+    "title": "가장 긴 바이토닉 부분 수열",
+    "level": 12,
+    "class": 4,
+    "essential": false,
+    "sprout": false,
+    "tags": [
+      "dp"
+    ]
+  },
+  {
+    "problemId": "11266",
+    "title": "단절점",
+    "level": 17,
+    "class": 6,
+    "essential": true,
+    "sprout": false,
+    "tags": [
+      "graphs",
+      "graph_traversal",
+      "dfs",
+      "articulation"
+    ]
+  },
+  {
+    "problemId": "11279",
+    "title": "최대 힙",
+    "level": 9,
+    "class": 3,
+    "essential": false,
+    "sprout": false,
+    "tags": [
+      "data_structures",
+      "priority_queue"
+    ]
+  },
+  {
+    "problemId": "11280",
+    "title": "2-SAT - 3",
+    "level": 17,
+    "class": 6,
+    "essential": true,
+    "sprout": false,
+    "tags": [
+      "graphs",
+      "scc",
+      "2_sat"
+    ]
+  },
+  {
+    "problemId": "11281",
+    "title": "2-SAT - 4",
+    "level": 18,
+    "class": 6,
+    "essential": true,
+    "sprout": false,
+    "tags": [
+      "graphs",
+      "scc",
+      "traceback",
+      "2_sat"
+    ]
+  },
+  {
+    "problemId": "11286",
+    "title": "절댓값 힙",
+    "level": 10,
+    "class": 3,
+    "essential": false,
+    "sprout": false,
+    "tags": [
+      "data_structures",
+      "priority_queue"
+    ]
+  },
+  {
+    "problemId": "11375",
+    "title": "열혈강호",
+    "level": 17,
+    "class": 7,
+    "essential": true,
+    "sprout": false,
+    "tags": [
+      "bipartite_matching"
+    ]
+  },
+  {
+    "problemId": "11377",
+    "title": "열혈강호 3",
+    "level": 18,
+    "class": 7,
+    "essential": true,
+    "sprout": false,
+    "tags": [
+      "graphs",
+      "flow",
+      "bipartite_matching"
+    ]
+  },
+  {
+    "problemId": "11385",
+    "title": "씽크스몰",
+    "level": 22,
+    "class": 9,
+    "essential": true,
+    "sprout": false,
+    "tags": [
+      "math",
+      "number_theory",
+      "fft",
+      "crt"
+    ]
+  },
+  {
+    "problemId": "11399",
+    "title": "ATM",
+    "level": 7,
+    "class": 3,
+    "essential": true,
+    "sprout": false,
+    "tags": [
+      "greedy",
+      "sorting"
+    ]
+  },
+  {
+    "problemId": "11400",
+    "title": "단절선",
+    "level": 17,
+    "class": 6,
+    "essential": true,
+    "sprout": false,
+    "tags": [
+      "graphs",
+      "graph_traversal",
+      "dfs",
+      "articulation"
+    ]
+  },
+  {
+    "problemId": "11403",
+    "title": "경로 찾기",
+    "level": 10,
+    "class": 3,
+    "essential": false,
+    "sprout": false,
+    "tags": [
+      "graphs",
+      "graph_traversal",
+      "shortest_path",
+      "floyd_warshall"
+    ]
+  },
+  {
+    "problemId": "11404",
+    "title": "플로이드",
+    "level": 12,
+    "class": 4,
+    "essential": true,
+    "sprout": false,
+    "tags": [
+      "graphs",
+      "shortest_path",
+      "floyd_warshall"
+    ]
+  },
+  {
+    "problemId": "11405",
+    "title": "책 구매하기",
+    "level": 18,
+    "class": 7,
+    "essential": false,
+    "sprout": false,
+    "tags": [
+      "graphs",
+      "flow",
+      "mcmf"
+    ]
+  },
+  {
+    "problemId": "11407",
+    "title": "책 구매하기 3",
+    "level": 18,
+    "class": 7,
+    "essential": true,
+    "sprout": false,
+    "tags": [
+      "graphs",
+      "flow",
+      "mcmf"
+    ]
+  },
+  {
+    "problemId": "11408",
+    "title": "열혈강호 5",
+    "level": 18,
+    "class": 7,
+    "essential": true,
+    "sprout": false,
+    "tags": [
+      "graphs",
+      "flow",
+      "mcmf"
+    ]
+  },
+  {
+    "problemId": "11438",
+    "title": "LCA 2",
+    "level": 16,
+    "class": 6,
+    "essential": true,
+    "sprout": false,
+    "tags": [
+      "data_structures",
+      "trees",
+      "lca",
+      "sparse_table"
+    ]
+  },
+  {
+    "problemId": "11444",
+    "title": "피보나치 수 6",
+    "level": 14,
+    "class": 4,
+    "essential": true,
+    "sprout": false,
+    "tags": [
+      "math",
+      "exponentiation_by_squaring"
+    ]
+  },
+  {
+    "problemId": "11479",
+    "title": "서로 다른 부분 문자열의 개수 2",
+    "level": 19,
+    "class": 7,
+    "essential": true,
+    "sprout": false,
+    "tags": [
+      "string",
+      "suffix_array"
+    ]
+  },
+  {
+    "problemId": "11505",
+    "title": "구간 곱 구하기",
+    "level": 15,
+    "class": 6,
+    "essential": false,
+    "sprout": false,
+    "tags": [
+      "segtree",
+      "data_structures"
+    ]
+  },
+  {
+    "problemId": "11650",
+    "title": "좌표 정렬하기",
+    "level": 6,
+    "class": 2,
+    "essential": true,
+    "sprout": false,
+    "tags": [
+      "sorting"
+    ]
+  },
+  {
+    "problemId": "11651",
+    "title": "좌표 정렬하기 2",
+    "level": 6,
+    "class": 2,
+    "essential": false,
+    "sprout": false,
+    "tags": [
+      "sorting"
+    ]
+  },
+  {
+    "problemId": "11654",
+    "title": "아스키 코드",
+    "level": 1,
+    "class": 1,
+    "essential": true,
+    "sprout": true,
+    "tags": [
+      "implementation"
+    ]
+  },
+  {
+    "problemId": "11659",
+    "title": "구간 합 구하기 4",
+    "level": 8,
+    "class": 3,
+    "essential": true,
+    "sprout": false,
+    "tags": [
+      "prefix_sum"
+    ]
+  },
+  {
+    "problemId": "11660",
+    "title": "구간 합 구하기 5",
+    "level": 10,
+    "class": 4,
+    "essential": true,
+    "sprout": false,
+    "tags": [
+      "dp",
+      "prefix_sum"
+    ]
+  },
+  {
+    "problemId": "11689",
+    "title": "GCD(n, k) = 1",
+    "level": 15,
+    "class": 6,
+    "essential": true,
+    "sprout": false,
+    "tags": [
+      "math",
+      "number_theory",
+      "euler_phi"
+    ]
+  },
+  {
+    "problemId": "11717",
+    "title": "Wall Making Game",
+    "level": 19,
+    "class": 8,
+    "essential": false,
+    "sprout": false,
+    "tags": [
+      "dp",
+      "game_theory",
+      "sprague_grundy"
+    ]
+  },
+  {
+    "problemId": "11720",
+    "title": "숫자의 합",
+    "level": 2,
+    "class": 1,
+    "essential": true,
+    "sprout": false,
+    "tags": [
+      "implementation",
+      "math",
+      "string"
+    ]
+  },
+  {
+    "problemId": "11723",
+    "title": "집합",
+    "level": 6,
+    "class": 3,
+    "essential": true,
+    "sprout": false,
+    "tags": [
+      "implementation",
+      "set",
+      "bitmask"
+    ]
+  },
+  {
+    "problemId": "11724",
+    "title": "연결 요소의 개수",
+    "level": 9,
+    "class": 3,
+    "essential": true,
+    "sprout": false,
+    "tags": [
+      "graphs",
+      "graph_traversal",
+      "bfs",
+      "dfs"
+    ]
+  },
+  {
+    "problemId": "11725",
+    "title": "트리의 부모 찾기",
+    "level": 9,
+    "class": 4,
+    "essential": true,
+    "sprout": false,
+    "tags": [
+      "graphs",
+      "graph_traversal",
+      "trees",
+      "bfs",
+      "dfs"
+    ]
+  },
+  {
+    "problemId": "11726",
+    "title": "2×n 타일링",
+    "level": 8,
+    "class": 3,
+    "essential": true,
+    "sprout": false,
+    "tags": [
+      "dp"
+    ]
+  },
+  {
+    "problemId": "11727",
+    "title": "2×n 타일링 2",
+    "level": 8,
+    "class": 3,
+    "essential": false,
+    "sprout": false,
+    "tags": [
+      "dp"
+    ]
+  },
+  {
+    "problemId": "11779",
+    "title": "최소비용 구하기 2",
+    "level": 13,
+    "class": 4,
+    "essential": false,
+    "sprout": false,
+    "tags": [
+      "graphs",
+      "shortest_path",
+      "dijkstra",
+      "traceback"
+    ]
+  },
+  {
+    "problemId": "11808",
+    "title": "마리오와 사악한 키노피오",
+    "level": 22,
+    "class": 9,
+    "essential": false,
+    "sprout": false,
+    "tags": [
+      "dp",
+      "trees",
+      "dp_tree"
+    ]
+  },
+  {
+    "problemId": "11866",
+    "title": "요세푸스 문제 0",
+    "level": 7,
+    "class": 2,
+    "essential": true,
+    "sprout": false,
+    "tags": [
+      "implementation",
+      "data_structures",
+      "queue"
+    ]
+  },
+  {
+    "problemId": "11932",
+    "title": "트리와 K번째 수",
+    "level": 22,
+    "class": 8,
+    "essential": true,
+    "sprout": false,
+    "tags": [
+      "data_structures",
+      "trees",
+      "segtree",
+      "coordinate_compression",
+      "lca",
+      "pst"
+    ]
+  },
+  {
+    "problemId": "11933",
+    "title": "공장들",
+    "level": 22,
+    "class": 9,
+    "essential": true,
+    "sprout": false,
+    "tags": [
+      "trees",
+      "divide_and_conquer",
+      "lca",
+      "centroid",
+      "centroid_decomposition",
+      "tree_compression"
+    ]
+  },
+  {
+    "problemId": "12015",
+    "title": "가장 긴 증가하는 부분 수열 2",
+    "level": 14,
+    "class": 5,
+    "essential": true,
+    "sprout": false,
+    "tags": [
+      "binary_search",
+      "lis"
+    ]
+  },
+  {
+    "problemId": "12100",
+    "title": "2048 (Easy)",
+    "level": 15,
+    "class": 5,
+    "essential": true,
+    "sprout": false,
+    "tags": [
+      "implementation",
+      "bruteforcing",
+      "simulation",
+      "backtracking"
+    ]
+  },
+  {
+    "problemId": "12670",
+    "title": "The Year of Code Jam (Large)",
+    "level": 23,
+    "class": 10,
+    "essential": false,
+    "sprout": false,
+    "tags": [
+      "graphs",
+      "flow",
+      "bipartite_graph",
+      "mfmc"
+    ]
+  },
+  {
+    "problemId": "12735",
+    "title": "Boat",
+    "level": 23,
+    "class": 9,
+    "essential": false,
+    "sprout": false,
+    "tags": [
+      "math",
+      "dp",
+      "combinatorics"
+    ]
+  },
+  {
+    "problemId": "12736",
+    "title": "Fireworks",
+    "level": 25,
+    "class": 10,
+    "essential": true,
+    "sprout": false,
+    "tags": [
+      "dp",
+      "data_structures",
+      "trees",
+      "dp_tree",
+      "priority_queue",
+      "smaller_to_larger",
+      "slope_trick"
+    ]
+  },
+  {
+    "problemId": "12766",
+    "title": "지사 배정",
+    "level": 21,
+    "class": 8,
+    "essential": true,
+    "sprout": false,
+    "tags": [
+      "graphs",
+      "dijkstra",
+      "divide_and_conquer",
+      "dp",
+      "divide_and_conquer_optimization",
+      "prefix_sum",
+      "shortest_path"
+    ]
+  },
+  {
+    "problemId": "12771",
+    "title": "Oil",
+    "level": 20,
+    "class": 8,
+    "essential": true,
+    "sprout": false,
+    "tags": [
+      "sorting",
+      "geometry",
+      "sweeping",
+      "angle_sorting"
+    ]
+  },
+  {
+    "problemId": "12823",
+    "title": "Critical Projects",
+    "level": 22,
+    "class": 10,
+    "essential": false,
+    "sprout": false,
+    "tags": [
+      "graphs",
+      "dag",
+      "topological_sorting"
+    ]
+  },
+  {
+    "problemId": "12850",
+    "title": "본대 산책2",
+    "level": 16,
+    "class": 5,
+    "essential": false,
+    "sprout": false,
+    "tags": [
+      "math",
+      "graphs",
+      "exponentiation_by_squaring"
+    ]
+  },
+  {
+    "problemId": "12851",
+    "title": "숨바꼭질 2",
+    "level": 12,
+    "class": 4,
+    "essential": false,
+    "sprout": false,
+    "tags": [
+      "graphs",
+      "graph_traversal",
+      "set",
+      "bfs"
+    ]
+  },
+  {
+    "problemId": "12858",
+    "title": "Range GCD",
+    "level": 21,
+    "class": 8,
+    "essential": false,
+    "sprout": false,
+    "tags": [
+      "math",
+      "data_structures",
+      "number_theory",
+      "segtree",
+      "lazyprop",
+      "euclidean",
+      "difference_array"
+    ]
+  },
+  {
+    "problemId": "12865",
+    "title": "평범한 배낭",
+    "level": 11,
+    "class": 4,
+    "essential": true,
+    "sprout": false,
+    "tags": [
+      "dp",
+      "knapsack"
+    ]
+  },
+  {
+    "problemId": "12876",
+    "title": "반평면 땅따먹기 2",
+    "level": 23,
+    "class": 9,
+    "essential": true,
+    "sprout": false,
+    "tags": [
+      "graphs",
+      "data_structures",
+      "segtree",
+      "disjoint_set",
+      "divide_and_conquer",
+      "offline_queries",
+      "cht",
+      "offline_dynamic_connectivity",
+      "li_chao_tree"
+    ]
+  },
+  {
+    "problemId": "12898",
+    "title": "Selling RNA Strands",
+    "level": 22,
+    "class": 10,
+    "essential": true,
+    "sprout": false,
+    "tags": [
+      "data_structures",
+      "string",
+      "trees",
+      "segtree",
+      "offline_queries",
+      "trie",
+      "euler_tour_technique"
+    ]
+  },
+  {
+    "problemId": "12918",
+    "title": "정리정돈",
+    "level": 22,
+    "class": 8,
+    "essential": false,
+    "sprout": false,
+    "tags": [
+      "graphs",
+      "geometry",
+      "flow",
+      "mcmf"
+    ]
+  },
+  {
+    "problemId": "12928",
+    "title": "트리와 경로의 길이",
+    "level": 17,
+    "class": 8,
+    "essential": false,
+    "sprout": false,
+    "tags": [
+      "dp",
+      "trees"
+    ]
+  },
+  {
+    "problemId": "12963",
+    "title": "달리기",
+    "level": 18,
+    "class": 8,
+    "essential": false,
+    "sprout": false,
+    "tags": [
+      "data_structures",
+      "graphs",
+      "greedy",
+      "disjoint_set"
+    ]
+  },
+  {
+    "problemId": "13034",
+    "title": "다각형 게임",
+    "level": 18,
+    "class": 7,
+    "essential": false,
+    "sprout": false,
+    "tags": [
+      "game_theory",
+      "sprague_grundy"
+    ]
+  },
+  {
+    "problemId": "13141",
+    "title": "Ignition",
+    "level": 16,
+    "class": 6,
+    "essential": false,
+    "sprout": false,
+    "tags": [
+      "graphs",
+      "bruteforcing",
+      "shortest_path",
+      "floyd_warshall"
+    ]
+  },
+  {
+    "problemId": "13161",
+    "title": "분단의 슬픔",
+    "level": 20,
+    "class": 8,
+    "essential": true,
+    "sprout": false,
+    "tags": [
+      "graphs",
+      "flow",
+      "mfmc"
+    ]
+  },
+  {
+    "problemId": "13172",
+    "title": "Σ",
+    "level": 12,
+    "class": 4,
+    "essential": false,
+    "sprout": false,
+    "tags": [
+      "math",
+      "number_theory",
+      "exponentiation_by_squaring",
+      "modular_multiplicative_inverse",
+      "flt"
+    ]
+  },
+  {
+    "problemId": "13261",
+    "title": "탈옥",
+    "level": 20,
+    "class": 8,
+    "essential": true,
+    "sprout": false,
+    "tags": [
+      "dp",
+      "divide_and_conquer",
+      "divide_and_conquer_optimization"
+    ]
+  },
+  {
+    "problemId": "13263",
+    "title": "나무 자르기",
+    "level": 19,
+    "class": 7,
+    "essential": true,
+    "sprout": false,
+    "tags": [
+      "dp",
+      "cht"
+    ]
+  },
+  {
+    "problemId": "13309",
+    "title": "트리",
+    "level": 20,
+    "class": 8,
+    "essential": false,
+    "sprout": false,
+    "tags": [
+      "data_structures",
+      "trees",
+      "segtree",
+      "euler_tour_technique",
+      "hld"
+    ]
+  },
+  {
+    "problemId": "13323",
+    "title": "BOJ 수열 1",
+    "level": 23,
+    "class": 9,
+    "essential": true,
+    "sprout": false,
+    "tags": [
+      "dp",
+      "data_structures",
+      "priority_queue",
+      "slope_trick"
+    ]
+  },
+  {
+    "problemId": "13329",
+    "title": "Meteor Shower",
+    "level": 22,
+    "class": 9,
+    "essential": false,
+    "sprout": false,
+    "tags": [
+      "data_structures",
+      "geometry",
+      "set",
+      "sweeping",
+      "tree_set",
+      "convex_hull",
+      "angle_sorting"
+    ]
+  },
+  {
+    "problemId": "13334",
+    "title": "철로",
+    "level": 14,
+    "class": 6,
+    "essential": true,
+    "sprout": false,
+    "tags": [
+      "data_structures",
+      "sorting",
+      "sweeping",
+      "priority_queue"
+    ]
+  },
+  {
+    "problemId": "13361",
+    "title": "최고인 대장장이 토르비욘",
+    "level": 21,
+    "class": 9,
+    "essential": false,
+    "sprout": false,
+    "tags": [
+      "graphs",
+      "data_structures",
+      "graph_traversal",
+      "disjoint_set",
+      "coordinate_compression"
+    ]
+  },
+  {
+    "problemId": "13460",
+    "title": "구슬 탈출 2",
+    "level": 15,
+    "class": 5,
+    "essential": true,
+    "sprout": false,
+    "tags": [
+      "implementation",
+      "graphs",
+      "graph_traversal",
+      "simulation",
+      "bfs"
+    ]
+  },
+  {
+    "problemId": "13510",
+    "title": "트리와 쿼리 1",
+    "level": 20,
+    "class": 8,
+    "essential": true,
+    "sprout": false,
+    "tags": [
+      "data_structures",
+      "trees",
+      "segtree",
+      "hld"
+    ]
+  },
+  {
+    "problemId": "13537",
+    "title": "수열과 쿼리 1",
+    "level": 18,
+    "class": 7,
+    "essential": true,
+    "sprout": false,
+    "tags": [
+      "data_structures",
+      "sorting",
+      "segtree",
+      "merge_sort_tree"
+    ]
+  },
+  {
+    "problemId": "13538",
+    "title": "XOR 쿼리",
+    "level": 22,
+    "class": 8,
+    "essential": false,
+    "sprout": false,
+    "tags": [
+      "data_structures",
+      "segtree",
+      "pst"
+    ]
+  },
+  {
+    "problemId": "13544",
+    "title": "수열과 쿼리 3",
+    "level": 18,
+    "class": 7,
+    "essential": false,
+    "sprout": false,
+    "tags": [
+      "data_structures",
+      "sorting",
+      "segtree",
+      "merge_sort_tree"
+    ]
+  },
+  {
+    "problemId": "13545",
+    "title": "수열과 쿼리 0",
+    "level": 22,
+    "class": 8,
+    "essential": false,
+    "sprout": false,
+    "tags": [
+      "prefix_sum",
+      "offline_queries",
+      "sqrt_decomposition",
+      "mo"
+    ]
+  },
+  {
+    "problemId": "13546",
+    "title": "수열과 쿼리 4",
+    "level": 22,
+    "class": 8,
+    "essential": true,
+    "sprout": false,
+    "tags": [
+      "offline_queries",
+      "sqrt_decomposition",
+      "mo"
+    ]
+  },
+  {
+    "problemId": "13547",
+    "title": "수열과 쿼리 5",
+    "level": 19,
+    "class": 7,
+    "essential": true,
+    "sprout": false,
+    "tags": [
+      "offline_queries",
+      "mo"
+    ]
+  },
+  {
+    "problemId": "13548",
+    "title": "수열과 쿼리 6",
+    "level": 20,
+    "class": 7,
+    "essential": true,
+    "sprout": false,
+    "tags": [
+      "offline_queries",
+      "mo"
+    ]
+  },
+  {
+    "problemId": "13549",
+    "title": "숨바꼭질 3",
+    "level": 11,
+    "class": 4,
+    "essential": true,
+    "sprout": false,
+    "tags": [
+      "graphs",
+      "graph_traversal",
+      "bfs",
+      "shortest_path",
+      "dijkstra",
+      "0_1_bfs"
+    ]
+  },
+  {
+    "problemId": "13569",
+    "title": "Rounding",
+    "level": 22,
+    "class": 9,
+    "essential": true,
+    "sprout": false,
+    "tags": [
+      "graphs",
+      "flow",
+      "circulation"
+    ]
+  },
+  {
+    "problemId": "13576",
+    "title": "Prefix와 Suffix",
+    "level": 19,
+    "class": 8,
+    "essential": true,
+    "sprout": false,
+    "tags": [
+      "string",
+      "suffix_array",
+      "z"
+    ]
+  },
+  {
+    "problemId": "13725",
+    "title": "RNG",
+    "level": 24,
+    "class": 10,
+    "essential": false,
+    "sprout": false,
+    "tags": [
+      "math",
+      "fft",
+      "kitamasa"
+    ]
+  },
+  {
+    "problemId": "13727",
+    "title": "5차원 구사과 초콜릿",
+    "level": 25,
+    "class": 10,
+    "essential": true,
+    "sprout": false,
+    "tags": [
+      "math",
+      "dp",
+      "bitmask",
+      "dp_bitfield",
+      "precomputation",
+      "berlekamp_massey"
+    ]
+  },
+  {
+    "problemId": "13896",
+    "title": "Sky Tax",
+    "level": 18,
+    "class": 8,
+    "essential": false,
+    "sprout": false,
+    "tags": [
+      "trees",
+      "lca"
+    ]
+  },
+  {
+    "problemId": "13907",
+    "title": "세금",
+    "level": 17,
+    "class": 7,
+    "essential": false,
+    "sprout": false,
+    "tags": [
+      "dp",
+      "graphs",
+      "shortest_path",
+      "dijkstra"
+    ]
+  },
+  {
+    "problemId": "13925",
+    "title": "수열과 쿼리 13",
+    "level": 21,
+    "class": 8,
+    "essential": true,
+    "sprout": false,
+    "tags": [
+      "data_structures",
+      "segtree",
+      "lazyprop"
+    ]
+  },
+  {
+    "problemId": "13974",
+    "title": "파일 합치기 2",
+    "level": 19,
+    "class": 8,
+    "essential": true,
+    "sprout": false,
+    "tags": [
+      "dp",
+      "knuth"
+    ]
+  },
+  {
+    "problemId": "13977",
+    "title": "이항 계수와 쿼리",
+    "level": 16,
+    "class": 6,
+    "essential": false,
+    "sprout": false,
+    "tags": [
+      "math",
+      "number_theory",
+      "combinatorics",
+      "exponentiation_by_squaring",
+      "modular_multiplicative_inverse",
+      "flt"
+    ]
+  },
+  {
+    "problemId": "14001",
+    "title": "Mole Tunnels",
+    "level": 23,
+    "class": 10,
+    "essential": true,
+    "sprout": false,
+    "tags": [
+      "dp",
+      "graphs",
+      "trees",
+      "flow",
+      "mcmf"
+    ]
+  },
+  {
+    "problemId": "14003",
+    "title": "가장 긴 증가하는 부분 수열 5",
+    "level": 16,
+    "class": 5,
+    "essential": true,
+    "sprout": false,
+    "tags": [
+      "binary_search",
+      "traceback",
+      "lis"
+    ]
+  },
+  {
+    "problemId": "14166",
+    "title": "Robotic Cow Herd",
+    "level": 24,
+    "class": 9,
+    "essential": false,
+    "sprout": false,
+    "tags": [
+      "data_structures",
+      "greedy",
+      "binary_search",
+      "priority_queue"
+    ]
+  },
+  {
+    "problemId": "14177",
+    "title": "티떱랜드",
+    "level": 20,
+    "class": 8,
+    "essential": false,
+    "sprout": false,
+    "tags": [
+      "dp",
+      "prefix_sum",
+      "divide_and_conquer",
+      "divide_and_conquer_optimization"
+    ]
+  },
+  {
+    "problemId": "14428",
+    "title": "수열과 쿼리 16",
+    "level": 15,
+    "class": 6,
+    "essential": false,
+    "sprout": false,
+    "tags": [
+      "segtree",
+      "data_structures"
+    ]
+  },
+  {
+    "problemId": "14500",
+    "title": "테트로미노",
+    "level": 12,
+    "class": 3,
+    "essential": false,
+    "sprout": false,
+    "tags": [
+      "implementation",
+      "bruteforcing"
+    ]
+  },
+  {
+    "problemId": "14502",
+    "title": "연구소",
+    "level": 12,
+    "class": 4,
+    "essential": false,
+    "sprout": false,
+    "tags": [
+      "implementation",
+      "graphs",
+      "bruteforcing",
+      "graph_traversal",
+      "bfs",
+      "grid_graph"
+    ]
+  },
+  {
+    "problemId": "14510",
+    "title": "Blazing New Trails",
+    "level": 24,
+    "class": 10,
+    "essential": false,
+    "sprout": false,
+    "tags": [
+      "graphs",
+      "binary_search",
+      "mst",
+      "alien"
+    ]
+  },
+  {
+    "problemId": "14517",
+    "title": "팰린드롬 개수 구하기 (Large)",
+    "level": 16,
+    "class": 6,
+    "essential": false,
+    "sprout": false,
+    "tags": [
+      "dp",
+      "inclusion_and_exclusion"
+    ]
+  },
+  {
+    "problemId": "14560",
+    "title": "Communism",
+    "level": 20,
+    "class": 8,
+    "essential": false,
+    "sprout": false,
+    "tags": [
+      "sorting",
+      "two_pointer",
+      "mitm"
+    ]
+  },
+  {
+    "problemId": "14572",
+    "title": "스터디 그룹",
+    "level": 16,
+    "class": 7,
+    "essential": false,
+    "sprout": false,
+    "tags": [
+      "greedy",
+      "sorting",
+      "two_pointer"
+    ]
+  },
+  {
+    "problemId": "14626",
+    "title": "ISBN",
+    "level": 5,
+    "class": 2,
+    "essential": false,
+    "sprout": false,
+    "tags": [
+      "math",
+      "implementation",
+      "bruteforcing",
+      "arithmetic"
+    ]
+  },
+  {
+    "problemId": "14636",
+    "title": "Money for Nothing",
+    "level": 22,
+    "class": 9,
+    "essential": true,
+    "sprout": false,
+    "tags": [
+      "dp",
+      "geometry",
+      "divide_and_conquer",
+      "divide_and_conquer_optimization"
+    ]
+  },
+  {
+    "problemId": "14725",
+    "title": "개미굴",
+    "level": 13,
+    "class": 6,
+    "essential": false,
+    "sprout": false,
+    "tags": [
+      "data_structures",
+      "string",
+      "trees",
+      "set",
+      "trie"
+    ]
+  },
+  {
+    "problemId": "14737",
+    "title": "Dev, Please Add This!",
+    "level": 25,
+    "class": 10,
+    "essential": false,
+    "sprout": false,
+    "tags": [
+      "implementation",
+      "graphs",
+      "dag",
+      "scc",
+      "2_sat"
+    ]
+  },
+  {
+    "problemId": "14869",
+    "title": "요리 강좌",
+    "level": 22,
+    "class": 9,
+    "essential": false,
+    "sprout": false,
+    "tags": [
+      "dp",
+      "data_structures",
+      "deque",
+      "sliding_window",
+      "deque_trick",
+      "dp_deque"
+    ]
+  },
+  {
+    "problemId": "14870",
+    "title": "조개 줍기",
+    "level": 22,
+    "class": 9,
+    "essential": true,
+    "sprout": false,
+    "tags": [
+      "dp",
+      "data_structures",
+      "segtree",
+      "two_pointer"
+    ]
+  },
+  {
+    "problemId": "14897",
+    "title": "서로 다른 수와 쿼리 1",
+    "level": 19,
+    "class": 7,
+    "essential": false,
+    "sprout": false,
+    "tags": [
+      "data_structures",
+      "offline_queries",
+      "coordinate_compression",
+      "mo"
+    ]
+  },
+  {
+    "problemId": "14898",
+    "title": "서로 다른 수와 쿼리 2",
+    "level": 22,
+    "class": 9,
+    "essential": true,
+    "sprout": false,
+    "tags": [
+      "data_structures",
+      "sorting",
+      "segtree",
+      "pst",
+      "merge_sort_tree"
+    ]
+  },
+  {
+    "problemId": "14938",
+    "title": "서강그라운드",
+    "level": 12,
+    "class": 4,
+    "essential": false,
+    "sprout": false,
+    "tags": [
+      "graphs",
+      "shortest_path",
+      "dijkstra",
+      "floyd_warshall"
+    ]
+  },
+  {
+    "problemId": "14939",
+    "title": "불 끄기",
+    "level": 17,
+    "class": 6,
+    "essential": false,
+    "sprout": false,
+    "tags": [
+      "greedy",
+      "bruteforcing",
+      "bitmask"
+    ]
+  },
+  {
+    "problemId": "14940",
+    "title": "쉬운 최단거리",
+    "level": 10,
+    "class": 3,
+    "essential": true,
+    "sprout": false,
+    "tags": [
+      "graphs",
+      "graph_traversal",
+      "bfs",
+      "grid_graph"
+    ]
+  },
+  {
+    "problemId": "14942",
+    "title": "개미",
+    "level": 16,
+    "class": 6,
+    "essential": false,
+    "sprout": false,
+    "tags": [
+      "data_structures",
+      "graphs",
+      "graph_traversal",
+      "dfs",
+      "sparse_table"
+    ]
+  },
+  {
+    "problemId": "14959",
+    "title": "Slot Machines",
+    "level": 18,
+    "class": 7,
+    "essential": false,
+    "sprout": false,
+    "tags": [
+      "string",
+      "kmp"
+    ]
+  },
+  {
+    "problemId": "14960",
+    "title": "Strongly Matchable",
+    "level": 24,
+    "class": 10,
+    "essential": true,
+    "sprout": false,
+    "tags": [
+      "graphs",
+      "flow",
+      "mfmc",
+      "hall"
+    ]
+  },
+  {
+    "problemId": "15266",
+    "title": "Intrinsic Interval",
+    "level": 25,
+    "class": 10,
+    "essential": false,
+    "sprout": false,
+    "tags": [
+      "data_structures",
+      "segtree",
+      "divide_and_conquer",
+      "offline_queries"
+    ]
+  },
+  {
+    "problemId": "15292",
+    "title": "Journey from Petersburg to Moscow",
+    "level": 24,
+    "class": 10,
+    "essential": false,
+    "sprout": false,
+    "tags": [
+      "graphs",
+      "shortest_path",
+      "dijkstra"
+    ]
+  },
+  {
+    "problemId": "15337",
+    "title": "Starting a Scenic Railroad Service",
+    "level": 18,
+    "class": 8,
+    "essential": false,
+    "sprout": false,
+    "tags": [
+      "data_structures",
+      "greedy",
+      "prefix_sum",
+      "sweeping"
+    ]
+  },
+  {
+    "problemId": "15338",
+    "title": "String Puzzle",
+    "level": 23,
+    "class": 10,
+    "essential": true,
+    "sprout": false,
+    "tags": [
+      "trees"
+    ]
+  },
+  {
+    "problemId": "15504",
+    "title": "프로그래밍 대결",
+    "level": 21,
+    "class": 9,
+    "essential": false,
+    "sprout": false,
+    "tags": [
+      "graphs",
+      "flow",
+      "mcmf"
+    ]
+  },
+  {
+    "problemId": "15507",
+    "title": "연산 최적화",
+    "level": 23,
+    "class": 9,
+    "essential": false,
+    "sprout": false,
+    "tags": [
+      "dp",
+      "graphs",
+      "string",
+      "graph_traversal",
+      "bfs",
+      "hashing",
+      "z"
+    ]
+  },
+  {
+    "problemId": "15521",
+    "title": "Revenge of the Broken Door",
+    "level": 25,
+    "class": 10,
+    "essential": false,
+    "sprout": false,
+    "tags": [
+      "dp",
+      "graphs",
+      "data_structures",
+      "trees",
+      "segtree",
+      "binary_search",
+      "shortest_path",
+      "dijkstra",
+      "lca",
+      "euler_tour_technique"
+    ]
+  },
+  {
+    "problemId": "15650",
+    "title": "N과 M (2)",
+    "level": 8,
+    "class": 4,
+    "essential": true,
+    "sprout": false,
+    "tags": [
+      "backtracking"
+    ]
+  },
+  {
+    "problemId": "15652",
+    "title": "N과 M (4)",
+    "level": 8,
+    "class": 4,
+    "essential": false,
+    "sprout": false,
+    "tags": [
+      "backtracking"
+    ]
+  },
+  {
+    "problemId": "15654",
+    "title": "N과 M (5)",
+    "level": 8,
+    "class": 4,
+    "essential": true,
+    "sprout": false,
+    "tags": [
+      "backtracking"
+    ]
+  },
+  {
+    "problemId": "15663",
+    "title": "N과 M (9)",
+    "level": 9,
+    "class": 4,
+    "essential": true,
+    "sprout": false,
+    "tags": [
+      "backtracking"
+    ]
+  },
+  {
+    "problemId": "15666",
+    "title": "N과 M (12)",
+    "level": 9,
+    "class": 4,
+    "essential": false,
+    "sprout": false,
+    "tags": [
+      "backtracking"
+    ]
+  },
+  {
+    "problemId": "15678",
+    "title": "연세워터파크",
+    "level": 16,
+    "class": 6,
+    "essential": false,
+    "sprout": false,
+    "tags": [
+      "dp",
+      "data_structures",
+      "segtree",
+      "priority_queue",
+      "deque",
+      "deque_trick",
+      "dp_deque"
+    ]
+  },
+  {
+    "problemId": "15681",
+    "title": "트리와 쿼리",
+    "level": 11,
+    "class": 5,
+    "essential": false,
+    "sprout": false,
+    "tags": [
+      "dp",
+      "graphs",
+      "graph_traversal",
+      "trees",
+      "dfs",
+      "dp_tree"
+    ]
+  },
+  {
+    "problemId": "15686",
+    "title": "치킨 배달",
+    "level": 11,
+    "class": 4,
+    "essential": false,
+    "sprout": false,
+    "tags": [
+      "implementation",
+      "bruteforcing",
+      "backtracking"
+    ]
+  },
+  {
+    "problemId": "15737",
+    "title": "일반 그래프 매칭",
+    "level": 24,
+    "class": 10,
+    "essential": false,
+    "sprout": false,
+    "tags": [
+      "graphs",
+      "general_matching"
+    ]
+  },
+  {
+    "problemId": "15768",
+    "title": "Duathlon",
+    "level": 24,
+    "class": 10,
+    "essential": true,
+    "sprout": false,
+    "tags": [
+      "graphs",
+      "graph_traversal",
+      "bcc"
+    ]
+  },
+  {
+    "problemId": "15773",
+    "title": "Touch The Sky",
+    "level": 22,
+    "class": 9,
+    "essential": true,
+    "sprout": false,
+    "tags": [
+      "data_structures",
+      "greedy",
+      "sorting",
+      "priority_queue"
+    ]
+  },
+  {
+    "problemId": "15824",
+    "title": "너 봄에는 캡사이신이 맛있단다",
+    "level": 14,
+    "class": 6,
+    "essential": false,
+    "sprout": false,
+    "tags": [
+      "math",
+      "sorting",
+      "combinatorics",
+      "exponentiation_by_squaring"
+    ]
+  },
+  {
+    "problemId": "15829",
+    "title": "Hashing",
+    "level": 4,
+    "class": 2,
+    "essential": false,
+    "sprout": false,
+    "tags": [
+      "implementation",
+      "string",
+      "hashing"
+    ]
+  },
+  {
+    "problemId": "15939",
+    "title": "쉬운 최단경로 문제",
+    "level": 23,
+    "class": 10,
+    "essential": false,
+    "sprout": false,
+    "tags": [
+      "geometry",
+      "prefix_sum",
+      "two_pointer",
+      "point_in_convex_polygon"
+    ]
+  },
+  {
+    "problemId": "15974",
+    "title": "공룡 발자국",
+    "level": 23,
+    "class": 9,
+    "essential": false,
+    "sprout": false,
+    "tags": [
+      "dp",
+      "sorting",
+      "geometry",
+      "two_pointer",
+      "angle_sorting"
+    ]
+  },
+  {
+    "problemId": "15977",
+    "title": "조화로운 행렬",
+    "level": 22,
+    "class": 9,
+    "essential": true,
+    "sprout": false,
+    "tags": [
+      "dp",
+      "data_structures",
+      "segtree",
+      "divide_and_conquer",
+      "lis",
+      "multi_segtree",
+      "cdq"
+    ]
+  },
+  {
+    "problemId": "16041",
+    "title": "Double Clique",
+    "level": 23,
+    "class": 10,
+    "essential": false,
+    "sprout": false,
+    "tags": [
+      "math",
+      "graphs",
+      "ad_hoc"
+    ]
+  },
+  {
+    "problemId": "16074",
+    "title": "Mountaineers",
+    "level": 21,
+    "class": 8,
+    "essential": true,
+    "sprout": false,
+    "tags": [
+      "graphs",
+      "data_structures",
+      "binary_search",
+      "disjoint_set",
+      "mst",
+      "pbs"
+    ]
+  },
+  {
+    "problemId": "16124",
+    "title": "나는 행복합니다",
+    "level": 22,
+    "class": 9,
+    "essential": true,
+    "sprout": false,
+    "tags": [
+      "data_structures",
+      "segtree",
+      "lazyprop"
+    ]
+  },
+  {
+    "problemId": "16163",
+    "title": "#15164번_제보",
+    "level": 16,
+    "class": 7,
+    "essential": true,
+    "sprout": false,
+    "tags": [
+      "string",
+      "manacher"
+    ]
+  },
+  {
+    "problemId": "16181",
+    "title": "Coloring Roads",
+    "level": 23,
+    "class": 9,
+    "essential": false,
+    "sprout": false,
+    "tags": [
+      "data_structures",
+      "trees",
+      "stack",
+      "hld"
+    ]
+  },
+  {
+    "problemId": "16191",
+    "title": "Utilitarianism",
+    "level": 23,
+    "class": 10,
+    "essential": true,
+    "sprout": false,
+    "tags": [
+      "dp",
+      "trees",
+      "binary_search",
+      "dp_tree",
+      "alien"
+    ]
+  },
+  {
+    "problemId": "16236",
+    "title": "아기 상어",
+    "level": 13,
+    "class": 4,
+    "essential": false,
+    "sprout": false,
+    "tags": [
+      "implementation",
+      "graphs",
+      "graph_traversal",
+      "simulation",
+      "bfs"
+    ]
+  },
+  {
+    "problemId": "16287",
+    "title": "Parcel",
+    "level": 16,
+    "class": 6,
+    "essential": true,
+    "sprout": false,
+    "tags": [
+      "dp",
+      "mitm"
+    ]
+  },
+  {
+    "problemId": "16367",
+    "title": "TV Show Game",
+    "level": 19,
+    "class": 7,
+    "essential": false,
+    "sprout": false,
+    "tags": [
+      "graphs",
+      "scc",
+      "traceback",
+      "2_sat"
+    ]
+  },
+  {
+    "problemId": "16404",
+    "title": "주식회사 승범이네",
+    "level": 18,
+    "class": 7,
+    "essential": true,
+    "sprout": false,
+    "tags": [
+      "data_structures",
+      "trees",
+      "segtree",
+      "lazyprop",
+      "euler_tour_technique",
+      "difference_array"
+    ]
+  },
+  {
+    "problemId": "16565",
+    "title": "N포커",
+    "level": 14,
+    "class": 6,
+    "essential": false,
+    "sprout": false,
+    "tags": [
+      "math",
+      "dp",
+      "combinatorics",
+      "inclusion_and_exclusion"
+    ]
+  },
+  {
+    "problemId": "16566",
+    "title": "카드 게임",
+    "level": 16,
+    "class": 5,
+    "essential": false,
+    "sprout": false,
+    "tags": [
+      "data_structures",
+      "binary_search",
+      "disjoint_set"
+    ]
+  },
+  {
+    "problemId": "16583",
+    "title": "Boomerangs",
+    "level": 20,
+    "class": 8,
+    "essential": false,
+    "sprout": false,
+    "tags": [
+      "graphs",
+      "greedy",
+      "graph_traversal",
+      "trees",
+      "dfs"
+    ]
+  },
+  {
+    "problemId": "16670",
+    "title": "King Kog’s Reception",
+    "level": 21,
+    "class": 9,
+    "essential": true,
+    "sprout": false,
+    "tags": [
+      "data_structures",
+      "segtree",
+      "lazyprop"
+    ]
+  },
+  {
+    "problemId": "16724",
+    "title": "피리 부는 사나이",
+    "level": 13,
+    "class": 5,
+    "essential": false,
+    "sprout": false,
+    "tags": [
+      "data_structures",
+      "graphs",
+      "graph_traversal",
+      "dfs",
+      "disjoint_set",
+      "grid_graph"
+    ]
+  },
+  {
+    "problemId": "16746",
+    "title": "Four-Coloring",
+    "level": 25,
+    "class": 10,
+    "essential": false,
+    "sprout": false,
+    "tags": [
+      "graphs",
+      "ad_hoc",
+      "constructive",
+      "planar_graph"
+    ]
+  },
+  {
+    "problemId": "16783",
+    "title": "Bulldozer",
+    "level": 24,
+    "class": 9,
+    "essential": true,
+    "sprout": false,
+    "tags": [
+      "data_structures",
+      "sorting",
+      "geometry",
+      "segtree",
+      "sweeping",
+      "maximum_subarray",
+      "bulldozer"
+    ]
+  },
+  {
+    "problemId": "16877",
+    "title": "핌버",
+    "level": 18,
+    "class": 7,
+    "essential": false,
+    "sprout": false,
+    "tags": [
+      "game_theory",
+      "sprague_grundy"
+    ]
+  },
+  {
+    "problemId": "16901",
+    "title": "XOR MST",
+    "level": 22,
+    "class": 9,
+    "essential": false,
+    "sprout": false,
+    "tags": [
+      "graphs",
+      "data_structures",
+      "trees",
+      "divide_and_conquer",
+      "mst",
+      "trie"
+    ]
+  },
+  {
+    "problemId": "16903",
+    "title": "수열과 쿼리 20",
+    "level": 18,
+    "class": 7,
+    "essential": false,
+    "sprout": false,
+    "tags": [
+      "data_structures",
+      "trees",
+      "trie"
+    ]
+  },
+  {
+    "problemId": "16928",
+    "title": "뱀과 사다리 게임",
+    "level": 11,
+    "class": 3,
+    "essential": false,
+    "sprout": false,
+    "tags": [
+      "graphs",
+      "graph_traversal",
+      "bfs"
+    ]
+  },
+  {
+    "problemId": "16946",
+    "title": "벽 부수고 이동하기 4",
+    "level": 14,
+    "class": 5,
+    "essential": false,
+    "sprout": false,
+    "tags": [
+      "graphs",
+      "graph_traversal",
+      "bfs",
+      "dfs"
+    ]
+  },
+  {
+    "problemId": "16953",
+    "title": "A → B",
+    "level": 9,
+    "class": 4,
+    "essential": false,
+    "sprout": false,
+    "tags": [
+      "graphs",
+      "greedy",
+      "graph_traversal",
+      "bfs"
+    ]
+  },
+  {
+    "problemId": "16975",
+    "title": "수열과 쿼리 21",
+    "level": 17,
+    "class": 7,
+    "essential": false,
+    "sprout": false,
+    "tags": [
+      "data_structures",
+      "segtree",
+      "lazyprop",
+      "difference_array"
+    ]
+  },
+  {
+    "problemId": "16977",
+    "title": "히스토그램에서 가장 큰 직사각형과 쿼리",
+    "level": 23,
+    "class": 9,
+    "essential": false,
+    "sprout": false,
+    "tags": [
+      "data_structures",
+      "segtree",
+      "binary_search",
+      "pbs",
+      "maximum_subarray"
+    ]
+  },
+  {
+    "problemId": "16978",
+    "title": "수열과 쿼리 22",
+    "level": 17,
+    "class": 7,
+    "essential": true,
+    "sprout": false,
+    "tags": [
+      "data_structures",
+      "segtree",
+      "offline_queries"
+    ]
+  },
+  {
+    "problemId": "16983",
+    "title": "Coin Collecting",
+    "level": 23,
+    "class": 10,
+    "essential": false,
+    "sprout": false,
+    "tags": [
+      "greedy"
+    ]
+  },
+  {
+    "problemId": "16998",
+    "title": "It’s a Mod, Mod, Mod, Mod World",
+    "level": 22,
+    "class": 9,
+    "essential": false,
+    "sprout": false,
+    "tags": [
+      "math",
+      "number_theory",
+      "euclidean",
+      "floor_sum"
+    ]
+  },
+  {
+    "problemId": "17070",
+    "title": "파이프 옮기기 1",
+    "level": 11,
+    "class": 4,
+    "essential": false,
+    "sprout": false,
+    "tags": [
+      "dp",
+      "graphs",
+      "graph_traversal"
+    ]
+  },
+  {
+    "problemId": "17104",
+    "title": "골드바흐 파티션 2",
+    "level": 21,
+    "class": 8,
+    "essential": false,
+    "sprout": false,
+    "tags": [
+      "math",
+      "number_theory",
+      "primality_test",
+      "sieve",
+      "fft"
+    ]
+  },
+  {
+    "problemId": "17134",
+    "title": "르모앙의 추측",
+    "level": 20,
+    "class": 8,
+    "essential": true,
+    "sprout": false,
+    "tags": [
+      "math",
+      "number_theory",
+      "primality_test",
+      "sieve",
+      "fft"
+    ]
+  },
+  {
+    "problemId": "17143",
+    "title": "낚시왕",
+    "level": 15,
+    "class": 5,
+    "essential": false,
+    "sprout": false,
+    "tags": [
+      "implementation",
+      "simulation"
+    ]
+  },
+  {
+    "problemId": "17144",
+    "title": "미세먼지 안녕!",
+    "level": 12,
+    "class": 4,
+    "essential": false,
+    "sprout": false,
+    "tags": [
+      "implementation",
+      "simulation"
+    ]
+  },
+  {
+    "problemId": "17169",
+    "title": "Eat Economically",
+    "level": 22,
+    "class": 10,
+    "essential": true,
+    "sprout": false,
+    "tags": [
+      "data_structures",
+      "graphs",
+      "greedy",
+      "priority_queue",
+      "flow",
+      "mcmf"
+    ]
+  },
+  {
+    "problemId": "17219",
+    "title": "비밀번호 찾기",
+    "level": 7,
+    "class": 3,
+    "essential": false,
+    "sprout": false,
+    "tags": [
+      "data_structures",
+      "set",
+      "hash_set"
+    ]
+  },
+  {
+    "problemId": "17353",
+    "title": "하늘에서 떨어지는 1, 2, ..., R-L+1개의 별",
+    "level": 19,
+    "class": 7,
+    "essential": false,
+    "sprout": false,
+    "tags": [
+      "data_structures",
+      "segtree",
+      "lazyprop",
+      "difference_array"
+    ]
+  },
+  {
+    "problemId": "17387",
+    "title": "선분 교차 2",
+    "level": 14,
+    "class": 5,
+    "essential": true,
+    "sprout": false,
+    "tags": [
+      "geometry",
+      "case_work",
+      "line_intersection"
+    ]
+  },
+  {
+    "problemId": "17399",
+    "title": "트리의 외심",
+    "level": 19,
+    "class": 8,
+    "essential": true,
+    "sprout": false,
+    "tags": [
+      "trees",
+      "lca"
+    ]
+  },
+  {
+    "problemId": "17401",
+    "title": "일하는 세포",
+    "level": 16,
+    "class": 6,
+    "essential": false,
+    "sprout": false,
+    "tags": [
+      "math",
+      "exponentiation_by_squaring"
+    ]
+  },
+  {
+    "problemId": "17404",
+    "title": "RGB거리 2",
+    "level": 12,
+    "class": 5,
+    "essential": false,
+    "sprout": false,
+    "tags": [
+      "dp"
+    ]
+  },
+  {
+    "problemId": "17429",
+    "title": "국제 메시 기구",
+    "level": 22,
+    "class": 8,
+    "essential": true,
+    "sprout": false,
+    "tags": [
+      "data_structures",
+      "trees",
+      "segtree",
+      "lazyprop",
+      "euler_tour_technique",
+      "hld"
+    ]
+  },
+  {
+    "problemId": "17439",
+    "title": "꽃집",
+    "level": 25,
+    "class": 10,
+    "essential": true,
+    "sprout": false,
+    "tags": [
+      "dp",
+      "binary_search",
+      "alien",
+      "monotone_queue_optimization"
+    ]
+  },
+  {
+    "problemId": "17442",
+    "title": "삼분 그래프",
+    "level": 23,
+    "class": 10,
+    "essential": true,
+    "sprout": false,
+    "tags": [
+      "data_structures",
+      "graphs",
+      "sorting",
+      "geometry",
+      "segtree",
+      "sweeping",
+      "coordinate_compression",
+      "planar_graph",
+      "angle_sorting",
+      "euler_characteristic"
+    ]
+  },
+  {
+    "problemId": "17474",
+    "title": "수열과 쿼리 26",
+    "level": 25,
+    "class": 10,
+    "essential": true,
+    "sprout": false,
+    "tags": [
+      "data_structures",
+      "segtree",
+      "lazyprop",
+      "beats"
+    ]
+  },
+  {
+    "problemId": "17517",
+    "title": "Parklife",
+    "level": 22,
+    "class": 10,
+    "essential": true,
+    "sprout": false,
+    "tags": [
+      "dp",
+      "data_structures",
+      "trees",
+      "dp_tree",
+      "priority_queue",
+      "smaller_to_larger"
+    ]
+  },
+  {
+    "problemId": "17526",
+    "title": "Star Trek",
+    "level": 21,
+    "class": 8,
+    "essential": false,
+    "sprout": false,
+    "tags": [
+      "dp",
+      "cht",
+      "li_chao_tree"
+    ]
+  },
+  {
+    "problemId": "17613",
+    "title": "점프",
+    "level": 19,
+    "class": 8,
+    "essential": false,
+    "sprout": false,
+    "tags": [
+      "dp",
+      "divide_and_conquer"
+    ]
+  },
+  {
+    "problemId": "17625",
+    "title": "고압선",
+    "level": 24,
+    "class": 10,
+    "essential": false,
+    "sprout": false,
+    "tags": [
+      "sorting",
+      "geometry",
+      "sweeping",
+      "bulldozer"
+    ]
+  },
+  {
+    "problemId": "17626",
+    "title": "Four Squares",
+    "level": 8,
+    "class": 3,
+    "essential": false,
+    "sprout": false,
+    "tags": [
+      "dp",
+      "bruteforcing"
+    ]
+  },
+  {
+    "problemId": "17642",
+    "title": "Dynamic Diameter",
+    "level": 25,
+    "class": 10,
+    "essential": false,
+    "sprout": false,
+    "tags": [
+      "data_structures",
+      "trees",
+      "segtree",
+      "divide_and_conquer",
+      "lazyprop",
+      "euler_tour_technique",
+      "centroid_decomposition"
+    ]
+  },
+  {
+    "problemId": "17693",
+    "title": "Port Facility",
+    "level": 23,
+    "class": 10,
+    "essential": true,
+    "sprout": false,
+    "tags": [
+      "graphs",
+      "data_structures",
+      "segtree",
+      "disjoint_set",
+      "smaller_to_larger"
+    ]
+  },
+  {
+    "problemId": "17955",
+    "title": "Max or Min",
+    "level": 23,
+    "class": 10,
+    "essential": true,
+    "sprout": false,
+    "tags": [
+      "data_structures",
+      "segtree",
+      "maximum_subarray"
+    ]
+  },
+  {
+    "problemId": "17973",
+    "title": "Quadrilaterals",
+    "level": 23,
+    "class": 10,
+    "essential": false,
+    "sprout": false,
+    "tags": [
+      "geometry",
+      "sweeping",
+      "bulldozer"
+    ]
+  },
+  {
+    "problemId": "18110",
+    "title": "solved.ac",
+    "level": 7,
+    "class": 2,
+    "essential": false,
+    "sprout": false,
+    "tags": [
+      "math",
+      "implementation",
+      "sorting"
+    ]
+  },
+  {
+    "problemId": "18111",
+    "title": "마인크래프트",
+    "level": 9,
+    "class": 3,
+    "essential": false,
+    "sprout": false,
+    "tags": [
+      "implementation",
+      "bruteforcing"
+    ]
+  },
+  {
+    "problemId": "18123",
+    "title": "평행우주",
+    "level": 22,
+    "class": 9,
+    "essential": true,
+    "sprout": false,
+    "tags": [
+      "trees",
+      "hashing",
+      "centroid",
+      "tree_isomorphism",
+      "rerooting",
+      "tree_diameter"
+    ]
+  },
+  {
+    "problemId": "18227",
+    "title": "성대나라의 물탱크",
+    "level": 18,
+    "class": 7,
+    "essential": true,
+    "sprout": false,
+    "tags": [
+      "data_structures",
+      "trees",
+      "segtree",
+      "euler_tour_technique"
+    ]
+  },
+  {
+    "problemId": "18251",
+    "title": "내 생각에 A번인 단순 dfs 문제가 이 대회에서 E번이 되어버린 건에 관하여 (Easy)",
+    "level": 17,
+    "class": 7,
+    "essential": false,
+    "sprout": false,
+    "tags": [
+      "dp",
+      "graphs",
+      "graph_traversal",
+      "dfs",
+      "sweeping",
+      "maximum_subarray"
+    ]
+  },
+  {
+    "problemId": "18252",
+    "title": "별이 빛나는 밤에",
+    "level": 22,
+    "class": 9,
+    "essential": false,
+    "sprout": false,
+    "tags": [
+      "geometry",
+      "two_pointer",
+      "convex_hull"
+    ]
+  },
+  {
+    "problemId": "18438",
+    "title": "LCS 5",
+    "level": 25,
+    "class": 10,
+    "essential": true,
+    "sprout": false,
+    "tags": [
+      "dp",
+      "divide_and_conquer",
+      "traceback",
+      "lcs",
+      "hirschberg"
+    ]
+  },
+  {
+    "problemId": "18473",
+    "title": "Fast Spanning Tree",
+    "level": 26,
+    "class": 10,
+    "essential": false,
+    "sprout": false,
+    "tags": [
+      "data_structures",
+      "disjoint_set",
+      "priority_queue",
+      "smaller_to_larger"
+    ]
+  },
+  {
+    "problemId": "18485",
+    "title": "Nine Judges",
+    "level": 23,
+    "class": 10,
+    "essential": false,
+    "sprout": false,
+    "tags": [
+      "graphs",
+      "sorting",
+      "dag",
+      "scc"
+    ]
+  },
+  {
+    "problemId": "18526",
+    "title": "Bomas",
+    "level": 23,
+    "class": 10,
+    "essential": true,
+    "sprout": false,
+    "tags": [
+      "dp",
+      "data_structures",
+      "geometry",
+      "trees",
+      "set",
+      "sweeping",
+      "dp_tree",
+      "tree_set"
+    ]
+  },
+  {
+    "problemId": "18586",
+    "title": "Salty Fish",
+    "level": 24,
+    "class": 10,
+    "essential": false,
+    "sprout": false,
+    "tags": [
+      "dp",
+      "graphs",
+      "data_structures",
+      "trees",
+      "set",
+      "dp_tree",
+      "tree_set",
+      "flow",
+      "smaller_to_larger",
+      "mfmc"
+    ]
+  },
+  {
+    "problemId": "18855",
+    "title": "Treatment Project",
+    "level": 24,
+    "class": 10,
+    "essential": false,
+    "sprout": false,
+    "tags": [
+      "graphs",
+      "data_structures",
+      "segtree",
+      "shortest_path",
+      "dijkstra",
+      "priority_queue"
+    ]
+  },
+  {
+    "problemId": "18870",
+    "title": "좌표 압축",
+    "level": 9,
+    "class": 3,
+    "essential": true,
+    "sprout": false,
+    "tags": [
+      "sorting",
+      "coordinate_compression"
+    ]
+  },
+  {
+    "problemId": "19585",
+    "title": "전설",
+    "level": 18,
+    "class": 6,
+    "essential": true,
+    "sprout": false,
+    "tags": [
+      "data_structures",
+      "string",
+      "trees",
+      "set",
+      "hash_set",
+      "trie"
+    ]
+  },
+  {
+    "problemId": "20040",
+    "title": "사이클 게임",
+    "level": 12,
+    "class": 5,
+    "essential": false,
+    "sprout": false,
+    "tags": [
+      "data_structures",
+      "disjoint_set"
+    ]
+  },
+  {
+    "problemId": "20149",
+    "title": "선분 교차 3",
+    "level": 17,
+    "class": 6,
+    "essential": false,
+    "sprout": false,
+    "tags": [
+      "geometry",
+      "case_work",
+      "line_intersection"
+    ]
+  },
+  {
+    "problemId": "20303",
+    "title": "할로윈의 양아치",
+    "level": 14,
+    "class": 5,
+    "essential": false,
+    "sprout": false,
+    "tags": [
+      "dp",
+      "graphs",
+      "data_structures",
+      "graph_traversal",
+      "disjoint_set",
+      "knapsack"
+    ]
+  },
+  {
+    "problemId": "21736",
+    "title": "헌내기는 친구가 필요해",
+    "level": 9,
+    "class": 3,
+    "essential": false,
+    "sprout": false,
+    "tags": [
+      "graphs",
+      "graph_traversal",
+      "bfs",
+      "dfs",
+      "grid_graph"
+    ]
+  },
+  {
+    "problemId": "24272",
+    "title": "루트 노드가 많은 트리일수록 좋은 트리이다",
+    "level": 21,
+    "class": 8,
+    "essential": false,
+    "sprout": false,
+    "tags": [
+      "data_structures",
+      "trees",
+      "segtree",
+      "set",
+      "lazyprop",
+      "euler_tour_technique"
+    ]
+  },
+  {
+    "problemId": "24505",
+    "title": "blobhyperthink",
+    "level": 17,
+    "class": 7,
+    "essential": false,
+    "sprout": false,
+    "tags": [
+      "dp",
+      "data_structures",
+      "segtree"
+    ]
+  },
+  {
+    "problemId": "25083",
+    "title": "새싹",
+    "level": 1,
+    "class": 1,
+    "essential": true,
+    "sprout": true,
+    "tags": [
+      "implementation"
+    ]
+  },
+  {
+    "problemId": "27172",
+    "title": "수 나누기 게임",
+    "level": 12,
+    "class": 5,
+    "essential": false,
+    "sprout": false,
+    "tags": [
+      "math",
+      "bruteforcing",
+      "number_theory",
+      "primality_test",
+      "sieve"
+    ]
+  },
+  {
+    "problemId": "27866",
+    "title": "문자와 문자열",
+    "level": 1,
+    "class": 1,
+    "essential": true,
+    "sprout": true,
+    "tags": [
+      "implementation",
+      "string"
+    ]
+  },
+  {
+    "problemId": "28702",
+    "title": "FizzBuzz",
+    "level": 5,
+    "class": 2,
+    "essential": false,
+    "sprout": false,
+    "tags": [
+      "math",
+      "string"
+    ]
+  },
+  {
+    "problemId": "28707",
+    "title": "배열 정렬",
+    "level": 15,
+    "class": 5,
+    "essential": false,
+    "sprout": false,
+    "tags": [
+      "graphs",
+      "data_structures",
+      "set",
+      "shortest_path",
+      "hash_set",
+      "dijkstra"
+    ]
+  },
+  {
+    "problemId": "30802",
+    "title": "웰컴 키트",
+    "level": 3,
+    "class": 2,
+    "essential": true,
+    "sprout": false,
+    "tags": [
+      "math",
+      "implementation",
+      "arithmetic"
+    ]
+  },
+  {
+    "problemId": "30804",
+    "title": "과일 탕후루",
+    "level": 9,
+    "class": 3,
+    "essential": false,
+    "sprout": false,
+    "tags": [
+      "implementation",
+      "bruteforcing",
+      "two_pointer"
+    ]
+  },
+  {
+    "problemId": "30805",
+    "title": "사전 순 최대 공통 부분 수열",
+    "level": 12,
+    "class": 4,
+    "essential": false,
+    "sprout": false,
+    "tags": [
+      "greedy"
+    ]
+  },
+  {
+    "problemId": "31397",
+    "title": "반 나누기 (Hard)",
+    "level": 20,
+    "class": 8,
+    "essential": false,
+    "sprout": false,
+    "tags": [
+      "geometry",
+      "binary_search",
+      "polygon_area"
+    ]
+  },
+  {
+    "problemId": "31403",
+    "title": "$A + B - C$",
+    "level": 2,
+    "class": 1,
+    "essential": false,
+    "sprout": false,
+    "tags": [
+      "math",
+      "string",
+      "arithmetic"
+    ]
+  },
+  {
+    "problemId": "31603",
+    "title": "Tree Quiz",
+    "level": 22,
+    "class": 8,
+    "essential": false,
+    "sprout": false,
+    "tags": [
+      "data_structures",
+      "trees",
+      "segtree",
+      "binary_search",
+      "euler_tour_technique",
+      "pst"
+    ]
+  }
+]
