@@ -38,4 +38,12 @@ public interface AiServerClient {
      * @return MBTI 스타일 분석 결과
      */
     CodingStyleResponse analyzeCodingStyle(CodingStyleRequest request);
+
+    /**
+     * 대화형 튜터 채팅
+     * 
+     * @param request 대화 요청 (메시지, 히스토리, 컨텍스트)
+     * @return 튜터 응답
+     */
+    TutorChatResponse chat(TutorChatRequest request);
 }

@@ -91,4 +91,21 @@ public class AiServerClientImpl implements AiServerClient {
             throw new AiServerException("코딩 스타일 분석 요청에 실패했습니다", e);
         }
     }
+
+    @Override
+    public TutorChatResponse chat(TutorChatRequest request) {
+        try {
+            log.debug("Sending chat message to tutor");
+
+            return restClient.post()
+                    .uri(baseUrl + "/tutor/chat")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .body(request)
+                    .retrieve()
+                    .body(TutorChatResponse.class);
+        } catch (RestClientException e) {
+            log.error("Failed to chat with tutor: {}", e.getMessage(), e);
+            throw new AiServerException("튜터 대화 요청에 실패했습니다", e);
+        }
+    }
 }

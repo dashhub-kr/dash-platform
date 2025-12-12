@@ -1,12 +1,7 @@
 package com.ssafy.dash.ai.presentation;
 
-import com.ssafy.dash.ai.application.AiLearningPathService;
-import com.ssafy.dash.ai.application.CodeReviewService;
-import com.ssafy.dash.ai.application.CodingStyleService;
-import com.ssafy.dash.ai.application.HintService;
-import com.ssafy.dash.ai.client.dto.CodingStyleResponse;
-import com.ssafy.dash.ai.client.dto.HintResponse;
-import com.ssafy.dash.ai.client.dto.LearningPathResponse;
+import com.ssafy.dash.ai.application.*;
+import com.ssafy.dash.ai.client.dto.*;
 import com.ssafy.dash.ai.domain.CodeAnalysisResult;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -14,10 +9,12 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 /**
  * AI API 컨트롤러
  */
-@Tag(name = "AI", description = "AI 기반 코드 분석, 힌트, 학습 경로, 스타일 분석 API")
+@Tag(name = "AI", description = "AI 기반 코드 분석, 힌트, 학습 경로, 스타일 분석, 대화형 튜터 API")
 @RestController
 @RequestMapping("/api/ai")
 @RequiredArgsConstructor
@@ -27,6 +24,7 @@ public class AiController {
         private final HintService hintService;
         private final AiLearningPathService learningPathService;
         private final CodingStyleService codingStyleService;
+        private final TutorService tutorService;
 
         @Operation(summary = "코드 분석 요청", description = "알고리즘 풀이 코드를 AI로 분석합니다")
         @PostMapping("/review")
@@ -72,6 +70,18 @@ public class AiController {
                 return ResponseEntity.ok(response);
         }
 
+        @Operation(summary = "튜터 대화", description = "대화형 AI 튜터와 채팅합니다")
+        @PostMapping("/tutor/chat")
+        public ResponseEntity<TutorChatResponse> chat(@RequestBody TutorChatRequestDto request) {
+                TutorChatResponse response = tutorService.chat(
+                                request.userId(),
+                                request.message(),
+                                request.history(),
+                                request.problemNumber(),
+                                request.code());
+                return ResponseEntity.ok(response);
+        }
+
         public record CodeReviewRequest(
                         Long algorithmRecordId,
                         String code,
@@ -84,5 +94,13 @@ public class AiController {
                         String problemNumber,
                         String problemTitle,
                         int level) {
+        }
+
+        public record TutorChatRequestDto(
+                        Long userId,
+                        String message,
+                        List<TutorChatRequest.ChatMessage> history,
+                        String problemNumber,
+                        String code) {
         }
 }
