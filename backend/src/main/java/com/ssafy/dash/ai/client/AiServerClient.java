@@ -1,11 +1,6 @@
 package com.ssafy.dash.ai.client;
 
-import com.ssafy.dash.ai.client.dto.CodeReviewRequest;
-import com.ssafy.dash.ai.client.dto.CodeReviewResponse;
-import com.ssafy.dash.ai.client.dto.HintRequest;
-import com.ssafy.dash.ai.client.dto.HintResponse;
-import com.ssafy.dash.ai.client.dto.LearningPathRequest;
-import com.ssafy.dash.ai.client.dto.LearningPathResponse;
+import com.ssafy.dash.ai.client.dto.*;
 
 /**
  * AI 서버 통신 클라이언트 인터페이스
@@ -35,4 +30,12 @@ public interface AiServerClient {
      * @return AI 추천 학습 경로
      */
     LearningPathResponse generateLearningPath(LearningPathRequest request);
+
+    /**
+     * 코딩 스타일 분석 (MBTI 스타일)
+     * 
+     * @param request 코드 샘플 및 통계
+     * @return MBTI 스타일 분석 결과
+     */
+    CodingStyleResponse analyzeCodingStyle(CodingStyleRequest request);
 }

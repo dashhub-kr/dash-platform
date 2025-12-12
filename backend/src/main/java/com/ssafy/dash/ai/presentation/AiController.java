@@ -2,7 +2,9 @@ package com.ssafy.dash.ai.presentation;
 
 import com.ssafy.dash.ai.application.AiLearningPathService;
 import com.ssafy.dash.ai.application.CodeReviewService;
+import com.ssafy.dash.ai.application.CodingStyleService;
 import com.ssafy.dash.ai.application.HintService;
+import com.ssafy.dash.ai.client.dto.CodingStyleResponse;
 import com.ssafy.dash.ai.client.dto.HintResponse;
 import com.ssafy.dash.ai.client.dto.LearningPathResponse;
 import com.ssafy.dash.ai.domain.CodeAnalysisResult;
@@ -13,9 +15,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 /**
- * AI 코드 분석 API 컨트롤러
+ * AI API 컨트롤러
  */
-@Tag(name = "AI", description = "AI 기반 코드 분석, 힌트, 학습 경로 API")
+@Tag(name = "AI", description = "AI 기반 코드 분석, 힌트, 학습 경로, 스타일 분석 API")
 @RestController
 @RequestMapping("/api/ai")
 @RequiredArgsConstructor
@@ -24,6 +26,7 @@ public class AiController {
         private final CodeReviewService codeReviewService;
         private final HintService hintService;
         private final AiLearningPathService learningPathService;
+        private final CodingStyleService codingStyleService;
 
         @Operation(summary = "코드 분석 요청", description = "알고리즘 풀이 코드를 AI로 분석합니다")
         @PostMapping("/review")
@@ -59,6 +62,13 @@ public class AiController {
         @GetMapping("/learning-path/{userId}")
         public ResponseEntity<LearningPathResponse> getLearningPath(@PathVariable Long userId) {
                 LearningPathResponse response = learningPathService.generateAiLearningPath(userId);
+                return ResponseEntity.ok(response);
+        }
+
+        @Operation(summary = "코딩 스타일 분석", description = "사용자의 코드 패턴을 분석하여 MBTI 스타일 결과를 생성합니다")
+        @GetMapping("/coding-style/{userId}")
+        public ResponseEntity<CodingStyleResponse> getCodingStyle(@PathVariable Long userId) {
+                CodingStyleResponse response = codingStyleService.analyzeCodingStyle(userId);
                 return ResponseEntity.ok(response);
         }
 

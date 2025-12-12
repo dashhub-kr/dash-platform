@@ -1,11 +1,6 @@
 package com.ssafy.dash.ai.client;
 
-import com.ssafy.dash.ai.client.dto.CodeReviewRequest;
-import com.ssafy.dash.ai.client.dto.CodeReviewResponse;
-import com.ssafy.dash.ai.client.dto.HintRequest;
-import com.ssafy.dash.ai.client.dto.HintResponse;
-import com.ssafy.dash.ai.client.dto.LearningPathRequest;
-import com.ssafy.dash.ai.client.dto.LearningPathResponse;
+import com.ssafy.dash.ai.client.dto.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -76,6 +71,24 @@ public class AiServerClientImpl implements AiServerClient {
         } catch (RestClientException e) {
             log.error("Failed to generate learning path: {}", e.getMessage(), e);
             throw new AiServerException("학습 경로 생성 요청에 실패했습니다", e);
+        }
+    }
+
+    @Override
+    public CodingStyleResponse analyzeCodingStyle(CodingStyleRequest request) {
+        try {
+            log.debug("Analyzing coding style with {} code samples",
+                    request.getCodeSamples() != null ? request.getCodeSamples().size() : 0);
+
+            return restClient.post()
+                    .uri(baseUrl + "/coding-style")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .body(request)
+                    .retrieve()
+                    .body(CodingStyleResponse.class);
+        } catch (RestClientException e) {
+            log.error("Failed to analyze coding style: {}", e.getMessage(), e);
+            throw new AiServerException("코딩 스타일 분석 요청에 실패했습니다", e);
         }
     }
 }
