@@ -14,7 +14,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import java.time.LocalDateTime;
 import java.util.List;
 
 /**
@@ -29,6 +28,7 @@ public class SolvedacSyncService {
     private final UserRepository userRepository;
     private final UserClassStatMapper classStatMapper;
     private final UserTagStatMapper tagStatMapper;
+    private final com.ssafy.dash.algorithm.domain.AlgorithmRecordRepository recordRepository;
 
     /**
      * 사용자 Solved.ac 핸들 등록 및 초기 데이터 동기화
@@ -45,13 +45,16 @@ public class SolvedacSyncService {
                 .orElseThrow(() -> new IllegalArgumentException("User not found: " + userId));
         user.updateSolvedacProfile(handle, userInfo.getTier(),
                 userInfo.getRating(), userInfo.getClassLevel());
-        userRepository.save(user);
+        userRepository.update(user);
 
         // 3. 클래스 통계 동기화
         syncClassStats(userId, handle);
 
         // 4. 태그 통계 동기화
         syncTagStats(userId, handle);
+
+        // 5. 상위 100 문제 동기화
+        syncTop100Problems(userId, handle);
 
         log.info("Successfully synced Solved.ac data for user {}", userId);
     }
@@ -97,6 +100,54 @@ public class SolvedacSyncService {
         });
 
         log.info("Synced {} tag stats for user {}", response.getCount(), userId);
+    }
+
+    /**
+     * 상위 100 문제 동기화
+     */
+    @Transactional
+    public void syncTop100Problems(Long userId, String handle) {
+        var response = solvedacClient.getTop100Problems(handle);
+        var existingRecords = recordRepository.findByUserId(userId);
+        var existingProblemNumbers = existingRecords.stream()
+                .map(com.ssafy.dash.algorithm.domain.AlgorithmRecord::getProblemNumber)
+                .collect(java.util.stream.Collectors.toSet());
+
+        int count = 0;
+        for (var item : response.getItems()) {
+            if (existingProblemNumbers.contains(item.getProblemId())) {
+                continue;
+            }
+
+            // 코드 없이 레코드 생성
+            var record = com.ssafy.dash.algorithm.domain.AlgorithmRecord.create(
+                    userId,
+                    null, // studyId
+                    item.getProblemId(),
+                    item.getTitleKo(),
+                    "none", // 언어 필수
+                    "",     // 코드 없음
+                    LocalDateTime.now()
+            );
+            
+            // 난이도(레벨) 등의 메타데이터 추가
+            record.enrichMetadata(
+                "BOJ", 
+                String.valueOf(item.getLevel()), 
+                null, 
+                null, 
+                "Solved.ac Sync", 
+                null, 
+                null, 
+                null, 
+                LocalDateTime.now()
+            );
+
+            recordRepository.save(record);
+            count++;
+        }
+
+        log.info("Synced {} new problems from Top 100 for user {}", count, userId);
     }
 
     /**

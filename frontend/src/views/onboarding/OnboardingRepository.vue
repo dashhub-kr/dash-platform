@@ -78,12 +78,12 @@ const success = ref(false);
 
 const scheduleRedirect = () => {
   setTimeout(() => {
-    window.location.href = "/";
+    window.location.href = "/dashboard";
   }, 1500);
 };
 
 const skipOnboarding = () => {
-  window.location.href = "/";
+  window.location.href = "/dashboard";
 };
 
 const submitRepository = async () => {

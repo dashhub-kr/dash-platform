@@ -1,6 +1,8 @@
 package com.ssafy.dash.ai.client.dto;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -11,7 +13,9 @@ import java.util.List;
  * AI 서버의 StructuredResponse 스키마와 매핑
  */
 @Data
+@Builder
 @NoArgsConstructor
+@AllArgsConstructor
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class CodeReviewResponse {
 
@@ -26,7 +30,9 @@ public class CodeReviewResponse {
     private RefactorInfo refactor;
 
     @Data
+    @Builder
     @NoArgsConstructor
+    @AllArgsConstructor
     @JsonIgnoreProperties(ignoreUnknown = true)
     public static class ProblemInfo {
         private String description;
@@ -37,7 +43,9 @@ public class CodeReviewResponse {
     }
 
     @Data
+    @Builder
     @NoArgsConstructor
+    @AllArgsConstructor
     @JsonIgnoreProperties(ignoreUnknown = true)
     public static class AlgorithmInfo {
         private List<String> patterns;
@@ -45,7 +53,9 @@ public class CodeReviewResponse {
     }
 
     @Data
+    @Builder
     @NoArgsConstructor
+    @AllArgsConstructor
     @JsonIgnoreProperties(ignoreUnknown = true)
     public static class StructureItem {
         private String name;
@@ -53,7 +63,9 @@ public class CodeReviewResponse {
     }
 
     @Data
+    @Builder
     @NoArgsConstructor
+    @AllArgsConstructor
     @JsonIgnoreProperties(ignoreUnknown = true)
     public static class KeyBlock {
         private String code;
@@ -61,7 +73,9 @@ public class CodeReviewResponse {
     }
 
     @Data
+    @Builder
     @NoArgsConstructor
+    @AllArgsConstructor
     @JsonIgnoreProperties(ignoreUnknown = true)
     public static class TraceExample {
         private boolean hasExample;
@@ -71,7 +85,9 @@ public class CodeReviewResponse {
     }
 
     @Data
+    @Builder
     @NoArgsConstructor
+    @AllArgsConstructor
     @JsonIgnoreProperties(ignoreUnknown = true)
     public static class ComplexityInfo {
         private String time;
@@ -80,7 +96,9 @@ public class CodeReviewResponse {
     }
 
     @Data
+    @Builder
     @NoArgsConstructor
+    @AllArgsConstructor
     @JsonIgnoreProperties(ignoreUnknown = true)
     public static class PitfallsInfo {
         private List<String> items;
@@ -88,7 +106,9 @@ public class CodeReviewResponse {
     }
 
     @Data
+    @Builder
     @NoArgsConstructor
+    @AllArgsConstructor
     @JsonIgnoreProperties(ignoreUnknown = true)
     public static class RefactorInfo {
         private boolean provided;

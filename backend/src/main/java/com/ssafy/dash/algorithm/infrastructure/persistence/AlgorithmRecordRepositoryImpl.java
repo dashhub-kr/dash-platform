@@ -44,6 +44,11 @@ public class AlgorithmRecordRepositoryImpl implements AlgorithmRecordRepository 
     }
 
     @Override
+    public List<AlgorithmRecord> findByStudyId(Long studyId) {
+        return mapper.selectByStudyId(studyId);
+    }
+
+    @Override
     public boolean delete(Long id) {
         return mapper.delete(id) > 0;
     }

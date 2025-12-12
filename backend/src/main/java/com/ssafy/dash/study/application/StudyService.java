@@ -26,7 +26,7 @@ public class StudyService {
     public Study createStudy(Long userId, String name) {
         Study study = Study.create(name);
         studyRepository.save(study);
-        // Assuming MyBatis sets the ID in the object after insert
+        // MyBatis가 insert 후 객체에 ID를 설정한다고 가정
         
         joinStudy(userId, study.getId());
         
@@ -38,12 +38,13 @@ public class StudyService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("User not found"));
         
-        // Custom check using findById since existsById is missing
+        // existsById가 없으므로 findById를 사용하여 확인
         if (studyRepository.findById(studyId).isEmpty()) {
              throw new IllegalArgumentException("Study not found");
         }
         
         user.updateStudy(studyId);
-        userRepository.save(user);
+        user.updateStudy(studyId);
+        userRepository.update(user);
     }
 }

@@ -26,4 +26,10 @@ public interface SolvedacApiClient {
      * GET /user/problem_tag_stats?handle={handle}
      */
     TagStatResponse getTagStats(String handle);
+
+    /**
+     * 상위 100개 문제 조회
+     * GET /user/top_100?handle={handle}
+     */
+    com.ssafy.dash.external.solvedac.dto.Top100Response getTop100Problems(String handle);
 }

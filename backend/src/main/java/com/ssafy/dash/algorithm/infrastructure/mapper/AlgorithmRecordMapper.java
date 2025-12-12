@@ -16,6 +16,8 @@ public interface AlgorithmRecordMapper {
     List<AlgorithmRecord> selectAll();
     
     List<AlgorithmRecord> selectByUserId(Long userId);
+
+    List<AlgorithmRecord> selectByStudyId(Long studyId);
     
     void update(AlgorithmRecord record);
     

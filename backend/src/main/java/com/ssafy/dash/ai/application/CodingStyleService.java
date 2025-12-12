@@ -50,7 +50,15 @@ public class CodingStyleService {
                 .toList();
 
         if (codeSamples.isEmpty()) {
-            throw new IllegalArgumentException("분석할 코드가 없습니다. 최소 1개 이상의 코드가 필요합니다.");
+            log.info("No code samples found for user {}. Returning default coding style.", userId);
+            return CodingStyleResponse.builder()
+                    .mbtiCode("READY")
+                    .nickname("준비된 도전자")
+                    .summary("아직 분석할 코드가 없습니다. 문제를 풀고 커밋하면 AI가 코딩 스타일을 분석해드립니다.")
+                    .strengths(java.util.List.of("열정", "잠재력"))
+                    .weaknesses(java.util.List.of())
+                    .jobFit(java.util.List.of("알고리즘 마스터"))
+                    .build();
         }
 
         // 사용자 통계 수집

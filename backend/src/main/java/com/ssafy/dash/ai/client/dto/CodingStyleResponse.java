@@ -1,6 +1,8 @@
 package com.ssafy.dash.ai.client.dto;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -10,7 +12,9 @@ import java.util.List;
  * 코딩 스타일 분석 응답 DTO (MBTI 스타일)
  */
 @Data
+@Builder
 @NoArgsConstructor
+@AllArgsConstructor
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class CodingStyleResponse {
     private String mbtiCode; // 예: "INTP" (코딩 스타일)
@@ -23,7 +27,9 @@ public class CodingStyleResponse {
     private String advice; // 조언
 
     @Data
+    @Builder
     @NoArgsConstructor
+    @AllArgsConstructor
     @JsonIgnoreProperties(ignoreUnknown = true)
     public static class StyleAxis {
         private String axis; // "E/I", "S/N", "T/F", "J/P"

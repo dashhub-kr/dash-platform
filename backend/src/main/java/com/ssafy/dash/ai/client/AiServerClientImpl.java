@@ -33,9 +33,20 @@ public class AiServerClientImpl implements AiServerClient {
                     .body(request)
                     .retrieve()
                     .body(CodeReviewResponse.class);
-        } catch (RestClientException e) {
-            log.error("Failed to analyze code: {}", e.getMessage(), e);
-            throw new AiServerException("코드 분석 요청에 실패했습니다", e);
+        } catch (Exception e) {
+            log.warn("Failed to analyze code: {}. Using fallback.", e.getMessage());
+            return CodeReviewResponse.builder()
+                    .summary("AI 서버 연결에 실패했습니다. (임시 응답)")
+                    .complexity(CodeReviewResponse.ComplexityInfo.builder()
+                            .time("O(N)")
+                            .space("O(1)")
+                            .explanation("AI 분석을 수행할 수 없어 기본값을 반환합니다.")
+                            .build())
+                    .algorithm(CodeReviewResponse.AlgorithmInfo.builder()
+                            .patterns(java.util.List.of("Unknown"))
+                            .intuition("AI 분석 서버가 응답하지 않습니다.")
+                            .build())
+                    .build();
         }
     }
 
@@ -51,9 +62,15 @@ public class AiServerClientImpl implements AiServerClient {
                     .body(request)
                     .retrieve()
                     .body(HintResponse.class);
-        } catch (RestClientException e) {
-            log.error("Failed to generate hint: {}", e.getMessage(), e);
-            throw new AiServerException("힌트 생성 요청에 실패했습니다", e);
+        } catch (Exception e) {
+            log.warn("Failed to generate hint: {}. Using fallback.", e.getMessage());
+            return HintResponse.builder()
+                    .level(request.getLevel())
+                    .hint("AI 서버 연결 실패: 스스로 생각해보는 것도 좋은 공부가 됩니다! (임시 힌트)")
+                    .relatedConcepts(java.util.List.of("Algorithm", "Problem Solving"))
+                    .encouragement("서버가 잠시 쉬고 있네요. 화이팅!")
+                    .nextStepSuggestion("서버가 돌아오면 더 좋은 힌트를 드릴게요.")
+                    .build();
         }
     }
 
@@ -68,9 +85,13 @@ public class AiServerClientImpl implements AiServerClient {
                     .body(request)
                     .retrieve()
                     .body(LearningPathResponse.class);
-        } catch (RestClientException e) {
-            log.error("Failed to generate learning path: {}", e.getMessage(), e);
-            throw new AiServerException("학습 경로 생성 요청에 실패했습니다", e);
+        } catch (Exception e) {
+            log.warn("Failed to generate learning path: {}. Using fallback.", e.getMessage());
+            return LearningPathResponse.builder()
+                    .overallAssessment("AI 서버 연결 실패")
+                    .personalizedAdvice("현재 AI 분석을 이용할 수 없습니다.")
+                    .phases(java.util.List.of())
+                    .build();
         }
     }
 
@@ -86,9 +107,13 @@ public class AiServerClientImpl implements AiServerClient {
                     .body(request)
                     .retrieve()
                     .body(CodingStyleResponse.class);
-        } catch (RestClientException e) {
-            log.error("Failed to analyze coding style: {}", e.getMessage(), e);
-            throw new AiServerException("코딩 스타일 분석 요청에 실패했습니다", e);
+        } catch (Exception e) {
+            log.warn("Failed to analyze coding style: {}. Using fallback.", e.getMessage());
+            return CodingStyleResponse.builder()
+                    .mbtiCode("NONE")
+                    .nickname("연결되지 않은 코더")
+                    .summary("AI 서버와 연결할 수 없습니다.")
+                    .build();
         }
     }
 
@@ -103,9 +128,12 @@ public class AiServerClientImpl implements AiServerClient {
                     .body(request)
                     .retrieve()
                     .body(TutorChatResponse.class);
-        } catch (RestClientException e) {
-            log.error("Failed to chat with tutor: {}", e.getMessage(), e);
-            throw new AiServerException("튜터 대화 요청에 실패했습니다", e);
+        } catch (Exception e) {
+            log.warn("Failed to chat with tutor: {}. Using fallback.", e.getMessage());
+            return TutorChatResponse.builder()
+                    .reply("죄송해요, AI 선생님이 잠시 자리를 비웠어요. 다시 시도해주세요.")
+                    .teachingStyle("socratic")
+                    .build();
         }
     }
 }

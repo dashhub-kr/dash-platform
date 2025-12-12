@@ -492,45 +492,8 @@
           </div>
         </section>
       </template>
-
-      <template v-else-if="authChecked && user">
-        <section class="container mx-auto px-6 py-20">
-          <div
-            class="max-w-3xl mx-auto bg-gradient-to-br from-slate-900/60 to-slate-800/30 border border-white/6 rounded-3xl p-12 shadow-xl text-center"
-          >
-            <div class="flex flex-col items-center gap-4">
-              <div class="bg-indigo-700/20 p-4 rounded-full">
-                <ClipboardList :size="48" class="text-indigo-300" />
-              </div>
-              <h2 class="text-3xl md:text-4xl font-extrabold text-white">
-                대시보드
-              </h2>
-              <p class="text-slate-300 max-w-xl">가입된 스터디가 없습니다.</p>
-
-              <div class="mt-6 flex gap-4 justify-center">
-                <button
-                  class="px-5 py-3 rounded-full bg-indigo-600 text-white font-semibold shadow-lg hover:bg-indigo-500 transition"
-                  @click="goToDashboard"
-                >
-                  스터디 찾기
-                </button>
-                <button
-                  @click="goToDashboard"
-                  class="px-5 py-3 rounded-full bg-white/5 text-white border border-white/10 hover:bg-white/10 transition"
-                >
-                  새 스터디 만들기
-                </button>
-              </div>
-
-              <p class="text-xs text-slate-500 mt-4">
-                Tip: GitHub 연동 후 자동 커밋으로 활동이 기록됩니다.
-              </p>
-            </div>
-          </div>
-        </section>
-      </template>
     </main>
-
+    
     <footer class="border-t border-white/5 py-8 bg-slate-950">
       <div class="container mx-auto px-6 text-center text-sm text-slate-500">
         © 2025 DASH. All rights reserved.
@@ -637,7 +600,11 @@ watch(
   authChecked,
   (val) => {
     if (val) {
-      nextTick(() => initReveal());
+      if (user.value) {
+        window.location.href = "/dashboard";
+      } else {
+        nextTick(() => initReveal());
+      }
     }
   },
   { immediate: true }

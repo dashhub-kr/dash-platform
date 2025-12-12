@@ -1,6 +1,8 @@
 package com.ssafy.dash.ai.client.dto;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -10,7 +12,9 @@ import java.util.List;
  * AI 학습 경로 추천 응답 DTO
  */
 @Data
+@Builder
 @NoArgsConstructor
+@AllArgsConstructor
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class LearningPathResponse {
     private String overallAssessment; // 현재 상태 종합 평가
@@ -21,7 +25,9 @@ public class LearningPathResponse {
     private String motivationalMessage; // 동기부여 메시지
 
     @Data
+    @Builder
     @NoArgsConstructor
+    @AllArgsConstructor
     @JsonIgnoreProperties(ignoreUnknown = true)
     public static class LearningPhase {
         private int priority; // 우선순위 (1, 2, 3)

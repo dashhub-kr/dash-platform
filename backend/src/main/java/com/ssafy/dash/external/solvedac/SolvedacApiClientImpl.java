@@ -66,4 +66,18 @@ public class SolvedacApiClientImpl implements SolvedacApiClient {
             throw new SolvedacApiException("태그 통계를 가져올 수 없습니다: " + handle, e);
         }
     }
+
+    @Override
+    public com.ssafy.dash.external.solvedac.dto.Top100Response getTop100Problems(String handle) {
+        try {
+            log.debug("Fetching top 100 problems for handle: {}", handle);
+            return restClient.get()
+                    .uri(baseUrl + "/user/top_100?handle={handle}", handle)
+                    .retrieve()
+                    .body(com.ssafy.dash.external.solvedac.dto.Top100Response.class);
+        } catch (RestClientException e) {
+            log.error("Failed to fetch top 100 problems for handle: {}", handle, e);
+            throw new SolvedacApiException("상위 100개 문제를 가져올 수 없습니다: " + handle, e);
+        }
+    }
 }

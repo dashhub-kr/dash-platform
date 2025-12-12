@@ -63,24 +63,47 @@
 <script setup>
 import { ref, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
-// import { aiApi } from '@/api/ai'; // Assuming this exists or using mocked data for now
+import { aiApi } from '../../api/ai';
+import { useAuth } from '../../composables/useAuth';
 
 const router = useRouter();
+const { user } = useAuth();
 const loading = ref(true);
 const styleResult = ref(null);
 
-onMounted(async () => {
-  // Simulate AI Analysis time
-  setTimeout(() => {
-    loading.value = false;
-    // Mock result for now as per spec visual
-    styleResult.value = {
-      codingStyle: '신중한 모험가 Type',
-      description: '정확성을 최우선으로 하며, 탄탄한 논리력을 바탕으로 문제를 해결합니다.',
-      recommendedTags: ['구현', '그래프 탐색', '자료구조']
-    };
-  }, 3000);
-});
+  onMounted(async () => {
+    if (!user.value) {
+      // 사용자가 아직 로드되지 않은 경우, 대기하거나 리다이렉트합니다.
+      // 보통 라우터 가드나 부모 컴포넌트에서 인증이 처리됩니다.
+      // 사용자가 존재한다고 가정하거나 대기합니다.
+      // 먼저 사용자 존재 여부를 확인합니다.
+    }
+    
+    try {
+       // 인증 컨텍스트에서 userId를 사용합니다.
+       // 사용할 수 없는 경우 모의 ID로 대체합니다 (실제 흐름에서는 발생하지 않아야 함).
+       const userId = user.value?.id || 1; 
+       
+       const res = await aiApi.getCodingStyle(userId);
+       const data = res.data; // CodingStyleResponse
+       
+       styleResult.value = {
+          codingStyle: `${data.nickname} (${data.mbtiCode})`,
+          description: data.summary,
+          recommendedTags: data.strengths?.slice(0, 3) || ['Algorithm', 'Data Structure']
+       };
+    } catch (e) {
+        console.error("AI Analysis failed", e);
+        // 대체 UI 또는 오류 시각화
+        styleResult.value = {
+          codingStyle: '분석 실패',
+          description: 'AI 서버에 연결할 수 없습니다. 나중에 다시 시도해주세요.',
+          recommendedTags: []
+        };
+    } finally {
+        loading.value = false;
+    }
+  });
 
 const nextStep = () => {
   router.push('/onboarding/study');

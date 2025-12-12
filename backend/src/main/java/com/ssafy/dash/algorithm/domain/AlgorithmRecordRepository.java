@@ -14,6 +14,8 @@ public interface AlgorithmRecordRepository {
     List<AlgorithmRecord> findAll();
     
     List<AlgorithmRecord> findByUserId(Long userId);
+
+    List<AlgorithmRecord> findByStudyId(Long studyId);
     
     boolean delete(Long id);
 

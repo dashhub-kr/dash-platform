@@ -26,6 +26,10 @@
     SELECT * FROM algorithm_records WHERE user_id = #{userId} ORDER BY id DESC
   </select>
 
+  <select id="selectByStudyId" resultType="AlgorithmRecord" parameterType="long">
+    SELECT * FROM algorithm_records WHERE study_id = #{studyId} ORDER BY id DESC
+  </select>
+
   <update id="update" parameterType="AlgorithmRecord">
     UPDATE algorithm_records
     SET problem_number = #{problemNumber}, title = #{title}, code = #{code}, language = #{language},
