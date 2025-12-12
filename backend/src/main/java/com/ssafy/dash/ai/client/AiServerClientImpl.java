@@ -4,6 +4,8 @@ import com.ssafy.dash.ai.client.dto.CodeReviewRequest;
 import com.ssafy.dash.ai.client.dto.CodeReviewResponse;
 import com.ssafy.dash.ai.client.dto.HintRequest;
 import com.ssafy.dash.ai.client.dto.HintResponse;
+import com.ssafy.dash.ai.client.dto.LearningPathRequest;
+import com.ssafy.dash.ai.client.dto.LearningPathResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -57,6 +59,23 @@ public class AiServerClientImpl implements AiServerClient {
         } catch (RestClientException e) {
             log.error("Failed to generate hint: {}", e.getMessage(), e);
             throw new AiServerException("힌트 생성 요청에 실패했습니다", e);
+        }
+    }
+
+    @Override
+    public LearningPathResponse generateLearningPath(LearningPathRequest request) {
+        try {
+            log.debug("Requesting learning path for level: {}", request.getCurrentLevel());
+
+            return restClient.post()
+                    .uri(baseUrl + "/learning-path")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .body(request)
+                    .retrieve()
+                    .body(LearningPathResponse.class);
+        } catch (RestClientException e) {
+            log.error("Failed to generate learning path: {}", e.getMessage(), e);
+            throw new AiServerException("학습 경로 생성 요청에 실패했습니다", e);
         }
     }
 }
