@@ -200,5 +200,48 @@ sequenceDiagram
 | **Analysis** | `GET` | `/api/users/{id}/analysis/growth` | 성장 추세 분석 |
 | **Analysis** | `POST` | `/api/users/{id}/analysis/snapshot` | 통계 스냅샷 생성 |
 
-> **Note**: `StudyController` 및 대시보드용 조회 API는 추후 고도화 예정입니다.
+### 4.4 AI API (신규)
+
+| Controller | Method | URL | Description |
+| :--- | :--- | :--- | :--- |
+| **AI** | `POST` | `/api/ai/review` | 코드 분석 요청 |
+| **AI** | `GET` | `/api/ai/review/{algorithmRecordId}` | 분석 결과 조회 |
+| **AI** | `POST` | `/api/ai/hint` | 레벨별 맞춤 힌트 생성 |
+| **AI** | `GET` | `/api/ai/learning-path/{userId}` | AI 개인화 학습 경로 |
+| **AI** | `GET` | `/api/ai/coding-style/{userId}` | MBTI 스타일 코딩 분석 |
+| **AI** | `POST` | `/api/ai/tutor/chat` | 대화형 AI 튜터 |
+
+> **상세 문서**: AI 모듈의 상세 명세는 [AI_MODULE.md](./AI_MODULE.md)를 참고하세요.
+
+---
+
+## 5. AI 도메인 엔티티 (AI Entities)
+
+### 5.1 CodeAnalysisResult (코드 분석 결과)
+
+AI가 분석한 코드 리뷰 결과를 저장합니다.
+
+```mermaid
+erDiagram
+    AlgorithmRecord ||--o| CodeAnalysisResult : "has analysis"
+    
+    CodeAnalysisResult {
+        Long id PK
+        Long algorithmRecordId FK "분석 대상 기록"
+        String summary "분석 요약"
+        String timeComplexity "시간 복잡도"
+        String spaceComplexity "공간 복잡도"
+        String patterns "사용된 패턴 (JSON)"
+        String pitfalls "주의사항 (JSON)"
+        String improvements "개선점 (JSON)"
+        Integer score "점수 (0-100)"
+        DateTime analyzedAt "분석 시간"
+    }
+```
+
+**주요 필드:**
+- `summary`: AI가 생성한 코드 분석 요약
+- `timeComplexity`, `spaceComplexity`: 복잡도 분석 (예: "O(n log n)")
+- `patterns`: 사용된 알고리즘 패턴 (JSON 배열)
+- `score`: 종합 점수 (0-100)
 

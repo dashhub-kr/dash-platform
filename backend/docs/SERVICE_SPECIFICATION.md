@@ -149,7 +149,14 @@ graph TD
     - 태그/클래스별 통계 동기화
     - 사용자 스킬 분석 서비스 (강점/약점/밸런스/난이도/학습경로/성장추세)
     - 9개 분석 API 엔드포인트 구현
-2.  **Phase 2 (Dashboard)**: 웹훅 -> AI 분석 -> 대시보드 카드 시각화 & 반례 찾기.
-3.  **Phase 3 (Economy)**: 도토리 적립(파싱) 및 소비(힌트) 로직 구현.
-4.  **Phase 4 (Playground)**: 2D 맵 에셋 적용, 위치 동기화, 던전 UI 연동.
+2.  **Phase 2 (AI Integration)**: ✅ **완료** - AI 기반 코드 분석 및 튜터링 시스템.
+    - 코드 리뷰 통합 (`POST /api/ai/review`)
+    - 맞춤형 힌트 시스템 (`POST /api/ai/hint`)
+    - AI 개인화 학습 경로 (`GET /api/ai/learning-path/{userId}`)
+    - MBTI 스타일 코딩 분석 (`GET /api/ai/coding-style/{userId}`)
+    - 대화형 AI 튜터 (`POST /api/ai/tutor/chat`)
+    - 상세 문서: [AI_MODULE.md](./AI_MODULE.md)
+3.  **Phase 3 (Dashboard)**: 웹훅 -> AI 분석 -> 대시보드 카드 시각화 & 반례 찾기.
+4.  **Phase 4 (Economy)**: 도토리 적립(파싱) 및 소비(힌트) 로직 구현.
+5.  **Phase 5 (Playground)**: 2D 맵 에셋 적용, 위치 동기화, 던전 UI 연동.
 
