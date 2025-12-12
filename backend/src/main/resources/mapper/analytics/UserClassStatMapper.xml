@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ssafy.dash.analytics.infrastructure.persistence.UserClassStatMapper">
+
+    <insert id="upsert">
+        INSERT INTO user_class_stats 
+            (user_id, class_number, total, total_solved, essentials, essential_solved, decoration)
+        VALUES 
+            (#{userId}, #{classNumber}, #{total}, #{totalSolved}, #{essentials}, #{essentialSolved}, #{decoration})
+        ON DUPLICATE KEY UPDATE
+            total = VALUES(total),
+            total_solved = VALUES(total_solved),
+            essentials = VALUES(essentials),
+            essential_solved = VALUES(essential_solved),
+            decoration = VALUES(decoration),
+            updated_at = CURRENT_TIMESTAMP
+    </insert>
+
+    <select id="findByUserId" resultType="com.ssafy.dash.analytics.domain.UserClassStat">
+        SELECT id, user_id as userId, class_number as classNumber, 
+               total, total_solved as totalSolved, essentials, essential_solved as essentialSolved, 
+               decoration, updated_at as updatedAt
+        FROM user_class_stats
+        WHERE user_id = #{userId}
+        ORDER BY class_number
+    </select>
+
+    <select id="findByUserIdAndClass" resultType="com.ssafy.dash.analytics.domain.UserClassStat">
+        SELECT id, user_id as userId, class_number as classNumber, 
+               total, total_solved as totalSolved, essentials, essential_solved as essentialSolved, 
+               decoration, updated_at as updatedAt
+        FROM user_class_stats
+        WHERE user_id = #{userId} AND class_number = #{classNumber}
+    </select>
+
+    <delete id="deleteByUserId">
+        DELETE FROM user_class_stats WHERE user_id = #{userId}
+    </delete>
+
+</mapper>

@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ssafy.dash.analytics.infrastructure.persistence.UserStatsSnapshotMapper">
+
+    <resultMap id="snapshotResultMap" type="com.ssafy.dash.analytics.domain.UserStatsSnapshot">
+        <id property="id" column="id"/>
+        <result property="userId" column="user_id"/>
+        <result property="snapshotDate" column="snapshot_date"/>
+        <result property="totalSolved" column="total_solved"/>
+        <result property="solvedacTier" column="solvedac_tier"/>
+        <result property="solvedacRating" column="solvedac_rating"/>
+        <result property="solvedacClass" column="solvedac_class"/>
+        <result property="createdAt" column="created_at"/>
+    </resultMap>
+
+    <insert id="insert" parameterType="com.ssafy.dash.analytics.domain.UserStatsSnapshot"
+            useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO user_stats_snapshots 
+            (user_id, snapshot_date, total_solved, solvedac_tier, solvedac_rating, solvedac_class)
+        VALUES 
+            (#{userId}, #{snapshotDate}, #{totalSolved}, #{solvedacTier}, #{solvedacRating}, #{solvedacClass})
+        ON DUPLICATE KEY UPDATE
+            total_solved = VALUES(total_solved),
+            solvedac_tier = VALUES(solvedac_tier),
+            solvedac_rating = VALUES(solvedac_rating),
+            solvedac_class = VALUES(solvedac_class)
+    </insert>
+
+    <select id="findByUserIdAndDate" resultMap="snapshotResultMap">
+        SELECT * FROM user_stats_snapshots
+        WHERE user_id = #{userId} AND snapshot_date = #{snapshotDate}
+    </select>
+
+    <select id="findLatestByUserId" resultMap="snapshotResultMap">
+        SELECT * FROM user_stats_snapshots
+        WHERE user_id = #{userId}
+        ORDER BY snapshot_date DESC
+        LIMIT 1
+    </select>
+
+    <select id="findByUserIdBetweenDates" resultMap="snapshotResultMap">
+        SELECT * FROM user_stats_snapshots
+        WHERE user_id = #{userId}
+          AND snapshot_date BETWEEN #{startDate} AND #{endDate}
+        ORDER BY snapshot_date ASC
+    </select>
+
+    <delete id="deleteOlderThan">
+        DELETE FROM user_stats_snapshots
+        WHERE snapshot_date &lt; #{date}
+    </delete>
+
+</mapper>
