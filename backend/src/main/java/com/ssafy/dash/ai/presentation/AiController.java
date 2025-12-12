@@ -1,6 +1,8 @@
 package com.ssafy.dash.ai.presentation;
 
 import com.ssafy.dash.ai.application.CodeReviewService;
+import com.ssafy.dash.ai.application.HintService;
+import com.ssafy.dash.ai.client.dto.HintResponse;
 import com.ssafy.dash.ai.domain.CodeAnalysisResult;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -11,13 +13,14 @@ import org.springframework.web.bind.annotation.*;
 /**
  * AI 코드 분석 API 컨트롤러
  */
-@Tag(name = "AI Code Review", description = "AI 기반 코드 분석 API")
+@Tag(name = "AI", description = "AI 기반 코드 분석 및 힌트 API")
 @RestController
 @RequestMapping("/api/ai")
 @RequiredArgsConstructor
 public class AiController {
 
     private final CodeReviewService codeReviewService;
+    private final HintService hintService;
 
     @Operation(summary = "코드 분석 요청", description = "알고리즘 풀이 코드를 AI로 분석합니다")
     @PostMapping("/review")
@@ -38,10 +41,28 @@ public class AiController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
+    @Operation(summary = "힌트 요청", description = "문제에 대한 맞춤형 힌트를 생성합니다 (레벨 1: 유형, 2: 접근법, 3: 상세)")
+    @PostMapping("/hint")
+    public ResponseEntity<HintResponse> getHint(@RequestBody HintRequest request) {
+        HintResponse response = hintService.generateHint(
+                request.userId(),
+                request.problemNumber(),
+                request.problemTitle(),
+                request.level());
+        return ResponseEntity.ok(response);
+    }
+
     public record CodeReviewRequest(
             Long algorithmRecordId,
             String code,
             String language,
             String problemNumber) {
+    }
+
+    public record HintRequest(
+            Long userId,
+            String problemNumber,
+            String problemTitle,
+            int level) {
     }
 }

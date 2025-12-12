@@ -2,6 +2,8 @@ package com.ssafy.dash.ai.client;
 
 import com.ssafy.dash.ai.client.dto.CodeReviewRequest;
 import com.ssafy.dash.ai.client.dto.CodeReviewResponse;
+import com.ssafy.dash.ai.client.dto.HintRequest;
+import com.ssafy.dash.ai.client.dto.HintResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -37,6 +39,24 @@ public class AiServerClientImpl implements AiServerClient {
         } catch (RestClientException e) {
             log.error("Failed to analyze code: {}", e.getMessage(), e);
             throw new AiServerException("코드 분석 요청에 실패했습니다", e);
+        }
+    }
+
+    @Override
+    public HintResponse generateHint(HintRequest request) {
+        try {
+            log.debug("Requesting hint for problem: {}, level: {}",
+                    request.getProblemNumber(), request.getLevel());
+
+            return restClient.post()
+                    .uri(baseUrl + "/hint")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .body(request)
+                    .retrieve()
+                    .body(HintResponse.class);
+        } catch (RestClientException e) {
+            log.error("Failed to generate hint: {}", e.getMessage(), e);
+            throw new AiServerException("힌트 생성 요청에 실패했습니다", e);
         }
     }
 }
