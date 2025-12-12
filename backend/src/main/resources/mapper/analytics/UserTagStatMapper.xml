@@ -16,21 +16,12 @@
             updated_at = CURRENT_TIMESTAMP
     </insert>
 
-    <select id="findByUserId" resultType="com.ssafy.dash.analytics.domain.UserTagStat">
-        SELECT id, user_id as userId, tag_key as tagKey, 
-               total, solved, partial, tried, 
-               updated_at as updatedlAt
-        FROM user_tag_stats
-        WHERE user_id = #{userId}
-        ORDER BY solved DESC
+    <select id="findByUserId" resultType="UserTagStat">
+        SELECT * FROM user_tag_stats WHERE user_id = #{userId} ORDER BY solved DESC
     </select>
 
-    <select id="findByUserIdAndTag" resultType="com.ssafy.dash.analytics.domain.UserTagStat">
-        SELECT id, user_id as userId, tag_key as tagKey, 
-               total, solved, partial, tried, 
-               updated_at as updatedAt
-        FROM user_tag_stats
-        WHERE user_id = #{userId} AND tag_key = #{tagKey}
+    <select id="findByUserIdAndTag" resultType="UserTagStat">
+        SELECT * FROM user_tag_stats WHERE user_id = #{userId} AND tag_key = #{tagKey}
     </select>
 
     <delete id="deleteByUserId">

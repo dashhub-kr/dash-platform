@@ -2,157 +2,36 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.ssafy.dash.algorithm.infrastructure.mapper.AlgorithmRecordMapper">
 
-  <resultMap id="AlgorithmRecordResult" type="AlgorithmRecord">
-    <id property="id" column="id" />
-    <result property="userId" column="user_id" />
-    <result property="studyId" column="study_id" />
-    <result property="problemNumber" column="problem_number" />
-    <result property="title" column="title" />
-    <result property="code" column="code" />
-    <result property="language" column="language" />
-    <result property="platform" column="platform" />
-    <result property="difficulty" column="difficulty" />
-    <result property="runtimeMs" column="runtime_ms" />
-    <result property="memoryKb" column="memory_kb" />
-    <result property="repositoryName" column="repository_name" />
-    <result property="filePath" column="file_path" />
-    <result property="commitSha" column="commit_sha" />
-    <result property="commitMessage" column="commit_message" />
-    <result property="committedAt" column="committed_at" />
-    <result property="createdAt" column="created_at" />
-    <result property="updatedAt" column="updated_at" />
-  </resultMap>
-
   <insert id="insert" parameterType="AlgorithmRecord" useGeneratedKeys="true" keyProperty="id">
     INSERT INTO algorithm_records (
-      user_id,
-      study_id,
-      problem_number,
-      title,
-      code,
-      language,
-      platform,
-      difficulty,
-      runtime_ms,
-      memory_kb,
-      repository_name,
-      file_path,
-      commit_sha,
-      commit_message,
-      committed_at,
-      created_at,
-      updated_at
-    )
-    VALUES (
-      #{userId},
-      #{studyId},
-      #{problemNumber},
-      #{title},
-      #{code},
-      #{language},
-      #{platform},
-      #{difficulty},
-      #{runtimeMs},
-      #{memoryKb},
-      #{repositoryName},
-      #{filePath},
-      #{commitSha},
-      #{commitMessage},
-      #{committedAt},
-      #{createdAt},
-      #{updatedAt}
+      user_id, study_id, problem_number, title, code, language, platform, difficulty,
+      runtime_ms, memory_kb, repository_name, file_path, commit_sha, commit_message,
+      committed_at, created_at, updated_at
+    ) VALUES (
+      #{userId}, #{studyId}, #{problemNumber}, #{title}, #{code}, #{language}, #{platform}, #{difficulty},
+      #{runtimeMs}, #{memoryKb}, #{repositoryName}, #{filePath}, #{commitSha}, #{commitMessage},
+      #{committedAt}, #{createdAt}, #{updatedAt}
     )
   </insert>
 
-  <select id="selectById" resultMap="AlgorithmRecordResult" parameterType="long">
-    SELECT 
-      id,
-      user_id,
-      study_id,
-      problem_number,
-      title,
-      code,
-      language,
-      platform,
-      difficulty,
-      runtime_ms,
-      memory_kb,
-      repository_name,
-      file_path,
-      commit_sha,
-      commit_message,
-      committed_at,
-      created_at,
-      updated_at
-    FROM algorithm_records 
-    WHERE id = #{id}
+  <select id="selectById" resultType="AlgorithmRecord" parameterType="long">
+    SELECT * FROM algorithm_records WHERE id = #{id}
   </select>
 
-  <select id="selectAll" resultMap="AlgorithmRecordResult">
-    SELECT 
-      id,
-      user_id,
-      study_id,
-      problem_number,
-      title,
-      code,
-      language,
-      platform,
-      difficulty,
-      runtime_ms,
-      memory_kb,
-      repository_name,
-      file_path,
-      commit_sha,
-      commit_message,
-      committed_at,
-      created_at,
-      updated_at
-    FROM algorithm_records 
-    ORDER BY id DESC
+  <select id="selectAll" resultType="AlgorithmRecord">
+    SELECT * FROM algorithm_records ORDER BY id DESC
   </select>
 
-  <select id="selectByUserId" resultMap="AlgorithmRecordResult" parameterType="long">
-    SELECT 
-      id,
-      user_id,
-      study_id,
-      problem_number,
-      title,
-      code,
-      language,
-      platform,
-      difficulty,
-      runtime_ms,
-      memory_kb,
-      repository_name,
-      file_path,
-      commit_sha,
-      commit_message,
-      committed_at,
-      created_at,
-      updated_at
-    FROM algorithm_records 
-    WHERE user_id = #{userId}
-    ORDER BY id DESC
+  <select id="selectByUserId" resultType="AlgorithmRecord" parameterType="long">
+    SELECT * FROM algorithm_records WHERE user_id = #{userId} ORDER BY id DESC
   </select>
 
   <update id="update" parameterType="AlgorithmRecord">
     UPDATE algorithm_records
-    SET problem_number = #{problemNumber},
-        title = #{title},
-        code = #{code},
-        language = #{language},
-        platform = #{platform},
-        difficulty = #{difficulty},
-        runtime_ms = #{runtimeMs},
-        memory_kb = #{memoryKb},
-        repository_name = #{repositoryName},
-        file_path = #{filePath},
-        commit_sha = #{commitSha},
-        commit_message = #{commitMessage},
-        committed_at = #{committedAt},
-        updated_at = #{updatedAt}
+    SET problem_number = #{problemNumber}, title = #{title}, code = #{code}, language = #{language},
+        platform = #{platform}, difficulty = #{difficulty}, runtime_ms = #{runtimeMs}, memory_kb = #{memoryKb},
+        repository_name = #{repositoryName}, file_path = #{filePath}, commit_sha = #{commitSha},
+        commit_message = #{commitMessage}, committed_at = #{committedAt}, updated_at = #{updatedAt}
     WHERE id = #{id}
   </update>
 

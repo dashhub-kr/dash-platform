@@ -3,7 +3,7 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.ssafy.dash.analytics.infrastructure.persistence.AnalyticsMapper">
 
-    <select id="findFamilyScoresByUserId" resultType="com.ssafy.dash.analytics.application.dto.FamilyScoreDto">
+    <select id="findFamilyScoresByUserId" resultType="FamilyScoreDto">
         SELECT
             t.family_id as familyId,
             tf.name as familyName,
@@ -20,7 +20,7 @@
         ORDER BY tf.order_index
     </select>
 
-    <select id="getUserCoreCoverage" resultType="com.ssafy.dash.analytics.application.dto.TagCoverageDto">
+    <select id="getUserCoreCoverage" resultType="TagCoverageDto">
         SELECT
             (SELECT COUNT(*) FROM tags WHERE is_core = true) as totalCoreTags,
             COUNT(DISTINCT CASE WHEN user_tags.tag_key IS NOT NULL THEN user_tags.tag_key END) as solvedCoreTags,

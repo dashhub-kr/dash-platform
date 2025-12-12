@@ -17,21 +17,12 @@
             updated_at = CURRENT_TIMESTAMP
     </insert>
 
-    <select id="findByUserId" resultType="com.ssafy.dash.analytics.domain.UserClassStat">
-        SELECT id, user_id as userId, class_number as classNumber, 
-               total, total_solved as totalSolved, essentials, essential_solved as essentialSolved, 
-               decoration, updated_at as updatedAt
-        FROM user_class_stats
-        WHERE user_id = #{userId}
-        ORDER BY class_number
+    <select id="findByUserId" resultType="UserClassStat">
+        SELECT * FROM user_class_stats WHERE user_id = #{userId} ORDER BY class_number
     </select>
 
-    <select id="findByUserIdAndClass" resultType="com.ssafy.dash.analytics.domain.UserClassStat">
-        SELECT id, user_id as userId, class_number as classNumber, 
-               total, total_solved as totalSolved, essentials, essential_solved as essentialSolved, 
-               decoration, updated_at as updatedAt
-        FROM user_class_stats
-        WHERE user_id = #{userId} AND class_number = #{classNumber}
+    <select id="findByUserIdAndClass" resultType="UserClassStat">
+        SELECT * FROM user_class_stats WHERE user_id = #{userId} AND class_number = #{classNumber}
     </select>
 
     <delete id="deleteByUserId">

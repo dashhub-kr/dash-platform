@@ -24,10 +24,9 @@
         DELETE FROM problem_tags WHERE problem_number = #{problemNumber}
     </delete>
 
-    <select id="findProblemByNumber" resultType="com.ssafy.dash.problem.domain.Problem">
+    <select id="findProblemByNumber" resultType="Problem">
         SELECT problem_number, title, level, class as problemClass, essential, sprout
-        FROM problems
-        WHERE problem_number = #{problemNumber}
+        FROM problems WHERE problem_number = #{problemNumber}
     </select>
 
     <select id="findTagsByProblemNumber" resultType="string">

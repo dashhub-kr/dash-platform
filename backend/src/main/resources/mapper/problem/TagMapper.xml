@@ -23,33 +23,24 @@
         display_names = VALUES(display_names)
     </insert>
 
-    <select id="findFamilyByKey" resultType="com.ssafy.dash.problem.domain.TagFamily">
-        SELECT id, family_key, name, order_index
-        FROM tag_families
-        WHERE family_key = #{familyKey}
+    <select id="findFamilyByKey" resultType="TagFamily">
+        SELECT * FROM tag_families WHERE family_key = #{familyKey}
     </select>
     
-    <select id="findAllFamilies" resultType="com.ssafy.dash.problem.domain.TagFamily">
-        SELECT id, family_key, name, order_index
-        FROM tag_families
-        ORDER BY order_index
+    <select id="findAllFamilies" resultType="TagFamily">
+        SELECT * FROM tag_families ORDER BY order_index
     </select>
 
-    <select id="findTagByKey" resultType="com.ssafy.dash.problem.domain.Tag">
-        SELECT id, tag_key, boj_tag_id, family_id, parent_tag_key, importance_tier, weight, is_core, display_names
-        FROM tags
-        WHERE tag_key = #{key}
+    <select id="findTagByKey" resultType="Tag">
+        SELECT * FROM tags WHERE tag_key = #{key}
     </select>
 
-    <select id="findAllTags" resultType="com.ssafy.dash.problem.domain.Tag">
-        SELECT id, tag_key, boj_tag_id, family_id, parent_tag_key, importance_tier, weight, is_core, display_names
-        FROM tags
+    <select id="findAllTags" resultType="Tag">
+        SELECT * FROM tags
     </select>
 
-    <select id="findCoreTagsByFamilyId" resultType="com.ssafy.dash.problem.domain.Tag">
-        SELECT id, tag_key, boj_tag_id, family_id, parent_tag_key, importance_tier, weight, is_core, display_names
-        FROM tags
-        WHERE family_id = #{familyId} AND is_core = true
+    <select id="findCoreTagsByFamilyId" resultType="Tag">
+        SELECT * FROM tags WHERE family_id = #{familyId} AND is_core = true
     </select>
 
     <update id="updateTagMetadata">
