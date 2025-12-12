@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.ssafy.dash.ai.infrastructure.TutorConversationMapper">
+
+    <resultMap id="conversationResultMap" type="com.ssafy.dash.ai.domain.TutorConversation">
+        <id property="id" column="id"/>
+        <result property="userId" column="user_id"/>
+        <result property="sessionId" column="session_id"/>
+        <result property="role" column="role"/>
+        <result property="content" column="content"/>
+        <result property="problemNumber" column="problem_number"/>
+        <result property="createdAt" column="created_at"/>
+    </resultMap>
+
+    <!-- 대화 메시지 저장 -->
+    <insert id="insert" parameterType="com.ssafy.dash.ai.domain.TutorConversation" 
+            useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO tutor_conversation (user_id, session_id, role, content, problem_number)
+        VALUES (#{userId}, #{sessionId}, #{role}, #{content}, #{problemNumber})
+    </insert>
+
+    <!-- 세션의 최근 대화 조회 (오래된 순으로 정렬) -->
+    <select id="findRecentBySession" resultMap="conversationResultMap">
+        SELECT * FROM (
+            SELECT * FROM tutor_conversation
+            WHERE user_id = #{userId} AND session_id = #{sessionId}
+            ORDER BY created_at DESC
+            LIMIT #{limit}
+        ) AS recent
+        ORDER BY created_at ASC
+    </select>
+
+    <!-- 사용자의 세션 목록 조회 (최근 30일) -->
+    <select id="findSessionsByUser" resultType="String">
+        SELECT DISTINCT session_id
+        FROM tutor_conversation
+        WHERE user_id = #{userId}
+          AND created_at > DATE_SUB(NOW(), INTERVAL 30 DAY)
+        ORDER BY MAX(created_at) DESC
+    </select>
+
+    <!-- 세션의 마지막 활동 시간 조회 -->
+    <select id="findLastActivityBySession" resultType="java.time.LocalDateTime">
+        SELECT MAX(created_at)
+        FROM tutor_conversation
+        WHERE user_id = #{userId} AND session_id = #{sessionId}
+    </select>
+
+    <!-- 90일 이상 된 대화 삭제 -->
+    <delete id="deleteOldConversations">
+        DELETE FROM tutor_conversation
+        WHERE created_at &lt; DATE_SUB(NOW(), INTERVAL #{daysOld} DAY)
+    </delete>
+
+</mapper>

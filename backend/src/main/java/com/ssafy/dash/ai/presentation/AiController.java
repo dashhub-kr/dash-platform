@@ -70,17 +70,20 @@ public class AiController {
                 return ResponseEntity.ok(response);
         }
 
-        @Operation(summary = "튜터 대화", description = "대화형 AI 튜터와 채팅합니다")
+        @Operation(summary = "튜터 대화 (세션 기반)", description = "DB에 대화 저장. sessionId가 null이면 새 세션 생성, 응답에 sessionId 포함")
         @PostMapping("/tutor/chat")
-        public ResponseEntity<TutorChatResponse> chat(@RequestBody TutorChatRequestDto request) {
-                TutorChatResponse response = tutorService.chat(
+        public ResponseEntity<TutorSessionResponseDto> chat(@RequestBody TutorChatRequestDto request) {
+                TutorService.TutorSessionResponse response = tutorService.chat(
                                 request.userId(),
+                                request.sessionId(),
                                 request.message(),
-                                request.history(),
                                 request.problemNumber(),
                                 request.code());
-                return ResponseEntity.ok(response);
+
+                return ResponseEntity.ok(TutorSessionResponseDto.from(response));
         }
+
+        // === DTOs ===
 
         public record CodeReviewRequest(
                         Long algorithmRecordId,
@@ -98,9 +101,28 @@ public class AiController {
 
         public record TutorChatRequestDto(
                         Long userId,
+                        String sessionId, // nullable - 새 세션이면 null
                         String message,
-                        List<TutorChatRequest.ChatMessage> history,
                         String problemNumber,
                         String code) {
+        }
+
+        public record TutorSessionResponseDto(
+                        String sessionId,
+                        String reply,
+                        String teachingStyle,
+                        List<String> followUpQuestions,
+                        String conceptExplanation,
+                        String encouragement) {
+
+                public static TutorSessionResponseDto from(TutorService.TutorSessionResponse response) {
+                        return new TutorSessionResponseDto(
+                                        response.getSessionId(),
+                                        response.getReply(),
+                                        response.getTeachingStyle(),
+                                        response.getFollowUpQuestions(),
+                                        response.getConceptExplanation(),
+                                        response.getEncouragement());
+                }
         }
 }
