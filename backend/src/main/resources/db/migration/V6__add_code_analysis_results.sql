@@ -14,8 +14,7 @@ CREATE TABLE IF NOT EXISTS code_analysis_results (
     refactor_code TEXT,
     refactor_explanation TEXT,
     score INT,
-    analyzed_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (algorithm_record_id) REFERENCES algorithm_records(id) ON DELETE CASCADE
+    analyzed_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
-CREATE INDEX idx_car_algorithm_record ON code_analysis_results(algorithm_record_id);
+-- Index handled by unique constraint

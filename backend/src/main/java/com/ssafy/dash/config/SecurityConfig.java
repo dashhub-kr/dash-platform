@@ -46,8 +46,10 @@ public class SecurityConfig {
                                                                 "/actuator/health",
                                                                 "/actuator/health/**",
                                                                 "/api/users/*/solvedac/**", // Solved.ac API endpoints
-                                                                "/api/users/*/analysis/**" // Analysis API endpoints for
-                                                                                           // testing
+                                                                "/api/users/*/analysis/**", // Analysis API endpoints
+                                                                                            // for
+                                                                                            // testing
+                                                                "/api/ai/**" // AI endpoints for testing
                                                 ).permitAll()
                                                 .anyRequest().authenticated())
                                 .exceptionHandling(exception -> exception
