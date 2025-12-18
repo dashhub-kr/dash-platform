@@ -58,7 +58,14 @@ public class SecurityConfig {
                                 .oauth2Login(oauth2 -> oauth2
                                                 .userInfoEndpoint(userInfo -> userInfo
                                                                 .userService(customOAuth2UserService))
-                                                .defaultSuccessUrl("http://localhost:5173/oauth2/redirect", true));
+                                                .defaultSuccessUrl("http://localhost:5173/oauth2/redirect", true))
+                                .logout(logout -> logout
+                                                .logoutUrl("/logout")
+                                                .invalidateHttpSession(true)
+                                                .deleteCookies("JSESSIONID")
+                                                .logoutSuccessHandler((request, response, authentication) -> {
+                                                        response.setStatus(200);
+                                                }));
 
                 return http.build();
         }
