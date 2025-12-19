@@ -48,4 +48,19 @@ public class DashboardController {
 
         return ResponseEntity.ok(records);
     }
+
+    @GetMapping("/heatmap")
+    public ResponseEntity<List<com.ssafy.dash.dashboard.application.dto.result.HeatmapItem>> getHeatmap(
+            @AuthenticationPrincipal CustomOAuth2User oauthUser) {
+        
+        Long userId = oauthUser.getUserId();
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new UserNotFoundException(userId));
+
+        Long studyId = user.getStudyId();
+        
+        var heatmap = algorithmRecordService.getHeatmap(userId, studyId);
+        
+        return ResponseEntity.ok(heatmap);
+    }
 }

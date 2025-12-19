@@ -13,7 +13,10 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import com.ssafy.dash.dashboard.application.dto.result.HeatmapItem;
+import java.util.Map;
 import java.util.stream.Collectors;
+
 
 @Service
 public class AlgorithmRecordService {
@@ -100,6 +103,39 @@ public class AlgorithmRecordService {
         if (!deleted) {
             throw new AlgorithmRecordNotFoundException(id);
         }
+    }
+
+    @Transactional(readOnly = true)
+    public List<HeatmapItem> getHeatmap(Long userId, Long studyId) {
+        List<AlgorithmRecord> records;
+        if (studyId != null) {
+            records = algorithmRecordRepository.findByStudyId(studyId);
+        } else {
+            records = algorithmRecordRepository.findByUserId(userId);
+        }
+
+        // Group by Date (YYYY-MM-DD)
+        Map<String, List<AlgorithmRecord>> groupedByDate = records.stream()
+                .collect(Collectors.groupingBy(record -> 
+                    record.getCommittedAt().toLocalDate().toString()
+                ));
+
+        return groupedByDate.entrySet().stream()
+                .map(entry -> {
+                    String date = entry.getKey();
+                    List<AlgorithmRecord> dailyRecords = entry.getValue();
+                    Long count = (long) dailyRecords.size();
+                    
+                    List<String> contributors = dailyRecords.stream()
+                            .map(AlgorithmRecord::getUsername)
+                            .filter(java.util.Objects::nonNull)
+                            .distinct()
+                            .collect(Collectors.toList());
+
+                    return HeatmapItem.of(date, count, contributors);
+                })
+                .sorted((a, b) -> a.getDate().compareTo(b.getDate()))
+                .collect(Collectors.toList());
     }
 
 }
