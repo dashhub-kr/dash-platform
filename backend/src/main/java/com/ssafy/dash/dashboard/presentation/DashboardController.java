@@ -28,20 +28,22 @@ public class DashboardController {
     @GetMapping("/records")
     public ResponseEntity<List<AlgorithmRecordResult>> getDashboardRecords(
             @AuthenticationPrincipal CustomOAuth2User oauthUser) {
-        
+
         Long userId = oauthUser.getUserId();
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new UserNotFoundException(userId));
 
         Long studyId = user.getStudyId();
-        
+
         List<AlgorithmRecordResult> records;
         if (studyId != null) {
             log.info("Fetching dashboard records for studyId: {}", studyId);
             records = algorithmRecordService.findByStudyId(studyId);
+            log.info("Found {} records for studyId: {}", records.size(), studyId);
         } else {
             log.info("User {} has no study, fetching own records only", userId);
             records = algorithmRecordService.findByUserId(userId);
+            log.info("Found {} records for userId: {}", records.size(), userId);
         }
 
         return ResponseEntity.ok(records);

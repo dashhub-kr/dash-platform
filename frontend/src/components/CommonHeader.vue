@@ -12,7 +12,7 @@
             @click="goHome"
             aria-label="홈으로 이동"
           >
-            <img src="/icons/icon-128.png" alt="Dash Logo" class="w-8 h-8 rounded-lg shadow-md group-hover:scale-105 transition-transform" />
+            <img src="/icons/icon-128.png" alt="Dash Logo" class="w-8 h-8 group-hover:scale-105 transition-transform" />
             <span
               class="text-xl font-bold text-slate-800 tracking-tight group-hover:text-indigo-600 transition-colors"
               >Dash</span
@@ -28,48 +28,49 @@
         <!-- 비로그인 시 랜딩 페이지 네비게이션 -->
         <nav
           v-if="authChecked && !user"
-          class="hidden sm:flex items-center gap-1 pointer-events-auto bg-slate-100/50 p-1 rounded-full border border-slate-200/50"
+          class="hidden sm:flex items-center gap-6 pointer-events-auto"
         >
           <button
             @click.prevent="$emit('scroll', 'hero')"
-            class="px-4 py-1.5 rounded-full text-sm font-bold text-slate-500 hover:bg-white hover:text-slate-800 hover:shadow-sm transition-all"
+            class="text-sm font-bold text-slate-500 hover:text-indigo-600 transition-colors"
           >
             홈
           </button>
           <button
             @click.prevent="$emit('scroll', 'features')"
-            class="px-4 py-1.5 rounded-full text-sm font-bold text-slate-500 hover:bg-white hover:text-slate-800 hover:shadow-sm transition-all"
+            class="text-sm font-bold text-slate-500 hover:text-indigo-600 transition-colors"
           >
             주요 기능
           </button>
           <button
             @click.prevent="$emit('scroll', 'core')"
-            class="px-4 py-1.5 rounded-full text-sm font-bold text-slate-500 hover:bg-white hover:text-slate-800 hover:shadow-sm transition-all"
+            class="text-sm font-bold text-slate-500 hover:text-indigo-600 transition-colors"
           >
             핵심 기능
           </button>
         </nav>
 
         <!-- 로그인 시 앱 네비게이션 -->
+        <!-- 로그인 시 앱 네비게이션 -->
         <nav
           v-else-if="authChecked && user"
-          class="hidden sm:flex items-center gap-1 pointer-events-auto"
+          class="hidden sm:flex items-center gap-6 pointer-events-auto"
         >
           <router-link
             to="/map"
-            class="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-bold text-slate-600 hover:bg-indigo-50 hover:text-indigo-600 transition-all"
-            active-class="bg-indigo-50 text-indigo-600"
+            class="flex items-center text-slate-500 hover:text-indigo-600 transition-colors"
+            active-class="text-indigo-600"
+            title="월드 맵"
           >
-            <Map :size="16" />
-            월드 맵
+            <Map :size="24" />
           </router-link>
           <router-link
             to="/simcity"
-            class="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-bold text-slate-600 hover:bg-indigo-50 hover:text-indigo-600 transition-all"
-            active-class="bg-indigo-50 text-indigo-600"
+            class="flex items-center text-slate-500 hover:text-indigo-600 transition-colors"
+            active-class="text-indigo-600"
+            title="심시티"
           >
-            <LayoutGrid :size="16" />
-            심시티
+            <LayoutGrid :size="24" />
           </router-link>
         </nav>
       </div>
@@ -82,19 +83,13 @@
               class="flex items-center gap-3 min-w-0 relative"
               ref="profileRef"
             >
-              <div class="flex items-center gap-3 min-w-0 bg-slate-50 pl-1 pr-3 py-1 rounded-full border border-slate-100 cursor-pointer hover:border-slate-300 transition-colors" @click.stop="toggleProfileMenu">
-                <div
-                  class="w-8 h-8 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-600 font-bold text-sm"
-                >
-                  {{ userInitial }}
-                </div>
-                <div class="flex flex-col leading-tight min-w-0 text-left">
-                  <span
-                    class="text-sm text-slate-700 font-bold max-w-[100px] sm:max-w-[140px] truncate"
-                    >{{ user.username || user.email }}</span
-                  >
-                </div>
-                 <ChevronDown :size="14" class="text-slate-400" />
+              <!-- Profile Avatar Only -->
+              <div 
+                class="w-9 h-9 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-600 font-bold text-sm cursor-pointer hover:ring-2 hover:ring-indigo-100 transition-all"
+                @click.stop="toggleProfileMenu"
+                :title="user.username || user.email"
+              >
+                {{ userInitial }}
               </div>
 
               <transition name="slide-down">
@@ -136,7 +131,7 @@
 
 <script setup>
 import { ref, computed, onMounted, onBeforeUnmount } from "vue";
-import { ChevronDown, Github, Map, LayoutGrid } from "lucide-vue-next";
+import { Github, Map, LayoutGrid } from "lucide-vue-next";
 
 import { useAuth } from "../composables/useAuth";
 import { authApi } from "../api/auth";

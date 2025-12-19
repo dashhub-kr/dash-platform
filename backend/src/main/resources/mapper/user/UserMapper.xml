@@ -23,7 +23,10 @@
   <update id="update" parameterType="User">
     UPDATE users
     SET username = #{username}, email = #{email}, provider = #{provider}, 
-        provider_id = #{providerId}, avatar_url = #{avatarUrl}, study_id = #{studyId}
+        provider_id = #{providerId}, avatar_url = #{avatarUrl}, study_id = #{studyId},
+        solvedac_handle = #{solvedacHandle}, solvedac_tier = #{solvedacTier},
+        solvedac_rating = #{solvedacRating}, solvedac_class = #{solvedacClass},
+        stats_last_synced_at = #{statsLastSyncedAt}
     WHERE id = #{id} AND deleted_at IS NULL
   </update>
 

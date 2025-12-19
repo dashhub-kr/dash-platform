@@ -16,4 +16,8 @@ export const aiApi = {
 
   // 튜터 채팅
   chat: (request) => http.post('/ai/tutor/chat', request),
+
+  // Solved.ac 통계
+  getTagStats: (userId, limit = 10) => http.get(`/users/${userId}/solvedac/stats/tags?limit=${limit}`),
+  getClassStats: (userId) => http.get(`/users/${userId}/solvedac/stats/classes`),
 };

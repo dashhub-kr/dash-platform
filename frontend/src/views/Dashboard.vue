@@ -18,7 +18,57 @@
         <div v-for="i in 6" :key="i" class="h-64 rounded-3xl bg-white shadow-sm border border-slate-100 animate-pulse"></div>
       </div>
 
-      <div v-else-if="records.length === 0" class="flex flex-col items-center justify-center py-20 bg-white rounded-3xl border border-dashed border-slate-300">
+      <!-- Stats Overview -->
+      <div v-if="!loading" class="mb-10 animate-fade-in-up">
+        <div class="bg-white rounded-3xl p-8 shadow-sm border border-slate-100 relative overflow-hidden">
+             <div class="flex items-center justify-between mb-6">
+                <h2 class="text-xl font-bold text-slate-800 flex items-center gap-2">
+                    <TrendingUp class="text-indigo-500" />
+                    스터디 활동 로그
+                </h2>
+                <div class="flex items-center gap-2 text-xs font-medium text-slate-400">
+                    <span>Less</span>
+                    <div class="flex gap-1">
+                        <div class="w-3 h-3 rounded-sm bg-slate-100"></div>
+                        <div class="w-3 h-3 rounded-sm bg-indigo-200"></div>
+                        <div class="w-3 h-3 rounded-sm bg-indigo-400"></div>
+                        <div class="w-3 h-3 rounded-sm bg-indigo-600"></div>
+                        <div class="w-3 h-3 rounded-sm bg-indigo-800"></div>
+                    </div>
+                    <span>More</span>
+                </div>
+             </div>
+             
+             <!-- Heatmap (Grass) -->
+             <div class="overflow-x-auto pb-2">
+                <div class="flex gap-[3px] min-w-max">
+                    <div v-for="(week, wIdx) in heatmapWeeks" :key="wIdx" class="flex flex-col gap-[3px]">
+                        <div 
+                            v-for="(day, dIdx) in week" 
+                            :key="dIdx"
+                            class="w-3 h-3 rounded-[2px] transition-all relative group cursor-pointer"
+                            :class="day.colorClass"
+                        >
+                            <div class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 hidden group-hover:block z-20 min-w-max pointer-events-none">
+                                <div class="bg-slate-800 text-white text-xs rounded-lg py-2 px-3 shadow-xl flex flex-col items-center gap-1">
+                                    <span class="font-bold text-slate-200">{{ day.dateFormatted }}</span>
+                                    <span class="font-bold">{{ day.count }} solutions</span>
+                                    <div v-if="day.count > 0" class="flex flex-wrap gap-1 max-w-[150px] justify-center mt-1 border-t border-slate-700 pt-1">
+                                        <span v-for="name in day.contributors" :key="name" class="text-[10px] bg-slate-700 px-1.5 py-0.5 rounded text-indigo-300">
+                                            {{ name }}
+                                        </span>
+                                    </div>
+                                </div>
+                                <div class="w-2 h-2 bg-slate-800 transform rotate-45 absolute -bottom-1 left-1/2 -translate-x-1/2"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+             </div>
+        </div>
+      </div>
+
+      <div v-if="records.length === 0 && !loading" class="flex flex-col items-center justify-center py-20 bg-white rounded-3xl border border-dashed border-slate-300">
         <div class="w-20 h-20 bg-indigo-50 rounded-full flex items-center justify-center mb-6">
           <Code2 :size="40" class="text-indigo-400" />
         </div>
@@ -131,31 +181,81 @@
             </div>
 
             <!-- Review Data -->
-            <div v-else-if="modalType === 'review' && modalData" class="space-y-8">
+            <div v-else-if="modalType === 'review' && modalData" class="space-y-6">
+                 <!-- Summary -->
                  <div class="bg-indigo-50/50 p-6 rounded-3xl border border-indigo-100">
-                    <h4 class="text-sm font-bold text-indigo-900 uppercase tracking-wide mb-3">Analysis Summary</h4>
-                    <p class="text-slate-700 leading-relaxed text-lg">{{ modalData.summary }}</p>
+                    <h4 class="text-sm font-bold text-indigo-900 uppercase tracking-wide mb-3">📝 분석 요약</h4>
+                    <p class="text-slate-700 leading-relaxed">{{ modalData.summary }}</p>
                  </div>
 
+                 <!-- Problem Info -->
+                 <div v-if="modalData.problem" class="bg-slate-50 p-5 rounded-2xl border border-slate-100">
+                    <h4 class="text-sm font-bold text-slate-800 uppercase tracking-wide mb-3">🎯 문제 분석</h4>
+                    <p class="text-slate-600 mb-2">{{ modalData.problem.description }}</p>
+                    <div v-if="modalData.problem.isGuess" class="text-xs text-amber-600 bg-amber-50 px-2 py-1 rounded inline-block">
+                      ⚠️ {{ modalData.problem.guessReason }}
+                    </div>
+                 </div>
+
+                 <!-- Algorithm Patterns -->
+                 <div v-if="modalData.algorithm?.patterns?.length" class="bg-purple-50 p-5 rounded-2xl border border-purple-100">
+                    <h4 class="text-sm font-bold text-purple-800 uppercase tracking-wide mb-3">🧩 알고리즘 패턴</h4>
+                    <div class="flex flex-wrap gap-2 mb-3">
+                      <span v-for="(pattern, idx) in modalData.algorithm.patterns" :key="idx" 
+                            class="px-3 py-1 bg-purple-100 text-purple-700 rounded-full text-sm font-medium">
+                        {{ pattern }}
+                      </span>
+                    </div>
+                    <p v-if="modalData.algorithm.intuition" class="text-slate-600 text-sm">{{ modalData.algorithm.intuition }}</p>
+                 </div>
+
+                 <!-- Complexity -->
                  <div class="grid grid-cols-2 gap-4">
                      <div class="bg-white p-5 rounded-2xl border border-slate-100 shadow-sm">
-                         <span class="text-xs font-bold text-slate-400 uppercase">Time Complexity</span>
-                         <div class="text-2xl font-black text-slate-800 mt-1">{{ modalData.complexity?.time || '-' }}</div>
+                         <span class="text-xs font-bold text-slate-400 uppercase">⏱️ Time</span>
+                         <div class="text-xl font-black text-slate-800 mt-1">{{ modalData.complexity?.time || '-' }}</div>
                      </div>
                      <div class="bg-white p-5 rounded-2xl border border-slate-100 shadow-sm">
-                         <span class="text-xs font-bold text-slate-400 uppercase">Space Complexity</span>
-                         <div class="text-2xl font-black text-slate-800 mt-1">{{ modalData.complexity?.space || '-' }}</div>
+                         <span class="text-xs font-bold text-slate-400 uppercase">💾 Space</span>
+                         <div class="text-xl font-black text-slate-800 mt-1">{{ modalData.complexity?.space || '-' }}</div>
                      </div>
                  </div>
 
-                 <div>
+                 <!-- Key Code Blocks -->
+                 <div v-if="modalData.keyBlocks?.length">
+                     <h4 class="flex items-center gap-2 text-lg font-bold text-slate-800 mb-4">
+                         💡 핵심 코드 블록
+                     </h4>
+                     <div class="space-y-3">
+                         <div v-for="(block, idx) in modalData.keyBlocks" :key="idx" class="bg-slate-900 rounded-xl overflow-hidden">
+                             <pre class="p-4 text-sm text-green-400 overflow-x-auto"><code>{{ block.code }}</code></pre>
+                             <div class="px-4 pb-3 text-slate-400 text-sm">{{ block.explanation }}</div>
+                         </div>
+                     </div>
+                 </div>
+
+                 <!-- Pitfalls -->
+                 <div v-if="modalData.pitfalls?.items?.length">
+                     <h4 class="flex items-center gap-2 text-lg font-bold text-red-600 mb-4">
+                         ⚠️ 주의할 점
+                     </h4>
+                     <ul class="space-y-2">
+                         <li v-for="(item, idx) in modalData.pitfalls.items" :key="idx" class="flex items-start gap-3 bg-red-50 p-3 rounded-xl border border-red-100">
+                             <div class="w-1.5 h-1.5 rounded-full bg-red-400 mt-2 shrink-0"></div>
+                             <span class="text-slate-700 text-sm">{{ item }}</span>
+                         </li>
+                     </ul>
+                 </div>
+
+                 <!-- Improvements -->
+                 <div v-if="modalData.pitfalls?.improvements?.length">
                      <h4 class="flex items-center gap-2 text-lg font-bold text-slate-800 mb-4">
                          <TrendingUp class="text-green-500" /> 개선 포인트
                      </h4>
-                     <ul class="space-y-3">
-                         <li v-for="(item, idx) in (modalData.pitfalls?.improvements || [])" :key="idx" class="flex items-start gap-3 bg-slate-50 p-4 rounded-xl">
-                             <div class="w-1.5 h-1.5 rounded-full bg-slate-400 mt-2 shrink-0"></div>
-                             <span class="text-slate-600">{{ item }}</span>
+                     <ul class="space-y-2">
+                         <li v-for="(item, idx) in modalData.pitfalls.improvements" :key="idx" class="flex items-start gap-3 bg-green-50 p-3 rounded-xl border border-green-100">
+                             <div class="w-1.5 h-1.5 rounded-full bg-green-400 mt-2 shrink-0"></div>
+                             <span class="text-slate-700 text-sm">{{ item }}</span>
                          </li>
                      </ul>
                  </div>
@@ -194,8 +294,7 @@ import {
   X,
   TrendingUp,
   LayoutGrid,
-  Youtube,
-  Map
+  Youtube
 } from 'lucide-vue-next';
 
 const records = ref([]);
@@ -207,16 +306,85 @@ const modalTitle = ref('');
 const modalLoading = ref(false);
 const modalData = ref(null);
 
+const heatmapWeeks = ref([]);
+
 onMounted(async () => {
   try {
-    const res = await dashboardApi.getRecords();
-    records.value = res.data;
+    // Fetch records - this should always work
+    const recordsRes = await dashboardApi.getRecords();
+    console.log('Records data:', recordsRes.data);
+    records.value = recordsRes.data;
   } catch(e) {
-    console.error(e);
-  } finally {
-    loading.value = false;
+    console.error('Records error:', e);
   }
+  
+  try {
+    // Fetch heatmap - may fail if endpoint doesn't exist yet
+    const heatmapRes = await dashboardApi.getHeatmap();
+    processHeatmap(heatmapRes.data || []);
+  } catch(e) {
+    console.error('Heatmap error:', e);
+    // Initialize empty heatmap on error
+    processHeatmap([]);
+  }
+  
+  loading.value = false;
 });
+
+const processHeatmap = (data) => {
+    // 1. Map data for quick lookup
+    const activityMap = new Map();
+    data.forEach(item => {
+        activityMap.set(item.date, item);
+    });
+
+    // 2. Generate last 365 days (approx 52 weeks)
+    const weeks = [];
+    const today = new Date();
+    // Align to Saturday of this week to fill to the right
+    const end = new Date(today);
+    // Go back 52 weeks * 7 days
+    const start = new Date(end);
+    start.setDate(start.getDate() - (52 * 7) + 1); 
+    
+    // Adjust start to be Sunday
+    // while(start.getDay() !== 0) start.setDate(start.getDate() - 1);
+
+    let current = new Date(start);
+    let currentWeek = [];
+
+    // Loop until we cover enough days
+    for (let i = 0; i < 52 * 7; i++) {
+        const dateStr = current.toISOString().split('T')[0];
+        const activity = activityMap.get(dateStr);
+        const count = activity ? activity.count : 0;
+        
+        // Determine color
+        let colorClass = 'bg-slate-100';
+        if (count > 0) colorClass = 'bg-indigo-200';
+        if (count >= 3) colorClass = 'bg-indigo-400';
+        if (count >= 6) colorClass = 'bg-indigo-600';
+        if (count >= 9) colorClass = 'bg-indigo-800';
+
+        currentWeek.push({
+            date: dateStr,
+            dateFormatted: current.toLocaleDateString('ko-KR', { month: 'short', day: 'numeric' }),
+            count: count,
+            contributors: activity ? activity.contributors : [],
+            colorClass: colorClass
+        });
+
+        if (currentWeek.length === 7) {
+            weeks.push(currentWeek);
+            currentWeek = [];
+        }
+        
+        current.setDate(current.getDate() + 1);
+    }
+    
+    if (currentWeek.length > 0) weeks.push(currentWeek);
+    heatmapWeeks.value = weeks;
+};
 
 const formatDate = (dateString) => {
     if (!dateString) return '';

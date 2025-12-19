@@ -11,7 +11,10 @@
   </select>
 
   <select id="findAll" resultType="Study">
-    SELECT * FROM studies ORDER BY id
+    SELECT s.*, 
+           (SELECT COUNT(*) FROM users u WHERE u.study_id = s.id AND u.deleted_at IS NULL) as member_count
+    FROM studies s 
+    ORDER BY s.id
   </select>
 
   <update id="update" parameterType="Study">

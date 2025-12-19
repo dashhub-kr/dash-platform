@@ -14,6 +14,7 @@ public class Study {
     private Long id;
     private String name;
     private LocalDateTime createdAt;
+    private Integer memberCount; // 회원수 (조회용)
 
     public Study(Long id, String name, LocalDateTime createdAt) {
         this.id = id;
