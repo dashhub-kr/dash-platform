@@ -47,6 +47,8 @@ public record AlgorithmRecordResult(
                 record.getRepositoryName(),
                 record.getFilePath(),
                 record.getCommitSha(),
+                record.getCommitMessage(),
+                record.getCommittedAt(),
                 record.getCreatedAt(),
                 record.getUpdatedAt(),
                 record.getScore(),
