@@ -22,8 +22,15 @@ public class User {
     private Long studyId;
     private LocalDateTime deletedAt;
 
+    // Solved.ac 연동 필드
+    private String solvedacHandle;
+    private Integer solvedacTier;
+    private Integer solvedacRating;
+    private Integer solvedacClass;
+    private LocalDateTime statsLastSyncedAt;
+
     private User(Long id, String username, String email, LocalDateTime createdAt,
-                 String provider, String providerId, String avatarUrl) {
+            String provider, String providerId, String avatarUrl) {
         this.id = id;
         this.username = requireText(username, "username");
         this.email = requireText(email, "email");
@@ -38,7 +45,7 @@ public class User {
     }
 
     public static User create(String username, String email, LocalDateTime createdAt,
-                              String provider, String providerId, String avatarUrl) {
+            String provider, String providerId, String avatarUrl) {
         return new User(null, username, email, createdAt, provider, providerId, avatarUrl);
     }
 
@@ -50,6 +57,14 @@ public class User {
 
     public void updateStudy(Long studyId) {
         this.studyId = studyId;
+    }
+
+    public void updateSolvedacProfile(String handle, Integer tier, Integer rating, Integer classLevel) {
+        this.solvedacHandle = handle;
+        this.solvedacTier = tier;
+        this.solvedacRating = rating;
+        this.solvedacClass = classLevel;
+        this.statsLastSyncedAt = LocalDateTime.now();
     }
 
     private static String requireText(String value, String fieldName) {

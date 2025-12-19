@@ -11,11 +11,21 @@ public record UserResult(
         LocalDateTime createdAt,
         String provider,
         String providerId,
-        String avatarUrl
+        String avatarUrl,
+        Long studyId
 ) {
 
     public static UserResult from(User user) {
-        return new UserResult(user.getId(), user.getUsername(), user.getEmail(), user.getCreatedAt(), user.getProvider(), user.getProviderId(), user.getAvatarUrl());
+        return new UserResult(
+                user.getId(),
+                user.getUsername(),
+                user.getEmail(),
+                user.getCreatedAt(),
+                user.getProvider(),
+                user.getProviderId(),
+                user.getAvatarUrl(),
+                user.getStudyId()
+        );
     }
 
 }

@@ -1,0 +1,19 @@
+package com.ssafy.dash.problem.infrastructure.persistence;
+
+import com.ssafy.dash.problem.domain.Problem;
+import com.ssafy.dash.problem.domain.ProblemTag;
+import java.util.List;
+import org.apache.ibatis.annotations.Mapper;
+
+@Mapper
+public interface ProblemMapper {
+    void saveProblem(Problem problem);
+
+    void saveProblemTag(ProblemTag problemTag);
+
+    void deleteProblemTags(String problemNumber);
+
+    Problem findProblemByNumber(String problemNumber);
+
+    List<String> findTagsByProblemNumber(String problemNumber);
+}

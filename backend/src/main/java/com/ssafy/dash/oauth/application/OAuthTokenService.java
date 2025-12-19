@@ -28,7 +28,8 @@ public class OAuthTokenService {
     @Transactional
     public void saveAccessToken(Long userId, OAuth2AccessToken accessToken) {
         if (userId == null || accessToken == null) {
-            log.debug("saveAccessToken called with null userId or accessToken (userId={}, accessTokenPresent={})", userId, accessToken != null);
+            log.debug("saveAccessToken called with null userId or accessToken (userId={}, accessTokenPresent={})",
+                    userId, accessToken != null);
             return;
         }
 
@@ -36,15 +37,16 @@ public class OAuthTokenService {
         String masked = mask(tokenValue);
         Instant issuedAtInstant = accessToken.getIssuedAt();
         Instant expiresAtInstant = accessToken.getExpiresAt();
-        log.info("Persisting OAuth token for userId={} tokenMasked={} issuedAtUTC={} expiresAtUTC={} diffSeconds={}",
-            userId,
-            masked,
-            issuedAtInstant,
-            expiresAtInstant,
-            (issuedAtInstant != null && expiresAtInstant != null) ? expiresAtInstant.getEpochSecond() - issuedAtInstant.getEpochSecond() : null);
+        log.info(
+                "Persisting OAuth token for userId={} tokenMasked={} issuedAtUTC={} expiresAtUTC={} (expiration ignored)",
+                userId,
+                masked,
+                issuedAtInstant,
+                expiresAtInstant);
 
         LocalDateTime now = LocalDateTime.now();
-        LocalDateTime expiresAt = null;
+        // 깃허브 토큰 만료 시간 무시 (무제한으로 처리)
+        final LocalDateTime expiresAt = null;
         String tokenType = accessToken.getTokenType() != null ? accessToken.getTokenType().getValue() : null;
 
         UserOAuthToken token = tokenRepository.findByUserId(userId)
@@ -94,7 +96,7 @@ public class OAuthTokenService {
         if (!StringUtils.hasText(tokenValue)) {
             return "null";
         }
-        
+
         return tokenValue.length() > 8 ? tokenValue.substring(0, 6) + "..." : "***";
     }
 

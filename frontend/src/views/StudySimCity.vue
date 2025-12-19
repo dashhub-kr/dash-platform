@@ -1,45 +1,73 @@
 <template>
-  <div class="simcity-container">
+  <div class="simcity-container font-[Pretendard]">
     <div ref="canvasContainer" class="canvas-container"></div>
     
-    <div class="ui-overlay">
-      <div class="header">
-        <h1>스터디 심시티</h1>
-        <div class="acorn-display">
-          <span class="icon">🌰</span>
-          <span class="count">{{ acorns }} 도토리</span>
+    <!-- Header Overlay -->
+    <div class="absolute top-6 left-6 z-10 animate-fade-in-down">
+      <div class="bg-white/80 backdrop-blur-md border border-white/50 rounded-2xl p-4 shadow-lg shadow-indigo-500/10 flex items-center gap-4">
+        <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-indigo-400 to-cyan-400 flex items-center justify-center text-2xl shadow-md transform -rotate-6">
+          🏙️
+        </div>
+        <div>
+          <h1 class="text-xl font-bold text-slate-800 tracking-tight">스터디 심시티</h1>
+          <div class="flex items-center gap-2 text-amber-600 font-bold bg-amber-50 px-2 py-0.5 rounded-lg text-sm mt-1">
+            <span>🌰</span>
+            <span>{{ acorns }} 도토리</span>
+          </div>
         </div>
       </div>
-      
-      <div class="controls">
+    </div>
+
+    <!-- Controls Overlay -->
+    <div class="absolute bottom-10 left-1/2 transform -translate-x-1/2 z-10 animate-fade-in-up">
+      <div class="bg-white/90 backdrop-blur-xl border border-white/50 rounded-3xl p-2 shadow-2xl shadow-indigo-500/20 flex items-center gap-2">
         <button 
           @click="setMode('build')" 
-          :class="{ active: mode === 'build' }"
-          class="control-btn build-btn"
+          :class="['flex items-center gap-2 px-6 py-3 rounded-2xl font-bold transition-all duration-300', mode === 'build' ? 'bg-indigo-600 text-white shadow-lg scale-105' : 'bg-transparent text-slate-500 hover:bg-slate-100']"
         >
-          건설
+          <span>🏗️</span>
+          <span>건설 모드</span>
         </button>
+        <div class="w-px h-8 bg-slate-200"></div>
         <button 
           @click="setMode('destroy')" 
-          :class="{ active: mode === 'destroy' }"
-          class="control-btn destroy-btn"
+          :class="['flex items-center gap-2 px-6 py-3 rounded-2xl font-bold transition-all duration-300', mode === 'destroy' ? 'bg-rose-500 text-white shadow-lg scale-105' : 'bg-transparent text-slate-500 hover:bg-slate-100']"
         >
-          철거
+          <span>💣</span>
+          <span>철거 모드</span>
         </button>
       </div>
-
-      <div class="instructions">
-        <p>{{ mode === 'build' ? '빈 칸을 눌러 건설하세요.' : '건물을 눌러 철거하세요.' }}</p>
-        <p class="warning" v-if="message">{{ message }}</p>
-      </div>
+      
+      <!-- Instructions / Toast -->
+      <transition name="fade">
+        <div v-if="message" class="absolute -top-16 left-1/2 transform -translate-x-1/2 bg-slate-800/90 text-white px-4 py-2 rounded-xl text-sm font-bold shadow-xl backdrop-blur-md flex items-center gap-2 whitespace-nowrap">
+          <span>⚠️</span>
+          {{ message }}
+        </div>
+        <div v-else class="absolute -top-12 left-1/2 transform -translate-x-1/2 text-slate-500 text-sm font-medium bg-white/50 px-3 py-1 rounded-full whitespace-nowrap backdrop-blur-sm">
+           {{ mode === 'build' ? '빈 땅을 클릭하여 건물을 지으세요' : '건물을 클릭하여 철거하세요' }}
+        </div>
+      </transition>
     </div>
+
+    <!-- Map Return Button -->
+    <button 
+      @click="$router.push('/map')"
+      class="absolute top-6 right-6 z-10 bg-white/80 backdrop-blur-md p-3 rounded-full text-slate-500 hover:text-indigo-600 hover:bg-white border border-white/50 shadow-md transition-all hover:scale-110 active:scale-95"
+      title="지도로 돌아가기"
+    >
+      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
+    </button>
   </div>
 </template>
 
 <script setup>
 import { ref, onMounted, onBeforeUnmount } from 'vue';
+import { useRouter } from 'vue-router';
 import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
+
+const router = useRouter();
 
 // 상태 (State)
 const acorns = ref(500); // 초기 대략적인 무작위 수량
@@ -82,15 +110,12 @@ const showMessage = (msg) => {
 };
 
 const initScene = () => {
-  // 씬 (Scene)
+  // 씬 (Scene) - Light & Sky Blue Theme
   scene = new THREE.Scene();
-  scene.background = new THREE.Color(0xe0f2fe); // 하늘색
-  scene = new THREE.Scene();
-  scene.background = new THREE.Color(0xe0f2fe); // 하늘색
-  scene.fog = new THREE.Fog(0xe0f2fe, 10, 50); // 깊이감을 위해 안개 복원
+  scene.background = new THREE.Color(0xf0f9ff); // Very light sky blue
+  scene.fog = new THREE.Fog(0xf0f9ff, 15, 45); // Soft fog
 
   // 카메라 (Camera)
-  // 카메라 - 아이소메트릭 뷰를 위한 직교 투영
   const aspect = window.innerWidth / window.innerHeight;
   const d = 15; // 뷰 크기
   camera = new THREE.OrthographicCamera(-d * aspect, d * aspect, d, -d, 1, 1000);
@@ -100,22 +125,25 @@ const initScene = () => {
   camera.lookAt(0, 0, 0);
 
   // 렌더러 (Renderer)
-  renderer = new THREE.WebGLRenderer({ antialias: true });
+  renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
   renderer.setSize(window.innerWidth, window.innerHeight);
   renderer.shadowMap.enabled = true;
+  renderer.shadowMap.type = THREE.SoftShadowMap; // Softer shadows
   canvasContainer.value.appendChild(renderer.domElement);
 
   // 조명 (Lights)
-  const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
+  const ambientLight = new THREE.AmbientLight(0xffffff, 0.7);
   scene.add(ambientLight);
 
-  const dirLight = new THREE.DirectionalLight(0xffffff, 0.8);
-  dirLight.position.set(10, 20, 10);
+  const dirLight = new THREE.DirectionalLight(0xffffff, 0.6);
+  dirLight.position.set(20, 30, 15);
   dirLight.castShadow = true;
+  dirLight.shadow.mapSize.width = 1024;
+  dirLight.shadow.mapSize.height = 1024;
   scene.add(dirLight);
 
-  // 헬퍼 (Helper)
-  gridHelper = new THREE.GridHelper(GRID_SIZE, GRID_DIVISIONS, 0x888888, 0xcccccc);
+  // 헬퍼 (Helper) - Softer grid
+  gridHelper = new THREE.GridHelper(GRID_SIZE, GRID_DIVISIONS, 0xcbd5e1, 0xe2e8f0);
   scene.add(gridHelper);
 
   // 바닥 평면 (레이캐스팅용, 보이지 않음)
@@ -133,7 +161,7 @@ const initScene = () => {
 
   // 커서 하이라이트 (그리드 바닥 선택)
   const cursorGeo = new THREE.PlaneGeometry(CELL_SIZE, CELL_SIZE);
-  const cursorMat = new THREE.MeshBasicMaterial({ color: 0xffff00, transparent: true, opacity: 0.3, side: THREE.DoubleSide });
+  const cursorMat = new THREE.MeshBasicMaterial({ color: 0x6366f1, transparent: true, opacity: 0.2, side: THREE.DoubleSide }); // Indigo highlight
   cursorMesh = new THREE.Mesh(cursorGeo, cursorMat);
   cursorMesh.rotation.x = -Math.PI / 2;
   cursorMesh.visible = false;
@@ -157,7 +185,7 @@ const initScene = () => {
   controls = new OrbitControls(camera, renderer.domElement);
   controls.enableDamping = true;
   controls.dampingFactor = 0.05;
-  controls.enableRotate = false; // 고정 아이소메트릭 뷰를 위해 회전 잠금
+  controls.enableRotate = false; // 고정 아이소메트릭 뷰
   controls.enableZoom = true;
   controls.enablePan = true;
   controls.minZoom = 0.5;
@@ -221,7 +249,7 @@ const createBuilding = (x, z) => {
     transparent: true,
     side: THREE.DoubleSide,
     alphaTest: 0.5,
-    fog: false // 선택사항: 집도 선명하게 유지할까? 선명하게 유지하자.
+    fog: false
   });
   
   const mesh = new THREE.Mesh(geo, mat);
@@ -236,7 +264,7 @@ const createBuilding = (x, z) => {
   );
   
   mesh.quaternion.copy(camera.quaternion); // 균일한 빌보드 회전
-  mesh.receiveShadow = false; // 이 스타일에서는 평면이 그림자를 예쁘게 드리우지 않음
+  mesh.receiveShadow = false; 
   mesh.castShadow = false;
 
   // 애니메이션 (스케일로 팝업)
@@ -396,11 +424,14 @@ onBeforeUnmount(() => {
 </script>
 
 <style scoped>
+@import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css');
+
 .simcity-container {
   width: 100vw;
   height: 100vh;
   position: relative;
   overflow: hidden;
+  background-color: #f0f9ff; /* Fallback */
 }
 
 .canvas-container {
@@ -408,97 +439,35 @@ onBeforeUnmount(() => {
   height: 100%;
 }
 
-.ui-overlay {
-  position: absolute;
-  top: 15px;
-  left: 15px;
-  background: rgba(255, 255, 255, 0.95);
-  padding: 12px;
-  border-radius: 12px;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-  width: 220px;
-  font-family: 'Inter', sans-serif;
-  backdrop-filter: blur(2px);
+.animate-fade-in-down {
+  animation: fade-in-down 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  opacity: 0;
+  transform: translateY(-20px);
 }
 
-.header {
-  margin-bottom: 12px;
-  border-bottom: 1px solid #f3f4f6;
-  padding-bottom: 8px;
+.animate-fade-in-up {
+  animation: fade-in-up 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  opacity: 0;
+  transform: translate(-50%, 20px);
 }
 
-h1 {
-  font-size: 1rem;
-  font-weight: 700;
-  color: #374151;
-  margin: 0;
-  letter-spacing: -0.01em;
+@keyframes fade-in-down {
+  to { opacity: 1; transform: translateY(0); }
 }
 
-.acorn-display {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  margin-top: 4px;
-  font-size: 0.9rem;
-  color: #8B4513;
-  font-weight: 600;
+@keyframes fade-in-up {
+  to { opacity: 1; transform: translate(-50%, 0); }
 }
 
-.controls {
-  display: flex;
-  gap: 8px;
-  margin-bottom: 10px;
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.3s ease, transform 0.3s ease;
 }
 
-.control-btn {
-  flex: 1;
-  padding: 6px 4px;
-  border: none;
-  border-radius: 6px;
-  cursor: pointer;
-  font-weight: 500;
-  font-size: 0.75rem;
-  transition: all 0.2s;
-}
-
-.build-btn {
-  background: #d1fae5;
-  color: #065f46;
-}
-.build-btn.active {
-  background: #10b981;
-  color: white;
-  box-shadow: 0 0 0 2px #065f46;
-}
-
-.destroy-btn {
-  background: #fee2e2;
-  color: #991b1b;
-}
-.destroy-btn.active {
-  background: #ef4444;
-  color: white;
-  box-shadow: 0 0 0 2px #991b1b;
-}
-
-.instructions {
-  font-size: 0.9rem;
-  color: #6b7280;
-}
-
-.warning {
-  color: #dc2626;
-  font-weight: 600;
-  margin-top: 5px;
-  animation: shake 0.5s;
-}
-
-@keyframes shake {
-  0% { transform: translateX(0); }
-  25% { transform: translateX(-5px); }
-  50% { transform: translateX(5px); }
-  75% { transform: translateX(-5px); }
-  100% { transform: translateX(0); }
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
+  transform: translate(-50%, 10px);
 }
 </style>
+

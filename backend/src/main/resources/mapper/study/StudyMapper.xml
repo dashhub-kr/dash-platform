@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ssafy.dash.study.infrastructure.mapper.StudyMapper">
+
+  <insert id="save" parameterType="Study" useGeneratedKeys="true" keyProperty="id">
+    INSERT INTO studies (name, created_at) VALUES (#{name}, #{createdAt})
+  </insert>
+
+  <select id="findById" resultType="Study" parameterType="long">
+    SELECT * FROM studies WHERE id = #{id}
+  </select>
+
+  <select id="findAll" resultType="Study">
+    SELECT s.*, 
+           (SELECT COUNT(*) FROM users u WHERE u.study_id = s.id AND u.deleted_at IS NULL) as member_count
+    FROM studies s 
+    ORDER BY s.id
+  </select>
+
+  <update id="update" parameterType="Study">
+    UPDATE studies SET name = #{name} WHERE id = #{id}
+  </update>
+
+  <delete id="delete" parameterType="long">
+    DELETE FROM studies WHERE id = #{id}
+  </delete>
+
+</mapper>

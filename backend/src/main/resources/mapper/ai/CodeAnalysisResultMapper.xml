@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ssafy.dash.ai.infrastructure.CodeAnalysisResultMapper">
+
+    <insert id="insert" parameterType="CodeAnalysisResult" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO code_analysis_results (
+            algorithm_record_id, summary, time_complexity, space_complexity,
+            complexity_explanation, patterns, algorithm_intuition,
+            pitfalls, improvements, refactor_provided, refactor_code,
+            refactor_explanation, score, analyzed_at
+        ) VALUES (
+            #{algorithmRecordId}, #{summary}, #{timeComplexity}, #{spaceComplexity},
+            #{complexityExplanation}, #{patterns}, #{algorithmIntuition},
+            #{pitfalls}, #{improvements}, #{refactorProvided}, #{refactorCode},
+            #{refactorExplanation}, #{score}, #{analyzedAt}
+        )
+    </insert>
+
+    <select id="findByAlgorithmRecordId" resultType="CodeAnalysisResult">
+        SELECT * FROM code_analysis_results 
+        WHERE algorithm_record_id = #{algorithmRecordId}
+    </select>
+
+    <update id="update" parameterType="CodeAnalysisResult">
+        UPDATE code_analysis_results SET
+            summary = #{summary},
+            time_complexity = #{timeComplexity},
+            space_complexity = #{spaceComplexity},
+            complexity_explanation = #{complexityExplanation},
+            patterns = #{patterns},
+            algorithm_intuition = #{algorithmIntuition},
+            pitfalls = #{pitfalls},
+            improvements = #{improvements},
+            refactor_provided = #{refactorProvided},
+            refactor_code = #{refactorCode},
+            refactor_explanation = #{refactorExplanation},
+            score = #{score},
+            analyzed_at = #{analyzedAt}
+        WHERE id = #{id}
+    </update>
+
+    <delete id="deleteByAlgorithmRecordId">
+        DELETE FROM code_analysis_results WHERE algorithm_record_id = #{algorithmRecordId}
+    </delete>
+
+</mapper>

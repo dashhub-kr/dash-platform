@@ -16,6 +16,10 @@ const routes = [
   { path: "/", name: "Landing", component: Landing },
   { path: "/playground", name: "Playground", component: Playground },
   { path: "/oauth2/redirect", name: "OauthRedirect", component: OauthRedirect },
+  { path: "/onboarding/welcome", name: "OnboardingWelcome", component: () => import("../views/onboarding/OnboardingWelcome.vue") },
+  { path: "/onboarding/analysis", name: "OnboardingAnalysis", component: () => import("../views/onboarding/OnboardingAnalysis.vue") },
+  { path: "/onboarding/study", name: "OnboardingStudy", component: () => import("../views/onboarding/OnboardingStudy.vue") },
+  { path: "/onboarding/repo", name: "OnboardingRepository", component: () => import("../views/onboarding/OnboardingRepository.vue") },
   { path: "/dashboard", name: "Dashboard", component: Dashboard },
   { path: "/boards", name: "BoardList", component: BoardList },
   { path: "/boards/write", name: "BoardWrite", component: BoardForm },
@@ -24,6 +28,7 @@ const routes = [
   { path: "/profile", name: "Profile", component: Profile },
   { path: "/youtube", name: "YouTubeSearch", component: YouTubeSearch },
   { path: "/simcity", name: "StudySimCity", component: StudySimCity },
+  { path: "/map", name: "WorldMap", component: () => import("../components/WorldMap.vue") },
 ];
 
 const router = createRouter({

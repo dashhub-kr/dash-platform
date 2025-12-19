@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ssafy.dash.analytics.infrastructure.persistence.UserTagStatMapper">
+
+    <insert id="upsert">
+        INSERT INTO user_tag_stats 
+            (user_id, tag_key, total, solved, partial, tried)
+        VALUES 
+            (#{userId}, #{tagKey}, #{total}, #{solved}, #{partial}, #{tried})
+        ON DUPLICATE KEY UPDATE
+            total = VALUES(total),
+            solved = VALUES(solved),
+            partial = VALUES(partial),
+            tried = VALUES(tried),
+            updated_at = CURRENT_TIMESTAMP
+    </insert>
+
+    <select id="findByUserId" resultType="UserTagStat">
+        SELECT * FROM user_tag_stats WHERE user_id = #{userId} ORDER BY solved DESC
+    </select>
+
+    <select id="findByUserIdAndTag" resultType="UserTagStat">
+        SELECT * FROM user_tag_stats WHERE user_id = #{userId} AND tag_key = #{tagKey}
+    </select>
+
+    <delete id="deleteByUserId">
+        DELETE FROM user_tag_stats WHERE user_id = #{userId}
+    </delete>
+
+</mapper>

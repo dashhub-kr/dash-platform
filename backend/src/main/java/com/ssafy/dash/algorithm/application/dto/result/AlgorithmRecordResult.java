@@ -7,6 +7,7 @@ import com.ssafy.dash.algorithm.domain.AlgorithmRecord;
 public record AlgorithmRecordResult(
         Long id,
         Long userId,
+        String username,
         String problemNumber,
         String title,
         String code,
@@ -21,13 +22,13 @@ public record AlgorithmRecordResult(
         String commitMessage,
         LocalDateTime committedAt,
         LocalDateTime createdAt,
-        LocalDateTime updatedAt
-) {
+        LocalDateTime updatedAt) {
 
     public static AlgorithmRecordResult from(AlgorithmRecord record) {
         return new AlgorithmRecordResult(
                 record.getId(),
                 record.getUserId(),
+                record.getUsername(),
                 record.getProblemNumber(),
                 record.getTitle(),
                 record.getCode(),
@@ -42,8 +43,7 @@ public record AlgorithmRecordResult(
                 record.getCommitMessage(),
                 record.getCommittedAt(),
                 record.getCreatedAt(),
-                record.getUpdatedAt()
-            );
+                record.getUpdatedAt());
     }
 
 }

@@ -1,7 +1,7 @@
 <template>
   <header
     v-if="visible"
-    class="border-b border-white/10 bg-slate-950 sticky top-0 z-50"
+    class="border-b border-slate-200 bg-white/70 backdrop-blur-md sticky top-0 z-50 transition-all duration-300"
   >
     <!-- 좌측 -->
     <div class="container mx-auto px-6 h-16 relative">
@@ -12,14 +12,10 @@
             @click="goHome"
             aria-label="홈으로 이동"
           >
-            <img
-              src="/icons/icon-32.png"
-              alt="DASH logo"
-              class="w-7 h-7 object-contain drop-shadow-lg"
-            />
+            <img src="/icons/icon-128.png" alt="Dash Logo" class="w-8 h-8 group-hover:scale-105 transition-transform" />
             <span
-              class="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-white to-slate-400"
-              >DASH</span
+              class="text-xl font-bold text-slate-800 tracking-tight group-hover:text-indigo-600 transition-colors"
+              >Dash</span
             >
           </div>
         </div>
@@ -29,28 +25,53 @@
       <div
         class="absolute left-1/2 top-0 transform -translate-x-1/2 h-full flex items-center justify-center pointer-events-none"
       >
+        <!-- 비로그인 시 랜딩 페이지 네비게이션 -->
         <nav
           v-if="authChecked && !user"
           class="hidden sm:flex items-center gap-6 pointer-events-auto"
         >
           <button
             @click.prevent="$emit('scroll', 'hero')"
-            class="text-sm text-slate-300 hover:text-white transition text-center"
+            class="text-sm font-bold text-slate-500 hover:text-indigo-600 transition-colors"
           >
             홈
           </button>
           <button
             @click.prevent="$emit('scroll', 'features')"
-            class="text-sm text-slate-300 hover:text-white transition text-center"
+            class="text-sm font-bold text-slate-500 hover:text-indigo-600 transition-colors"
           >
             주요 기능
           </button>
           <button
             @click.prevent="$emit('scroll', 'core')"
-            class="text-sm text-slate-300 hover:text-white transition text-center"
+            class="text-sm font-bold text-slate-500 hover:text-indigo-600 transition-colors"
           >
             핵심 기능
           </button>
+        </nav>
+
+        <!-- 로그인 시 앱 네비게이션 -->
+        <!-- 로그인 시 앱 네비게이션 -->
+        <nav
+          v-else-if="authChecked && user"
+          class="hidden sm:flex items-center gap-6 pointer-events-auto"
+        >
+          <router-link
+            to="/map"
+            class="flex items-center text-slate-500 hover:text-indigo-600 transition-colors"
+            active-class="text-indigo-600"
+            title="월드 맵"
+          >
+            <Map :size="24" />
+          </router-link>
+          <router-link
+            to="/simcity"
+            class="flex items-center text-slate-500 hover:text-indigo-600 transition-colors"
+            active-class="text-indigo-600"
+            title="심시티"
+          >
+            <LayoutGrid :size="24" />
+          </router-link>
         </nav>
       </div>
 
@@ -62,44 +83,29 @@
               class="flex items-center gap-3 min-w-0 relative"
               ref="profileRef"
             >
-              <div class="flex items-center gap-3 min-w-0">
-                <div
-                  class="w-9 h-9 rounded-full bg-indigo-600/20 flex items-center justify-center text-indigo-300 font-semibold"
-                >
-                  {{ userInitial }}
-                </div>
-                <div class="flex flex-col leading-tight min-w-0">
-                  <span class="text-xs text-slate-300">반갑습니다,</span>
-                  <span
-                    class="text-sm text-white font-semibold max-w-[140px] sm:max-w-[180px] block truncate"
-                    >{{ user.username || user.email }}</span
-                  >
-                </div>
-              </div>
-
-              <button
+              <!-- Profile Avatar Only -->
+              <div 
+                class="w-9 h-9 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-600 font-bold text-sm cursor-pointer hover:ring-2 hover:ring-indigo-100 transition-all"
                 @click.stop="toggleProfileMenu"
-                :aria-expanded="profileMenuOpen"
-                class="p-1 rounded hover:bg-slate-800 transition-colors"
-                aria-label="계정 메뉴"
+                :title="user.username || user.email"
               >
-                <ChevronDown :size="16" class="text-slate-300" />
-              </button>
+                {{ userInitial }}
+              </div>
 
               <transition name="slide-down">
                 <div
                   v-if="profileMenuOpen"
-                  class="absolute right-0 top-full mt-2 w-48 bg-slate-900 border border-slate-800 rounded-lg py-1 shadow-lg z-50"
+                  class="absolute right-0 top-full mt-2 w-48 bg-white border border-slate-100 rounded-2xl py-2 shadow-xl z-50 overflow-hidden"
                 >
                   <button
                     @click="goToProfile"
-                    class="w-full text-left px-3 py-2 text-sm text-slate-200 hover:bg-slate-800"
+                    class="w-full text-left px-4 py-2.5 text-sm font-medium text-slate-600 hover:bg-slate-50 hover:text-indigo-600 transition-colors"
                   >
                     마이페이지
                   </button>
                   <button
                     @click="handleLogout"
-                    class="w-full text-left px-3 py-2 text-sm text-rose-400 hover:bg-slate-800"
+                    class="w-full text-left px-4 py-2.5 text-sm font-medium text-rose-500 hover:bg-rose-50 transition-colors"
                   >
                     로그아웃
                   </button>
@@ -111,8 +117,9 @@
           <template v-else>
             <button
               @click="handleLogin"
-              class="px-4 py-2 rounded-full text-sm font-semibold text-white bg-indigo-600 hover:bg-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-400 transition-shadow shadow-sm"
+              class="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-bold text-white bg-slate-900 hover:bg-slate-800 transition-all shadow-md hover:shadow-lg transform hover:-translate-y-0.5"
             >
+              <Github :size="16" />
               로그인
             </button>
           </template>
@@ -124,7 +131,7 @@
 
 <script setup>
 import { ref, computed, onMounted, onBeforeUnmount } from "vue";
-import { ChevronDown } from "lucide-vue-next";
+import { Github, Map, LayoutGrid } from "lucide-vue-next";
 
 import { useAuth } from "../composables/useAuth";
 import { authApi } from "../api/auth";
@@ -151,7 +158,7 @@ const goHome = () => {
   window.location.href = "/";
 };
 const handleLogin = () => {
-  window.location.href = `/oauth2/authorization/github`; // This is OAuth entry, keep as simple link
+  window.location.href = `/oauth2/authorization/github`;
 };
 
 const toggleProfileMenu = () => {
@@ -169,12 +176,13 @@ const onDocClick = (e) => {
 };
 
 const handleLogout = async () => {
+  if (!confirm("로그아웃 하시겠습니까?")) return;
   try {
     await authApi.logout();
   } catch (e) {
-    console.error("Logout failed:", e);
+    console.error("Logout API failed, forcing local logout:", e);
   } finally {
-    await refresh();
+    // Force a full reload to clear any in-memory state
     window.location.href = "/";
   }
 };
@@ -186,3 +194,20 @@ onBeforeUnmount(() => {
   document.removeEventListener("click", onDocClick);
 });
 </script>
+
+<style scoped>
+.slide-down-enter-from,
+.slide-down-leave-to {
+  opacity: 0;
+  transform: translateY(-10px) scale(0.95);
+}
+.slide-down-enter-to,
+.slide-down-leave-from {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+}
+.slide-down-enter-active,
+.slide-down-leave-active {
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+</style>

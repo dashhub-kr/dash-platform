@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ssafy.dash.analytics.infrastructure.persistence.AnalyticsMapper">
+
+    <select id="findFamilyScoresByUserId" resultType="FamilyScoreDto">
+        SELECT
+            t.family_id as familyId,
+            tf.name as familyName,
+            tf.family_key as familyKey,
+            SUM(t.weight) as rawScore,
+            COUNT(DISTINCT t.tag_key) as distinctTags,
+            COUNT(DISTINCT ar.problem_number) as solvedProblems
+        FROM algorithm_records ar
+        JOIN problem_tags pt ON ar.problem_number = pt.problem_number
+        JOIN tags t ON pt.tag_key = t.tag_key
+        JOIN tag_families tf ON t.family_id = tf.id
+        WHERE ar.user_id = #{userId}
+        GROUP BY t.family_id, tf.name, tf.family_key
+        ORDER BY tf.order_index
+    </select>
+
+    <select id="getUserCoreCoverage" resultType="TagCoverageDto">
+        SELECT
+            (SELECT COUNT(*) FROM tags WHERE is_core = true) as totalCoreTags,
+            COUNT(DISTINCT CASE WHEN user_tags.tag_key IS NOT NULL THEN user_tags.tag_key END) as solvedCoreTags,
+            CASE 
+                WHEN (SELECT COUNT(*) FROM tags WHERE is_core = true) = 0 THEN 0
+                ELSE (COUNT(DISTINCT CASE WHEN user_tags.tag_key IS NOT NULL THEN user_tags.tag_key END) * 1.0 / (SELECT COUNT(*) FROM tags WHERE is_core = true)) * 100 
+            END as coveragePercentage
+        FROM tags core
+        LEFT JOIN (
+            SELECT DISTINCT pt.tag_key
+            FROM algorithm_records ar
+            JOIN problem_tags pt ON ar.problem_number = pt.problem_number
+            WHERE ar.user_id = #{userId}
+        ) user_tags ON core.tag_key = user_tags.tag_key
+        WHERE core.is_core = true
+    </select>
+
+</mapper>

@@ -1,29 +1,25 @@
 <template>
   <div
-    class="min-h-screen bg-slate-950 text-slate-100 flex flex-col selection:bg-indigo-500/30"
+    class="min-h-screen bg-slate-50 text-slate-800 flex flex-col selection:bg-indigo-500/30 font-[Pretendard]"
   >
-    <!-- 배경 -->
-    <div v-if="!user" class="fixed inset-0 z-0 pointer-events-none">
+    <!-- 배경: Light Mode Gradients -->
+    <div class="fixed inset-0 z-0 pointer-events-none overflow-hidden">
+      <!-- Top Left Gradient -->
       <div
-        class="absolute top-0 left-1/2 -translate-x-1/2 w-[1000px] h-[600px] bg-indigo-600/20 rounded-full blur-[120px] opacity-50 mix-blend-screen"
+        class="absolute top-[-10%] left-[-10%] w-[50vw] h-[50vw] bg-indigo-200/40 rounded-full blur-[120px] mix-blend-multiply opacity-70 animate-blob"
       ></div>
+      <!-- Bottom Right Gradient -->
       <div
-        class="absolute bottom-0 right-0 w-[800px] h-[600px] bg-blue-600/10 rounded-full blur-[100px] opacity-30"
+        class="absolute bottom-[-10%] right-[-10%] w-[50vw] h-[50vw] bg-purple-200/40 rounded-full blur-[120px] mix-blend-multiply opacity-70 animate-blob animation-delay-2000"
       ></div>
+      <!-- Center Accent -->
       <div
-        class="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20"
+        class="absolute top-[30%] left-[30%] w-[40vw] h-[40vw] bg-pink-200/40 rounded-full blur-[120px] mix-blend-multiply opacity-70 animate-blob animation-delay-4000"
       ></div>
+      
+      <!-- Grid Pattern -->
       <div
-        class="absolute inset-0 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:24px_24px]"
-      ></div>
-    </div>
-
-    <div v-else class="fixed inset-0 z-0 pointer-events-none">
-      <div
-        class="absolute inset-0 bg-gradient-to-b from-slate-900 via-slate-850 to-slate-800 opacity-95"
-      ></div>
-      <div
-        class="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-5 mix-blend-overlay"
+        class="absolute inset-0 bg-[linear-gradient(to_right,#8080800a_1px,transparent_1px),linear-gradient(to_bottom,#8080800a_1px,transparent_1px)] bg-[size:24px_24px]"
       ></div>
     </div>
 
@@ -32,407 +28,216 @@
       <template v-if="authChecked && !user">
         <section
           id="hero"
-          class="container mx-auto px-6 pt-20 pb-16 text-center relative"
+          class="container mx-auto px-6 pt-32 pb-24 text-center relative max-w-5xl"
         >
+          <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-50 border border-indigo-100 text-indigo-600 text-sm font-bold mb-6 animate-fade-in-up">
+             <span class="relative flex h-2 w-2">
+                <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-indigo-400 opacity-75"></span>
+                <span class="relative inline-flex rounded-full h-2 w-2 bg-indigo-500"></span>
+              </span>
+             GitHub 연동으로 3초 만에 시작
+          </div>
+
           <h1
-            class="text-5xl md:text-7xl font-bold tracking-tight mb-6 text-balance animate-fade-in-up"
+            class="text-6xl md:text-7xl font-black tracking-tight mb-8 text-slate-900 leading-tight animate-fade-in-up delay-100"
           >
             알고리즘 스터디, <br />
             <span
-              class="text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 via-blue-400 to-cyan-400"
+              class="text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600"
             >
-              '백준 제출'만 하세요.
+              '제출'만 하세요.
             </span>
           </h1>
+          
           <p
-            class="text-lg md:text-xl text-slate-400 max-w-2xl mx-auto mb-10 text-pretty animate-fade-in-up"
-            style="animation-delay: 0.2s"
+            class="text-xl md:text-2xl text-slate-500 max-w-2xl mx-auto mb-12 text-pretty font-medium animate-fade-in-up delay-200"
           >
-            공통 목표 선정, 설명을 위한 주석, 형식에 맞는 업로드...<br
-              class="hidden md:block"
-            />
-            당신의
-            <span class="text-indigo-400 font-semibold">실패한 코드</span>조차
-            노력의 증거로 남겨드립니다.
+            번거로운 파일 관리, 리팩토링, 코드 리뷰...<br/>
+            이제 <span class="text-indigo-600 font-bold bg-indigo-50 px-1 rounded">Dash</span>가 전부 자동으로 처리해드립니다.
           </p>
 
           <div
-            class="flex flex-col sm:flex-row gap-4 justify-center items-center animate-fade-in-up"
-            style="animation-delay: 0.3s"
+            class="flex flex-col sm:flex-row gap-5 justify-center items-center animate-fade-in-up delay-300"
           >
             <button
               @click="handleLogin"
-              class="group relative inline-flex h-12 items-center justify-center overflow-hidden rounded-full bg-indigo-600 px-8 font-medium text-white transition-all duration-300 hover:bg-indigo-700 hover:ring-4 hover:ring-indigo-500/30 hover:scale-105"
+              class="group relative inline-flex h-14 items-center justify-center overflow-hidden rounded-2xl bg-slate-900 px-10 font-bold text-white transition-all duration-300 hover:bg-slate-800 hover:shadow-xl hover:shadow-indigo-500/20 hover:-translate-y-1"
             >
-              <span class="mr-2"><Github :size="20" /></span>
-              GitHub로 3초 만에 시작하기
+              <span class="mr-3"><Github :size="24" /></span>
+              <span class="text-lg">GitHub로 시작하기</span>
               <div
                 class="absolute inset-0 flex h-full w-full justify-center [transform:skew(-12deg)_translateX(-100%)] group-hover:duration-1000 group-hover:[transform:skew(-12deg)_translateX(100%)]"
               >
                 <div class="relative h-full w-8 bg-white/20"></div>
               </div>
             </button>
+             <button
+              @click="scrollToSection('features')"
+              class="inline-flex h-14 items-center justify-center rounded-2xl bg-white px-8 font-bold text-slate-600 border border-slate-200 hover:bg-slate-50 hover:border-slate-300 transition-all duration-300"
+            >
+              기능 둘러보기
+            </button>
           </div>
         </section>
 
         <section
           id="features"
-          class="container mx-auto px-6 py-20 relative max-w-7xl"
+          class="container mx-auto px-6 py-24 relative max-w-7xl"
         >
-          <div class="text-center mb-16 max-w-3xl mx-auto">
-            <h2 class="text-4xl font-bold mb-4 text-white">
-              Dash가 해결하는 3가지 문제
+          <div class="text-center mb-20 max-w-3xl mx-auto">
+            <h2 class="text-4xl font-extrabold mb-6 text-slate-900">
+              Dash가 해결하는 <span class="underline decoration-wavy decoration-indigo-300 underline-offset-4">3가지 문제</span>
             </h2>
-            <p class="text-lg text-slate-400">
-              스터디원들의 고질적인 페인 포인트를 시원하게 해결했습니다.
+            <p class="text-xl text-slate-500">
+               스터디원들의 '귀차니즘'을 기술적으로 해결했습니다.
             </p>
           </div>
 
           <div class="flex flex-col gap-12">
+            <!-- Feature 1: Uploader -->
             <div
-              class="reveal bg-white/[0.03] border border-white/10 rounded-3xl p-8 md:p-10 flex flex-col gap-10"
+              class="group reveal bg-white rounded-[40px] p-8 md:p-12 shadow-sm border border-slate-100 hover:shadow-2xl transition-all duration-500 grid grid-cols-1 lg:grid-cols-2 gap-12 items-center"
             >
-              <div
-                class="text-center md:text-left flex flex-col md:flex-row gap-6 items-center md:items-start border-b border-white/5 pb-8"
-              >
-                <div
-                  class="p-4 rounded-2xl bg-red-500/10 text-red-400 flex-shrink-0"
-                >
-                  <UploadCloud :size="40" />
-                </div>
-                <div class="flex-1">
-                  <h3 class="text-2xl font-bold text-white mb-2">
-                    Uploader (업로더)
-                  </h3>
-                  <p class="text-xl font-medium text-slate-300 mb-2">
-                    "문제 풀기도 벅찬데, 패키지 만들고 파일명 바꾸고... 너무
-                    귀찮아요."
-                  </p>
-                  <p class="text-slate-400">
-                    그냥
-                    <span class="text-red-400 font-bold"
-                      >백준에서 'Main'으로 풀고 제출하세요!<br
-                    /></span>
-                    <span
-                      class="text-white font-bold underline decoration-indigo-500/50"
-                      >파일 구조를 자동 변환</span
-                    >하고,
-                    <span
-                      class="text-white font-bold underline decoration-red-500/50"
-                      >실패한 기록</span
-                    >까지 잔디로 남겨드립니다.
-                  </p>
-                </div>
-              </div>
-
-              <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                <div
-                  class="bg-slate-900/50 rounded-2xl border border-white/10 p-6 relative overflow-hidden"
-                >
-                  <div
-                    class="absolute top-0 right-0 bg-indigo-500/20 text-indigo-300 text-[10px] px-2 py-1 rounded-bl-lg font-bold border-l border-b border-indigo-500/20"
-                  >
-                    Auto Refactoring
+               <div class="order-2 lg:order-1">
+                  <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-red-50 text-red-600 font-bold text-sm mb-6">
+                    <UploadCloud :size="16" />
+                    Uploader
                   </div>
-                  <div class="flex flex-col gap-4">
-                    <div class="flex items-center gap-3 opacity-60">
-                      <FileCode :size="24" class="text-slate-400" />
-                      <div class="flex-1">
-                        <p class="text-xs text-slate-500 mb-0.5">
-                          My Local IDE
-                        </p>
-                        <p
-                          class="text-sm text-slate-300 font-mono bg-slate-800 px-2 py-1 rounded w-fit"
-                        >
-                          class Main { ... }
-                        </p>
-                      </div>
-                    </div>
-                    <div class="flex justify-center relative h-8">
-                      <div
-                        class="absolute left-1/2 -translate-x-1/2 h-full w-0.5 bg-gradient-to-b from-slate-700 to-indigo-500"
-                      ></div>
-                      <ArrowDown
-                        :size="20"
-                        class="text-indigo-400 absolute bottom-0 bg-slate-900 rounded-full"
-                      />
-                    </div>
-                    <div class="flex items-center gap-3">
-                      <FolderTree :size="24" class="text-indigo-400" />
-                      <div class="flex-1">
-                        <p class="text-xs text-indigo-300 mb-0.5">
-                          GitHub Repository (Auto)
-                        </p>
-                        <div
-                          class="bg-indigo-950/30 border border-indigo-500/30 rounded p-2 font-mono text-xs space-y-1"
-                        >
-                          <p class="text-slate-400">📂 src/ssafy/week04/</p>
-                          <p class="text-green-300 pl-4">📄 BOJ_1000.java</p>
-                          <p class="text-slate-500 pl-4 text-[10px]">
-                            // package com.ssafy...
-                          </p>
+                  <h3 class="text-3xl font-bold text-slate-900 mb-4 leading-tight">
+                    "문제 풀기도 바쁜데,<br/> 패키지 관리는 너무 귀찮아요."
+                  </h3>
+                  <p class="text-lg text-slate-500 mb-8 leading-relaxed">
+                    그냥 백준에서 <code class="bg-slate-100 px-1.5 py-0.5 rounded text-red-500 font-bold">Main</code>으로 풀고 제출하세요.
+                    Dash가 자동으로 <span class="text-slate-900 font-bold underline decoration-indigo-200">파일 구조를 변환</span>하고,
+                    실패한 기록까지 잔디로 심어드립니다.
+                  </p>
+               </div>
+               <div class="order-1 lg:order-2 relative group-hover:scale-[1.02] transition-transform duration-500">
+                  <div class="absolute -inset-4 bg-gradient-to-r from-slate-100 to-slate-50 rounded-[40px] -z-10 transform rotate-2"></div>
+                  <div class="bg-white rounded-3xl shadow-xl border border-slate-200 overflow-hidden relative">
+                     <!-- Fake Browser Header -->
+                     <div class="h-10 bg-slate-50 border-b border-slate-100 flex items-center px-4 gap-2">
+                        <div class="flex gap-1.5">
+                           <div class="w-3 h-3 rounded-full bg-red-400"></div>
+                           <div class="w-3 h-3 rounded-full bg-amber-400"></div>
+                           <div class="w-3 h-3 rounded-full bg-green-400"></div>
                         </div>
-                      </div>
-                    </div>
+                        <div class="flex-1 text-center text-xs font-mono text-slate-400">Main.java - IntelliJ IDEA</div>
+                     </div>
+                     <div class="p-6 font-mono text-sm bg-slate-900 text-slate-300">
+                        <p><span class="text-amber-400">public class</span> <span class="text-white">Main</span> {</p>
+                        <p class="pl-4"><span class="text-amber-400">public static void</span> <span class="text-blue-300">main</span>(String[] args) {</p>
+                        <p class="pl-8 text-slate-500">// 제발 이번엔 맞자...</p>
+                        <p class="pl-8"><span class="text-white">solve();</span></p>
+                        <p class="pl-4">}</p>
+                        <p>}</p>
+                     </div>
+                     <!-- Transform Arrow -->
+                     <div class="absolute inset-0 flex items-center justify-center bg-slate-900/10 backdrop-blur-[1px] opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                        <div class="bg-white p-4 rounded-full shadow-lg transform translate-y-4 group-hover:translate-y-0 transition-all duration-300">
+                           <ArrowDown :size="32" class="text-indigo-600" />
+                        </div>
+                     </div>
                   </div>
-                </div>
-
-                <div
-                  class="bg-slate-900/50 rounded-2xl border border-white/10 p-6 relative overflow-hidden"
-                >
-                  <div
-                    class="absolute top-0 right-0 bg-red-500/20 text-red-300 text-[10px] px-2 py-1 rounded-bl-lg font-bold border-l border-b border-red-500/20"
-                  >
-                    Proof of Effort
-                  </div>
-                  <div class="flex flex-col justify-between h-full gap-4">
-                    <div class="flex justify-between items-center">
-                      <div class="flex items-center gap-2">
-                        <div
-                          class="w-2 h-2 rounded-full bg-red-500 animate-pulse"
-                        ></div>
-                        <span class="text-sm text-red-300 font-bold"
-                          >틀렸습니다 (시간 초과)</span
-                        >
-                      </div>
-                      <span class="text-xs text-slate-500"
-                        >오늘, 3시간 소요</span
-                      >
-                    </div>
-
-                    <div
-                      class="bg-slate-800/50 rounded-lg p-3 flex items-center gap-3 border border-white/5"
-                    >
-                      <div class="bg-green-500/20 p-1.5 rounded-full">
-                        <GitCommit :size="16" class="text-green-400" />
-                      </div>
-                      <div class="flex-1">
-                        <p class="text-xs text-slate-300 font-mono">
-                          feat: solve BOJ_2580 (Attempt 1)
-                        </p>
-                        <p class="text-[10px] text-slate-500">
-                          Dash Bot committed 1 min ago
-                        </p>
-                      </div>
-                    </div>
-
-                    <div>
-                      <p class="text-[10px] text-slate-400 mb-1">
-                        Contribution Graph
-                      </p>
-                      <div class="flex gap-1">
-                        <div class="w-4 h-4 rounded bg-slate-800"></div>
-                        <div class="w-4 h-4 rounded bg-green-700"></div>
-                        <div
-                          class="w-4 h-4 rounded bg-yellow-600 border border-yellow-500/50 shadow-[0_0_10px_rgba(234,179,8,0.3)]"
-                          title="실패했지만 기록됨!"
-                        ></div>
-                        <div class="w-4 h-4 rounded bg-slate-800"></div>
-                        <div class="w-4 h-4 rounded bg-slate-800"></div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
+               </div>
             </div>
 
+            <!-- Feature 2: Reviewer -->
             <div
-              class="reveal bg-white/[0.03] border border-white/10 rounded-3xl p-8 md:p-10 flex flex-col gap-10"
+              class="group reveal bg-white rounded-[40px] p-8 md:p-12 shadow-sm border border-slate-100 hover:shadow-2xl transition-all duration-500 grid grid-cols-1 lg:grid-cols-2 gap-12 items-center"
             >
-              <div
-                class="text-center md:text-left flex flex-col md:flex-row gap-6 items-center md:items-start border-b border-white/5 pb-8"
-              >
-                <div
-                  class="p-4 rounded-2xl bg-green-500/10 text-green-400 flex-shrink-0"
-                >
-                  <Bot :size="40" />
-                </div>
-                <div>
-                  <h3 class="text-2xl font-bold text-white mb-2">
-                    Reviewer (리뷰어)
+               <div class="relative group-hover:scale-[1.02] transition-transform duration-500">
+                  <div class="absolute -inset-4 bg-gradient-to-l from-indigo-50 to-purple-50 rounded-[40px] -z-10 transform -rotate-2"></div>
+                   <div class="bg-white rounded-3xl shadow-xl border border-slate-200 p-6 relative overflow-hidden">
+                       <div class="absolute top-0 left-0 bg-green-500 text-white text-[10px] font-bold px-3 py-1 rounded-br-xl">Dash AI Analysis</div>
+                       <div class="flex gap-4 mt-4">
+                           <div class="w-12 h-12 rounded-2xl bg-green-100 flex items-center justify-center shrink-0">
+                               <Bot :size="24" class="text-green-600" />
+                           </div>
+                           <div class="space-y-2">
+                               <div class="h-4 bg-slate-100 rounded w-48"></div>
+                               <div class="h-3 bg-slate-50 rounded w-full"></div>
+                               <div class="h-3 bg-slate-50 rounded w-5/6"></div>
+                           </div>
+                       </div>
+                       <div class="mt-6 bg-slate-50 rounded-xl p-4 border border-slate-100">
+                           <p class="text-sm text-slate-600 leading-relaxed font-medium">
+                               "이 풀이는 <span class="bg-green-100 text-green-700 font-bold px-1 rounded">DP(동적 계획법)</span>를 사용하여 O(N) 시간 복잡도로 <br/>
+                               효율적으로 해결했습니다. 메모이제이션 활용이 훌륭하네요! 👍"
+                           </p>
+                       </div>
+                   </div>
+               </div>
+               <div>
+                  <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-green-50 text-green-600 font-bold text-sm mb-6">
+                    <Bot :size="16" />
+                    AI Reviewer
+                  </div>
+                  <h3 class="text-3xl font-bold text-slate-900 mb-4 leading-tight">
+                    "주석 없는 코드는<br/> 읽기 힘들어요."
                   </h3>
-                  <p class="text-xl font-medium text-slate-300 mb-2">
-                    "주석 없는 코드를 이해하느라 시간을 다 써요."
+                  <p class="text-lg text-slate-500 mb-8 leading-relaxed">
+                    속 시원하게, <span class="text-slate-900 font-bold underline decoration-green-300">AI가 대신 읽어드립니다.</span><br/>
+                    알고리즘 분류, 시간 복잡도, 풀이 핵심을 3초 만에 요약해서 보여줍니다.
+                    코드 리뷰 시간을 획기적으로 줄여보세요.
                   </p>
-                  <p class="text-slate-400">
-                    속 시원하게,
-                    <span class="text-green-400 font-bold"
-                      >AI가 달아줄게요!<br
-                    /></span>
-                    코드를 읽지 않아도 풀이의 핵심을 3초 만에 파악하세요.
-                  </p>
-                </div>
-              </div>
-
-              <div
-                class="w-full grid grid-cols-1 md:grid-cols-[1fr_auto_1fr] gap-6 items-center"
-              >
-                <div
-                  class="bg-slate-900 rounded-xl p-6 border border-white/10 relative min-h-[160px] flex flex-col justify-center"
-                >
-                  <div
-                    class="absolute -top-3 left-4 bg-slate-800 px-2 py-0.5 text-xs text-slate-400 rounded"
-                  >
-                    Before
-                  </div>
-                  <div class="space-y-2 opacity-40 blur-[1px]">
-                    <div class="h-2 bg-slate-600 rounded w-3/4"></div>
-                    <div class="h-2 bg-slate-600 rounded w-full"></div>
-                    <div class="h-2 bg-slate-600 rounded w-1/2"></div>
-                  </div>
-                  <div
-                    class="mt-4 text-center text-red-400 text-sm font-medium flex justify-center items-center gap-2"
-                  >
-                    <Search :size="16" /> 분석에 10분 소요
-                  </div>
-                </div>
-
-                <ArrowRight
-                  :size="32"
-                  class="text-slate-600 mx-auto rotate-90 md:rotate-0"
-                />
-
-                <div
-                  class="bg-green-950/20 rounded-xl p-6 border border-green-500/20 relative min-h-[160px] flex flex-col justify-center"
-                >
-                  <div
-                    class="absolute -top-3 left-4 bg-green-600 px-2 py-0.5 text-xs text-white rounded shadow-lg"
-                  >
-                    Dash AI
-                  </div>
-                  <div class="flex flex-wrap gap-2 mb-3">
-                    <span
-                      class="px-2 py-1 rounded bg-blue-500/20 text-blue-300 text-xs font-mono"
-                      >#DP</span
-                    >
-                    <span
-                      class="px-2 py-1 rounded bg-purple-500/20 text-purple-300 text-xs font-mono"
-                      >#O(N)</span
-                    >
-                  </div>
-                  <p class="text-sm text-slate-200 leading-relaxed">
-                    "점화식을 이용한
-                    <span class="text-green-300 font-bold">동적 계획법</span>
-                    풀이입니다. <br />
-                    메모이제이션으로 중복 계산을 제거했습니다."
-                  </p>
-                </div>
-              </div>
+               </div>
             </div>
 
-            <div
-              class="reveal bg-white/[0.03] border border-white/10 rounded-3xl p-8 md:p-10 flex flex-col gap-10"
+            <!-- Feature 3: Captain -->
+             <div
+              class="group reveal bg-white rounded-[40px] p-8 md:p-12 shadow-sm border border-slate-100 hover:shadow-2xl transition-all duration-500 grid grid-cols-1 lg:grid-cols-2 gap-12 items-center"
             >
-              <div
-                class="text-center md:text-left flex flex-col md:flex-row gap-6 items-center md:items-start border-b border-white/5 pb-8"
-              >
-                <div
-                  class="p-4 rounded-2xl bg-blue-500/10 text-blue-400 flex-shrink-0"
-                >
-                  <ClipboardList :size="40" />
-                </div>
-                <div>
-                  <h3 class="text-2xl font-bold text-white mb-2">
-                    Lead (스터디장)
+               <div class="order-2 lg:order-1">
+                  <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-50 text-blue-600 font-bold text-sm mb-6">
+                    <ClipboardList :size="16" />
+                    Study Lead
+                  </div>
+                  <h3 class="text-3xl font-bold text-slate-900 mb-4 leading-tight">
+                    "매주 문제 고르는 게<br/> 제일 큰 일이에요."
                   </h3>
-                  <p class="text-xl font-medium text-slate-300 mb-2">
-                    "매주 문제를 정하는 것도, 레벨 차이 조율도 힘들어요."
+                  <p class="text-lg text-slate-500 mb-8 leading-relaxed">
+                    팀원들의 Solved.ac 티어와 취약 유형을 분석해,<br/>
+                    이번 주에 풀어야 할 <span class="text-slate-900 font-bold underline decoration-blue-300">최적의 문제를 추천</span>합니다.
+                    이제 스터디장은 결정만 하세요.
                   </p>
-                  <p class="text-slate-400">
-                    정확한 분석으로,
-                    <span class="text-blue-400 font-bold"
-                      >AI가 공통 목표를 잡아줘요!<br
-                    /></span>
-                    팀원들의 Solved.ac 티어와 취약점을 분석해, 이번 주 최적의
-                    문제를 추천합니다.
-                  </p>
-                </div>
-              </div>
-
-              <div
-                class="w-full grid grid-cols-1 md:grid-cols-[1fr_auto_1.2fr] gap-6 items-center"
-              >
-                <div
-                  class="bg-slate-900 rounded-xl p-6 border border-white/10 relative min-h-[200px] flex flex-col justify-center"
-                >
-                  <div class="absolute top-3 left-4 text-xs text-slate-500">
-                    💬 스터디 단톡방
-                  </div>
-                  <div class="space-y-3 mt-4">
-                    <div class="flex gap-2">
-                      <div class="w-6 h-6 rounded-full bg-slate-700"></div>
-                      <div
-                        class="bg-slate-800 p-2 rounded-r-lg rounded-bl-lg text-xs text-slate-300"
-                      >
-                        이번 주 뭐 풀까요? 골드?
+               </div>
+               <div class="order-1 lg:order-2 relative group-hover:scale-[1.02] transition-transform duration-500">
+                  <div class="absolute -inset-4 bg-gradient-to-tr from-blue-50 to-cyan-50 rounded-[40px] -z-10 transform rotate-1"></div>
+                  <div class="bg-white rounded-3xl shadow-xl border border-slate-200 p-6 flex flex-col gap-4">
+                      <div class="flex justify-between items-center border-b border-slate-100 pb-4">
+                          <span class="font-bold text-slate-800">Weekly Recommendation</span>
+                          <span class="text-xs bg-red-100 text-red-500 font-bold px-2 py-1 rounded-full">취약점 보완</span>
                       </div>
-                    </div>
-                    <div class="flex gap-2 flex-row-reverse">
-                      <div class="w-6 h-6 rounded-full bg-indigo-900"></div>
-                      <div
-                        class="bg-indigo-900/50 p-2 rounded-l-lg rounded-br-lg text-xs text-slate-300"
-                      >
-                        아직 실버도 어려워요.. 😓
+                      <div class="flex items-center gap-4 p-3 bg-slate-50 rounded-2xl border border-slate-100">
+                          <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-amber-400 to-amber-600 flex items-center justify-center text-white font-bold shadow-lg shadow-amber-500/30">G4</div>
+                          <div class="flex-1">
+                              <h4 class="font-bold text-slate-800">평범한 배낭</h4>
+                              <p class="text-xs text-slate-400">#DP #Knapsack</p>
+                          </div>
                       </div>
-                    </div>
-                    <div class="flex justify-center mt-2">
-                      <span
-                        class="text-[10px] text-red-400 bg-red-950/50 px-2 py-1 rounded-full"
-                        >결정 장애...</span
-                      >
-                    </div>
+                      <div class="flex items-center gap-4 p-3 bg-slate-50 rounded-2xl border border-slate-100 opacity-60">
+                           <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-slate-300 to-slate-400 flex items-center justify-center text-white font-bold">S1</div>
+                           <div class="flex-1">
+                               <h4 class="font-bold text-slate-800">정수 삼각형</h4>
+                               <p class="text-xs text-slate-400">#DP</p>
+                           </div>
+                      </div>
                   </div>
-                </div>
-
-                <div class="flex justify-center text-slate-500">
-                  <ArrowRight :size="32" class="hidden md:block" />
-                  <ArrowDown :size="32" class="block md:hidden" />
-                </div>
-
-                <div
-                  class="bg-blue-950/20 rounded-xl border border-blue-500/20 overflow-hidden flex flex-col min-h-[200px]"
-                >
-                  <div
-                    class="p-4 border-b border-blue-500/10 bg-blue-900/10 flex justify-between items-center"
-                  >
-                    <span
-                      class="text-xs font-bold text-blue-300 flex items-center gap-1"
-                    >
-                      <PieChart :size="12" /> Team Status
-                    </span>
-                    <span
-                      class="text-[10px] text-red-300 bg-red-500/10 px-1.5 py-0.5 rounded"
-                      >DP 취약 ⚠️</span
-                    >
-                  </div>
-                  <div
-                    class="p-5 flex-1 flex flex-col justify-center items-center text-center"
-                  >
-                    <h4 class="text-white font-bold text-base mb-1">
-                      Week 4: DP 기초 다지기
-                    </h4>
-                    <p class="text-xs text-slate-400 mb-3">
-                      팀원 평균 티어(실버1) 맞춤<br />필수 문제 5선 추천
-                    </p>
-                    <button
-                      class="text-xs bg-blue-600 hover:bg-blue-500 text-white px-4 py-2 rounded-lg transition-colors w-full shadow-lg shadow-blue-500/20"
-                    >
-                      커리큘럼 적용하기
-                    </button>
-                  </div>
-                </div>
-              </div>
+               </div>
             </div>
+
           </div>
         </section>
 
+        <!-- Bento Grid Features Overview -->
         <section
           id="core"
-          class="container mx-auto px-6 py-24 border-t border-white/5"
+          class="container mx-auto px-6 py-24"
         >
           <div class="text-center mb-16">
-            <h2 class="text-4xl font-bold mb-4 text-white">Dash의 핵심 기능</h2>
-            <p class="text-lg text-slate-400">
+            <h2 class="text-3xl font-bold mb-4 text-slate-900">그 외에도 강력한 기능들</h2>
+            <p class="text-lg text-slate-500">
               코딩에만 집중하세요. 나머지는 Dash가 알아서 합니다.
             </p>
           </div>
@@ -443,97 +248,63 @@
             <div
               v-for="(feature, index) in detailedFeatures"
               :key="feature.title"
-              class="group relative p-6 rounded-2xl border border-white/5 bg-white/[0.03] hover:bg-white/[0.06] transition-all duration-300 hover:-translate-y-1"
+              class="group relative p-8 rounded-3xl bg-white border border-slate-200 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300"
             >
+              <!-- Icon -->
               <div
-                class="absolute inset-0 rounded-2xl bg-gradient-to-br from-indigo-500/5 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity"
-              ></div>
-              <div class="relative z-10">
-                <div
-                  class="h-12 w-12 rounded-lg bg-indigo-500/10 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300"
-                >
-                  <component
-                    :is="feature.icon"
-                    :size="24"
-                    class="text-indigo-400"
-                  />
-                </div>
-                <h3 class="text-xl font-semibold mb-2 text-slate-200">
-                  {{ feature.title }}
-                </h3>
-                <p class="text-slate-400 text-sm leading-relaxed">
-                  {{ feature.description }}
-                </p>
+                class="w-12 h-12 rounded-2xl bg-indigo-50 flex items-center justify-center mb-6 group-hover:bg-indigo-600 transition-colors duration-300"
+              >
+                 <component :is="feature.icon" :size="24" class="text-indigo-600 group-hover:text-white transition-colors duration-300" />
               </div>
+              
+              <h3 class="text-xl font-bold mb-3 text-slate-800">
+                {{ feature.title }}
+              </h3>
+              <p class="text-slate-500 text-sm leading-relaxed">
+                {{ feature.description }}
+              </p>
             </div>
           </div>
         </section>
 
-        <section class="container mx-auto px-6 py-24 border-t border-white/5">
+        <!-- CTA -->
+        <section class="container mx-auto px-6 py-24 pb-32">
           <div
-            class="relative rounded-3xl bg-gradient-to-b from-indigo-900/20 to-slate-900/50 border border-indigo-500/20 p-12 overflow-hidden text-center"
+            class="relative rounded-[48px] bg-slate-900 overflow-hidden text-center p-12 md:p-24 shadow-2xl"
           >
-            <div
-              class="absolute top-0 left-1/2 -translate-x-1/2 w-1/2 h-1/2 bg-indigo-500/20 blur-[100px] rounded-full"
-            ></div>
-            <div class="relative z-10 max-w-2xl mx-auto">
-              <h2 class="text-3xl md:text-4xl font-bold mb-6 text-white">
-                코딩에만 집중하세요.<br />나머지는 Dash가 합니다.
+            <!-- Fancy Background elements within CTA -->
+            <div class="absolute top-0 right-0 w-64 h-64 bg-indigo-500 rounded-full blur-[80px] opacity-30"></div>
+            <div class="absolute bottom-0 left-0 w-64 h-64 bg-purple-500 rounded-full blur-[80px] opacity-30"></div>
+            
+            <div class="relative z-10 max-w-3xl mx-auto">
+              <h2 class="text-4xl md:text-5xl font-black mb-8 text-white leading-tight">
+                준비되셨나요? <br/>
+                <span class="text-indigo-400">Dash</span>로 멋진 항해를 시작하세요.
               </h2>
+              <p class="text-slate-400 text-lg mb-10">
+                 지금 바로 무료로 시작해보세요. 팀원 초대는 언제든지 가능합니다.
+              </p>
 
               <button
                 @click="handleLogin"
-                class="inline-flex items-center justify-center gap-2 px-8 py-4 rounded-full bg-white text-slate-950 hover:bg-slate-200 transition-all font-bold text-lg hover:shadow-[0_0_20px_rgba(255,255,255,0.3)]"
+                class="inline-flex items-center justify-center gap-2 px-10 py-5 rounded-2xl bg-white text-slate-900 hover:bg-indigo-50 transition-all font-bold text-lg shadow-lg hover:shadow-white/20 hover:scale-105"
               >
                 <Github :size="20" />
-                지금 무료로 Dash 시작하기
+                지금 Dash 시작하기
               </button>
             </div>
           </div>
         </section>
       </template>
-
-      <template v-else-if="authChecked && user">
-        <section class="container mx-auto px-6 py-20">
-          <div
-            class="max-w-3xl mx-auto bg-gradient-to-br from-slate-900/60 to-slate-800/30 border border-white/6 rounded-3xl p-12 shadow-xl text-center"
-          >
-            <div class="flex flex-col items-center gap-4">
-              <div class="bg-indigo-700/20 p-4 rounded-full">
-                <ClipboardList :size="48" class="text-indigo-300" />
-              </div>
-              <h2 class="text-3xl md:text-4xl font-extrabold text-white">
-                대시보드
-              </h2>
-              <p class="text-slate-300 max-w-xl">가입된 스터디가 없습니다.</p>
-
-              <div class="mt-6 flex gap-4 justify-center">
-                <button
-                  class="px-5 py-3 rounded-full bg-indigo-600 text-white font-semibold shadow-lg hover:bg-indigo-500 transition"
-                  @click="goToDashboard"
-                >
-                  스터디 찾기
-                </button>
-                <button
-                  @click="goToDashboard"
-                  class="px-5 py-3 rounded-full bg-white/5 text-white border border-white/10 hover:bg-white/10 transition"
-                >
-                  새 스터디 만들기
-                </button>
-              </div>
-
-              <p class="text-xs text-slate-500 mt-4">
-                Tip: GitHub 연동 후 자동 커밋으로 활동이 기록됩니다.
-              </p>
-            </div>
-          </div>
-        </section>
-      </template>
     </main>
-
-    <footer class="border-t border-white/5 py-8 bg-slate-950">
-      <div class="container mx-auto px-6 text-center text-sm text-slate-500">
-        © 2025 DASH. All rights reserved.
+    
+    <footer class="border-t border-slate-200 py-12 bg-white">
+      <div class="container mx-auto px-6 text-center">
+        <div class="text-2xl font-black text-slate-900 mb-6">Dash</div>
+        <div class="text-sm text-slate-400">
+          © 2025 DASH. All rights reserved. <br/>
+          Designed for developers, by developers.
+        </div>
       </div>
     </footer>
   </div>
@@ -606,7 +377,6 @@ import { useAuth } from "../composables/useAuth";
 import { authApi } from "../api/auth";
 
 const { user, authChecked } = useAuth();
-// const API_BASE = import.meta.env.VITE_API_BASE_URL || "http://localhost:8080";
 
 let revealObserver = null;
 function initReveal() {
@@ -624,11 +394,11 @@ function initReveal() {
         }
       });
     },
-    { threshold: 0.12 }
+    { threshold: 0.1 }
   );
 
   els.forEach((el, i) => {
-    el.style.transitionDelay = `${i * 120}ms`;
+    el.style.transitionDelay = `${i * 100}ms`;
     revealObserver.observe(el);
   });
 }
@@ -637,7 +407,11 @@ watch(
   authChecked,
   (val) => {
     if (val) {
-      nextTick(() => initReveal());
+      if (user.value) {
+        window.location.href = "/dashboard";
+      } else {
+        nextTick(() => initReveal());
+      }
     }
   },
   { immediate: true }
@@ -655,38 +429,37 @@ const scrollToSection = (id) => {
   if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
 };
 
-const goHome = () => {
-  window.location.href = "/";
-};
-const goToDashboard = () => {
-  window.location.href = "/dashboard";
-};
 const handleLogin = () => {
   window.location.href = `/oauth2/authorization/github`;
-};
-
-const toggleProfileMenu = () => {};
-
-const goToProfile = () => {
-  window.location.href = "/profile";
-};
-
-const handleLogout = async () => {
-  try {
-    await authApi.logout();
-  } catch (e) {
-    console.error("Logout failed:", e);
-  } finally {
-    window.location.href = "/";
-  }
 };
 </script>
 
 <style scoped>
+@import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css');
+
+.animate-blob {
+  animation: blob 7s infinite;
+}
+
+.animation-delay-2000 {
+  animation-delay: 2s;
+}
+
+.animation-delay-4000 {
+  animation-delay: 4s;
+}
+
+@keyframes blob {
+  0% { transform: translate(0px, 0px) scale(1); }
+  33% { transform: translate(30px, -50px) scale(1.1); }
+  66% { transform: translate(-20px, 20px) scale(0.9); }
+  100% { transform: translate(0px, 0px) scale(1); }
+}
+
 @keyframes fade-in-up {
   from {
     opacity: 0;
-    transform: translateY(20px);
+    transform: translateY(30px);
   }
   to {
     opacity: 1;
@@ -695,32 +468,20 @@ const handleLogout = async () => {
 }
 
 .animate-fade-in-up {
-  animation: fade-in-up 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  animation: fade-in-up 1s cubic-bezier(0.16, 1, 0.3, 1) forwards;
   opacity: 0;
 }
 
-.slide-down-enter-from,
-.slide-down-leave-to {
-  opacity: 0;
-  transform: translateY(-6px) scale(0.98);
-}
-.slide-down-enter-to,
-.slide-down-leave-from {
-  opacity: 1;
-  transform: translateY(0) scale(1);
-}
-.slide-down-enter-active,
-.slide-down-leave-active {
-  transition: transform 180ms cubic-bezier(0.16, 1, 0.3, 1), opacity 160ms ease;
-}
+.delay-100 { animation-delay: 0.1s; }
+.delay-200 { animation-delay: 0.2s; }
+.delay-300 { animation-delay: 0.3s; }
 
 .reveal {
   opacity: 0;
-  transform: translateY(18px);
-  will-change: transform, opacity;
-  transition: opacity 560ms cubic-bezier(0.16, 1, 0.3, 1),
-    transform 560ms cubic-bezier(0.16, 1, 0.3, 1);
+  transform: translateY(40px);
+  transition: opacity 1s cubic-bezier(0.16, 1, 0.3, 1), transform 1s cubic-bezier(0.16, 1, 0.3, 1);
 }
+
 .reveal-visible {
   opacity: 1;
   transform: translateY(0);

@@ -7,6 +7,7 @@ import org.springframework.stereotype.Repository;
 
 import com.ssafy.dash.algorithm.domain.AlgorithmRecord;
 import com.ssafy.dash.algorithm.domain.AlgorithmRecordRepository;
+import com.ssafy.dash.algorithm.domain.StudyStats;
 import com.ssafy.dash.algorithm.infrastructure.mapper.AlgorithmRecordMapper;
 
 @Repository
@@ -44,8 +45,18 @@ public class AlgorithmRecordRepositoryImpl implements AlgorithmRecordRepository 
     }
 
     @Override
+    public List<AlgorithmRecord> findByStudyId(Long studyId) {
+        return mapper.selectByStudyId(studyId);
+    }
+
+    @Override
     public boolean delete(Long id) {
         return mapper.delete(id) > 0;
     }
-    
+
+    @Override
+    public StudyStats countsByStudyId(Long studyId) {
+        return mapper.countsByStudyId(studyId);
+    }
+
 }

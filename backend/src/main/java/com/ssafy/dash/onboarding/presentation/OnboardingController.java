@@ -19,15 +19,31 @@ import com.ssafy.dash.onboarding.presentation.dto.response.RepositorySetupRespon
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import com.ssafy.dash.analytics.application.SolvedacSyncService;
+import com.ssafy.dash.analytics.application.dto.RegisterHandleRequest;
 
 @RestController
 @RequestMapping("/api/onboarding")
 public class OnboardingController {
 
     private final OnboardingService onboardingService;
+    private final SolvedacSyncService solvedacSyncService;
 
-    public OnboardingController(OnboardingService onboardingService) {
+    public OnboardingController(OnboardingService onboardingService, SolvedacSyncService solvedacSyncService) {
         this.onboardingService = onboardingService;
+        this.solvedacSyncService = solvedacSyncService;
+    }
+
+    @PostMapping("/solvedac")
+    @Operation(summary = "Solved.ac 핸들 등록", description = "Solved.ac 아이디를 연동하고 데이터를 분석합니다.")
+    public ResponseEntity<Void> registerSolvedacRaw(
+            @Parameter(hidden = true) @AuthenticationPrincipal OAuth2User principal,
+            @Validated @RequestBody RegisterHandleRequest request) {
+        if (principal instanceof CustomOAuth2User customUser) {
+            solvedacSyncService.registerSolvedacHandle(customUser.getUserId(), request.getHandle());
+            return ResponseEntity.ok().build();
+        }
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
     }
 
     @PostMapping("/repository")

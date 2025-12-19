@@ -11,10 +11,20 @@ public record UserResponse(
         LocalDateTime createdAt,
         String provider,
         String providerId,
-        String avatarUrl) {
+        String avatarUrl,
+        Long studyId) {
 
     public static UserResponse from(UserResult result) {
-        return new UserResponse(result.id(), result.username(), result.email(), result.createdAt(), result.provider(), result.providerId(), result.avatarUrl());
+        return new UserResponse(
+                result.id(),
+                result.username(),
+                result.email(),
+                result.createdAt(),
+                result.provider(),
+                result.providerId(),
+                result.avatarUrl(),
+                result.studyId()
+        );
     }
 
 }

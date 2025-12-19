@@ -5,4 +5,8 @@ export const onboardingApi = {
     submitRepository(repositoryName) {
         return http.post('/onboarding/repository', { repositoryName });
     },
+    // Register Solved.ac handle
+    registerSolvedac(handle) {
+        return http.post('/onboarding/solvedac', { handle });
+    },
 };

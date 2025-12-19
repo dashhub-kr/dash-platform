@@ -72,6 +72,7 @@ cd backend
 | User       | `UserControllerIntegrationTest`                             | `UserServiceTest`                               | `UserTest`            | CRUD + `/me` 엔드포인트 포함          |
 | OAuth      | `OAuthSessionControllerTest`, `CustomOAuth2UserServiceTest` | `OAuthUserServiceTest`, `OAuthTokenServiceTest` | `UserOAuthTokenTest`  | Security 어댑터/Access Token 갱신   |
 | Onboarding | `OnboardingControllerTest`                                  | `OnboardingServiceTest`                         | `OnboardingTest`      | GitHub Webhook/토큰 경로 필수        |
+| Analytics  | -                                                           | `UserSkillAnalysisServiceTest`, `BalanceAnalysisServiceTest`, `DifficultyAnalysisServiceTest`, `GrowthAnalysisServiceTest` | - | Solved.ac 연동 분석 (28 tests) |
 
 신규 모듈도 Controller + Service + Domain 세 축을 기본선으로 삼고, 별도 어댑터(Security, GitHub 등)가 있다면 전용 테스트 클래스를 추가한다.
 

@@ -36,7 +36,8 @@ public final class AlgorithmRecordFixtures {
     }
 
     public static AlgorithmRecordFixture algorithmRecordFixture(Long userId) {
-        return new AlgorithmRecordFixture(TEST_ALGORITHM_RECORD_ID, userId, TEST_PROBLEM_NUMBER, TEST_ALGORITHM_TITLE, TEST_ALGORITHM_CODE, TEST_ALGORITHM_LANGUAGE);
+        return new AlgorithmRecordFixture(TEST_ALGORITHM_RECORD_ID, userId, TEST_PROBLEM_NUMBER, TEST_ALGORITHM_TITLE,
+                TEST_ALGORITHM_CODE, TEST_ALGORITHM_LANGUAGE);
     }
 
     public record AlgorithmRecordFixture(
@@ -45,9 +46,8 @@ public final class AlgorithmRecordFixtures {
             String problemNumber,
             String title,
             String code,
-            String language
-    ) {
-        
+            String language) {
+
         public AlgorithmRecord toDomain(LocalDateTime createdAt) {
             AlgorithmRecord record = AlgorithmRecord.create(userId, null, problemNumber, title,
                     language, code, createdAt);
@@ -57,24 +57,24 @@ public final class AlgorithmRecordFixtures {
 
         public AlgorithmRecordResult toResult(LocalDateTime createdAt, LocalDateTime updatedAt) {
             return new AlgorithmRecordResult(
-                id,
-                userId,
-                problemNumber,
-                title,
-                code,
-                language,
-                "UNKNOWN",
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                createdAt,
-                updatedAt
-            );
+                    id,
+                    userId,
+                    "testuser",
+                    problemNumber,
+                    title,
+                    code,
+                    language,
+                    "UNKNOWN",
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    createdAt,
+                    updatedAt);
         }
 
         public AlgorithmRecordCreateCommand toCreateCommand(String codeOverride) {
@@ -87,6 +87,6 @@ public final class AlgorithmRecordFixtures {
                     codeOverride == null ? code : codeOverride);
         }
 
-    }   
-    
+    }
+
 }

@@ -67,6 +67,32 @@ cd backend
 - `github.infrastructure` 패키지가 GitHub API/Webhook 어댑터를 캡슐화한다.
 - `com.ssafy.dash.common`에는 `TestFixtures`, `FixtureTime`, `GlobalExceptionHandler` 등이 포함된다.
 
+### Analytics (신규)
+
+Solved.ac 연동 및 사용자 스킬 분석을 담당하는 도메인이다.
+
+- **Presentation**: `SolvedacStatsController`, `AnalysisController`가 통계 동기화 및 분석 API를 제공한다.
+- **Application**: 7개 서비스로 구성된다:
+    - `SolvedacSyncService`: Solved.ac API 호출 및 데이터 동기화.
+    - `UserSkillAnalysisService`: 강점/약점 태그 분석, 종합 요약.
+    - `BalanceAnalysisService`: 학습 밸런스(집중도) 분석.
+    - `DifficultyAnalysisService`: 클래스별 난이도 진행 분석.
+    - `LearningPathService`: 3단계 맞춤 학습 경로 추천.
+    - `GrowthAnalysisService`: 성장 추세 분석.
+    - `StatsSnapshotService`: 일별 통계 스냅샷 관리.
+- **Domain**: `UserTagStat`, `UserClassStat`, `UserStatsSnapshot` 엔티티.
+    - 엔티티 내 비즈니스 로직: `getMasteryLevel()`, `getCompletionRate()` 등 계산 메서드 포함.
+- **Infrastructure**: `UserTagStatMapper`, `UserClassStatMapper`, `UserStatsSnapshotMapper` MyBatis 매퍼.
+
+### External (신규)
+
+외부 API 연동을 담당하는 공용 패키지이다.
+
+- **solvedac**: `SolvedacApiClient` 인터페이스와 `SolvedacApiClientImpl` 구현체.
+    - Spring `RestClient`를 사용한 HTTP 통신.
+    - `SolvedacUserResponse`, `TagStatResponse`, `ClassStatResponse` DTO.
+    - `SolvedacApiException` 예외 처리.
+
 ## 4. DTO & 데이터 경계
 
 | 종류         | 위치                            | 용도                              | 생성 위치  |

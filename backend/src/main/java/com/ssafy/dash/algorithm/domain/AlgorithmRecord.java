@@ -31,7 +31,11 @@ public class AlgorithmRecord {
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
-    private AlgorithmRecord(Long userId, Long studyId, String problemNumber, String title, String language, String code, LocalDateTime createdAt, LocalDateTime updatedAt) {
+    // Joined fields
+    private String username;
+
+    private AlgorithmRecord(Long userId, Long studyId, String problemNumber, String title, String language, String code,
+            LocalDateTime createdAt, LocalDateTime updatedAt) {
         this.userId = requirePositive(userId);
         this.studyId = studyId;
         this.problemNumber = requireText(problemNumber, "problemNumber");
@@ -43,7 +47,8 @@ public class AlgorithmRecord {
         this.updatedAt = requireTimestamp(updatedAt, "updatedAt");
     }
 
-    public static AlgorithmRecord create(Long userId, Long studyId, String problemNumber, String title, String language, String code, LocalDateTime createdAt) {
+    public static AlgorithmRecord create(Long userId, Long studyId, String problemNumber, String title, String language,
+            String code, LocalDateTime createdAt) {
         return new AlgorithmRecord(
                 userId,
                 studyId,
@@ -52,8 +57,7 @@ public class AlgorithmRecord {
                 language,
                 code,
                 createdAt,
-                createdAt
-        );
+                createdAt);
     }
 
     public void applyUpdate(String problemNumber, String title, String language, String code, LocalDateTime updatedAt) {
@@ -72,7 +76,8 @@ public class AlgorithmRecord {
         this.updatedAt = requireTimestamp(updatedAt, "updatedAt");
     }
 
-    public void enrichMetadata(String platform, String difficulty, Integer runtimeMs, Integer memoryKb, String repositoryName, String filePath, String commitSha, String commitMessage, LocalDateTime committedAt) {
+    public void enrichMetadata(String platform, String difficulty, Integer runtimeMs, Integer memoryKb,
+            String repositoryName, String filePath, String commitSha, String commitMessage, LocalDateTime committedAt) {
         if (platform != null && !platform.isBlank()) {
             this.platform = platform;
         }

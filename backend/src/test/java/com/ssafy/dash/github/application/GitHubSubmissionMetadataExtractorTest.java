@@ -9,7 +9,7 @@ class GitHubSubmissionMetadataExtractorTest {
 
     @Test
     void extractParsesBaekjoonHubCommitMessage() {
-        String message = "[Bronze V] Title: A+B, Time: 1 ms, Memory: 1 KB -BaekjoonHub";
+        String message = "[Bronze V] Title: A+B, Time: 108 ms, Memory: 14212 KB -BaekjoonHub";
         String path = "백준/Bronze/1000.A+B.java";
 
         GitHubSubmissionMetadataExtractor.SubmissionMetadata metadata = extractor.extract(message, path);
@@ -36,5 +36,5 @@ class GitHubSubmissionMetadataExtractorTest {
         assertThat(metadata.title()).contains("SomeProblem");
         assertThat(metadata.language()).isEqualTo("KOTLIN");
     }
-    
+
 }

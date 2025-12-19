@@ -1,173 +1,484 @@
 <template>
-  <div class="min-h-screen bg-slate-950 text-slate-100 selection:bg-indigo-500/30">
-    
-    <main class="container mx-auto px-6 py-10">
+  <div class="min-h-screen bg-slate-50 text-slate-800">
+    <!-- Navbar / Header Area -->
+
+
+
+    <main class="container mx-auto px-6 py-8">
       <!-- Welcome Section -->
-      <section class="mb-12">
-        <h1 class="text-3xl md:text-4xl font-bold mb-4 animate-fade-in-up">
-          안녕하세요, <span class="text-indigo-400">{{ user?.username || '사용자' }}</span>님!
+      <div class="mb-10">
+        <h1 class="text-3xl font-extrabold text-slate-900 mb-2">
+          안녕하세요, <span class="text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-purple-600">탐험가님!</span> 👋
         </h1>
-        <p class="text-slate-400 animate-fade-in-up delay-100">
-          오늘도 코딩하기 좋은 날입니다. 학습 현황을 확인해보세요.
-        </p>
-      </section>
-
-      <!-- Stats Overview -->
-      <section class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12 animate-fade-in-up delay-200">
-        <!-- Solved Count -->
-        <div class="bg-slate-900/50 border border-white/10 rounded-2xl p-6 hover:bg-slate-900 transition-colors group">
-          <div class="flex items-center gap-4 mb-4">
-            <div class="p-3 bg-indigo-500/20 rounded-xl text-indigo-400 group-hover:scale-110 transition-transform">
-              <CheckCircle :size="24" />
-            </div>
-            <h3 class="text-lg font-semibold text-slate-200">해결한 문제</h3>
-          </div>
-          <p class="text-4xl font-bold text-white mb-2">{{ solvedCount }}</p>
-          <p class="text-sm text-slate-500">이번 주 +{{ weeklySolvedCount }} 문제</p>
-        </div>
-
-        <!-- Streak -->
-        <div class="bg-slate-900/50 border border-white/10 rounded-2xl p-6 hover:bg-slate-900 transition-colors group">
-          <div class="flex items-center gap-4 mb-4">
-            <div class="p-3 bg-green-500/20 rounded-xl text-green-400 group-hover:scale-110 transition-transform">
-              <Flame :size="24" />
-            </div>
-            <h3 class="text-lg font-semibold text-slate-200">연속 학습일</h3>
-          </div>
-          <p class="text-4xl font-bold text-white mb-2">{{ streakDays }}일</p>
-          <p class="text-sm text-slate-500">뜨겁게 불태우고 계시네요!</p>
-        </div>
-
-        <!-- Point/Tier -->
-        <div class="bg-slate-900/50 border border-white/10 rounded-2xl p-6 hover:bg-slate-900 transition-colors group">
-          <div class="flex items-center gap-4 mb-4">
-            <div class="p-3 bg-yellow-500/20 rounded-xl text-yellow-400 group-hover:scale-110 transition-transform">
-              <Trophy :size="24" />
-            </div>
-            <h3 class="text-lg font-semibold text-slate-200">나의 티어</h3>
-          </div>
-          <p class="text-4xl font-bold text-white mb-2">Gold 1</p>
-          <p class="text-sm text-slate-500">Platinum까지 120점 남음</p>
-        </div>
-      </section>
-
-      <!-- Quick Actions & Recent Activity -->
-      <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 animate-fade-in-up delay-300">
-        <!-- Quick Actions -->
-        <section class="lg:col-span-2">
-          <h2 class="text-xl font-bold mb-6 flex items-center gap-2">
-            <LayoutDashboard :size="24" class="text-indigo-400" />
-            빠른 이동
-          </h2>
-          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <button @click="$router.push('/boards')" class="p-6 bg-slate-800/50 border border-white/5 rounded-xl hover:bg-slate-800 hover:border-indigo-500/50 transition-all text-left group">
-              <div class="flex justify-between items-start mb-4">
-                <MessageSquare :size="28" class="text-slate-400 group-hover:text-indigo-400 transition-colors" />
-                <ArrowRight :size="20" class="text-slate-600 group-hover:translate-x-1 transition-transform" />
-              </div>
-              <h3 class="text-lg font-semibold text-white mb-1">게시판</h3>
-              <p class="text-sm text-slate-400">스터디원들과 정보를 공유하세요.</p>
-            </button>
-
-             <button @click="$router.push('/profile')" class="p-6 bg-slate-800/50 border border-white/5 rounded-xl hover:bg-slate-800 hover:border-indigo-500/50 transition-all text-left group">
-              <div class="flex justify-between items-start mb-4">
-                <User :size="28" class="text-slate-400 group-hover:text-indigo-400 transition-colors" />
-                <ArrowRight :size="20" class="text-slate-600 group-hover:translate-x-1 transition-transform" />
-              </div>
-              <h3 class="text-lg font-semibold text-white mb-1">마이페이지</h3>
-              <p class="text-sm text-slate-400">내 정보와 설정을 관리하세요.</p>
-            </button>
-
-            <button @click="$router.push('/youtube')" class="p-6 bg-slate-800/50 border border-white/5 rounded-xl hover:bg-slate-800 hover:border-red-500/50 transition-all text-left group">
-              <div class="flex justify-between items-start mb-4">
-                <Youtube :size="28" class="text-slate-400 group-hover:text-red-500 transition-colors" />
-                <ArrowRight :size="20" class="text-slate-600 group-hover:translate-x-1 transition-transform" />
-              </div>
-              <h3 class="text-lg font-semibold text-white mb-1">영상 학습</h3>
-              <p class="text-sm text-slate-400">유튜브에서 학습 영상을 검색하세요.</p>
-            </button>
-          </div>
-        </section>
-
-        <!-- Notification / Tip -->
-        <section>
-          <h2 class="text-xl font-bold mb-6 flex items-center gap-2">
-            <Bell :size="24" class="text-yellow-400" />
-            알림
-          </h2>
-          <div class="bg-gradient-to-br from-indigo-900/20 to-slate-900 border border-indigo-500/20 rounded-2xl p-6">
-            <div class="mb-4">
-              <span class="bg-indigo-500/20 text-indigo-300 text-xs font-bold px-2 py-1 rounded">Tip</span>
-            </div>
-            <h3 class="text-lg font-semibold text-white mb-2">알고리즘 기록 연동</h3>
-            <p class="text-slate-400 text-sm mb-4 leading-relaxed">
-              GitHub 저장소를 등록하면 문제 풀이 기록이 자동으로 대시보드에 반영됩니다.
-            </p>
-            <button class="w-full py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg text-sm font-semibold transition-colors">
-              저장소 연결하기
-            </button>
-          </div>
-        </section>
+        <p class="text-slate-500">오늘도 알고리즘의 바다를 항해할 준비가 되셨나요?</p>
       </div>
 
+      <!-- Content Grid -->
+      <div v-if="loading" class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div v-for="i in 6" :key="i" class="h-64 rounded-3xl bg-white shadow-sm border border-slate-100 animate-pulse"></div>
+      </div>
+
+      <!-- Stats Overview -->
+      <div v-if="!loading" class="mb-10 animate-fade-in-up">
+        <div class="bg-white rounded-3xl p-8 shadow-sm border border-slate-100 relative overflow-hidden">
+             <div class="flex items-center justify-between mb-6">
+                <h2 class="text-xl font-bold text-slate-800 flex items-center gap-2">
+                    <TrendingUp class="text-indigo-500" />
+                    스터디 활동 로그
+                </h2>
+                <div class="flex items-center gap-2 text-xs font-medium text-slate-400">
+                    <span>Less</span>
+                    <div class="flex gap-1">
+                        <div class="w-3 h-3 rounded-sm bg-slate-100"></div>
+                        <div class="w-3 h-3 rounded-sm bg-indigo-200"></div>
+                        <div class="w-3 h-3 rounded-sm bg-indigo-400"></div>
+                        <div class="w-3 h-3 rounded-sm bg-indigo-600"></div>
+                        <div class="w-3 h-3 rounded-sm bg-indigo-800"></div>
+                    </div>
+                    <span>More</span>
+                </div>
+             </div>
+             
+             <!-- Heatmap (Grass) -->
+             <div class="overflow-x-auto pb-2">
+                <div class="flex gap-[3px] min-w-max">
+                    <div v-for="(week, wIdx) in heatmapWeeks" :key="wIdx" class="flex flex-col gap-[3px]">
+                        <div 
+                            v-for="(day, dIdx) in week" 
+                            :key="dIdx"
+                            class="w-3 h-3 rounded-[2px] transition-all relative group cursor-pointer"
+                            :class="day.colorClass"
+                        >
+                            <div class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 hidden group-hover:block z-20 min-w-max pointer-events-none">
+                                <div class="bg-slate-800 text-white text-xs rounded-lg py-2 px-3 shadow-xl flex flex-col items-center gap-1">
+                                    <span class="font-bold text-slate-200">{{ day.dateFormatted }}</span>
+                                    <span class="font-bold">{{ day.count }} solutions</span>
+                                    <div v-if="day.count > 0" class="flex flex-wrap gap-1 max-w-[150px] justify-center mt-1 border-t border-slate-700 pt-1">
+                                        <span v-for="name in day.contributors" :key="name" class="text-[10px] bg-slate-700 px-1.5 py-0.5 rounded text-indigo-300">
+                                            {{ name }}
+                                        </span>
+                                    </div>
+                                </div>
+                                <div class="w-2 h-2 bg-slate-800 transform rotate-45 absolute -bottom-1 left-1/2 -translate-x-1/2"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+             </div>
+        </div>
+      </div>
+
+      <div v-if="records.length === 0 && !loading" class="flex flex-col items-center justify-center py-20 bg-white rounded-3xl border border-dashed border-slate-300">
+        <div class="w-20 h-20 bg-indigo-50 rounded-full flex items-center justify-center mb-6">
+          <Code2 :size="40" class="text-indigo-400" />
+        </div>
+        <h3 class="text-xl font-bold text-slate-800 mb-2">기록된 모험이 없습니다</h3>
+        <p class="text-slate-500 mb-6">첫 번째 알고리즘 문제를 해결하고 커밋해보세요!</p>
+        <button class="px-6 py-3 bg-slate-900 text-white rounded-xl font-bold hover:bg-slate-800 transition-colors">
+          가이드 보기
+        </button>
+      </div>
+
+      <div v-else class="grid grid-cols-1 gap-4">
+        <!-- Record Card (Horizontal) -->
+        <div 
+          v-for="record in records" 
+          :key="record.id" 
+          class="group relative bg-white rounded-3xl p-6 shadow-sm border border-slate-100 hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col md:flex-row items-center gap-6"
+        >
+          <!-- Left: Info -->
+          <div class="flex-1 w-full md:w-auto text-left">
+            <div class="flex items-center gap-2 mb-2">
+               <a 
+                 :href="`https://www.acmicpc.net/problem/${record.problemNumber}`" 
+                 target="_blank"
+                 class="flex items-center gap-1 text-xs font-bold text-indigo-500 bg-indigo-50 px-2 py-1 rounded hover:bg-indigo-100 transition-colors"
+               >
+                 #{{ record.problemNumber }}
+                 <ExternalLink :size="10" />
+               </a>
+               <span class="px-2 py-0.5 rounded-full text-xs font-bold bg-slate-100 text-slate-600 border border-slate-200 uppercase tracking-wider">
+                 {{ record.language }}
+               </span>
+            </div>
+            <h3 class="text-xl font-bold text-slate-800 leading-snug truncate group-hover:text-indigo-600 transition-colors">
+              {{ record.title }}
+            </h3>
+            <div class="flex items-center gap-2 mt-2">
+                 <div class="flex items-center gap-1.5 px-2 py-1 bg-slate-100 rounded-md">
+                    <div class="w-5 h-5 rounded-full bg-indigo-100 flex items-center justify-center text-[10px] font-bold text-indigo-600">
+                        {{ (record.username || '?').charAt(0).toUpperCase() }}
+                    </div>
+                    <span class="text-xs font-bold text-slate-600">{{ record.username || 'Unknown' }}</span>
+                 </div>
+                 <div class="text-xs text-slate-400 flex items-center gap-1">
+                   {{ formatDate(record.committedAt) }}
+                 </div>
+            </div>
+          </div>
+
+          <!-- Middle: Stats -->
+          <div class="flex items-center gap-3 w-full md:w-auto shrink-0">
+            <div class="flex-1 md:flex-none bg-slate-50 rounded-2xl px-5 py-3 flex items-center justify-center gap-2 border border-slate-100 min-w-[100px]">
+              <Zap :size="18" class="text-amber-400" />
+              <span class="text-sm font-bold text-slate-700">{{ record.runtimeMs }}ms</span>
+            </div>
+            <div class="flex-1 md:flex-none bg-slate-50 rounded-2xl px-5 py-3 flex items-center justify-center gap-2 border border-slate-100 min-w-[100px]">
+              <Database :size="18" class="text-blue-400" />
+              <span class="text-sm font-bold text-slate-700">{{ record.memoryKb }}KB</span>
+            </div>
+          </div>
+
+          <!-- Right: Actions -->
+          <div class="flex items-center gap-2 w-full md:w-auto shrink-0">
+             <button 
+                @click="requestReview(record)" 
+                class="flex-1 md:flex-none flex items-center justify-center gap-2 px-6 py-3 rounded-xl bg-indigo-50 text-indigo-600 font-bold text-sm hover:bg-indigo-100 transition-colors"
+                :disabled="processing === record.id"
+            >
+                <Bot :size="18" />
+                <span v-if="processing === record.id">...</span>
+                <span v-else>리뷰</span>
+            </button>
+            <button 
+                @click="requestHint(record)" 
+                class="flex-1 md:flex-none flex items-center justify-center gap-2 px-6 py-3 rounded-xl bg-amber-50 text-amber-600 font-bold text-sm hover:bg-amber-100 transition-colors"
+            >
+                <Lightbulb :size="18" />
+                힌트
+            </button>
+          </div>
+        </div>
+      </div>
     </main>
+
+    <!-- Trendy Modal -->
+    <div v-if="showModal" class="fixed inset-0 z-[100] flex items-center justify-center p-4">
+      <div class="absolute inset-0 bg-slate-900/40 backdrop-blur-sm transition-opacity" @click="closeModal"></div>
+      <div class="bg-white rounded-[32px] w-full max-w-2xl max-h-[85vh] overflow-hidden relative shadow-2xl flex flex-col animate-pop-in">
+        
+        <!-- Modal Header -->
+        <div class="px-8 py-6 border-b border-slate-100 flex justify-between items-center bg-white/80 backdrop-blur z-10 sticky top-0">
+           <h3 class="text-2xl font-black text-slate-800 flex items-center gap-3">
+             <div class="p-2 rounded-xl" :class="modalType === 'review' ? 'bg-indigo-100 text-indigo-600' : 'bg-amber-100 text-amber-600'">
+                <Bot v-if="modalType === 'review'" :size="24" />
+                <Lightbulb v-else :size="24" />
+             </div>
+             {{ modalTitle }}
+           </h3>
+           <button @click="closeModal" class="p-2 rounded-full hover:bg-slate-100 text-slate-400 transition-colors">
+             <X :size="24" />
+           </button>
+        </div>
+
+        <!-- Modal Content -->
+        <div class="p-8 overflow-y-auto custom-scrollbar">
+            <!-- Loading -->
+            <div v-if="modalLoading" class="py-20 flex flex-col items-center justify-center text-center">
+                 <div class="w-16 h-16 border-4 border-indigo-100 border-t-indigo-500 rounded-full animate-spin mb-6"></div>
+                 <h4 class="text-lg font-bold text-slate-800">AI가 분석중입니다</h4>
+                 <p class="text-slate-500">잠시만 기다려주세요...</p>
+            </div>
+
+            <!-- Review Data -->
+            <div v-else-if="modalType === 'review' && modalData" class="space-y-6">
+                 <!-- Summary -->
+                 <div class="bg-indigo-50/50 p-6 rounded-3xl border border-indigo-100">
+                    <h4 class="text-sm font-bold text-indigo-900 uppercase tracking-wide mb-3">📝 분석 요약</h4>
+                    <p class="text-slate-700 leading-relaxed">{{ modalData.summary }}</p>
+                 </div>
+
+                 <!-- Problem Info -->
+                 <div v-if="modalData.problem" class="bg-slate-50 p-5 rounded-2xl border border-slate-100">
+                    <h4 class="text-sm font-bold text-slate-800 uppercase tracking-wide mb-3">🎯 문제 분석</h4>
+                    <p class="text-slate-600 mb-2">{{ modalData.problem.description }}</p>
+                    <div v-if="modalData.problem.isGuess" class="text-xs text-amber-600 bg-amber-50 px-2 py-1 rounded inline-block">
+                      ⚠️ {{ modalData.problem.guessReason }}
+                    </div>
+                 </div>
+
+                 <!-- Algorithm Patterns -->
+                 <div v-if="modalData.algorithm?.patterns?.length" class="bg-purple-50 p-5 rounded-2xl border border-purple-100">
+                    <h4 class="text-sm font-bold text-purple-800 uppercase tracking-wide mb-3">🧩 알고리즘 패턴</h4>
+                    <div class="flex flex-wrap gap-2 mb-3">
+                      <span v-for="(pattern, idx) in modalData.algorithm.patterns" :key="idx" 
+                            class="px-3 py-1 bg-purple-100 text-purple-700 rounded-full text-sm font-medium">
+                        {{ pattern }}
+                      </span>
+                    </div>
+                    <p v-if="modalData.algorithm.intuition" class="text-slate-600 text-sm">{{ modalData.algorithm.intuition }}</p>
+                 </div>
+
+                 <!-- Complexity -->
+                 <div class="grid grid-cols-2 gap-4">
+                     <div class="bg-white p-5 rounded-2xl border border-slate-100 shadow-sm">
+                         <span class="text-xs font-bold text-slate-400 uppercase">⏱️ Time</span>
+                         <div class="text-xl font-black text-slate-800 mt-1">{{ modalData.complexity?.time || '-' }}</div>
+                     </div>
+                     <div class="bg-white p-5 rounded-2xl border border-slate-100 shadow-sm">
+                         <span class="text-xs font-bold text-slate-400 uppercase">💾 Space</span>
+                         <div class="text-xl font-black text-slate-800 mt-1">{{ modalData.complexity?.space || '-' }}</div>
+                     </div>
+                 </div>
+
+                 <!-- Key Code Blocks -->
+                 <div v-if="modalData.keyBlocks?.length">
+                     <h4 class="flex items-center gap-2 text-lg font-bold text-slate-800 mb-4">
+                         💡 핵심 코드 블록
+                     </h4>
+                     <div class="space-y-3">
+                         <div v-for="(block, idx) in modalData.keyBlocks" :key="idx" class="bg-slate-900 rounded-xl overflow-hidden">
+                             <pre class="p-4 text-sm text-green-400 overflow-x-auto"><code>{{ block.code }}</code></pre>
+                             <div class="px-4 pb-3 text-slate-400 text-sm">{{ block.explanation }}</div>
+                         </div>
+                     </div>
+                 </div>
+
+                 <!-- Pitfalls -->
+                 <div v-if="modalData.pitfalls?.items?.length">
+                     <h4 class="flex items-center gap-2 text-lg font-bold text-red-600 mb-4">
+                         ⚠️ 주의할 점
+                     </h4>
+                     <ul class="space-y-2">
+                         <li v-for="(item, idx) in modalData.pitfalls.items" :key="idx" class="flex items-start gap-3 bg-red-50 p-3 rounded-xl border border-red-100">
+                             <div class="w-1.5 h-1.5 rounded-full bg-red-400 mt-2 shrink-0"></div>
+                             <span class="text-slate-700 text-sm">{{ item }}</span>
+                         </li>
+                     </ul>
+                 </div>
+
+                 <!-- Improvements -->
+                 <div v-if="modalData.pitfalls?.improvements?.length">
+                     <h4 class="flex items-center gap-2 text-lg font-bold text-slate-800 mb-4">
+                         <TrendingUp class="text-green-500" /> 개선 포인트
+                     </h4>
+                     <ul class="space-y-2">
+                         <li v-for="(item, idx) in modalData.pitfalls.improvements" :key="idx" class="flex items-start gap-3 bg-green-50 p-3 rounded-xl border border-green-100">
+                             <div class="w-1.5 h-1.5 rounded-full bg-green-400 mt-2 shrink-0"></div>
+                             <span class="text-slate-700 text-sm">{{ item }}</span>
+                         </li>
+                     </ul>
+                 </div>
+            </div>
+
+            <!-- Hint Data -->
+            <div v-else-if="modalType === 'hint' && modalData" class="space-y-8">
+                <div class="text-center py-6">
+                    <div class="inline-block p-4 rounded-full bg-amber-100 text-amber-500 mb-4">
+                        <Lightbulb :size="48" />
+                    </div>
+                    <h4 class="text-2xl font-bold text-slate-800 mb-4">Level 1 Hint</h4>
+                    <p class="text-xl text-slate-600 font-medium leading-relaxed">
+                        "{{ modalData.hint }}"
+                    </p>
+                </div>
+            </div>
+        </div>
+
+      </div>
+    </div>
   </div>
 </template>
 
 <script setup>
 import { ref, onMounted } from 'vue';
-import { useRouter } from 'vue-router';
-import { useAuth } from '../composables/useAuth';
+import { dashboardApi } from '../api/dashboard';
+import http from '../api/http';
 import { 
-  CheckCircle, 
-  Flame, 
-  Trophy, 
-  LayoutDashboard, 
-  MessageSquare, 
-  User, 
-  ArrowRight,
-  Bell,
+  Bot, 
+  Lightbulb, 
+  Zap, 
+  Database, 
+  ExternalLink,
+  Code2,
+  X,
+  TrendingUp,
+  LayoutGrid,
   Youtube
 } from 'lucide-vue-next';
-import { algorithmApi } from '../api/algorithm';
 
-const router = useRouter();
-const { user } = useAuth();
-const solvedCount = ref(0);
-const weeklySolvedCount = ref(0);
-const streakDays = ref(0);
+const records = ref([]);
+const loading = ref(true);
+const processing = ref(null);
+const showModal = ref(false);
+const modalType = ref('');
+const modalTitle = ref('');
+const modalLoading = ref(false);
+const modalData = ref(null);
 
-// Fetch stats on mount
+const heatmapWeeks = ref([]);
+
 onMounted(async () => {
-    try {
-        // Mock data or fetch real data
-        const records = await algorithmApi.findAll();
-        solvedCount.value = records.data ? records.data.length : 0;
-        
-        // Simple mock logic for other stats
-        weeklySolvedCount.value = 3; 
-        streakDays.value = 12; 
-    } catch (e) {
-        console.error("Failed to load dashboard stats", e);
-    }
+  try {
+    // Fetch records - this should always work
+    const recordsRes = await dashboardApi.getRecords();
+    console.log('Records data:', recordsRes.data);
+    records.value = recordsRes.data;
+  } catch(e) {
+    console.error('Records error:', e);
+  }
+  
+  try {
+    // Fetch heatmap - may fail if endpoint doesn't exist yet
+    const heatmapRes = await dashboardApi.getHeatmap();
+    processHeatmap(heatmapRes.data || []);
+  } catch(e) {
+    console.error('Heatmap error:', e);
+    // Initialize empty heatmap on error
+    processHeatmap([]);
+  }
+  
+  loading.value = false;
 });
+
+const processHeatmap = (data) => {
+    // 1. Map data for quick lookup
+    const activityMap = new Map();
+    data.forEach(item => {
+        activityMap.set(item.date, item);
+    });
+
+    // 2. Generate last 365 days (approx 52 weeks)
+    const weeks = [];
+    const today = new Date();
+    // Align to Saturday of this week to fill to the right
+    const end = new Date(today);
+    // Go back 52 weeks * 7 days
+    const start = new Date(end);
+    start.setDate(start.getDate() - (52 * 7) + 1); 
+    
+    // Adjust start to be Sunday
+    // while(start.getDay() !== 0) start.setDate(start.getDate() - 1);
+
+    let current = new Date(start);
+    let currentWeek = [];
+
+    // Loop until we cover enough days
+    for (let i = 0; i < 52 * 7; i++) {
+        const dateStr = current.toISOString().split('T')[0];
+        const activity = activityMap.get(dateStr);
+        const count = activity ? activity.count : 0;
+        
+        // Determine color
+        let colorClass = 'bg-slate-100';
+        if (count > 0) colorClass = 'bg-indigo-200';
+        if (count >= 3) colorClass = 'bg-indigo-400';
+        if (count >= 6) colorClass = 'bg-indigo-600';
+        if (count >= 9) colorClass = 'bg-indigo-800';
+
+        currentWeek.push({
+            date: dateStr,
+            dateFormatted: current.toLocaleDateString('ko-KR', { month: 'short', day: 'numeric' }),
+            count: count,
+            contributors: activity ? activity.contributors : [],
+            colorClass: colorClass
+        });
+
+        if (currentWeek.length === 7) {
+            weeks.push(currentWeek);
+            currentWeek = [];
+        }
+        
+        current.setDate(current.getDate() + 1);
+    }
+    
+    if (currentWeek.length > 0) weeks.push(currentWeek);
+    heatmapWeeks.value = weeks;
+};
+
+const formatDate = (dateString) => {
+    if (!dateString) return '';
+    const date = new Date(dateString);
+    return date.toLocaleDateString('ko-KR', { 
+        year: 'numeric', 
+        month: 'long', 
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+    });
+};
+
+const requestReview = async (record) => {
+    openModal('review', 'AI Code Review');
+    modalLoading.value = true;
+    try {
+        const res = await http.post('/ai/review', {
+            algorithmRecordId: record.id,
+            code: record.code,
+            language: record.language,
+            problemNumber: String(record.problemNumber)
+        });
+        modalData.value = res.data;
+    } catch (e) {
+        modalData.value = { summary: 'Error analyzing code.' };
+    } finally {
+        modalLoading.value = false;
+    }
+};
+
+const requestHint = async (record) => {
+    openModal('hint', 'Smart Hint');
+    modalLoading.value = true;
+    try {
+        const res = await http.post('/ai/hint', {
+            userId: record.userId, 
+            problemNumber: String(record.problemNumber),
+            problemTitle: record.title,
+            level: 1
+        });
+        modalData.value = res.data;
+    } catch(e) {
+        modalData.value = { hint: 'Error fetching hint.' };
+    } finally {
+        modalLoading.value = false;
+    }
+};
+
+const openModal = (type, title) => {
+    modalType.value = type;
+    modalTitle.value = title;
+    showModal.value = true;
+    modalData.value = null;
+};
+
+const closeModal = () => {
+    showModal.value = false;
+};
 </script>
 
 <style scoped>
-.animate-fade-in-up {
-  animation: fade-in-up 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-  opacity: 0;
-  transform: translateY(20px);
+@import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css');
+
+* {
+  font-family: 'Pretendard', sans-serif;
 }
 
-.delay-100 { animation-delay: 0.1s; }
-.delay-200 { animation-delay: 0.2s; }
-.delay-300 { animation-delay: 0.3s; }
+.btn-primary-soft {
+  @apply flex items-center gap-2 px-4 py-2.5 rounded-xl bg-indigo-50 text-indigo-600 font-bold hover:bg-indigo-100 transition-colors;
+}
 
-@keyframes fade-in-up {
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+.btn-secondary-soft {
+  @apply flex items-center gap-2 px-4 py-2.5 rounded-xl bg-slate-100 text-slate-600 font-bold hover:bg-slate-200 transition-colors;
+}
+
+.animate-pop-in {
+  animation: popIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  opacity: 0;
+  transform: scale(0.95);
+}
+
+@keyframes popIn {
+  to { opacity: 1; transform: scale(1); }
+}
+
+.custom-scrollbar::-webkit-scrollbar {
+  width: 6px;
+}
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 10px;
 }
 </style>

@@ -73,6 +73,14 @@ public class AlgorithmRecordService {
                 .collect(Collectors.toList());
     }
 
+    @Transactional(readOnly = true)
+    public List<AlgorithmRecordResult> findByStudyId(Long studyId) {
+
+        return algorithmRecordRepository.findByStudyId(studyId).stream()
+                .map(AlgorithmRecordResult::from)
+                .collect(Collectors.toList());
+    }
+
     @Transactional
     public AlgorithmRecordResult update(Long id, AlgorithmRecordUpdateCommand command) {
         AlgorithmRecord record = algorithmRecordRepository.findById(id)

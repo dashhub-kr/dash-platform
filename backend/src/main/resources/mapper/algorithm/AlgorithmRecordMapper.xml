@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ssafy.dash.algorithm.infrastructure.mapper.AlgorithmRecordMapper">
+
+  <insert id="insert" parameterType="AlgorithmRecord" useGeneratedKeys="true" keyProperty="id">
+    INSERT INTO algorithm_records (
+      user_id, study_id, problem_number, title, code, language, platform, difficulty,
+      runtime_ms, memory_kb, repository_name, file_path, commit_sha, commit_message,
+      committed_at, created_at, updated_at
+    ) VALUES (
+      #{userId}, #{studyId}, #{problemNumber}, #{title}, #{code}, #{language}, #{platform}, #{difficulty},
+      #{runtimeMs}, #{memoryKb}, #{repositoryName}, #{filePath}, #{commitSha}, #{commitMessage},
+      #{committedAt}, #{createdAt}, #{updatedAt}
+    )
+  </insert>
+
+  <select id="selectById" resultType="AlgorithmRecord" parameterType="long">
+    SELECT * FROM algorithm_records WHERE id = #{id}
+  </select>
+
+  <select id="selectAll" resultType="AlgorithmRecord">
+    SELECT r.*, u.username
+    FROM algorithm_records r
+    LEFT JOIN users u ON r.user_id = u.id
+    ORDER BY r.id DESC
+  </select>
+
+  <select id="selectByUserId" resultType="AlgorithmRecord" parameterType="long">
+    SELECT r.*, u.username 
+    FROM algorithm_records r
+    LEFT JOIN users u ON r.user_id = u.id
+    WHERE r.user_id = #{userId} 
+    ORDER BY r.id DESC
+  </select>
+
+  <select id="selectByStudyId" resultType="AlgorithmRecord" parameterType="long">
+    SELECT r.*, u.username 
+    FROM algorithm_records r
+    LEFT JOIN users u ON r.user_id = u.id
+    WHERE r.study_id = #{studyId} 
+    ORDER BY r.id DESC
+  </select>
+
+  <update id="update" parameterType="AlgorithmRecord">
+    UPDATE algorithm_records
+    SET problem_number = #{problemNumber}, title = #{title}, code = #{code}, language = #{language},
+        platform = #{platform}, difficulty = #{difficulty}, runtime_ms = #{runtimeMs}, memory_kb = #{memoryKb},
+        repository_name = #{repositoryName}, file_path = #{filePath}, commit_sha = #{commitSha},
+        commit_message = #{commitMessage}, committed_at = #{committedAt}, updated_at = #{updatedAt}
+    WHERE id = #{id}
+  </update>
+
+  <delete id="delete" parameterType="long">
+    DELETE FROM algorithm_records WHERE id = #{id}
+  </delete>
+
+  <select id="countsByStudyId" resultType="com.ssafy.dash.study.application.dto.result.StudyStatsResult" parameterType="long">
+    SELECT
+      SUM(CASE WHEN difficulty LIKE '%Bronze%' THEN 1 ELSE 0 END) as bronze,
+      SUM(CASE WHEN difficulty LIKE '%Silver%' THEN 1 ELSE 0 END) as silver,
+      SUM(CASE WHEN difficulty LIKE '%Gold%' THEN 1 ELSE 0 END) as gold,
+      SUM(CASE WHEN difficulty LIKE '%Platinum%' THEN 1 ELSE 0 END) as platinum
+    FROM algorithm_records
+    WHERE study_id = #{studyId}
+  </select>
+
+
+</mapper>

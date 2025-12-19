@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ssafy.dash.problem.infrastructure.persistence.ProblemMapper">
+
+    <insert id="saveProblem">
+        INSERT INTO problems (problem_number, title, level, class, essential, sprout)
+        VALUES (#{problemNumber}, #{title}, #{level}, #{problemClass}, #{essential}, #{sprout})
+        ON DUPLICATE KEY UPDATE
+        title = VALUES(title),
+        level = VALUES(level),
+        class = VALUES(class),
+        essential = VALUES(essential),
+        sprout = VALUES(sprout)
+    </insert>
+
+    <insert id="saveProblemTag" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO problem_tags (problem_number, tag_key)
+        VALUES (#{problemNumber}, #{tagKey})
+        ON DUPLICATE KEY UPDATE id = id
+    </insert>
+
+    <delete id="deleteProblemTags">
+        DELETE FROM problem_tags WHERE problem_number = #{problemNumber}
+    </delete>
+
+    <select id="findProblemByNumber" resultType="Problem">
+        SELECT problem_number, title, level, class as problemClass, essential, sprout
+        FROM problems WHERE problem_number = #{problemNumber}
+    </select>
+
+    <select id="findTagsByProblemNumber" resultType="string">
+        SELECT tag_key
+        FROM problem_tags
+        WHERE problem_number = #{problemNumber}
+    </select>
+
+</mapper>
