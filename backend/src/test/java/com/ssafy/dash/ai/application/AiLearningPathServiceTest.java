@@ -3,7 +3,6 @@ package com.ssafy.dash.ai.application;
 import com.ssafy.dash.ai.client.AiServerClient;
 import com.ssafy.dash.ai.client.dto.LearningPathRequest;
 import com.ssafy.dash.ai.client.dto.LearningPathResponse;
-import com.ssafy.dash.analytics.application.UserSkillAnalysisService;
 import com.ssafy.dash.analytics.domain.UserClassStat;
 import com.ssafy.dash.analytics.domain.UserTagStat;
 import com.ssafy.dash.analytics.infrastructure.persistence.UserClassStatMapper;
@@ -34,9 +33,6 @@ class AiLearningPathServiceTest {
     private AiServerClient aiClient;
 
     @Mock
-    private UserSkillAnalysisService skillAnalysisService;
-
-    @Mock
     private UserTagStatMapper tagStatMapper;
 
     @Mock
@@ -50,7 +46,7 @@ class AiLearningPathServiceTest {
     @BeforeEach
     void setUp() {
         learningPathService = new AiLearningPathService(
-                aiClient, skillAnalysisService, tagStatMapper, classStatMapper, userRepository);
+                aiClient, tagStatMapper, classStatMapper, userRepository);
     }
 
     @Test
