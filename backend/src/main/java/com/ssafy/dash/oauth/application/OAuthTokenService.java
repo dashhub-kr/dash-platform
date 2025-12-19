@@ -37,19 +37,16 @@ public class OAuthTokenService {
         String masked = mask(tokenValue);
         Instant issuedAtInstant = accessToken.getIssuedAt();
         Instant expiresAtInstant = accessToken.getExpiresAt();
-        log.info("Persisting OAuth token for userId={} tokenMasked={} issuedAtUTC={} expiresAtUTC={} diffSeconds={}",
+        log.info(
+                "Persisting OAuth token for userId={} tokenMasked={} issuedAtUTC={} expiresAtUTC={} (expiration ignored)",
                 userId,
                 masked,
                 issuedAtInstant,
-                expiresAtInstant,
-                (issuedAtInstant != null && expiresAtInstant != null)
-                        ? expiresAtInstant.getEpochSecond() - issuedAtInstant.getEpochSecond()
-                        : null);
+                expiresAtInstant);
 
         LocalDateTime now = LocalDateTime.now();
-        final LocalDateTime expiresAt = expiresAtInstant != null
-                ? LocalDateTime.ofInstant(expiresAtInstant, java.time.ZoneId.systemDefault())
-                : null;
+        // 깃허브 토큰 만료 시간 무시 (무제한으로 처리)
+        final LocalDateTime expiresAt = null;
         String tokenType = accessToken.getTokenType() != null ? accessToken.getTokenType().getValue() : null;
 
         UserOAuthToken token = tokenRepository.findByUserId(userId)

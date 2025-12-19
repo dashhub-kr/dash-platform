@@ -3,8 +3,6 @@ package com.ssafy.dash.ai.application;
 import com.ssafy.dash.ai.client.AiServerClient;
 import com.ssafy.dash.ai.client.dto.LearningPathRequest;
 import com.ssafy.dash.ai.client.dto.LearningPathResponse;
-import com.ssafy.dash.analytics.application.UserSkillAnalysisService;
-import com.ssafy.dash.analytics.application.dto.TagWeaknessDto;
 import com.ssafy.dash.analytics.domain.UserClassStat;
 import com.ssafy.dash.analytics.domain.UserTagStat;
 import com.ssafy.dash.analytics.infrastructure.persistence.UserClassStatMapper;
@@ -27,7 +25,6 @@ import java.util.List;
 public class AiLearningPathService {
 
     private final AiServerClient aiClient;
-    private final UserSkillAnalysisService skillAnalysisService;
     private final UserTagStatMapper tagStatMapper;
     private final UserClassStatMapper classStatMapper;
     private final UserRepository userRepository;
@@ -55,54 +52,50 @@ public class AiLearningPathService {
             List<UserClassStat> classStats) {
         // 현재 레벨
         String currentLevel = buildCurrentLevel(user);
-        String nextGoal = determineNextGoal(classStats);
+        String goalLevel = determineNextGoal(classStats);
 
         // 약점 태그 (상위 5개)
-        List<LearningPathRequest.TagInfo> weaknessTags = tagStats.stream()
+        List<LearningPathRequest.TagStats> weaknessTags = tagStats.stream()
                 .filter(t -> t.getSolved() > 0 && t.getSolved() < 10)
                 .sorted(Comparator.comparing(UserTagStat::getSolved))
                 .limit(5)
-                .map(t -> LearningPathRequest.TagInfo.builder()
+                .map(t -> LearningPathRequest.TagStats.builder()
                         .tagKey(t.getTagKey())
+                        .tagName(t.getTagKey())
                         .solved(t.getSolved())
                         .total(t.getTotal())
                         .build())
                 .toList();
 
         // 강점 태그 (상위 5개)
-        List<LearningPathRequest.TagInfo> strengthTags = tagStats.stream()
+        List<LearningPathRequest.TagStats> strengthTags = tagStats.stream()
                 .sorted(Comparator.comparing(UserTagStat::getSolved).reversed())
                 .limit(5)
-                .map(t -> LearningPathRequest.TagInfo.builder()
+                .map(t -> LearningPathRequest.TagStats.builder()
                         .tagKey(t.getTagKey())
+                        .tagName(t.getTagKey())
                         .solved(t.getSolved())
                         .total(t.getTotal())
                         .build())
                 .toList();
 
-        // 클래스 진행도
-        List<LearningPathRequest.ClassInfo> classProgress = classStats.stream()
-                .map(c -> LearningPathRequest.ClassInfo.builder()
+        // 클래스 통계
+        List<LearningPathRequest.ClassStats> classStatsDto = classStats.stream()
+                .map(c -> LearningPathRequest.ClassStats.builder()
                         .classNumber(c.getClassNumber())
                         .essentialSolved(c.getEssentialSolved())
                         .essentials(c.getEssentials())
-                        .completionRate(c.getEssentialCompletionRate())
+                        .decoration(c.getDecoration())
                         .build())
                 .toList();
 
-        // 학습 유형 분석
-        String balanceType = analyzeBalanceType(tagStats);
-        String growthTrend = "STABLE"; // 추후 성장 추세 분석 연동
-
         return LearningPathRequest.builder()
                 .currentLevel(currentLevel)
-                .nextGoal(nextGoal)
+                .goalLevel(goalLevel)
+                .solvedCount(user.getSolvedacRating() != null ? user.getSolvedacRating() : 0)
                 .weaknessTags(weaknessTags)
                 .strengthTags(strengthTags)
-                .classProgress(classProgress)
-                .solvedCount(user.getSolvedacRating() != null ? user.getSolvedacRating() : 0)
-                .balanceType(balanceType)
-                .growthTrend(growthTrend)
+                .classStats(classStatsDto)
                 .build();
     }
 
@@ -137,19 +130,4 @@ public class AiLearningPathService {
                 .orElse("다음 클래스에 도전하기!");
     }
 
-    private String analyzeBalanceType(List<UserTagStat> tagStats) {
-        if (tagStats.isEmpty())
-            return "BALANCED";
-
-        int maxSolved = tagStats.stream().mapToInt(UserTagStat::getSolved).max().orElse(0);
-        int minSolved = tagStats.stream()
-                .filter(t -> t.getSolved() > 0)
-                .mapToInt(UserTagStat::getSolved).min().orElse(0);
-
-        if (maxSolved - minSolved > 30)
-            return "SPECIALIZED";
-        if (tagStats.stream().filter(t -> t.getSolved() > 10).count() > 5)
-            return "BALANCED";
-        return "FOCUSED";
-    }
 }

@@ -10,6 +10,7 @@ import java.util.List;
 
 /**
  * AI 학습 경로 추천 응답 DTO
+ * AI 서버 LearningPathResponse 스키마와 매핑
  */
 @Data
 @Builder
@@ -30,10 +31,11 @@ public class LearningPathResponse {
     @AllArgsConstructor
     @JsonIgnoreProperties(ignoreUnknown = true)
     public static class LearningPhase {
-        private int priority; // 우선순위 (1, 2, 3)
+        private int phase; // Phase 번호
         private String title; // 단계 제목
-        private String description; // 상세 설명
-        private String estimatedTime; // 예상 소요 시간
-        private List<String> actionItems; // 구체적 실천 항목
+        private String duration; // 기간 (예: "2주")
+        private String focus; // 집중 분야
+        private List<String> goals; // 목표
+        private List<String> milestones; // 마일스톤
     }
 }
