@@ -20,7 +20,7 @@
 
       <!-- Stats Overview -->
       <div v-if="!loading" class="mb-10 animate-fade-in-up">
-        <div class="bg-white rounded-3xl p-8 shadow-sm border border-slate-100 relative overflow-hidden">
+        <div class="bg-white rounded-3xl p-8 shadow-sm border border-slate-100 relative">
              <div class="flex items-center justify-between mb-6">
                 <h2 class="text-xl font-bold text-slate-800 flex items-center gap-2">
                     <TrendingUp class="text-indigo-500" />
@@ -48,30 +48,37 @@
              </div>
              
              <!-- Heatmap (Grass) -->
-             <div class="overflow-x-auto pb-2">
+             <div class="overflow-x-auto pb-2 custom-scrollbar">
                 <div class="flex gap-[3px] min-w-max">
                     <div v-for="(week, wIdx) in heatmapWeeks" :key="wIdx" class="flex flex-col gap-[3px]">
                         <div 
                             v-for="(day, dIdx) in week" 
                             :key="dIdx"
-                            class="w-3 h-3 rounded-[2px] transition-all relative group cursor-pointer"
+                            class="w-3 h-3 rounded-[2px] transition-all relative cursor-pointer hover:ring-2 hover:ring-indigo-300 hover:z-10"
                             :class="day.colorClass"
+                            @mouseenter="showTooltip($event, day)"
+                            @mouseleave="hideTooltip"
                         >
-                            <div class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 hidden group-hover:block z-20 min-w-max pointer-events-none">
-                                <div class="bg-slate-800 text-white text-xs rounded-lg py-2 px-3 shadow-xl flex flex-col items-center gap-1">
-                                    <span class="font-bold text-slate-200">{{ day.dateFormatted }}</span>
-                                    <span class="font-bold">{{ day.count }} solutions</span>
-                                    <div v-if="day.count > 0" class="flex flex-wrap gap-1 max-w-[150px] justify-center mt-1 border-t border-slate-700 pt-1">
-                                        <span v-for="name in day.contributors" :key="name" class="text-[10px] bg-slate-700 px-1.5 py-0.5 rounded text-indigo-300">
-                                            {{ name }}
-                                        </span>
-                                    </div>
-                                </div>
-                                <div class="w-2 h-2 bg-slate-800 transform rotate-45 absolute -bottom-1 left-1/2 -translate-x-1/2"></div>
-                            </div>
                         </div>
                     </div>
                 </div>
+             </div>
+
+             <!-- Shared Fixed Tooltip -->
+             <div v-if="tooltipData" 
+                  class="fixed z-50 pointer-events-none transform -translate-x-1/2 -translate-y-full mb-2"
+                  :style="{ left: tooltipPos.x + 'px', top: tooltipPos.y + 'px' }">
+                  <div class="bg-slate-800 text-white text-xs rounded-lg py-2 px-3 shadow-xl flex flex-col items-center gap-1 mb-2">
+                      <span class="font-bold text-slate-200">{{ tooltipData.dateFormatted }}</span>
+                      <span class="font-bold">{{ tooltipData.count }} solutions</span>
+                      <div v-if="tooltipData.count > 0" class="flex flex-wrap gap-1 max-w-[150px] justify-center mt-1 border-t border-slate-700 pt-1">
+                          <span v-for="name in tooltipData.contributors" :key="name" class="text-[10px] bg-slate-700 px-1.5 py-0.5 rounded text-indigo-300">
+                              {{ name }}
+                          </span>
+                      </div>
+                  </div>
+                  <!-- Arrow -->
+                  <div class="w-2 h-2 bg-slate-800 transform rotate-45 absolute bottom-1 left-1/2 -translate-x-1/2 shadow-sm"></div>
              </div>
         </div>
       </div>
@@ -450,6 +457,22 @@ const modalType = ref('');
 const modalTitle = ref('');
 const modalData = ref(null);
 const modalLoading = ref(false);
+
+const tooltipData = ref(null);
+const tooltipPos = ref({ x: 0, y: 0 });
+
+const showTooltip = (event, day) => {
+    const rect = event.target.getBoundingClientRect();
+    tooltipPos.value = {
+        x: rect.left + rect.width / 2,
+        y: rect.top
+    };
+    tooltipData.value = day;
+};
+
+const hideTooltip = () => {
+    tooltipData.value = null;
+};
 
 onMounted(async () => {
   try {
