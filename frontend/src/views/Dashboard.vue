@@ -89,9 +89,8 @@
 
       <div v-else class="grid grid-cols-1 gap-4">
         <!-- Record Card (Horizontal) -->
+        <template v-for="record in records" :key="record.id">
         <div 
-          v-for="record in records" 
-          :key="record.id" 
           class="group relative rounded-3xl p-6 shadow-sm border transition-all duration-300 flex flex-col md:flex-row items-center gap-6 hover:shadow-xl hover:-translate-y-1"
           :class="[
             (record.runtimeMs > 0 && record.memoryKb > 0) 
@@ -203,6 +202,7 @@
                  <pre class="p-6 text-sm font-mono text-green-400 overflow-x-auto selection:bg-green-900 selection:text-white"><code>{{ record.code || '// No code available' }}</code></pre>
              </div>
         </div>
+        </template>
       </div>
     </main>
 
@@ -444,7 +444,12 @@ const records = ref([]);
 const studyData = ref(null);
 const acornLogs = ref([]);
 const loading = ref(true);
-// ... (other refs)
+const heatmapWeeks = ref([]);
+const showModal = ref(false);
+const modalType = ref('');
+const modalTitle = ref('');
+const modalData = ref(null);
+const modalLoading = ref(false);
 
 onMounted(async () => {
   try {
