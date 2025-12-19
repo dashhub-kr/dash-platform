@@ -50,6 +50,7 @@ public class GitHubPushEventWorker {
     private final TransactionTemplate transactionTemplate;
     private final UserRepository userRepository;
     private final com.ssafy.dash.acorn.application.AcornService acornService;
+    private final com.ssafy.dash.ai.application.CodeReviewService codeReviewService;
 
     public GitHubPushEventWorker(GitHubPushEventRepository pushEventRepository,
                                  OnboardingRepository onboardingRepository,
@@ -61,6 +62,7 @@ public class GitHubPushEventWorker {
                                  PlatformTransactionManager transactionManager,
                                  UserRepository userRepository,
                                  com.ssafy.dash.acorn.application.AcornService acornService,
+                                 com.ssafy.dash.ai.application.CodeReviewService codeReviewService,
                                  @Value("${github.push-worker.max-batch:5}") int maxBatchSize) {
         this.pushEventRepository = pushEventRepository;
         this.onboardingRepository = onboardingRepository;
@@ -73,6 +75,7 @@ public class GitHubPushEventWorker {
         this.transactionTemplate = new TransactionTemplate(transactionManager);
         this.userRepository = userRepository;
         this.acornService = acornService;
+        this.codeReviewService = codeReviewService;
     }
 
     @Scheduled(fixedDelayString = "${github.push-worker.fixed-delay:10000}")
@@ -190,6 +193,19 @@ public class GitHubPushEventWorker {
                 10, 
                 "Problem Solved: " + metadata.problemNumber()
             );
+
+            // Auto-Analysis Logic
+            try {
+                codeReviewService.analyzeAndSave(
+                    record.getId(),
+                    record.getCode(),
+                    record.getLanguage(),
+                    record.getProblemNumber()
+                );
+            } catch (Exception e) {
+                log.error("Auto-analysis failed for record: {}", record.getId(), e);
+                // Analysis failure should not roll back the record saving
+            }
         }
     }
 

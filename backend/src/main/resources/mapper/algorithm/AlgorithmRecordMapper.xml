@@ -19,24 +19,30 @@
   </select>
 
   <select id="selectAll" resultType="AlgorithmRecord">
-    SELECT r.*, u.username
+    SELECT r.*, u.username,
+           car.score, car.time_complexity, car.complexity_explanation, car.patterns
     FROM algorithm_records r
     LEFT JOIN users u ON r.user_id = u.id
+    LEFT JOIN code_analysis_results car ON r.id = car.algorithm_record_id
     ORDER BY r.id DESC
   </select>
 
   <select id="selectByUserId" resultType="AlgorithmRecord" parameterType="long">
-    SELECT r.*, u.username 
+    SELECT r.*, u.username,
+           car.score, car.time_complexity, car.complexity_explanation, car.patterns
     FROM algorithm_records r
     LEFT JOIN users u ON r.user_id = u.id
+    LEFT JOIN code_analysis_results car ON r.id = car.algorithm_record_id
     WHERE r.user_id = #{userId} 
     ORDER BY r.id DESC
   </select>
 
   <select id="selectByStudyId" resultType="AlgorithmRecord" parameterType="long">
-    SELECT r.*, u.username 
+    SELECT r.*, u.username,
+           car.score, car.time_complexity, car.complexity_explanation, car.patterns
     FROM algorithm_records r
     LEFT JOIN users u ON r.user_id = u.id
+    LEFT JOIN code_analysis_results car ON r.id = car.algorithm_record_id
     WHERE r.study_id = #{studyId} 
     ORDER BY r.id DESC
   </select>

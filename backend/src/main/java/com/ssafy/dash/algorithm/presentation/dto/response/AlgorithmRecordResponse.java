@@ -21,7 +21,12 @@ public record AlgorithmRecordResponse(
         String commitMessage,
         LocalDateTime committedAt,
         LocalDateTime createdAt,
-        LocalDateTime updatedAt
+        LocalDateTime updatedAt,
+        // Analysis Fields
+        Integer score,
+        String timeComplexity,
+        String complexityExplanation,
+        String patterns
 ) {
 
     public static AlgorithmRecordResponse from(AlgorithmRecordResult result) {
@@ -42,7 +47,11 @@ public record AlgorithmRecordResponse(
                 result.commitMessage(),
                 result.committedAt(),
                 result.createdAt(),
-                result.updatedAt()
+                result.updatedAt(),
+                result.score(),
+                result.timeComplexity(),
+                result.complexityExplanation(),
+                result.patterns()
             );
     }
 

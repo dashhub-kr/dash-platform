@@ -133,40 +133,75 @@
             </div>
           </div>
 
-          <!-- Middle: Stats -->
-          <div class="flex items-center gap-3 w-full md:w-auto shrink-0">
+          <!-- Middle: Stats & Analysis -->
+          <div class="flex items-center gap-3 w-full md:w-auto shrink-0 flex-wrap justify-center md:justify-start">
+            <!-- Runtime -->
             <div class="flex-1 md:flex-none rounded-2xl px-5 py-3 flex items-center justify-center gap-2 border min-w-[100px]"
                  :class="(record.runtimeMs > 0 && record.memoryKb > 0) ? 'bg-slate-50 border-slate-100' : 'bg-red-50 border-red-100'">
               <Zap :size="18" :class="(record.runtimeMs > 0 && record.memoryKb > 0) ? 'text-amber-400' : 'text-red-400'" />
               <span class="text-sm font-bold" :class="(record.runtimeMs > 0 && record.memoryKb > 0) ? 'text-slate-700' : 'text-red-700'">{{ record.runtimeMs }}ms</span>
             </div>
+            
+            <!-- Memory -->
             <div class="flex-1 md:flex-none rounded-2xl px-5 py-3 flex items-center justify-center gap-2 border min-w-[100px]"
                  :class="(record.runtimeMs > 0 && record.memoryKb > 0) ? 'bg-slate-50 border-slate-100' : 'bg-red-50 border-red-100'">
               <Database :size="18" :class="(record.runtimeMs > 0 && record.memoryKb > 0) ? 'text-blue-400' : 'text-red-400'" />
               <span class="text-sm font-bold" :class="(record.runtimeMs > 0 && record.memoryKb > 0) ? 'text-slate-700' : 'text-red-700'">{{ record.memoryKb }}KB</span>
             </div>
-          </div>
 
+            <!-- Analysis: Score -->
+            <div v-if="record.score" class="flex-1 md:flex-none rounded-2xl px-5 py-3 flex items-center justify-center gap-2 border min-w-[80px] bg-purple-50 border-purple-100">
+              <Trophy :size="18" class="text-purple-500" />
+              <span class="text-sm font-bold text-purple-700">{{ record.score }}점</span>
+            </div>
+            
+            <!-- Analysis: Complexity -->
+            <div v-if="record.timeComplexity" class="flex-1 md:flex-none rounded-2xl px-5 py-3 flex items-center justify-center gap-2 border min-w-[100px] bg-sky-50 border-sky-100">
+               <Activity :size="18" class="text-sky-500" />
+               <span class="text-sm font-bold text-sky-700">{{ record.timeComplexity }}</span>
+            </div>
+          </div>
 
           <!-- Right: Actions -->
           <div class="flex items-center gap-2 w-full md:w-auto shrink-0">
              <button 
-                @click="requestReview(record)" 
-                class="flex-1 md:flex-none flex items-center justify-center gap-2 px-6 py-3 rounded-xl bg-indigo-50 text-indigo-600 font-bold text-sm hover:bg-indigo-100 transition-colors"
-                :disabled="processing === record.id"
+                @click="toggleCode(record.id)" 
+                class="flex-1 md:flex-none flex items-center justify-center gap-2 px-6 py-3 rounded-xl font-bold text-sm transition-colors"
+                :class="expandedCodeId === record.id ? 'bg-slate-800 text-white' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'"
             >
-                <Bot :size="18" />
-                <span v-if="processing === record.id">...</span>
-                <span v-else>리뷰</span>
+                <Code2 :size="18" />
+                <span v-if="expandedCodeId === record.id">숨기기</span>
+                <span v-else>코드</span>
             </button>
             <button 
                 @click="requestHint(record)" 
                 class="flex-1 md:flex-none flex items-center justify-center gap-2 px-6 py-3 rounded-xl bg-amber-50 text-amber-600 font-bold text-sm hover:bg-amber-100 transition-colors"
             >
                 <Lightbulb :size="18" />
-                힌트
+                hints
             </button>
           </div>
+        </div>
+        
+        <!-- Expanded Code & Detailed Analysis Section -->
+        <div v-if="expandedCodeId === record.id" class="mt-[-20px] mb-4 bg-slate-50 rounded-b-3xl border-x border-b border-slate-100 p-6 animate-fade-in mx-4">
+             <!-- Analysis Badge List -->
+             <div v-if="record.patterns" class="flex flex-wrap gap-2 mb-4">
+                 <span v-for="tag in parsePatterns(record.patterns)" :key="tag" class="px-3 py-1 bg-white border border-slate-200 rounded-full text-xs font-bold text-slate-600 shadow-sm">
+                   #{{ tag }}
+                 </span>
+                 <span v-if="record.complexityExplanation" class="px-3 py-1 bg-sky-100 text-sky-700 rounded-full text-xs font-bold shadow-sm">
+                   💡 {{ record.complexityExplanation }}
+                 </span>
+             </div>
+
+             <!-- Code Block -->
+             <div class="bg-slate-900 rounded-2xl overflow-hidden shadow-inner relative group">
+                 <div class="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                    <button @click="copyCode(record.code)" class="text-xs bg-white/10 text-white px-2 py-1 rounded hover:bg-white/20">Copy</button>
+                 </div>
+                 <pre class="p-6 text-sm font-mono text-green-400 overflow-x-auto selection:bg-green-900 selection:text-white"><code>{{ record.code || '// No code available' }}</code></pre>
+             </div>
         </div>
       </div>
     </main>
@@ -397,7 +432,9 @@ import {
   TrendingUp,
   LayoutGrid,
   Youtube,
-  Nut // Lucide icon for Acorn (if available, otherwise use Circle)
+  Nut,
+  Trophy,
+  Activity
 } from 'lucide-vue-next';
 
 // ... (other imports)
@@ -520,24 +557,39 @@ const formatDate = (dateString) => {
 };
 
 const requestReview = async (record) => {
-    openModal('review', 'AI Code Review');
-    modalLoading.value = true;
-    try {
-        const res = await http.post('/ai/review', {
-            algorithmRecordId: record.id,
-            code: record.code,
-            language: record.language,
-            problemNumber: String(record.problemNumber)
-        });
-        modalData.value = res.data;
-    } catch (e) {
-        modalData.value = { summary: 'Error analyzing code.' };
-    } finally {
-        modalLoading.value = false;
-    }
+    // Deprecated: Review is now automatic.
+    // Keeping function structure if called by legacy, but UI shouldn't call it.
+    console.warn("Manual review is deprecated.");
 };
 
 
+const expandedCodeId = ref(null);
+
+const toggleCode = (id) => {
+    if (expandedCodeId.value === id) {
+        expandedCodeId.value = null;
+    } else {
+        expandedCodeId.value = id;
+    }
+};
+
+const copyCode = (text) => {
+    navigator.clipboard.writeText(text).then(() => {
+        // Optional: Toast notification
+        console.log("Copied to clipboard");
+    });
+};
+
+const parsePatterns = (jsonString) => {
+    if (!jsonString) return [];
+    try {
+        const parsed = JSON.parse(jsonString);
+        return Array.isArray(parsed) ? parsed : [];
+    } catch (e) {
+        console.error("Failed to parse patterns", e);
+        return [];
+    }
+};
 
 const currentRecord = ref(null);
 

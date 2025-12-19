@@ -33,6 +33,11 @@ public class AlgorithmRecord {
 
     // Joined fields
     private String username;
+    // Analysis Join fields
+    private Integer score;
+    private String timeComplexity;
+    private String complexityExplanation;
+    private String patterns;
 
     private AlgorithmRecord(Long userId, Long studyId, String problemNumber, String title, String language, String code,
             LocalDateTime createdAt, LocalDateTime updatedAt) {
