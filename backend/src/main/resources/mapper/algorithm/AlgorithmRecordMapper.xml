@@ -54,14 +54,15 @@
     DELETE FROM algorithm_records WHERE id = #{id}
   </delete>
 
-  <select id="countsByStudyId" resultType="com.ssafy.dash.study.application.dto.result.StudyStatsResult" parameterType="long">
+  <select id="countsByStudyId" resultType="com.ssafy.dash.algorithm.domain.StudyStats" parameterType="long">
     SELECT
-      SUM(CASE WHEN difficulty LIKE '%Bronze%' THEN 1 ELSE 0 END) as bronze,
-      SUM(CASE WHEN difficulty LIKE '%Silver%' THEN 1 ELSE 0 END) as silver,
-      SUM(CASE WHEN difficulty LIKE '%Gold%' THEN 1 ELSE 0 END) as gold,
-      SUM(CASE WHEN difficulty LIKE '%Platinum%' THEN 1 ELSE 0 END) as platinum
-    FROM algorithm_records
-    WHERE study_id = #{studyId}
+      COALESCE(SUM(CASE WHEN r.difficulty LIKE '%Bronze%' OR (r.difficulty REGEXP '^[1-5]$') THEN 1 ELSE 0 END), 0) as bronze,
+      COALESCE(SUM(CASE WHEN r.difficulty LIKE '%Silver%' OR (r.difficulty REGEXP '^([6-9]|10)$') THEN 1 ELSE 0 END), 0) as silver,
+      COALESCE(SUM(CASE WHEN r.difficulty LIKE '%Gold%' OR (r.difficulty REGEXP '^(1[1-5])$') THEN 1 ELSE 0 END), 0) as gold,
+      COALESCE(SUM(CASE WHEN r.difficulty LIKE '%Platinum%' OR (r.difficulty REGEXP '^(1[6-9]|20)$') THEN 1 ELSE 0 END), 0) as platinum
+    FROM algorithm_records r
+    INNER JOIN users u ON r.user_id = u.id
+    WHERE u.study_id = #{studyId} AND u.deleted_at IS NULL
   </select>
 
 
