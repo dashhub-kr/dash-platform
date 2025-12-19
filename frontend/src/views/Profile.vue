@@ -50,6 +50,65 @@
               class="w-full bg-slate-50/50 border border-slate-200/60 rounded-2xl px-5 py-4 text-slate-400 font-medium cursor-not-allowed"
             />
             <p class="text-xs text-slate-400 font-medium ml-1">🔒 이메일은 변경할 수 없습니다.</p>
+            <p class="text-xs text-slate-400 font-medium ml-1">🔒 이메일은 변경할 수 없습니다.</p>
+          </div>
+
+          <!-- Solved.ac Section -->
+          <div class="space-y-3 pt-4 border-t border-slate-100">
+            <label for="solvedac" class="text-sm font-bold text-slate-700 ml-1 flex items-center gap-2">
+              <span class="bg-[#17C55B] text-white text-[10px] px-1.5 py-0.5 rounded font-bold">SOLVED.AC</span>
+              핸들 (아이디)
+            </label>
+            <div class="flex gap-2">
+                <input
+                  id="solvedac"
+                  v-model="userData.solvedacHandle"
+                  type="text"
+                  placeholder="백준 아이디를 입력하세요"
+                  class="flex-1 bg-slate-50 border border-slate-200 rounded-2xl px-5 py-4 text-slate-900 font-medium placeholder-slate-400 focus:outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 transition-all shadow-sm"
+                />
+                <button 
+                    type="button"
+                    @click="updateSolvedac"
+                    :disabled="syncingSolvedac"
+                    class="px-5 bg-slate-100 text-slate-600 rounded-2xl font-bold hover:bg-slate-200 transition-colors disabled:opacity-50"
+                >
+                    {{ syncingSolvedac ? '...' : '연동' }}
+                </button>
+            </div>
+          </div>
+
+          <!-- Repository Section -->
+          <div class="space-y-3 pt-4 border-t border-slate-100">
+            <label for="repository" class="text-sm font-bold text-slate-700 ml-1 flex items-center gap-2">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" class="text-slate-800"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
+                연동된 저장소
+            </label>
+            <div class="flex gap-2">
+                <input
+                  id="repository"
+                  v-model="userData.repositoryName"
+                  type="text"
+                  placeholder="owner/repository"
+                  class="flex-1 bg-slate-50 border border-slate-200 rounded-2xl px-5 py-4 text-slate-900 font-medium placeholder-slate-400 focus:outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 transition-all shadow-sm font-mono"
+                />
+                 <button 
+                    type="button"
+                    @click="updateRepository"
+                    :disabled="syncingRepo"
+                    class="px-5 bg-slate-100 text-slate-600 rounded-2xl font-bold hover:bg-slate-200 transition-colors disabled:opacity-50"
+                >
+                    {{ syncingRepo ? '...' : '변경' }}
+                </button>
+            </div>
+             <p v-if="userData.webhookConfigured" class="text-xs text-emerald-600 font-bold ml-1 flex items-center gap-1">
+                 <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+                 웹훅이 정상적으로 연결되어 있습니다.
+             </p>
+             <p v-else class="text-xs text-amber-500 font-bold ml-1 flex items-center gap-1">
+                 <span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span>
+                 웹훅이 연결되지 않았거나 확인이 필요합니다.
+             </p>
           </div>
 
           <div class="pt-4 flex justify-end">
@@ -89,6 +148,7 @@ import { ref, onMounted, computed } from 'vue';
 import { useRouter } from 'vue-router';
 import { userApi } from '../api/user';
 import { useAuth } from '../composables/useAuth';
+import { onboardingApi } from '../api/onboarding';
 
 const router = useRouter();
 const { refresh, user } = useAuth();
@@ -96,9 +156,15 @@ const { refresh, user } = useAuth();
 const userData = ref({
     id: null,
     username: '',
-    email: ''
+    email: '',
+    solvedacHandle: '',
+    solvedacTier: 0,
+    repositoryName: '',
+    webhookConfigured: false
 });
 const updating = ref(false);
+const syncingSolvedac = ref(false);
+const syncingRepo = ref(false);
 
 const userInitial = computed(() => {
     return userData.value.username ? userData.value.username.charAt(0).toUpperCase() : 'U';
@@ -121,13 +187,49 @@ const handleUpdate = async () => {
             email: userData.value.email 
         });
         alert("정보가 수정되었습니다.");
-        // Should refresh global auth state if useAuth stores user info
         window.location.reload(); 
     } catch (e) {
         console.error("Update failed", e);
         alert("수정에 실패했습니다.");
     } finally {
         updating.value = false;
+    }
+};
+
+const updateSolvedac = async () => {
+    if (!userData.value.solvedacHandle) return;
+    syncingSolvedac.value = true;
+    try {
+        await onboardingApi.registerSolvedacRaw(userData.value.solvedacHandle);
+        alert("Solved.ac 핸들이 업데이트 되었습니다.\n데이터 분석에는 시간이 걸릴 수 있습니다.");
+        // Refresh profile to get updated tier if sync was instant, or just acknowledge
+    } catch (e) {
+        console.error(e);
+        alert("Solved.ac 연동 실패. 아이디를 확인해주세요.");
+    } finally {
+        syncingSolvedac.value = false;
+    }
+};
+
+const updateRepository = async () => {
+    if (!userData.value.repositoryName) return;
+    syncingRepo.value = true;
+    try {
+        const res = await onboardingApi.submitRepository(userData.value.repositoryName);
+        const data = res.data;
+        userData.value.repositoryName = data.repositoryName;
+        userData.value.webhookConfigured = data.webhookConfigured;
+        
+        if (data.webhookConfigured) {
+             alert("저장소가 연결되고 웹훅이 설정되었습니다!");
+        } else {
+             alert("저장소는 연결되었으나 웹훅 설정에 실패했습니다.\n잠시 후 다시 시도해주세요.");
+        }
+    } catch (e) {
+        console.error(e);
+        alert("저장소 연결 실패. 이름을 확인해주세요.");
+    } finally {
+        syncingRepo.value = false;
     }
 };
 

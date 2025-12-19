@@ -12,7 +12,11 @@ public record UserResponse(
         String provider,
         String providerId,
         String avatarUrl,
-        Long studyId) {
+        Long studyId,
+        String solvedacHandle,
+        Integer solvedacTier,
+        String repositoryName,
+        Boolean webhookConfigured) {
 
     public static UserResponse from(UserResult result) {
         return new UserResponse(
@@ -23,7 +27,11 @@ public record UserResponse(
                 result.provider(),
                 result.providerId(),
                 result.avatarUrl(),
-                result.studyId()
+                result.studyId(),
+                result.solvedacHandle(),
+                result.solvedacTier(),
+                result.repositoryName(),
+                result.webhookConfigured()
         );
     }
 

@@ -17,9 +17,11 @@ import java.util.stream.Collectors;
 public class UserService {
 
     private final UserRepository userRepository;
+    private final com.ssafy.dash.onboarding.domain.OnboardingRepository onboardingRepository;
 
-    public UserService(UserRepository userRepository) {
+    public UserService(UserRepository userRepository, com.ssafy.dash.onboarding.domain.OnboardingRepository onboardingRepository) {
         this.userRepository = userRepository;
+        this.onboardingRepository = onboardingRepository;
     }
 
     @Transactional
@@ -34,8 +36,10 @@ public class UserService {
     public UserResult findById(Long id) {
         User u = userRepository.findById(id)
                 .orElseThrow(() -> new UserNotFoundException(id));
+        
+        var onboarding = onboardingRepository.findByUserId(id).orElse(null);
 
-        return UserResult.from(u);
+        return UserResult.from(u, onboarding);
     }
 
     @Transactional(readOnly = true)

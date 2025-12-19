@@ -50,14 +50,7 @@
             >
               {{ saving ? "저장 중..." : "저장소 연결하고 시작하기" }}
             </button>
-            <button
-              type="button"
-              class="w-full px-4 py-3 rounded-2xl bg-slate-100 hover:bg-slate-200 transition-colors text-slate-600 font-bold hover:text-slate-800"
-              @click="skipOnboarding"
-              :disabled="saving"
-            >
-              나중에 설정할게요
-            </button>
+
           </div>
         </form>
 
@@ -92,9 +85,7 @@ const scheduleRedirect = () => {
   }, 1500);
 };
 
-const skipOnboarding = () => {
-  window.location.href = "/dashboard";
-};
+
 
 const submitRepository = async () => {
   if (!repositoryName.value.trim()) {

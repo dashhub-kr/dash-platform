@@ -11,11 +11,23 @@ public record UserResult(
         LocalDateTime createdAt,
         String provider,
         String providerId,
+
         String avatarUrl,
-        Long studyId
+        Long studyId,
+        String solvedacHandle,
+        Integer solvedacTier,
+        String repositoryName,
+        Boolean webhookConfigured
 ) {
 
     public static UserResult from(User user) {
+        return from(user, null);
+    }
+
+    public static UserResult from(User user, com.ssafy.dash.onboarding.domain.Onboarding onboarding) {
+        String repoName = onboarding != null ? onboarding.getRepositoryName() : null;
+        Boolean webhook = onboarding != null ? onboarding.isWebhookConfigured() : null;
+
         return new UserResult(
                 user.getId(),
                 user.getUsername(),
@@ -24,7 +36,11 @@ public record UserResult(
                 user.getProvider(),
                 user.getProviderId(),
                 user.getAvatarUrl(),
-                user.getStudyId()
+                user.getStudyId(),
+                user.getSolvedacHandle(),
+                user.getSolvedacTier(),
+                repoName,
+                webhook
         );
     }
 
