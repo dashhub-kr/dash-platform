@@ -103,7 +103,36 @@ public class GitHubPushService {
             return false;
         }
         String normalized = path.toLowerCase();
-        return normalized.endsWith(".java") && !normalized.contains("readme");
+
+        // Check for common non-code files
+        if (normalized.contains("readme") || normalized.contains("project") || normalized.contains("settings")) {
+            log.debug("Skipping non-code file: {}", path);
+            return false;
+        }
+
+        // Supported extensions
+        boolean isSupported = normalized.endsWith(".java") || 
+                            normalized.endsWith(".py") || 
+                            normalized.endsWith(".cpp") || 
+                            normalized.endsWith(".cc") || 
+                            normalized.endsWith(".c") || 
+                            normalized.endsWith(".cs") || 
+                            normalized.endsWith(".kt") || 
+                            normalized.endsWith(".js") || 
+                            normalized.endsWith(".ts") || 
+                            normalized.endsWith(".rb") || 
+                            normalized.endsWith(".swift") || 
+                            normalized.endsWith(".go") || 
+                            normalized.endsWith(".rs") || 
+                            normalized.endsWith(".php") || 
+                            normalized.endsWith(".scala") || 
+                            normalized.endsWith(".dart");
+
+        if (!isSupported) {
+            log.debug("Skipping unsupported file extension: {}", path);
+        }
+
+        return isSupported;
     }
 
     private String writeFilesJson(List<PushFileMetadata> files) {

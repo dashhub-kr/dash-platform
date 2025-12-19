@@ -7,14 +7,19 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
 @Component
 public class GitHubSubmissionMetadataExtractor {
 
+    private static final Logger log = LoggerFactory.getLogger(GitHubSubmissionMetadataExtractor.class);
+
     private static final Pattern COMMIT_MESSAGE_PATTERN = Pattern.compile(
-            "\\[(?<difficulty>[^]]+)]\\s*Title:\\s*(?<title>[^,]+),\\s*Time:\\s*(?<time>\\d+)\\s*ms,\\s*Memory:\\s*(?<memory>\\d+)\\s*KB",
+            "\\[(?<difficulty>[^]]+)]\\s*Title\\s*:\\s*(?<title>[^,]+),\\s*Time\\s*:\\s*(?<time>\\d+)\\s*ms,\\s*Memory\\s*:\\s*(?<memory>\\d+)\\s*KB",
             Pattern.CASE_INSENSITIVE);
 
     private static final Map<String, String> LANGUAGE_MAP = Map.ofEntries(
@@ -37,8 +42,16 @@ public class GitHubSubmissionMetadataExtractor {
 
     public SubmissionMetadata extract(String commitMessage, String filePath) {
         String message = commitMessage == null ? "" : commitMessage.trim();
+        log.debug("Extracting metadata for file: {}, Message: [{}]", filePath, message);
+
         Matcher matcher = COMMIT_MESSAGE_PATTERN.matcher(message);
         boolean matched = matcher.find();
+
+        if (!matched) {
+            log.debug("FAIL: Message did not match regex pattern.");
+        } else {
+            log.debug("SUCCESS: Message matched pattern.");
+        }
 
         String difficulty = matched ? matcher.group("difficulty").trim() : null;
         String titleFromMessage = matched ? matcher.group("title").trim() : null;

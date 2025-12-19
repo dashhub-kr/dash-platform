@@ -5,8 +5,8 @@
 
 
     <main class="container mx-auto px-6 py-8">
-      <!-- Welcome Section -->
-      <div class="mb-10">
+      <!-- Header Section -->
+      <div class="mb-10 animate-fade-in-down">
         <h1 class="text-3xl font-extrabold text-slate-900 mb-2">
           안녕하세요, <span class="text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-purple-600">탐험가님!</span> 👋
         </h1>
@@ -18,22 +18,18 @@
         <div v-for="i in 6" :key="i" class="h-64 rounded-3xl bg-white shadow-sm border border-slate-100 animate-pulse"></div>
       </div>
 
-      <!-- Stats Overview -->
-      <div v-if="!loading" class="mb-10 animate-fade-in-up">
-        <div class="bg-white rounded-3xl p-8 shadow-sm border border-slate-100 relative">
-             <div class="flex items-center justify-between mb-6">
-                <h2 class="text-xl font-bold text-slate-800 flex items-center gap-2">
+      <!-- Stats & Sidebar Area -->
+      <div v-if="!loading" class="mb-10 animate-fade-in-up flex flex-col xl:flex-row items-start justify-center gap-6">
+        
+        <!-- Heatmap Card -->
+        <div class="bg-white rounded-3xl p-8 shadow-sm border border-slate-100 relative w-fit max-w-full">
+             <div class="flex items-center justify-between mb-6 gap-8">
+                <h2 class="text-xl font-bold text-slate-800 flex items-center gap-2 whitespace-nowrap">
                     <TrendingUp class="text-indigo-500" />
                     스터디 활동 로그
                 </h2>
-                
-                <div v-if="studyData" class="flex items-center gap-3 bg-amber-50 px-4 py-2 rounded-xl border border-amber-100 cursor-pointer hover:bg-amber-100 transition-colors" @click="openAcornHistory">
-                     <div class="w-8 h-8 rounded-full bg-amber-200 flex items-center justify-center text-xl shadow-sm">🌰</div>
-                     <div class="flex flex-col leading-none">
-                         <span class="text-xs font-bold text-amber-600 uppercase">ACORNS</span>
-                         <span class="text-lg font-black text-slate-800">{{ studyData.acornCount }}</span>
-                     </div>
-                </div>
+
+                <!-- Legend -->
                 <div class="flex items-center gap-2 text-xs font-medium text-slate-400">
                     <span>Less</span>
                     <div class="flex gap-1">
@@ -47,24 +43,55 @@
                 </div>
              </div>
              
-             <!-- Heatmap (Grass) -->
              <div class="overflow-x-auto pb-2 custom-scrollbar">
-                <div class="flex gap-[3px] min-w-max">
-                    <div v-for="(week, wIdx) in heatmapWeeks" :key="wIdx" class="flex flex-col gap-[3px]">
-                        <div 
-                            v-for="(day, dIdx) in week" 
-                            :key="dIdx"
-                            class="w-3 h-3 rounded-[2px] transition-all relative cursor-pointer hover:ring-2 hover:ring-indigo-300 hover:z-10"
-                            :class="day.colorClass"
-                            @mouseenter="showTooltip($event, day)"
-                            @mouseleave="hideTooltip"
-                        >
+                 <div class="min-w-max">
+                     <!-- Heatmap (Grass) -->
+                     <div class="flex gap-[3px]">
+                        <div v-for="(week, wIdx) in heatmapWeeks" :key="wIdx" class="flex flex-col gap-[3px]">
+                            <div 
+                                v-for="(day, dIdx) in week" 
+                                :key="dIdx"
+                                class="w-3 h-3 rounded-[2px] transition-all relative cursor-pointer hover:ring-2 hover:ring-indigo-300 hover:z-10"
+                                :class="day.colorClass"
+                                @mouseenter="showTooltip($event, day)"
+                                @mouseleave="hideTooltip"
+                            >
+                            </div>
                         </div>
                     </div>
-                </div>
+                 </div>
              </div>
+        </div>
 
-             <!-- Shared Fixed Tooltip -->
+        <!-- Sidebar: Acorn & Ticker -->
+        <div class="flex flex-col gap-4 min-w-[220px] shrink-0">
+           <!-- Badge -->
+           <div v-if="studyData" class="bg-white px-6 py-5 rounded-3xl shadow-sm border border-slate-100 flex flex-col items-center justify-center gap-2 cursor-pointer hover:bg-slate-50 transition-colors group" @click="openAcornHistory">
+                <div class="w-12 h-12 rounded-2xl bg-amber-100 group-hover:bg-amber-200 flex items-center justify-center text-3xl shadow-sm transition-colors ring-4 ring-white">🌰</div>
+                <div class="flex flex-col leading-none text-center">
+                     <span class="text-xs font-bold text-amber-600 uppercase tracking-wider mb-1">Study Acorns</span>
+                     <span class="text-3xl font-black text-slate-800">{{ studyData.acornCount }}</span>
+                </div>
+           </div>
+
+           <!-- Recent Logs List -->
+           <div v-if="acornLogs.length > 0" class="bg-white rounded-3xl p-5 shadow-sm border border-slate-100">
+                <h3 class="text-xs font-bold text-slate-400 mb-4 uppercase tracking-wider flex items-center gap-2 pb-2 border-b border-slate-100">
+                    <Activity :size="12" /> Recent Activity
+                </h3>
+                <div class="flex flex-col gap-3">
+                     <div v-for="log in acornLogs.slice(0, 5)" :key="log.id" class="flex items-center justify-between text-sm">
+                         <span class="font-bold text-slate-700 truncate max-w-[100px]">{{ log.username }}</span>
+                         <span class="font-bold font-mono" :class="log.amount > 0 ? 'text-green-500' : 'text-red-500'">
+                             {{ log.amount > 0 ? '+' : '' }}{{ log.amount }}
+                         </span>
+                     </div>
+                </div>
+           </div>
+        </div>
+
+      </div>
+      <!-- Shared Fixed Tooltip -->
              <div v-if="tooltipData" 
                   class="fixed z-50 pointer-events-none transform -translate-x-1/2 -translate-y-full mb-2"
                   :style="{ left: tooltipPos.x + 'px', top: tooltipPos.y + 'px' }">
@@ -80,8 +107,6 @@
                   <!-- Arrow -->
                   <div class="w-2 h-2 bg-slate-800 transform rotate-45 absolute bottom-1 left-1/2 -translate-x-1/2 shadow-sm"></div>
              </div>
-        </div>
-      </div>
 
       <div v-if="records.length === 0 && !loading" class="flex flex-col items-center justify-center py-20 bg-white rounded-3xl border border-dashed border-slate-300">
         <div class="w-20 h-20 bg-indigo-50 rounded-full flex items-center justify-center mb-6">
@@ -484,10 +509,15 @@ onMounted(async () => {
   
   if (user.value?.studyId) {
       try {
+          // Fetch Study Data
           const studyRes = await studyApi.get(user.value.studyId);
           studyData.value = studyRes.data;
+
+          // Fetch Acorn Logs for Ticker
+          const logsRes = await studyApi.getAcornLogs(user.value.studyId);
+          acornLogs.value = logsRes.data || [];
       } catch (e) {
-          console.error("Study fetch error", e);
+          console.error("Study data error", e);
       }
   }
 
@@ -698,5 +728,23 @@ const closeModal = () => {
 .custom-scrollbar::-webkit-scrollbar-thumb {
   background: #cbd5e1;
   border-radius: 10px;
+}
+
+.slide-up-enter-active,
+.slide-up-leave-active {
+  transition: all 0.5s ease;
+}
+.slide-up-enter-from {
+  opacity: 0;
+  transform: translateY(100%);
+}
+.slide-up-leave-to {
+  opacity: 0;
+  transform: translateY(-100%);
+}
+
+.mask-linear {
+    mask-image: linear-gradient(to bottom, transparent 0%, black 10%, black 90%, transparent 100%);
+    -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 10%, black 90%, transparent 100%);
 }
 </style>

@@ -181,18 +181,23 @@ public class GitHubPushEventWorker {
                 metadataExtractor.parseCommittedAt(file.committedAt()));
 
         algorithmRecordRepository.save(record);
+        log.info("AlgorithmRecord saved: id={}, problem={}", record.getId(), record.getProblemNumber());
 
         // Acorn Accumulation Logic
         if (record.getStudyId() != null 
                 && metadata.runtimeMs() != null && metadata.runtimeMs() > 0 
                 && metadata.memoryKb() != null && metadata.memoryKb() > 0) {
             
-            acornService.accumulate(
-                record.getStudyId(), 
-                userId, 
-                10, 
-                "Problem Solved: " + metadata.problemNumber()
-            );
+            try {
+                acornService.accumulate(
+                    record.getStudyId(), 
+                    userId, 
+                    10, 
+                    "Problem Solved: " + metadata.problemNumber()
+                );
+            } catch (Exception e) {
+                log.error("Acorn accumulation failed for record: {}", record.getId(), e);
+            }
 
             // Auto-Analysis Logic
             try {
