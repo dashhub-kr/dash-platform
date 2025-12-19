@@ -92,7 +92,12 @@
         <div 
           v-for="record in records" 
           :key="record.id" 
-          class="group relative bg-white rounded-3xl p-6 shadow-sm border border-slate-100 hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col md:flex-row items-center gap-6"
+          class="group relative rounded-3xl p-6 shadow-sm border transition-all duration-300 flex flex-col md:flex-row items-center gap-6 hover:shadow-xl hover:-translate-y-1"
+          :class="[
+            (record.runtimeMs > 0 && record.memoryKb > 0) 
+              ? 'bg-white border-slate-100 hover:border-indigo-200' 
+              : 'bg-red-50/30 border-red-100 hover:border-red-300 hover:bg-red-50/50'
+          ]"
         >
           <!-- Left: Info -->
           <div class="flex-1 w-full md:w-auto text-left">
@@ -107,6 +112,9 @@
                </a>
                <span class="px-2 py-0.5 rounded-full text-xs font-bold bg-slate-100 text-slate-600 border border-slate-200 uppercase tracking-wider">
                  {{ record.language }}
+               </span>
+               <span v-if="!(record.runtimeMs > 0 && record.memoryKb > 0)" class="px-2 py-0.5 rounded-full text-xs font-bold bg-red-100 text-red-600 border border-red-200 uppercase tracking-wider">
+                 FAILED
                </span>
             </div>
             <h3 class="text-xl font-bold text-slate-800 leading-snug truncate group-hover:text-indigo-600 transition-colors">
@@ -127,15 +135,18 @@
 
           <!-- Middle: Stats -->
           <div class="flex items-center gap-3 w-full md:w-auto shrink-0">
-            <div class="flex-1 md:flex-none bg-slate-50 rounded-2xl px-5 py-3 flex items-center justify-center gap-2 border border-slate-100 min-w-[100px]">
-              <Zap :size="18" class="text-amber-400" />
-              <span class="text-sm font-bold text-slate-700">{{ record.runtimeMs }}ms</span>
+            <div class="flex-1 md:flex-none rounded-2xl px-5 py-3 flex items-center justify-center gap-2 border min-w-[100px]"
+                 :class="(record.runtimeMs > 0 && record.memoryKb > 0) ? 'bg-slate-50 border-slate-100' : 'bg-red-50 border-red-100'">
+              <Zap :size="18" :class="(record.runtimeMs > 0 && record.memoryKb > 0) ? 'text-amber-400' : 'text-red-400'" />
+              <span class="text-sm font-bold" :class="(record.runtimeMs > 0 && record.memoryKb > 0) ? 'text-slate-700' : 'text-red-700'">{{ record.runtimeMs }}ms</span>
             </div>
-            <div class="flex-1 md:flex-none bg-slate-50 rounded-2xl px-5 py-3 flex items-center justify-center gap-2 border border-slate-100 min-w-[100px]">
-              <Database :size="18" class="text-blue-400" />
-              <span class="text-sm font-bold text-slate-700">{{ record.memoryKb }}KB</span>
+            <div class="flex-1 md:flex-none rounded-2xl px-5 py-3 flex items-center justify-center gap-2 border min-w-[100px]"
+                 :class="(record.runtimeMs > 0 && record.memoryKb > 0) ? 'bg-slate-50 border-slate-100' : 'bg-red-50 border-red-100'">
+              <Database :size="18" :class="(record.runtimeMs > 0 && record.memoryKb > 0) ? 'text-blue-400' : 'text-red-400'" />
+              <span class="text-sm font-bold" :class="(record.runtimeMs > 0 && record.memoryKb > 0) ? 'text-slate-700' : 'text-red-700'">{{ record.memoryKb }}KB</span>
             </div>
           </div>
+
 
           <!-- Right: Actions -->
           <div class="flex items-center gap-2 w-full md:w-auto shrink-0">
