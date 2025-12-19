@@ -49,6 +49,7 @@ public class GitHubPushEventWorker {
     private final int maxBatchSize;
     private final TransactionTemplate transactionTemplate;
     private final UserRepository userRepository;
+    private final com.ssafy.dash.acorn.application.AcornService acornService;
 
     public GitHubPushEventWorker(GitHubPushEventRepository pushEventRepository,
                                  OnboardingRepository onboardingRepository,
@@ -59,6 +60,7 @@ public class GitHubPushEventWorker {
                                  GitHubSubmissionMetadataExtractor metadataExtractor,
                                  PlatformTransactionManager transactionManager,
                                  UserRepository userRepository,
+                                 com.ssafy.dash.acorn.application.AcornService acornService,
                                  @Value("${github.push-worker.max-batch:5}") int maxBatchSize) {
         this.pushEventRepository = pushEventRepository;
         this.onboardingRepository = onboardingRepository;
@@ -70,6 +72,7 @@ public class GitHubPushEventWorker {
         this.maxBatchSize = Math.max(1, maxBatchSize);
         this.transactionTemplate = new TransactionTemplate(transactionManager);
         this.userRepository = userRepository;
+        this.acornService = acornService;
     }
 
     @Scheduled(fixedDelayString = "${github.push-worker.fixed-delay:10000}")
@@ -175,6 +178,19 @@ public class GitHubPushEventWorker {
                 metadataExtractor.parseCommittedAt(file.committedAt()));
 
         algorithmRecordRepository.save(record);
+
+        // Acorn Accumulation Logic
+        if (record.getStudyId() != null 
+                && metadata.runtimeMs() != null && metadata.runtimeMs() > 0 
+                && metadata.memoryKb() != null && metadata.memoryKb() > 0) {
+            
+            acornService.accumulate(
+                record.getStudyId(), 
+                userId, 
+                10, 
+                "Problem Solved: " + metadata.problemNumber()
+            );
+        }
     }
 
     private record QueuedPushFile(

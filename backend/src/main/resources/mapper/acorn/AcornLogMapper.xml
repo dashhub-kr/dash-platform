@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.ssafy.dash.acorn.infrastructure.mapper.AcornLogMapper">
+
+    <insert id="insert" parameterType="com.ssafy.dash.acorn.domain.AcornLog" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO acorn_log (study_id, user_id, amount, reason, created_at)
+        VALUES (#{studyId}, #{userId}, #{amount}, #{reason}, #{createdAt})
+    </insert>
+
+    <select id="selectByStudyId" resultType="com.ssafy.dash.acorn.domain.AcornLog">
+        SELECT 
+            al.id, al.study_id, al.user_id, al.amount, al.reason, al.created_at,
+            u.username as username
+        FROM acorn_log al
+        LEFT JOIN users u ON al.user_id = u.id
+        WHERE al.study_id = #{studyId}
+        ORDER BY al.created_at DESC
+    </select>
+
+</mapper>

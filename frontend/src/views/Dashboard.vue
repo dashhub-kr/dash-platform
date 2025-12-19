@@ -26,6 +26,14 @@
                     <TrendingUp class="text-indigo-500" />
                     스터디 활동 로그
                 </h2>
+                
+                <div v-if="studyData" class="flex items-center gap-3 bg-amber-50 px-4 py-2 rounded-xl border border-amber-100 cursor-pointer hover:bg-amber-100 transition-colors" @click="openAcornHistory">
+                     <div class="w-8 h-8 rounded-full bg-amber-200 flex items-center justify-center text-xl shadow-sm">🌰</div>
+                     <div class="flex flex-col leading-none">
+                         <span class="text-xs font-bold text-amber-600 uppercase">ACORNS</span>
+                         <span class="text-lg font-black text-slate-800">{{ studyData.acornCount }}</span>
+                     </div>
+                </div>
                 <div class="flex items-center gap-2 text-xs font-medium text-slate-400">
                     <span>Less</span>
                     <div class="flex gap-1">
@@ -273,6 +281,32 @@
                     </p>
                 </div>
             </div>
+
+            <!-- Acorn History -->
+            <div v-else-if="modalType === 'acorn'" class="space-y-4">
+                 <div v-if="!modalData || modalData.length === 0" class="text-center py-10 text-slate-400">
+                     내역이 없습니다.
+                 </div>
+                 <div v-else v-for="log in modalData" :key="log.id" class="flex items-center justify-between p-4 bg-slate-50 rounded-2xl border border-slate-100">
+                     <div class="flex items-center gap-3">
+                         <div class="w-10 h-10 rounded-full flex items-center justify-center text-lg shadow-sm"
+                              :class="log.amount > 0 ? 'bg-amber-100 text-amber-600' : 'bg-slate-200 text-slate-500'">
+                             {{ log.amount > 0 ? '🌰' : '💸' }}
+                         </div>
+                         <div>
+                             <p class="font-bold text-slate-800">{{ log.reason }}</p>
+                             <div class="flex items-center gap-2 text-xs text-slate-400 font-medium">
+                                 <span>{{ log.username }}</span>
+                                 <span>•</span>
+                                 <span>{{ formatDate(log.createdAt) }}</span>
+                             </div>
+                         </div>
+                     </div>
+                     <span class="font-black text-lg" :class="log.amount > 0 ? 'text-amber-500' : 'text-slate-400'">
+                         {{ log.amount > 0 ? '+' : '' }}{{ log.amount }}
+                     </span>
+                 </div>
+            </div>
         </div>
 
       </div>
@@ -283,6 +317,8 @@
 <script setup>
 import { ref, onMounted } from 'vue';
 import { dashboardApi } from '../api/dashboard';
+import { studyApi } from '../api/study';
+import { useAuth } from '../composables/useAuth';
 import http from '../api/http';
 import { 
   Bot, 
@@ -294,42 +330,61 @@ import {
   X,
   TrendingUp,
   LayoutGrid,
-  Youtube
+  Youtube,
+  Nut // Lucide icon for Acorn (if available, otherwise use Circle)
 } from 'lucide-vue-next';
 
-const records = ref([]);
-const loading = ref(true);
-const processing = ref(null);
-const showModal = ref(false);
-const modalType = ref('');
-const modalTitle = ref('');
-const modalLoading = ref(false);
-const modalData = ref(null);
+// ... (other imports)
 
-const heatmapWeeks = ref([]);
+const { user } = useAuth();
+const records = ref([]);
+const studyData = ref(null);
+const acornLogs = ref([]);
+const loading = ref(true);
+// ... (other refs)
 
 onMounted(async () => {
   try {
-    // Fetch records - this should always work
     const recordsRes = await dashboardApi.getRecords();
-    console.log('Records data:', recordsRes.data);
     records.value = recordsRes.data;
   } catch(e) {
     console.error('Records error:', e);
   }
   
+  if (user.value?.studyId) {
+      try {
+          const studyRes = await studyApi.get(user.value.studyId);
+          studyData.value = studyRes.data;
+      } catch (e) {
+          console.error("Study fetch error", e);
+      }
+  }
+
   try {
-    // Fetch heatmap - may fail if endpoint doesn't exist yet
     const heatmapRes = await dashboardApi.getHeatmap();
     processHeatmap(heatmapRes.data || []);
   } catch(e) {
     console.error('Heatmap error:', e);
-    // Initialize empty heatmap on error
     processHeatmap([]);
   }
   
   loading.value = false;
 });
+
+const openAcornHistory = async () => {
+    openModal('acorn', '도토리 활동 내역');
+    modalLoading.value = true;
+    try {
+        if (user.value?.studyId) {
+            const res = await studyApi.getAcornLogs(user.value.studyId);
+            modalData.value = res.data;
+        }
+    } catch (e) {
+        modalData.value = [];
+    } finally {
+        modalLoading.value = false;
+    }
+};
 
 const processHeatmap = (data) => {
     // 1. Map data for quick lookup

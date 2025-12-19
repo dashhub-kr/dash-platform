@@ -16,5 +16,13 @@ export const studyApi = {
     // Get study statistics
     getStats(studyId) {
         return http.get(`/studies/${studyId}/stats`);
+    },
+    // Get study details
+    get(studyId) {
+        return http.get(`/studies/${studyId}`);
+    },
+    // Get acorn logs
+    getAcornLogs(studyId) {
+        return http.get(`/studies/${studyId}/acorns`);
     }
 };

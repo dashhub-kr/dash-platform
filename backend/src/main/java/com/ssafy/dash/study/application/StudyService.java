@@ -57,4 +57,9 @@ public class StudyService {
         return new StudyStatsResult(stats.bronze(), stats.silver(), stats.gold(), stats.platinum());
     }
 
+    @Transactional(readOnly = true)
+    public java.util.Optional<Study> findStudyById(Long studyId) {
+        return studyRepository.findById(studyId);
+    }
+
 }

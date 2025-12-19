@@ -25,11 +25,18 @@ import java.util.List;
 public class StudyController {
 
     private final StudyService studyService;
+    private final com.ssafy.dash.acorn.application.AcornService acornService;
 
     @Operation(summary = "스터디 목록 조회", description = "참여 가능한 스터디 목록을 조회합니다.")
     @GetMapping
     public ResponseEntity<List<Study>> getStudies() {
         return ResponseEntity.ok(studyService.findAll());
+    }
+
+    @Operation(summary = "스터디 상세 조회", description = "특정 스터디의 정보를 조회합니다.")
+    @GetMapping("/{studyId}")
+    public ResponseEntity<Study> getStudy(@PathVariable Long studyId) {
+        return ResponseEntity.of(studyService.findStudyById(studyId));
     }
 
     @Operation(summary = "스터디 생성", description = "새로운 스터디를 생성하고 자동으로 가입합니다.")
@@ -61,5 +68,12 @@ public class StudyController {
     public ResponseEntity<StudyStatsResponse> getStudyStats(
             @PathVariable Long studyId) {
         return ResponseEntity.ok(StudyStatsResponse.from(studyService.getStudyStats(studyId)));
+    }
+
+    @Operation(summary = "도토리 내역 조회", description = "스터디의 도토리 적립/사용 내역을 조회합니다.")
+    @GetMapping("/{studyId}/acorns")
+    public ResponseEntity<List<com.ssafy.dash.acorn.domain.AcornLog>> getAcornLogs(
+            @PathVariable Long studyId) {
+        return ResponseEntity.ok(acornService.getLogs(studyId));
     }
 }
