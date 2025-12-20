@@ -17,6 +17,16 @@ CREATE TABLE IF NOT EXISTS users (
 	solvedac_rating INT,
 	solvedac_class INT,
 	stats_last_synced_at TIMESTAMP NULL,
+	
+    -- Random Defense
+    defense_type VARCHAR(20),
+    defense_problem_id INT,
+    defense_start_time TIMESTAMP NULL DEFAULT NULL,
+    silver_streak INT DEFAULT 0,
+    gold_streak INT DEFAULT 0,
+    max_silver_streak INT DEFAULT 0,
+    max_gold_streak INT DEFAULT 0,
+
 	created_at TIMESTAMP,
 	
     provider VARCHAR(50),

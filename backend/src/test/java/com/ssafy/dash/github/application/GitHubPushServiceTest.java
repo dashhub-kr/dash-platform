@@ -24,6 +24,12 @@ class GitHubPushServiceTest {
 
     @Mock
     private GitHubPushEventRepository repository;
+    
+    @Mock
+    private com.ssafy.dash.defense.application.DefenseService defenseService;
+    
+    @Mock
+    private com.ssafy.dash.onboarding.domain.OnboardingRepository onboardingRepository;
 
     private ObjectMapper objectMapper;
 
@@ -33,7 +39,7 @@ class GitHubPushServiceTest {
     @BeforeEach
     void setUp() {
         objectMapper = new ObjectMapper();
-        pushService = new GitHubPushService(objectMapper, repository);
+        pushService = new GitHubPushService(objectMapper, repository, defenseService, onboardingRepository);
     }
 
     @Test
