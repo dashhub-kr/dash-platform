@@ -26,7 +26,14 @@
         provider_id = #{providerId}, avatar_url = #{avatarUrl}, study_id = #{studyId},
         solvedac_handle = #{solvedacHandle}, solvedac_tier = #{solvedacTier},
         solvedac_rating = #{solvedacRating}, solvedac_class = #{solvedacClass},
-        stats_last_synced_at = #{statsLastSyncedAt}
+        stats_last_synced_at = #{statsLastSyncedAt},
+        defense_type = #{defenseType},
+        defense_problem_id = #{defenseProblemId},
+        defense_start_time = #{defenseStartTime},
+        silver_streak = #{silverStreak},
+        gold_streak = #{goldStreak},
+        max_silver_streak = #{maxSilverStreak},
+        max_gold_streak = #{maxGoldStreak}
     WHERE id = #{id} AND deleted_at IS NULL
   </update>
 

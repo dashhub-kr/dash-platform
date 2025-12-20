@@ -108,6 +108,8 @@ const router = useRouter();
 const enterZone = (zoneId) => {
   if (zoneId === 'warehouse') {
     router.push('/playground');
+  } else if (zoneId === 'defense') {
+    router.push('/defense');
   } else {
     // Shake animation or toast
     alert("🚧 공사 중인 구역입니다.");

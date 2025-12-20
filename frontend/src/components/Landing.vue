@@ -268,7 +268,7 @@
         <div class="text-2xl font-black text-slate-900 mb-6">Dash</div>
         <div class="text-sm text-slate-400">
           © 2025 DASH. All rights reserved. <br/>
-          Designed for developers, by developers.
+          Designed for utact, canit0221.
         </div>
       </div>
     </footer>

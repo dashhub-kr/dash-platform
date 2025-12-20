@@ -29,6 +29,15 @@ public class User {
     private Integer solvedacClass;
     private LocalDateTime statsLastSyncedAt;
 
+    // 랜덤 디펜스 필드
+    private String defenseType; // "SILVER" 또는 "GOLD"
+    private Integer defenseProblemId;
+    private LocalDateTime defenseStartTime;
+    private Integer silverStreak = 0;
+    private Integer goldStreak = 0;
+    private Integer maxSilverStreak = 0;
+    private Integer maxGoldStreak = 0;
+
     private User(Long id, String username, String email, LocalDateTime createdAt,
             String provider, String providerId, String avatarUrl) {
         this.id = id;

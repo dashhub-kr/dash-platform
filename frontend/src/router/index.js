@@ -29,6 +29,7 @@ const routes = [
   { path: "/youtube", name: "YouTubeSearch", component: YouTubeSearch },
   { path: "/simcity", name: "StudySimCity", component: StudySimCity },
   { path: "/map", name: "WorldMap", component: () => import("../components/WorldMap.vue") },
+  { path: "/defense", name: "DefenseView", component: () => import("../views/DefenseView.vue") },
 ];
 
 const router = createRouter({

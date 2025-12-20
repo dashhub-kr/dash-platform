@@ -26,10 +26,17 @@ public class GitHubPushService {
 
     private final ObjectMapper objectMapper;
     private final GitHubPushEventRepository pushEventRepository;
+    private final com.ssafy.dash.defense.application.DefenseService defenseService;
+    private final com.ssafy.dash.onboarding.domain.OnboardingRepository onboardingRepository;
 
-    public GitHubPushService(ObjectMapper objectMapper, GitHubPushEventRepository pushEventRepository) {
+    public GitHubPushService(ObjectMapper objectMapper, 
+                             GitHubPushEventRepository pushEventRepository,
+                             com.ssafy.dash.defense.application.DefenseService defenseService,
+                             com.ssafy.dash.onboarding.domain.OnboardingRepository onboardingRepository) {
         this.objectMapper = objectMapper;
         this.pushEventRepository = pushEventRepository;
+        this.defenseService = defenseService;
+        this.onboardingRepository = onboardingRepository;
     }
 
     @Transactional
@@ -42,15 +49,51 @@ public class GitHubPushService {
 
         try {
             JsonNode root = objectMapper.readTree(payload);
-            GitHubPushEvent event = buildEvent(deliveryId, root, payload);
+            
+            // 이벤트 생성을 위한 정보 추출
+            String repositoryName = root.path("repository").path("full_name").asText("unknown/unknown");
+            List<PushFileMetadata> files = collectTargetFiles(root.path("commits"));
+            
+            GitHubPushEvent event = buildEvent(deliveryId, root, payload, files, repositoryName);
             pushEventRepository.save(event);
+            
+            // 랜덤 디펜스 검증
+            verifyDefenseAttempt(repositoryName, files);
+            
         } catch (JsonProcessingException ex) {
             throw new GitHubPayloadProcessingException("GitHub push payload 파싱에 실패했습니다.", ex);
         }
     }
+    
+    private void verifyDefenseAttempt(String repositoryName, List<PushFileMetadata> files) {
+        onboardingRepository.findByRepositoryName(repositoryName).ifPresent(onboarding -> {
+            Long userId = onboarding.getUserId();
+            for (PushFileMetadata file : files) {
+                extractProblemId(file.path()).ifPresent(problemId -> {
+                    defenseService.verifyDefense(userId, problemId);
+                });
+            }
+        });
+    }
 
-    private GitHubPushEvent buildEvent(String deliveryId, JsonNode root, String payload) {
-        String repositoryName = root.path("repository").path("full_name").asText("unknown/unknown");
+    private Optional<Integer> extractProblemId(String path) {
+        // 파일명에서 마지막 숫자 시퀀스를 찾기 위한 간단한 정규식 (디렉토리 무시)
+        // 예: "src/BOJ_1234.java" -> 1234
+        // "1000.py" -> 1000
+        try {
+            java.util.regex.Pattern pattern = java.util.regex.Pattern.compile("(\\d+)");
+            java.util.regex.Matcher matcher = pattern.matcher(path);
+            String lastMatch = null;
+            while (matcher.find()) {
+                lastMatch = matcher.group(1);
+            }
+            return lastMatch != null ? Optional.of(Integer.parseInt(lastMatch)) : Optional.empty();
+        } catch (NumberFormatException e) {
+            return Optional.empty();
+        }
+    }
+
+    private GitHubPushEvent buildEvent(String deliveryId, JsonNode root, String payload, List<PushFileMetadata> files, String repositoryName) {
         String reference = root.path("ref").asText("refs/heads/main");
         JsonNode headCommit = root.path("head_commit");
         String headSha = headCommit.path("id").asText(root.path("after").asText());
@@ -58,7 +101,6 @@ public class GitHubPushService {
         String authorEmail = headCommit.path("author").path("email").asText();
         String commitMessage = headCommit.path("message").asText();
 
-        List<PushFileMetadata> files = collectTargetFiles(root.path("commits"));
         String filesJson = writeFilesJson(files);
 
         LocalDateTime receivedAt = LocalDateTime.now();
@@ -104,13 +146,13 @@ public class GitHubPushService {
         }
         String normalized = path.toLowerCase();
 
-        // Check for common non-code files
+        // 일반적인 비코드 파일 확인
         if (normalized.contains("readme") || normalized.contains("project") || normalized.contains("settings")) {
             log.debug("Skipping non-code file: {}", path);
             return false;
         }
 
-        // Supported extensions
+        // 지원되는 확장자
         boolean isSupported = normalized.endsWith(".java") || 
                             normalized.endsWith(".py") || 
                             normalized.endsWith(".cpp") || 
