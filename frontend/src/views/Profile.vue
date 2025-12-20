@@ -50,7 +50,6 @@
               class="w-full bg-slate-50/50 border border-slate-200/60 rounded-2xl px-5 py-4 text-slate-400 font-medium cursor-not-allowed"
             />
             <p class="text-xs text-slate-400 font-medium ml-1">🔒 이메일은 변경할 수 없습니다.</p>
-            <p class="text-xs text-slate-400 font-medium ml-1">🔒 이메일은 변경할 수 없습니다.</p>
           </div>
 
           <!-- Solved.ac Section -->

@@ -8,7 +8,7 @@
       <!-- Header Section -->
       <div class="mb-10 animate-fade-in-down">
         <h1 class="text-3xl font-extrabold text-slate-900 mb-2">
-          안녕하세요, <span class="text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-purple-600">탐험가님!</span> 👋
+          안녕하세요, <span class="text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-purple-600">{{ user?.username || '탐험가' }}님!</span> 👋
         </h1>
         <p class="text-slate-500">오늘도 알고리즘의 바다를 항해할 준비가 되셨나요?</p>
       </div>
