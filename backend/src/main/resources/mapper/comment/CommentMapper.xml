@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ssafy.dash.comment.infrastructure.mapper.CommentMapper">
+
+  <insert id="insert" parameterType="Comment" useGeneratedKeys="true" keyProperty="id">
+    INSERT INTO comments (board_id, user_id, parent_id, line_number, content, like_count, created_at, updated_at)
+    VALUES (#{boardId}, #{userId}, #{parentId}, #{lineNumber}, #{content}, #{likeCount}, #{createdAt}, #{updatedAt})
+  </insert>
+
+  <select id="selectById" resultType="Comment" parameterType="long">
+    SELECT 
+      c.id, c.board_id, c.user_id, c.parent_id, c.line_number, c.content, c.like_count, 
+      c.created_at, c.updated_at,
+      u.username as author_name
+    FROM comments c
+    LEFT JOIN users u ON c.user_id = u.id
+    WHERE c.id = #{id}
+  </select>
+
+  <select id="selectByBoardId" resultType="Comment" parameterType="long">
+    SELECT 
+      c.id, c.board_id, c.user_id, c.parent_id, c.line_number, c.content, c.like_count, 
+      c.created_at, c.updated_at,
+      u.username as author_name
+    FROM comments c
+    LEFT JOIN users u ON c.user_id = u.id
+    WHERE c.board_id = #{boardId}
+    ORDER BY c.created_at ASC
+  </select>
+
+  <select id="selectByBoardIdAndLineNumber" resultType="Comment">
+    SELECT 
+      c.id, c.board_id, c.user_id, c.parent_id, c.line_number, c.content, c.like_count, 
+      c.created_at, c.updated_at,
+      u.username as author_name
+    FROM comments c
+    LEFT JOIN users u ON c.user_id = u.id
+    WHERE c.board_id = #{boardId} AND c.line_number = #{lineNumber}
+    ORDER BY c.created_at ASC
+  </select>
+
+  <update id="update" parameterType="Comment">
+    UPDATE comments 
+    SET content = #{content}, updated_at = #{updatedAt}
+    WHERE id = #{id}
+  </update>
+
+  <update id="updateLikeCount" parameterType="Comment">
+    UPDATE comments SET like_count = #{likeCount} WHERE id = #{id}
+  </update>
+
+  <delete id="delete" parameterType="long">
+    DELETE FROM comments WHERE id = #{id}
+  </delete>
+
+  <delete id="deleteByBoardId" parameterType="long">
+    DELETE FROM comments WHERE board_id = #{boardId}
+  </delete>
+
+  <select id="countByBoardId" resultType="int" parameterType="long">
+    SELECT COUNT(*) FROM comments WHERE board_id = #{boardId}
+  </select>
+
+</mapper>
