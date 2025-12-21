@@ -1,7 +1,7 @@
 <template>
   <div class="min-h-screen bg-slate-950 text-slate-100 selection:bg-indigo-500/30">
 
-    <main class="container mx-auto px-6 py-10 max-w-4xl">
+    <main class="container mx-auto px-6 py-10 max-w-5xl">
       <!-- Back Button -->
       <button 
         @click="$router.push('/boards')" 
@@ -33,8 +33,30 @@
         </div>
 
         <!-- Body -->
-        <div class="prose prose-invert max-w-none text-slate-300 leading-relaxed whitespace-pre-wrap">
+        <div class="prose prose-invert max-w-none text-slate-300 leading-relaxed whitespace-pre-wrap mb-6">
           {{ post.content }}
+        </div>
+
+        <!-- Code Viewer (for CODE_REVIEW posts) -->
+        <div v-if="post.boardType === 'CODE_REVIEW' && algorithmRecord" class="mb-6">
+          <h3 class="text-lg font-bold text-white mb-4 flex items-center gap-2">
+            <Code2 :size="20" class="text-emerald-400" />
+            코드
+          </h3>
+          <CodeViewer
+            ref="codeViewerRef"
+            :code="algorithmRecord.code"
+            :language="algorithmRecord.language || 'java'"
+            :filename="`${algorithmRecord.title}.${getExtension(algorithmRecord.language)}`"
+            :line-comments="lineCommentCounts"
+            @line-click="handleLineClick"
+            @submit-comment="submitLineComment"
+          />
+        </div>
+
+        <!-- Code loading state -->
+        <div v-else-if="post.boardType === 'CODE_REVIEW' && loadingCode" class="mb-6 p-6 bg-slate-800/50 rounded-xl text-center">
+          <div class="animate-pulse">코드를 불러오는 중...</div>
         </div>
 
         <!-- Like Button -->
@@ -66,7 +88,7 @@
       <section v-if="post" class="bg-slate-900/50 border border-white/10 rounded-2xl p-8 animate-fade-in-up delay-200">
         <h2 class="text-xl font-bold text-white mb-6 flex items-center gap-2">
           <MessageCircle :size="22" />
-          댓글
+          일반 댓글
         </h2>
 
         <!-- Comment Form -->
@@ -88,13 +110,13 @@
           </div>
         </div>
 
-        <!-- Comments List -->
-        <div v-if="comments.length === 0" class="text-center py-10 text-slate-500">
+        <!-- Comments List (General comments only - no lineNumber) -->
+        <div v-if="generalComments.length === 0" class="text-center py-10 text-slate-500">
           아직 댓글이 없습니다. 첫 댓글을 남겨보세요!
         </div>
         <div v-else class="space-y-4">
           <div 
-            v-for="comment in comments" 
+            v-for="comment in generalComments" 
             :key="comment.id"
             class="bg-slate-800/50 rounded-xl p-5"
           >
@@ -156,9 +178,11 @@
 <script setup>
 import { ref, onMounted, computed } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
-import { ArrowLeft, ThumbsUp, MessageCircle } from 'lucide-vue-next';
+import { ArrowLeft, ThumbsUp, MessageCircle, Code2 } from 'lucide-vue-next';
 import { boardApi, commentApi } from '../api/board';
+import { algorithmApi } from '../api/algorithm';
 import { useAuth } from '../composables/useAuth';
+import CodeViewer from '../components/CodeViewer.vue';
 
 const route = useRoute();
 const router = useRouter();
@@ -166,18 +190,48 @@ const { user } = useAuth();
 
 const post = ref(null);
 const loading = ref(true);
+const loadingCode = ref(false);
 const comments = ref([]);
 const newComment = ref('');
 const isLiked = ref(false);
+const algorithmRecord = ref(null);
+const codeViewerRef = ref(null);
 
 const isAuthor = computed(() => {
     if (!post.value || !user.value) return false;
     return true; 
 });
 
+// General comments (no lineNumber)
+const generalComments = computed(() => {
+    return comments.value.filter(c => !c.lineNumber);
+});
+
+// Line comments count map
+const lineCommentCounts = computed(() => {
+    const counts = {};
+    comments.value.forEach(c => {
+        if (c.lineNumber) {
+            counts[c.lineNumber] = (counts[c.lineNumber] || 0) + 1;
+        }
+    });
+    return counts;
+});
+
 const formatDate = (dateString) => {
     if (!dateString) return '';
     return new Date(dateString).toLocaleString();
+};
+
+const getExtension = (lang) => {
+    const map = {
+        'java': 'java',
+        'python': 'py',
+        'javascript': 'js',
+        'cpp': 'cpp',
+        'c': 'c'
+    };
+    return map[lang?.toLowerCase()] || 'txt';
 };
 
 onMounted(async () => {
@@ -188,6 +242,19 @@ onMounted(async () => {
         // Load comments
         const commentsRes = await commentApi.findByBoardId(route.params.id);
         comments.value = commentsRes.data || [];
+
+        // Load algorithm record if CODE_REVIEW
+        if (post.value.boardType === 'CODE_REVIEW' && post.value.algorithmRecordId) {
+            loadingCode.value = true;
+            try {
+                const recordRes = await algorithmApi.findById(post.value.algorithmRecordId);
+                algorithmRecord.value = recordRes.data;
+            } catch (e) {
+                console.error("Failed to fetch algorithm record", e);
+            } finally {
+                loadingCode.value = false;
+            }
+        }
     } catch (e) {
         console.error("Failed to fetch post", e);
         alert("게시글을 찾을 수 없습니다.");
@@ -196,6 +263,30 @@ onMounted(async () => {
         loading.value = false;
     }
 });
+
+const handleLineClick = async ({ lineNumber }) => {
+    // Filter line comments and pass to CodeViewer
+    const lineComments = comments.value.filter(c => c.lineNumber === lineNumber);
+    if (codeViewerRef.value) {
+        codeViewerRef.value.setLineCommentsData(lineComments);
+    }
+};
+
+const submitLineComment = async ({ lineNumber, content }) => {
+    try {
+        const res = await commentApi.create(post.value.id, { 
+            content, 
+            lineNumber 
+        });
+        comments.value.push(res.data);
+        
+        // Update code viewer
+        handleLineClick({ lineNumber });
+    } catch (e) {
+        console.error("Line comment submit failed", e);
+        alert("댓글 작성에 실패했습니다.");
+    }
+};
 
 const toggleLike = async () => {
     try {
