@@ -47,4 +47,10 @@ export const algorithmApi = {
     findByStudyId(studyId) {
         return http.get(`/algorithm-records/study/${studyId}`);
     },
+
+    // Get algorithm records by user ID
+    // GET /api/algorithm-records/user/{userId}
+    findByUserId(userId) {
+        return http.get(`/algorithm-records/user/${userId}`);
+    },
 };

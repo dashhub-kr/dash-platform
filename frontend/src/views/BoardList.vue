@@ -1,5 +1,5 @@
 <template>
-  <div class="min-h-screen bg-slate-50 text-slate-800 font-[Pretendard] relative overflow-hidden">
+  <div class="min-h-screen bg-[#f0f9ff] text-slate-800 font-[Pretendard] relative overflow-hidden">
     
     <!-- Background Decor -->
     <div class="absolute top-0 right-0 w-[500px] h-[500px] bg-slate-200/50 rounded-full blur-[120px] mix-blend-multiply opacity-50 z-0 pointer-events-none"></div>
