@@ -7,6 +7,7 @@ import com.ssafy.dash.board.domain.Board;
 import com.ssafy.dash.board.domain.BoardRepository;
 import com.ssafy.dash.board.domain.exception.BoardNotFoundException;
 import com.ssafy.dash.common.exception.UnauthorizedAccessException;
+import com.ssafy.dash.like.application.LikeService;
 import com.ssafy.dash.user.domain.User;
 import com.ssafy.dash.user.domain.UserRepository;
 import com.ssafy.dash.user.domain.exception.UserNotFoundException;
@@ -22,10 +23,16 @@ public class BoardService {
 
     private final BoardRepository boardRepository;
     private final UserRepository userRepository;
+    private final com.ssafy.dash.comment.application.CommentService commentService;
+    private final LikeService likeService;
 
-    public BoardService(BoardRepository boardRepository, UserRepository userRepository) {
+    public BoardService(BoardRepository boardRepository, UserRepository userRepository,
+            com.ssafy.dash.comment.application.CommentService commentService,
+            LikeService likeService) {
         this.boardRepository = boardRepository;
         this.userRepository = userRepository;
+        this.commentService = commentService;
+        this.likeService = likeService;
     }
 
     @Transactional
@@ -44,26 +51,39 @@ public class BoardService {
 
         boardRepository.save(board);
 
-        return toResult(board, user);
+        if (command.initialComments() != null) {
+            for (var commentCmd : command.initialComments()) {
+                commentService.create(new com.ssafy.dash.comment.application.dto.command.CommentCreateCommand(
+                        board.getId(),
+                        command.userId(),
+                        null,
+                        commentCmd.lineNumber(),
+                        commentCmd.content()));
+            }
+        }
+
+        return toResult(board, user, false);
     }
 
     @Transactional(readOnly = true)
-    public BoardResult findById(Long id) {
+    public BoardResult findById(Long id, Long requestUserId) {
         Board board = boardRepository.findById(id)
                 .orElseThrow(() -> new BoardNotFoundException(id));
 
         User user = userRepository.findById(board.getUserId()).orElse(null);
+        boolean isLiked = (requestUserId != null) && likeService.isLikedBoard(id, requestUserId);
 
-        return toResult(board, user);
+        return toResult(board, user, isLiked);
     }
 
     @Transactional(readOnly = true)
-    public List<BoardResult> findAll() {
+    public List<BoardResult> findAll(Long requestUserId) {
 
         return boardRepository.findAll().stream()
                 .map(board -> {
                     User user = userRepository.findById(board.getUserId()).orElse(null);
-                    return toResult(board, user);
+                    boolean isLiked = (requestUserId != null) && likeService.isLikedBoard(board.getId(), requestUserId);
+                    return toResult(board, user, isLiked);
                 })
                 .collect(Collectors.toList());
     }
@@ -81,8 +101,9 @@ public class BoardService {
         boardRepository.update(board);
 
         User user = userRepository.findById(board.getUserId()).orElse(null);
+        boolean isLiked = likeService.isLikedBoard(id, requestUserId);
 
-        return toResult(board, user);
+        return toResult(board, user, isLiked);
     }
 
     @Transactional
@@ -95,16 +116,28 @@ public class BoardService {
         boardRepository.delete(id);
     }
 
+    @Transactional
+    public BoardResult like(Long boardId, Long userId) {
+        likeService.likeBoard(boardId, userId);
+        return findById(boardId, userId);
+    }
+
+    @Transactional
+    public BoardResult unlike(Long boardId, Long userId) {
+        likeService.unlikeBoard(boardId, userId);
+        return findById(boardId, userId);
+    }
+
     private void validateOwnership(Board board, Long requestUserId) {
         if (!board.getUserId().equals(requestUserId)) {
             throw new UnauthorizedAccessException("Board", board.getId(), requestUserId);
         }
     }
 
-    private BoardResult toResult(Board board, User user) {
+    private BoardResult toResult(Board board, User user, boolean isLiked) {
         String authorName = (user != null) ? user.getUsername() : "Unknown";
 
-        return BoardResult.from(board, authorName);
+        return BoardResult.from(board, authorName, isLiked);
     }
 
 }
