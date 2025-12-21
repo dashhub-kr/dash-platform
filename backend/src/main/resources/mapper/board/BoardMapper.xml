@@ -34,6 +34,7 @@
     SET title = #{title}, 
         content = #{content}, 
         algorithm_record_id = #{algorithmRecordId},
+        like_count = #{likeCount},
         updated_at = #{updatedAt} 
     WHERE id = #{id}
   </update>

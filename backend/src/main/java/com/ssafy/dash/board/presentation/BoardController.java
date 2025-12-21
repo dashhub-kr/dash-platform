@@ -42,8 +42,10 @@ public class BoardController {
     }
 
     @GetMapping
-    public ResponseEntity<List<BoardResponse>> findAll() {
-        List<BoardResponse> responses = boardService.findAll().stream()
+    public ResponseEntity<List<BoardResponse>> findAll(
+            @Parameter(hidden = true) @AuthenticationPrincipal OAuth2User principal) {
+        Long userId = extractUserIdNullable(principal);
+        List<BoardResponse> responses = boardService.findAll(userId).stream()
                 .map(BoardResponse::from)
                 .collect(Collectors.toList());
 
@@ -51,8 +53,11 @@ public class BoardController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<BoardResponse> findById(@PathVariable Long id) {
-        BoardResponse response = BoardResponse.from(boardService.findById(id));
+    public ResponseEntity<BoardResponse> findById(
+            @PathVariable Long id,
+            @Parameter(hidden = true) @AuthenticationPrincipal OAuth2User principal) {
+        Long userId = extractUserIdNullable(principal);
+        BoardResponse response = BoardResponse.from(boardService.findById(id, userId));
 
         return ResponseEntity.ok(response);
     }
@@ -78,6 +83,35 @@ public class BoardController {
         boardService.delete(id, userId);
 
         return ResponseEntity.noContent().build();
+    }
+
+    @PostMapping("/{id}/like")
+    public ResponseEntity<BoardResponse> like(
+            @PathVariable Long id,
+            @Parameter(hidden = true) @AuthenticationPrincipal OAuth2User principal) {
+
+        Long userId = extractUserId(principal);
+        BoardResponse response = BoardResponse.from(boardService.like(id, userId));
+
+        return ResponseEntity.ok(response);
+    }
+
+    @DeleteMapping("/{id}/like")
+    public ResponseEntity<BoardResponse> unlike(
+            @PathVariable Long id,
+            @Parameter(hidden = true) @AuthenticationPrincipal OAuth2User principal) {
+
+        Long userId = extractUserId(principal);
+        BoardResponse response = BoardResponse.from(boardService.unlike(id, userId));
+
+        return ResponseEntity.ok(response);
+    }
+
+    private Long extractUserIdNullable(OAuth2User principal) {
+        if (principal instanceof CustomOAuth2User customUser) {
+            return customUser.getUserId();
+        }
+        return null; // Guest or not authenticated properly
     }
 
     private Long extractUserId(OAuth2User principal) {

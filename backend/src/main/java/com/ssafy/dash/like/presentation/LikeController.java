@@ -25,30 +25,6 @@ public class LikeController {
         this.likeService = likeService;
     }
 
-    // ===== Board Like =====
-
-    @PostMapping("/boards/{boardId}/like")
-    public ResponseEntity<LikeResponse> likeBoard(
-            @PathVariable Long boardId,
-            @Parameter(hidden = true) @AuthenticationPrincipal OAuth2User principal) {
-
-        Long userId = extractUserId(principal);
-        int likeCount = likeService.likeBoard(boardId, userId);
-
-        return ResponseEntity.ok(new LikeResponse(likeCount));
-    }
-
-    @DeleteMapping("/boards/{boardId}/like")
-    public ResponseEntity<LikeResponse> unlikeBoard(
-            @PathVariable Long boardId,
-            @Parameter(hidden = true) @AuthenticationPrincipal OAuth2User principal) {
-
-        Long userId = extractUserId(principal);
-        int likeCount = likeService.unlikeBoard(boardId, userId);
-
-        return ResponseEntity.ok(new LikeResponse(likeCount));
-    }
-
     // ===== Comment Like =====
 
     @PostMapping("/comments/{commentId}/like")

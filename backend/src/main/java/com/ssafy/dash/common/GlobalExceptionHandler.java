@@ -27,13 +27,14 @@ public class GlobalExceptionHandler {
 
     private static final Logger log = LoggerFactory.getLogger(GlobalExceptionHandler.class);
 
-    @ExceptionHandler({UserNotFoundException.class, BoardNotFoundException.class, AlgorithmRecordNotFoundException.class})
+    @ExceptionHandler({ UserNotFoundException.class, BoardNotFoundException.class,
+            AlgorithmRecordNotFoundException.class })
     public ResponseEntity<ApiErrorResponse> handleNotFound(RuntimeException ex, HttpServletRequest request) {
 
         return buildResponse(resolveNotFoundCode(ex), ex.getMessage(), request);
     }
 
-    @ExceptionHandler({MethodArgumentNotValidException.class, BindException.class})
+    @ExceptionHandler({ MethodArgumentNotValidException.class, BindException.class })
     public ResponseEntity<ApiErrorResponse> handleValidation(BindException ex, HttpServletRequest request) {
 
         List<ApiErrorResponse.FieldErrorDetail> details = extractFieldErrors(ex.getBindingResult());
@@ -42,14 +43,15 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(MethodArgumentTypeMismatchException.class)
-    public ResponseEntity<ApiErrorResponse> handleTypeMismatch(MethodArgumentTypeMismatchException ex, HttpServletRequest request) {
+    public ResponseEntity<ApiErrorResponse> handleTypeMismatch(MethodArgumentTypeMismatchException ex,
+            HttpServletRequest request) {
 
         ApiErrorResponse.FieldErrorDetail detail = new ApiErrorResponse.FieldErrorDetail(
                 ex.getName(),
                 ex.getValue(),
-                String.format("'%s' 파라미터 타입이 올바르지 않습니다.", ex.getName())
-        );
-        return buildResponse(ErrorCode.VALIDATION_FAILED, ErrorCode.VALIDATION_FAILED.getMessage(), request, List.of(detail));
+                String.format("'%s' 파라미터 타입이 올바르지 않습니다.", ex.getName()));
+        return buildResponse(ErrorCode.VALIDATION_FAILED, ErrorCode.VALIDATION_FAILED.getMessage(), request,
+                List.of(detail));
     }
 
     @ExceptionHandler(WebhookRegistrationException.class)
@@ -69,14 +71,18 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ApiErrorResponse> handleAll(Exception ex, HttpServletRequest request) {
 
         log.error("Unhandled exception", ex);
-        return buildResponse(ErrorCode.INTERNAL_SERVER_ERROR, null, request);
+        // Debugging: expose exception details
+        return buildResponse(ErrorCode.INTERNAL_SERVER_ERROR, ex.getClass().getName() + ": " + ex.getMessage(),
+                request);
     }
 
-    private ResponseEntity<ApiErrorResponse> buildResponse(ErrorCode errorCode, String message, HttpServletRequest request) {
+    private ResponseEntity<ApiErrorResponse> buildResponse(ErrorCode errorCode, String message,
+            HttpServletRequest request) {
         return buildResponse(errorCode, message, request, null);
     }
 
-    private ResponseEntity<ApiErrorResponse> buildResponse(ErrorCode errorCode, String message, HttpServletRequest request, List<ApiErrorResponse.FieldErrorDetail> details) {
+    private ResponseEntity<ApiErrorResponse> buildResponse(ErrorCode errorCode, String message,
+            HttpServletRequest request, List<ApiErrorResponse.FieldErrorDetail> details) {
         ApiErrorResponse response = ApiErrorResponse.of(errorCode, message, request.getRequestURI(), details);
         return ResponseEntity.status(errorCode.getStatus()).body(response);
     }
@@ -96,8 +102,9 @@ public class GlobalExceptionHandler {
 
     private List<ApiErrorResponse.FieldErrorDetail> extractFieldErrors(BindingResult bindingResult) {
         return bindingResult.getFieldErrors().stream()
-                .map(error -> new ApiErrorResponse.FieldErrorDetail(error.getField(), error.getRejectedValue(), error.getDefaultMessage()))
+                .map(error -> new ApiErrorResponse.FieldErrorDetail(error.getField(), error.getRejectedValue(),
+                        error.getDefaultMessage()))
                 .toList();
     }
-    
+
 }

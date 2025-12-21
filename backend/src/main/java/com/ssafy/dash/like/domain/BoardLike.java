@@ -16,7 +16,7 @@ public class BoardLike {
     private Long userId;
     private LocalDateTime createdAt;
 
-    private BoardLike(Long boardId, Long userId, LocalDateTime createdAt) {
+    protected BoardLike(Long boardId, Long userId, LocalDateTime createdAt) {
         this.boardId = boardId;
         this.userId = userId;
         this.createdAt = createdAt;
