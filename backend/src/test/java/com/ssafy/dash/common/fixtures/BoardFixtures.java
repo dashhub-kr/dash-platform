@@ -72,11 +72,11 @@ public final class BoardFixtures {
         }
 
         public BoardCreateCommand toCreateCommand() {
-            return new BoardCreateCommand(title, content, userId, null, boardType);
+            return new BoardCreateCommand(title, content, userId, null, boardType, null);
         }
 
         public BoardCreateRequest toCreateRequest() {
-            return new BoardCreateRequest(title, content, userId, null, boardType);
+            return new BoardCreateRequest(title, content, userId, null, boardType, null);
         }
 
         public BoardResult toResult(LocalDateTime createdAt, LocalDateTime updatedAt) {

@@ -18,9 +18,14 @@ public class BoardCreateRequest {
     private Long userId;
     private Long algorithmRecordId; // nullable
     private String boardType; // GENERAL | CODE_REVIEW
+    private java.util.List<InitialCommentRequest> initialComments;
 
     public BoardCreateCommand toCommand() {
-        return new BoardCreateCommand(title, content, userId, algorithmRecordId, boardType);
+        var commandComments = (initialComments != null)
+                ? initialComments.stream().map(InitialCommentRequest::toCommand).toList()
+                : java.util.Collections.<com.ssafy.dash.board.application.dto.command.InitialCommentCommand>emptyList();
+
+        return new BoardCreateCommand(title, content, userId, algorithmRecordId, boardType, commandComments);
     }
 
 }
