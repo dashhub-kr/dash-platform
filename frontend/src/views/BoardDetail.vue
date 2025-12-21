@@ -53,6 +53,7 @@
           />
         </div>
 
+
         <!-- Code loading state -->
         <div v-else-if="post.boardType === 'CODE_REVIEW' && loadingCode" class="mb-6 p-6 bg-slate-100 rounded-xl text-center text-slate-500">
           <div class="animate-pulse">코드를 불러오는 중...</div>
@@ -197,6 +198,7 @@ const algorithmRecord = ref(null);
 
 const isAuthor = computed(() => {
     if (!post.value || !user.value) return false;
+    return true; 
     return true; 
 });
 
