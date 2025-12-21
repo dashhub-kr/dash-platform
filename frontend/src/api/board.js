@@ -30,4 +30,56 @@ export const boardApi = {
     delete(id) {
         return http.delete(`/boards/${id}`);
     },
+
+    // Like a board post
+    // POST /api/boards/{id}/like
+    like(id) {
+        return http.post(`/boards/${id}/like`);
+    },
+
+    // Unlike a board post
+    // DELETE /api/boards/{id}/like
+    unlike(id) {
+        return http.delete(`/boards/${id}/like`);
+    },
+};
+
+// Comment API
+export const commentApi = {
+    // Get comments for a board post
+    // GET /api/boards/{boardId}/comments
+    findByBoardId(boardId, lineNumber = null) {
+        const params = lineNumber ? { lineNumber } : {};
+        return http.get(`/boards/${boardId}/comments`, { params });
+    },
+
+    // Create a comment
+    // POST /api/boards/{boardId}/comments
+    create(boardId, data) {
+        return http.post(`/boards/${boardId}/comments`, data);
+    },
+
+    // Update a comment
+    // PUT /api/boards/{boardId}/comments/{commentId}
+    update(boardId, commentId, data) {
+        return http.put(`/boards/${boardId}/comments/${commentId}`, data);
+    },
+
+    // Delete a comment
+    // DELETE /api/boards/{boardId}/comments/{commentId}
+    delete(boardId, commentId) {
+        return http.delete(`/boards/${boardId}/comments/${commentId}`);
+    },
+
+    // Like a comment
+    // POST /api/comments/{commentId}/like
+    like(commentId) {
+        return http.post(`/comments/${commentId}/like`);
+    },
+
+    // Unlike a comment
+    // DELETE /api/comments/{commentId}/like
+    unlike(commentId) {
+        return http.delete(`/comments/${commentId}/like`);
+    },
 };

@@ -15,6 +15,31 @@
 
       <div class="bg-slate-900/50 border border-white/10 rounded-2xl p-8 animate-fade-in-up delay-100">
         <form @submit.prevent="handleSubmit" class="space-y-6">
+          <!-- Board Type -->
+          <div class="space-y-2">
+            <label class="text-sm font-medium text-slate-300">게시글 유형</label>
+            <div class="flex gap-4">
+              <label class="flex items-center gap-2 cursor-pointer">
+                <input 
+                  type="radio" 
+                  v-model="form.boardType" 
+                  value="GENERAL"
+                  class="w-4 h-4 accent-indigo-500"
+                />
+                <span class="text-slate-200">일반</span>
+              </label>
+              <label class="flex items-center gap-2 cursor-pointer">
+                <input 
+                  type="radio" 
+                  v-model="form.boardType" 
+                  value="CODE_REVIEW"
+                  class="w-4 h-4 accent-emerald-500"
+                />
+                <span class="text-slate-200">코드리뷰</span>
+              </label>
+            </div>
+          </div>
+
           <!-- Title -->
           <div class="space-y-2">
             <label for="title" class="text-sm font-medium text-slate-300">제목</label>
@@ -80,7 +105,8 @@ const isEdit = computed(() => !!route.params.id);
 const submitting = ref(false);
 const form = ref({
     title: '',
-    content: ''
+    content: '',
+    boardType: 'GENERAL'
 });
 
 onMounted(async () => {
@@ -90,7 +116,8 @@ onMounted(async () => {
             if (res.data) {
                 form.value = {
                     title: res.data.title,
-                    content: res.data.content
+                    content: res.data.content,
+                    boardType: res.data.boardType || 'GENERAL'
                 };
             }
         } catch (e) {

@@ -25,8 +25,9 @@
         <!-- List Header -->
         <div class="grid grid-cols-12 px-8 py-5 bg-slate-50 border-b border-slate-100 text-sm font-bold text-slate-500 uppercase tracking-wider">
           <div class="col-span-1 text-center">번호</div>
-          <div class="col-span-7 pl-2">제목</div>
+          <div class="col-span-5 pl-2">제목</div>
           <div class="col-span-2 text-center">작성자</div>
+          <div class="col-span-2 text-center">추천/댓글</div>
           <div class="col-span-2 text-center">작성일</div>
         </div>
 
@@ -56,13 +57,24 @@
             class="grid grid-cols-12 px-8 py-5 border-b border-slate-100 hover:bg-indigo-50/30 cursor-pointer transition-colors group items-center"
           >
             <div class="col-span-1 text-center text-slate-400 font-mono text-sm group-hover:text-indigo-500 transition-colors">{{ post.id }}</div>
-            <div class="col-span-7 pl-2 pr-4">
+            <div class="col-span-5 pl-2 pr-4 flex items-center gap-2">
+              <span v-if="post.boardType === 'CODE_REVIEW'" class="px-2 py-0.5 text-xs font-bold rounded-full bg-emerald-100 text-emerald-700">코드리뷰</span>
               <h3 class="text-slate-800 font-bold text-lg group-hover:text-indigo-600 transition-colors truncate">
                 {{ post.title }}
               </h3>
             </div>
             <div class="col-span-2 text-center text-sm font-medium text-slate-600">
               {{ post.authorName || '익명' }}
+            </div>
+            <div class="col-span-2 text-center text-sm text-slate-500 flex items-center justify-center gap-3">
+              <span class="flex items-center gap-1" title="추천">
+                <ThumbsUp :size="14" class="text-rose-400" />
+                {{ post.likeCount || 0 }}
+              </span>
+              <span class="flex items-center gap-1" title="댓글">
+                <MessageCircle :size="14" class="text-indigo-400" />
+                {{ post.commentCount || 0 }}
+              </span>
             </div>
             <div class="col-span-2 text-center text-xs text-slate-400 font-medium">
               {{ formatDate(post.createdAt) }}
@@ -77,7 +89,7 @@
 <script setup>
 import { ref, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
-import { PenSquare, Inbox } from 'lucide-vue-next';
+import { PenSquare, Inbox, ThumbsUp, MessageCircle } from 'lucide-vue-next';
 import { boardApi } from '../api/board';
 
 const router = useRouter();
