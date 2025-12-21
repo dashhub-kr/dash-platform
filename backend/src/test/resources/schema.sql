@@ -77,3 +77,50 @@ CREATE TABLE IF NOT EXISTS github_push_event (
   UNIQUE (delivery_id)
 
 );
+
+CREATE TABLE IF NOT EXISTS boards (
+  id BIGINT AUTO_INCREMENT PRIMARY KEY,
+  title VARCHAR(255) NOT NULL,
+  content CLOB NOT NULL,
+  user_id BIGINT NOT NULL,
+  algorithm_record_id BIGINT NULL,
+  board_type VARCHAR(20) NOT NULL DEFAULT 'GENERAL',
+  like_count INT NOT NULL DEFAULT 0,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (user_id) REFERENCES users(id)
+);
+
+CREATE TABLE IF NOT EXISTS comments (
+  id BIGINT AUTO_INCREMENT PRIMARY KEY,
+  board_id BIGINT NOT NULL,
+  user_id BIGINT NOT NULL,
+  parent_id BIGINT NULL,
+  line_number INT NULL,
+  content CLOB NOT NULL,
+  like_count INT NOT NULL DEFAULT 0,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (board_id) REFERENCES boards(id) ON DELETE CASCADE,
+  FOREIGN KEY (user_id) REFERENCES users(id)
+);
+
+CREATE TABLE IF NOT EXISTS board_likes (
+  id BIGINT AUTO_INCREMENT PRIMARY KEY,
+  board_id BIGINT NOT NULL,
+  user_id BIGINT NOT NULL,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (board_id) REFERENCES boards(id) ON DELETE CASCADE,
+  FOREIGN KEY (user_id) REFERENCES users(id),
+  UNIQUE (board_id, user_id)
+);
+
+CREATE TABLE IF NOT EXISTS comment_likes (
+  id BIGINT AUTO_INCREMENT PRIMARY KEY,
+  comment_id BIGINT NOT NULL,
+  user_id BIGINT NOT NULL,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (comment_id) REFERENCES comments(id) ON DELETE CASCADE,
+  FOREIGN KEY (user_id) REFERENCES users(id),
+  UNIQUE (comment_id, user_id)
+);
