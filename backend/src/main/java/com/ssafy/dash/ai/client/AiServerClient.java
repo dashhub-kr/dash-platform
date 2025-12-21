@@ -46,4 +46,12 @@ public interface AiServerClient {
      * @return 튜터 응답
      */
     TutorChatResponse chat(TutorChatRequest request);
+
+    /**
+     * 반례 생성 요청
+     * 
+     * @param request 반례 요청 정보 (문제, 코드)
+     * @return 반례 응답
+     */
+    AiCounterExampleResponse generateCounterExample(AiCounterExampleRequest request);
 }

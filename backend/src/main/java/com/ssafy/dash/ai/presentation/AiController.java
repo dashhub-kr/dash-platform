@@ -24,7 +24,9 @@ public class AiController {
         private final HintService hintService;
         private final AiLearningPathService learningPathService;
         private final CodingStyleService codingStyleService;
+
         private final TutorService tutorService;
+        private final DebugService debugService;
 
         @Operation(summary = "코드 분석 요청", description = "알고리즘 풀이 코드를 AI로 분석합니다")
         @PostMapping("/review")
@@ -81,6 +83,18 @@ public class AiController {
                                 request.code());
 
                 return ResponseEntity.ok(TutorSessionResponseDto.from(response));
+
+        }
+
+        @Operation(summary = "반례 생성", description = "오답 코드에 대한 반례를 생성합니다")
+        @PostMapping("/debug/counter-example")
+        public ResponseEntity<AiCounterExampleResponse> generateCounterExample(
+                        @RequestBody AiCounterExampleRequest request) {
+                AiCounterExampleResponse response = debugService.generateCounterExample(
+                                request.problemNumber(),
+                                request.code(),
+                                request.language());
+                return ResponseEntity.ok(response);
         }
 
         // === DTOs ===

@@ -135,4 +135,25 @@ public class AiServerClientImpl implements AiServerClient {
                     .build();
         }
     }
+
+    @Override
+    public AiCounterExampleResponse generateCounterExample(AiCounterExampleRequest request) {
+        try {
+            log.debug("Generating counter example for problem: {}", request.problemNumber());
+
+            return restClient.post()
+                    .uri(baseUrl + "/debug/counter-example")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .body(request)
+                    .retrieve()
+                    .body(AiCounterExampleResponse.class);
+        } catch (Exception e) {
+            log.warn("Failed to generate counter example: {}. Using fallback.", e.getMessage());
+            return new AiCounterExampleResponse(
+                    "Error",
+                    "Error",
+                    "Error",
+                    "AI 서버 연결 실패: " + e.getMessage());
+        }
+    }
 }
