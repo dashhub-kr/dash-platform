@@ -41,4 +41,10 @@ export const algorithmApi = {
     delete(id) {
         return http.delete(`/algorithm-records/${id}`);
     },
+
+    // Get algorithm records by study ID
+    // GET /api/algorithm-records/study/{studyId}
+    findByStudyId(studyId) {
+        return http.get(`/algorithm-records/study/${studyId}`);
+    },
 };

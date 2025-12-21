@@ -40,6 +40,23 @@
             </div>
           </div>
 
+          <!-- Algorithm Record Selection (CODE_REVIEW only) -->
+          <div v-if="form.boardType === 'CODE_REVIEW'" class="space-y-2">
+            <label class="text-sm font-medium text-slate-300">풀이 선택</label>
+            <div v-if="loadingRecords" class="text-slate-500 text-sm py-3">풀이 목록을 불러오는 중...</div>
+            <div v-else-if="studyRecords.length === 0" class="text-slate-500 text-sm py-3">스터디에 등록된 풀이가 없습니다.</div>
+            <select
+              v-else
+              v-model="form.algorithmRecordId"
+              class="w-full bg-slate-800/50 border border-white/10 rounded-lg px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-emerald-500/50 focus:border-transparent transition-all"
+            >
+              <option :value="null">풀이를 선택하세요</option>
+              <option v-for="record in studyRecords" :key="record.id" :value="record.id">
+                [#{{ record.problemNumber }}] {{ record.title }} - {{ record.username || 'Unknown' }}
+              </option>
+            </select>
+          </div>
+
           <!-- Title -->
           <div class="space-y-2">
             <label for="title" class="text-sm font-medium text-slate-300">제목</label>
@@ -91,23 +108,49 @@
 </template>
 
 <script setup>
-import { ref, onMounted, computed } from 'vue';
+import { ref, onMounted, computed, watch } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
 import { ArrowLeft } from 'lucide-vue-next';
 import { boardApi } from '../api/board';
-import { useAuth } from '../composables/useAuth'; // Ensure imported
+import { algorithmApi } from '../api/algorithm';
+import { useAuth } from '../composables/useAuth';
 
 const router = useRouter();
 const route = useRoute();
-const { user } = useAuth(); // Add this
+const { user } = useAuth();
 
 const isEdit = computed(() => !!route.params.id);
 const submitting = ref(false);
+const loadingRecords = ref(false);
+const studyRecords = ref([]);
+
 const form = ref({
     title: '',
     content: '',
-    boardType: 'GENERAL'
+    boardType: 'GENERAL',
+    algorithmRecordId: null
 });
+
+// Watch for boardType changes to load study records
+watch(() => form.value.boardType, async (newType) => {
+    if (newType === 'CODE_REVIEW' && user.value?.studyId) {
+        await loadStudyRecords();
+    }
+});
+
+const loadStudyRecords = async () => {
+    if (!user.value?.studyId) return;
+    loadingRecords.value = true;
+    try {
+        const res = await algorithmApi.findByStudyId(user.value.studyId);
+        studyRecords.value = res.data || [];
+    } catch (e) {
+        console.error("Failed to load study records", e);
+        studyRecords.value = [];
+    } finally {
+        loadingRecords.value = false;
+    }
+};
 
 onMounted(async () => {
     if (isEdit.value) {
@@ -117,8 +160,13 @@ onMounted(async () => {
                 form.value = {
                     title: res.data.title,
                     content: res.data.content,
-                    boardType: res.data.boardType || 'GENERAL'
+                    boardType: res.data.boardType || 'GENERAL',
+                    algorithmRecordId: res.data.algorithmRecordId || null
                 };
+                // Load records if CODE_REVIEW
+                if (form.value.boardType === 'CODE_REVIEW') {
+                    await loadStudyRecords();
+                }
             }
         } catch (e) {
             console.error("Failed to load post", e);
@@ -132,15 +180,20 @@ onMounted(async () => {
 const handleSubmit = async () => {
     submitting.value = true;
     try {
+        const payload = {
+            ...form.value,
+            userId: user.value?.id
+        };
+        // Remove algorithmRecordId if GENERAL type
+        if (payload.boardType === 'GENERAL') {
+            payload.algorithmRecordId = null;
+        }
+
         if (isEdit.value) {
-            await boardApi.update(route.params.id, form.value);
+            await boardApi.update(route.params.id, payload);
             alert("게시글이 수정되었습니다.");
         } else {
-            // Include userId for creation
-            await boardApi.create({
-                ...form.value,
-                userId: user.value?.id
-            });
+            await boardApi.create(payload);
             alert("게시글이 등록되었습니다.");
         }
         router.push('/boards');

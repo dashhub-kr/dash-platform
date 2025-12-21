@@ -51,6 +51,15 @@ public class AlgorithmRecordController {
         return ResponseEntity.ok(responses);
     }
 
+    @GetMapping("/study/{studyId}")
+    public ResponseEntity<List<AlgorithmRecordResponse>> findByStudyId(@PathVariable Long studyId) {
+        List<AlgorithmRecordResponse> responses = algorithmRecordService.findByStudyId(studyId).stream()
+                .map(AlgorithmRecordResponse::from)
+                .collect(Collectors.toList());
+
+        return ResponseEntity.ok(responses);
+    }
+
     @GetMapping("/{id}")
     public ResponseEntity<AlgorithmRecordResponse> findById(@PathVariable Long id) {
         AlgorithmRecordResponse response = AlgorithmRecordResponse.from(algorithmRecordService.findById(id));
