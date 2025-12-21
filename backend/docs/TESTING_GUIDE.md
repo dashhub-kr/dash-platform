@@ -68,7 +68,9 @@ cd backend
 | 모듈         | Controller/Adapter                                          | Service                                         | Domain                | 특이 사항                          |
 |------------|-------------------------------------------------------------|-------------------------------------------------|-----------------------|--------------------------------|
 | Algorithm  | `AlgorithmRecordControllerTest`                             | `AlgorithmRecordServiceTest`                    | `AlgorithmRecordTest` | Multipart 업로드, OAuth 사용자 ID 추출 |
-| Board      | `BoardControllerTest`                                       | `BoardServiceTest`                              | `BoardTest`           | 작성자 조회와 권한 검증                  |
+| Board      | `BoardControllerTest`                                       | `BoardServiceTest`                              | `BoardTest`           | 작성자 조회, 풀이 연결, 추천 수 |
+| Comment    | `CommentControllerTest` (TODO)                              | `CommentServiceTest` (TODO)                     | `CommentTest` (TODO)  | 대댓글 1단계 제한, 라인 댓글, 트리 구조 |
+| Like       | `LikeController` (LikeService에 통합)                        | `LikeServiceTest` (TODO)                        | -                     | Board/Comment 추천, likeCount 캐시 |
 | User       | `UserControllerIntegrationTest`                             | `UserServiceTest`                               | `UserTest`            | CRUD + `/me` 엔드포인트 포함          |
 | OAuth      | `OAuthSessionControllerTest`, `CustomOAuth2UserServiceTest` | `OAuthUserServiceTest`, `OAuthTokenServiceTest` | `UserOAuthTokenTest`  | Security 어댑터/Access Token 갱신   |
 | Onboarding | `OnboardingControllerTest`                                  | `OnboardingServiceTest`                         | `OnboardingTest`      | GitHub Webhook/토큰 경로 필수        |

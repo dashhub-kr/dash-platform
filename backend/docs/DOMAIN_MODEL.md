@@ -13,6 +13,15 @@ erDiagram
     User ||--o{ UserTagStat : "has"
     User ||--o{ UserClassStat : "has"
     User ||--o{ UserStatsSnapshot : "tracks"
+    User ||--o{ Board : "writes"
+    User ||--o{ Comment : "writes"
+    User ||--o{ BoardLike : "likes"
+    User ||--o{ CommentLike : "likes"
+    Board ||--o| AlgorithmRecord : "references"
+    Board ||--o{ Comment : "has"
+    Board ||--o{ BoardLike : "has"
+    Comment ||--o{ Comment : "replies (parentId)"
+    Comment ||--o{ CommentLike : "has"
     
     Study {
         Long id PK
@@ -42,6 +51,44 @@ erDiagram
         datetime committedAt
     }
 
+    Board {
+        Long id PK
+        Long userId FK "작성자"
+        Long algorithmRecordId FK "nullable 풀이 연결"
+        String boardType "GENERAL | CODE_REVIEW"
+        String title
+        String content
+        Integer likeCount "추천 수 캐시"
+        datetime createdAt
+        datetime updatedAt
+    }
+
+    Comment {
+        Long id PK
+        Long boardId FK
+        Long userId FK
+        Long parentId FK "nullable 대댓글용"
+        Integer lineNumber "nullable 라인 댓글용"
+        String content
+        Integer likeCount "추천 수 캐시"
+        datetime createdAt
+        datetime updatedAt
+    }
+
+    BoardLike {
+        Long id PK
+        Long boardId FK
+        Long userId FK
+        datetime createdAt
+    }
+
+    CommentLike {
+        Long id PK
+        Long commentId FK
+        Long userId FK
+        datetime createdAt
+    }
+
     UserTagStat {
         Long id PK
         Long userId FK
@@ -67,6 +114,7 @@ erDiagram
         Integer solvedacTier
     }
 ```
+
 
 ## 2. 주요 엔티티 (Key Entities)
 
@@ -111,6 +159,27 @@ Solved.ac Class 1-10에 대한 진행 현황입니다.
 성장 추세 분석을 위한 일별 통계 스냅샷입니다.
 - **용도**: 과거 특정 시점의 통계와 현재를 비교하여 성장률 분석.
 - **저장 주기**: 일 1회 또는 분석 요청 시.
+
+### 2.7 Board (게시글) - 신규
+알고리즘 풀이를 공유하는 게시판 게시글입니다.
+- **주요 필드**:
+    - `algorithmRecordId`: 연결된 알고리즘 풀이 기록 (nullable).
+    - `boardType`: 게시글 유형 (GENERAL, CODE_REVIEW).
+    - `likeCount`: 추천 수 (성능을 위한 캐시).
+- **특징**: 풀이 코드를 첨부하면 코드 뷰어에서 라인별 댓글 가능.
+
+### 2.8 Comment (댓글) - 신규
+게시글에 달리는 댓글입니다. 라인 댓글과 대댓글을 지원합니다.
+- **주요 필드**:
+    - `parentId`: 부모 댓글 ID (null = 최상위 댓글, 1단계 대댓글만 허용).
+    - `lineNumber`: 코드 라인 번호 (null = 일반 댓글).
+    - `likeCount`: 추천 수.
+- **규칙**: 대댓글의 대댓글은 서비스에서 거부됨.
+
+### 2.9 BoardLike / CommentLike (추천) - 신규
+게시글/댓글 추천 기록입니다.
+- **복합 유니크**: `(boardId, userId)` 또는 `(commentId, userId)`.
+- **연동**: 추천/취소 시 해당 엔티티의 `likeCount` 필드가 자동 동기화됨.
 
 ---
 

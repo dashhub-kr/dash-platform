@@ -43,6 +43,21 @@ cd backend
 - JSON 기반 CRUD API (`BoardController`)와 `BoardCreate/UpdateRequest` DTO를 갖는다.
 - `BoardService`는 작성자 정보를 `UserRepository`로 조회한 뒤 `BoardResult`로 매핑한다.
 - 도메인 `Board`는 `applyUpdate`를 통해 제목/내용 검증과 타임스탬프 동기화를 보장한다.
+- **확장 필드**: `algorithmRecordId`(풀이 연결), `boardType`(GENERAL/CODE_REVIEW), `likeCount`(추천 수).
+
+### Comment (신규)
+
+- 게시글 종속 REST API (`CommentController`)가 `/api/boards/{boardId}/comments` 경로를 제공한다.
+- **대댓글**: `parentId` 필드로 1단계 대댓글 지원. 2단계 이상은 `CommentService`에서 거부한다.
+- **라인 댓글**: `lineNumber` 필드로 코드 뷰어 라인별 댓글 지원.
+- `CommentService`가 `buildCommentTree()`로 대댓글을 부모 댓글의 `replies`에 포함한 트리 구조로 반환한다.
+
+### Like (신규)
+
+- 게시글/댓글 추천 기능을 `LikeController`가 제공한다.
+- 도메인: `BoardLike`, `CommentLike` (userId + targetId 복합 유니크).
+- `LikeService`가 추천/취소 시 해당 엔티티의 `likeCount` 캐시를 동기화한다.
+- 엔드포인트: `POST/DELETE /api/boards/{id}/like`, `POST/DELETE /api/comments/{id}/like`.
 
 ### User
 
