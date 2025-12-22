@@ -153,7 +153,7 @@ public class TutorService {
                 .toList();
 
         String tier = user != null ? getTierName(user.getSolvedacTier()) : "Unrated";
-        int solvedCount = user != null && user.getSolvedacRating() != null ? user.getSolvedacRating() : 0;
+        int solvedCount = user != null && user.getSolvedCount() != null ? user.getSolvedCount() : 0;
 
         return TutorChatRequest.UserContext.builder()
                 .tier(tier)

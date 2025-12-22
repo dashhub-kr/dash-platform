@@ -18,6 +18,7 @@ CREATE TABLE IF NOT EXISTS users (
 	solvedac_tier INT,
 	solvedac_rating INT,
 	solvedac_class INT,
+	solved_count INT DEFAULT 0,
 	stats_last_synced_at TIMESTAMP NULL,
 	
     -- Random Defense

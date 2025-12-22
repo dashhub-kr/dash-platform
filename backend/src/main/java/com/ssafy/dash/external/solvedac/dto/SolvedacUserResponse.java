@@ -24,4 +24,6 @@ public class SolvedacUserResponse {
     private Integer maxStreak;
 
     private String profileImageUrl;
+
+    private Integer solvedCount;
 }
