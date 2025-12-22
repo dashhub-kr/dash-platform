@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.ssafy.dash.ai.infrastructure.persistence.LearningPathCacheMapper">
+
+    <resultMap id="LearningPathCacheResultMap" type="com.ssafy.dash.ai.domain.LearningPathCache">
+        <id property="id" column="id"/>
+        <result property="userId" column="user_id"/>
+        <result property="analysisJson" column="analysis_json"/>
+        <result property="generatedAt" column="generated_at"/>
+        <result property="createdAt" column="created_at"/>
+        <result property="updatedAt" column="updated_at"/>
+    </resultMap>
+
+    <select id="findByUserId" resultMap="LearningPathCacheResultMap">
+        SELECT id, user_id, analysis_json, generated_at, created_at, updated_at
+        FROM learning_path_cache
+        WHERE user_id = #{userId}
+    </select>
+
+    <insert id="save" parameterType="com.ssafy.dash.ai.domain.LearningPathCache" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO learning_path_cache (user_id, analysis_json, generated_at)
+        VALUES (#{userId}, #{analysisJson}, #{generatedAt})
+    </insert>
+
+    <update id="update">
+        UPDATE learning_path_cache 
+        SET analysis_json = #{analysisJson}, 
+            generated_at = #{generatedAt},
+            updated_at = CURRENT_TIMESTAMP
+        WHERE user_id = #{userId}
+    </update>
+
+</mapper>

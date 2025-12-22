@@ -1,8 +1,10 @@
 package com.ssafy.dash.ai.application;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ssafy.dash.ai.client.AiServerClient;
 import com.ssafy.dash.ai.client.dto.LearningPathRequest;
 import com.ssafy.dash.ai.client.dto.LearningPathResponse;
+import com.ssafy.dash.ai.infrastructure.persistence.LearningPathCacheMapper;
 import com.ssafy.dash.analytics.domain.UserClassStat;
 import com.ssafy.dash.analytics.domain.UserTagStat;
 import com.ssafy.dash.analytics.infrastructure.persistence.UserClassStatMapper;
@@ -41,12 +43,18 @@ class AiLearningPathServiceTest {
     @Mock
     private UserRepository userRepository;
 
+    @Mock
+    private LearningPathCacheMapper cacheMapper;
+
+    @Mock
+    private ObjectMapper objectMapper;
+
     private AiLearningPathService learningPathService;
 
     @BeforeEach
     void setUp() {
         learningPathService = new AiLearningPathService(
-                aiClient, tagStatMapper, classStatMapper, userRepository);
+                aiClient, tagStatMapper, classStatMapper, userRepository, cacheMapper, objectMapper);
     }
 
     @Test
@@ -76,11 +84,12 @@ class AiLearningPathServiceTest {
         when(aiClient.generateLearningPath(any(LearningPathRequest.class))).thenReturn(mockResponse);
 
         // when
-        LearningPathResponse result = learningPathService.generateAiLearningPath(userId);
+        var result = learningPathService.generateAiLearningPath(userId);
 
         // then
         assertThat(result).isNotNull();
-        assertThat(result.getOverallAssessment()).isEqualTo("현재 상태 평가");
+        assertThat(result.getAiAnalysis()).isNotNull();
+        assertThat(result.getAiAnalysis().getOverallAssessment()).isEqualTo("현재 상태 평가");
 
         ArgumentCaptor<LearningPathRequest> captor = ArgumentCaptor.forClass(LearningPathRequest.class);
         verify(aiClient).generateLearningPath(captor.capture());

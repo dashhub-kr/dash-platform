@@ -299,3 +299,28 @@ CREATE TABLE IF NOT EXISTS comment_likes (
     FOREIGN KEY (user_id) REFERENCES users(id),
     UNIQUE KEY uk_comment_like (comment_id, user_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- AI Tutor Conversation Table
+CREATE TABLE IF NOT EXISTS tutor_conversation (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    user_id BIGINT NOT NULL,
+    session_id VARCHAR(100),
+    role VARCHAR(20) NOT NULL,
+    content TEXT,
+    problem_number VARCHAR(50),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(id),
+    INDEX idx_tutor_session (user_id, session_id, created_at)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- AI Learning Path Cache Table (Daily Singleton)
+CREATE TABLE IF NOT EXISTS learning_path_cache (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    user_id BIGINT NOT NULL UNIQUE,
+    analysis_json LONGTEXT NOT NULL COMMENT 'Full LearningDashboardResponse as JSON',
+    generated_at DATE NOT NULL COMMENT 'The date when this analysis was generated',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+    INDEX idx_learning_path_cache_user_date (user_id, generated_at)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
