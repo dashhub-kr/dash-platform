@@ -156,4 +156,27 @@ public class AiServerClientImpl implements AiServerClient {
                     "AI 서버 연결 실패: " + e.getMessage());
         }
     }
+
+    @Override
+    public AiSimulatorResponse simulate(AiSimulatorRequest request) {
+        try {
+            log.debug("Requesting code simulation");
+
+            return restClient.post()
+                    .uri(baseUrl + "/simulator/run")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .body(request)
+                    .retrieve()
+                    .body(AiSimulatorResponse.class);
+        } catch (Exception e) {
+            log.warn("Failed to simulate code: {}. Using fallback.", e.getMessage());
+            return AiSimulatorResponse.builder()
+                    .stdout("")
+                    .stderr("AI 서버 연결 실패: " + e.getMessage())
+                    .timeComplexity("Unknown")
+                    .spaceComplexity("Unknown")
+                    .analysis("시뮬레이션을 수행할 수 없습니다.")
+                    .build();
+        }
+    }
 }

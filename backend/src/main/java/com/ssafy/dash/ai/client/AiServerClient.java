@@ -54,4 +54,9 @@ public interface AiServerClient {
      * @return 반례 응답
      */
     AiCounterExampleResponse generateCounterExample(AiCounterExampleRequest request);
+
+    /**
+     * 코드 시뮬레이션 (가상 컴파일러)
+     */
+    AiSimulatorResponse simulate(AiSimulatorRequest request);
 }
