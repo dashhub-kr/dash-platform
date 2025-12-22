@@ -97,7 +97,8 @@ public class GitHubClientImpl implements GitHubClient {
             }
             throw new GitHubWebhookException(resolveApiError(body, "GitHub 웹훅 생성에 실패했습니다."), ex);
         } catch (HttpClientErrorException ex) {
-            throw new GitHubWebhookException(resolveApiError(ex.getResponseBodyAsString(), "GitHub 웹훅 생성에 실패했습니다."), ex);
+            throw new GitHubWebhookException(resolveApiError(ex.getResponseBodyAsString(), "GitHub 웹훅 생성에 실패했습니다."),
+                    ex);
         } catch (RestClientException ex) {
             throw new GitHubWebhookException("GitHub 웹훅 API 호출 중 오류가 발생했습니다.", ex);
         }
@@ -117,7 +118,7 @@ public class GitHubClientImpl implements GitHubClient {
 
         try {
             ResponseEntity<String> response = restTemplate.exchange(
-                buildContentsUri(slug, filePath, ref),
+                    buildContentsUri(slug, filePath, ref),
                     HttpMethod.GET,
                     requestEntity,
                     String.class);
@@ -133,9 +134,47 @@ public class GitHubClientImpl implements GitHubClient {
             byte[] decoded = Base64.getMimeDecoder().decode(content);
             return new String(decoded, StandardCharsets.UTF_8);
         } catch (HttpClientErrorException ex) {
-            throw new GitHubFileDownloadException(resolveApiError(ex.getResponseBodyAsString(), "GitHub 파일 다운로드에 실패했습니다."), ex);
+            throw new GitHubFileDownloadException(
+                    resolveApiError(ex.getResponseBodyAsString(), "GitHub 파일 다운로드에 실패했습니다."), ex);
         } catch (RestClientException | JsonProcessingException ex) {
             throw new GitHubFileDownloadException("GitHub 파일 다운로드 중 오류가 발생했습니다.", ex);
+        }
+    }
+
+    @Override
+    public List<com.ssafy.dash.github.domain.RepositoryInfo> listUserRepositories(String accessToken) {
+        validateAccessToken(accessToken);
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setBearerAuth(accessToken);
+        headers.setAccept(Collections.singletonList(MediaType.APPLICATION_JSON));
+        HttpEntity<Void> requestEntity = new HttpEntity<>(headers);
+
+        try {
+            // GitHub API: 사용자 저장소 목록 조회 (최근 업데이트 순, 최대 100개)
+            ResponseEntity<String> response = restTemplate.exchange(
+                    "/user/repos?per_page=100&sort=updated&affiliation=owner",
+                    HttpMethod.GET,
+                    requestEntity,
+                    String.class);
+
+            JsonNode reposNode = objectMapper.readTree(response.getBody());
+
+            return java.util.stream.StreamSupport.stream(reposNode.spliterator(), false)
+                    .map(node -> new com.ssafy.dash.github.domain.RepositoryInfo(
+                            node.path("full_name").asText(),
+                            node.path("name").asText(),
+                            node.path("description").asText(null),
+                            node.path("private").asBoolean(false),
+                            node.path("default_branch").asText("main")))
+                    .collect(Collectors.toList());
+        } catch (HttpClientErrorException ex) {
+            log.error("Failed to fetch user repositories: {}", ex.getResponseBodyAsString());
+            throw new GitHubWebhookException(resolveApiError(ex.getResponseBodyAsString(), "GitHub 저장소 목록 조회에 실패했습니다."),
+                    ex);
+        } catch (RestClientException | JsonProcessingException ex) {
+            log.error("Failed to fetch user repositories", ex);
+            throw new GitHubWebhookException("GitHub 저장소 목록 조회 중 오류가 발생했습니다.", ex);
         }
     }
 
