@@ -93,58 +93,59 @@ class BoardControllerTest {
         @Test
         @DisplayName("전체 게시글을 조회하면 200과 목록을 반환한다")
         void getAllBoards_Success() throws Exception {
-                given(boardService.findAll(anyLong())).willReturn(List.of(boardResult));
+                given(boardService.findAll(any())).willReturn(List.of(boardResult));
 
                 mockMvc.perform(get("/api/boards"))
                                 .andExpect(status().isOk())
                                 .andExpect(jsonPath("$[0].id").value(TestFixtures.TEST_BOARD_ID));
 
-                verify(boardService).findAll(anyLong());
+                verify(boardService).findAll(any());
         }
 
         @Test
         @DisplayName("ID로 게시글을 조회하면 단일 결과를 반환한다")
         void getBoardById_Success() throws Exception {
-                given(boardService.findById(eq(TestFixtures.TEST_BOARD_ID), anyLong())).willReturn(boardResult);
+                given(boardService.findById(eq(TestFixtures.TEST_BOARD_ID), any())).willReturn(boardResult);
 
                 mockMvc.perform(get("/api/boards/" + TestFixtures.TEST_BOARD_ID))
                                 .andExpect(status().isOk())
                                 .andExpect(jsonPath("$.id").value(TestFixtures.TEST_BOARD_ID));
 
-                verify(boardService).findById(eq(TestFixtures.TEST_BOARD_ID), anyLong());
+                verify(boardService).findById(eq(TestFixtures.TEST_BOARD_ID), any());
         }
 
         @Test
         @DisplayName("존재하지 않는 ID로 조회하면 404를 반환한다")
         void getBoardById_Failure_NotFound() throws Exception {
-                given(boardService.findById(eq(TestFixtures.TEST_BOARD_ID), anyLong()))
+                given(boardService.findById(eq(TestFixtures.TEST_BOARD_ID), any()))
                                 .willThrow(new BoardNotFoundException(TestFixtures.TEST_BOARD_ID));
 
                 mockMvc.perform(get("/api/boards/" + TestFixtures.TEST_BOARD_ID))
                                 .andExpect(status().isNotFound());
 
-                verify(boardService).findById(eq(TestFixtures.TEST_BOARD_ID), anyLong());
+                verify(boardService).findById(eq(TestFixtures.TEST_BOARD_ID), any());
         }
 
-    @Test
-    @DisplayName("게시글 수정 요청이 성공하면 변경 내용이 반영된다")
-    void updateBoard_Success() throws Exception {
-        BoardUpdateRequest req = TestFixtures.createBoardUpdateRequest();
-        BoardResult updatedResult = new BoardResult(TestFixtures.TEST_BOARD_ID, req.getTitle(), req.getContent(),
-                user.getId(), user.getUsername(), null, "GENERAL", 0, 0, false, FixtureTime.now(), FixtureTime.now());
-                user.getId(), user.getUsername(), null, "GENERAL", 0, 0, false, FixtureTime.now(), FixtureTime.now());
+        @Test
+        @DisplayName("게시글 수정 요청이 성공하면 변경 내용이 반영된다")
+        void updateBoard_Success() throws Exception {
+                BoardUpdateRequest req = TestFixtures.createBoardUpdateRequest();
+                BoardResult updatedResult = new BoardResult(TestFixtures.TEST_BOARD_ID, req.getTitle(),
+                                req.getContent(),
+                                user.getId(), user.getUsername(), null, "GENERAL", 0, 0, false, FixtureTime.now(),
+                                FixtureTime.now());
 
-        given(boardService.update(eq(TestFixtures.TEST_BOARD_ID), any(BoardUpdateCommand.class), anyLong()))
-                .willReturn(updatedResult);
+                given(boardService.update(eq(TestFixtures.TEST_BOARD_ID), any(BoardUpdateCommand.class), anyLong()))
+                                .willReturn(updatedResult);
 
-        mockMvc.perform(put("/api/boards/" + TestFixtures.TEST_BOARD_ID)
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(req)))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.title").value(req.getTitle()));
+                mockMvc.perform(put("/api/boards/" + TestFixtures.TEST_BOARD_ID)
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(req)))
+                                .andExpect(status().isOk())
+                                .andExpect(jsonPath("$.title").value(req.getTitle()));
 
-        verify(boardService).update(eq(TestFixtures.TEST_BOARD_ID), any(BoardUpdateCommand.class), anyLong());
-    }
+                verify(boardService).update(eq(TestFixtures.TEST_BOARD_ID), any(BoardUpdateCommand.class), anyLong());
+        }
 
         @Test
         @DisplayName("없는 게시글을 수정하면 404를 반환한다")
