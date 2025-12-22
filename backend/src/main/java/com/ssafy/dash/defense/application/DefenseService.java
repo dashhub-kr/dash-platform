@@ -37,12 +37,21 @@ public class DefenseService {
             throw new IllegalStateException("이미 디펜스가 진행 중입니다.");
         }
 
-        Integer problemId;
+        List<Integer> problemBank;
         if ("GOLD".equalsIgnoreCase(type)) {
-            problemId = pickRandomProblem(DefenseProblemBank.GOLD_PROBLEMS);
+            problemBank = DefenseProblemBank.GOLD_PROBLEMS;
         } else {
-            problemId = pickRandomProblem(DefenseProblemBank.SILVER_PROBLEMS);
+            problemBank = DefenseProblemBank.SILVER_PROBLEMS;
         }
+
+        // 이미 푼 문제 필터링
+        List<Integer> unsolvedProblems = filterUnsolvedProblems(userId, problemBank);
+
+        if (unsolvedProblems.isEmpty()) {
+            throw new IllegalStateException("풀지 않은 문제가 없습니다. 모든 문제를 완료했습니다!");
+        }
+
+        Integer problemId = pickRandomProblem(unsolvedProblems);
 
         user.setDefenseType(type.toUpperCase());
         user.setDefenseProblemId(problemId);
@@ -131,6 +140,15 @@ public class DefenseService {
 
     private Integer pickRandomProblem(List<Integer> problems) {
         return problems.get(random.nextInt(problems.size()));
+    }
+
+    private List<Integer> filterUnsolvedProblems(Long userId, List<Integer> problems) {
+        // 사용자가 이미 푼 문제 ID 목록 조회
+        java.util.Set<String> solvedProblemNumbers = algorithmRecordRepository.findSolvedProblemNumbers(userId);
+
+        return problems.stream()
+                .filter(p -> !solvedProblemNumbers.contains(String.valueOf(p)))
+                .collect(java.util.stream.Collectors.toList());
     }
 
     public record DefenseStatusResult(
