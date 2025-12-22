@@ -2,6 +2,7 @@ package com.ssafy.dash.ai.presentation;
 
 import com.ssafy.dash.ai.application.*;
 import com.ssafy.dash.ai.client.dto.*;
+import com.ssafy.dash.ai.presentation.dto.LearningDashboardResponse;
 import com.ssafy.dash.ai.domain.CodeAnalysisResult;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -60,8 +61,8 @@ public class AiController {
 
         @Operation(summary = "AI 학습 경로", description = "분석 데이터 기반 개인화 학습 경로를 생성합니다")
         @GetMapping("/learning-path/{userId}")
-        public ResponseEntity<LearningPathResponse> getLearningPath(@PathVariable Long userId) {
-                LearningPathResponse response = learningPathService.generateAiLearningPath(userId);
+        public ResponseEntity<LearningDashboardResponse> getLearningPath(@PathVariable Long userId) {
+                LearningDashboardResponse response = learningPathService.generateAiLearningPath(userId);
                 return ResponseEntity.ok(response);
         }
 
@@ -95,6 +96,12 @@ public class AiController {
                                 request.code(),
                                 request.language());
                 return ResponseEntity.ok(response);
+        }
+
+        @Operation(summary = "코드 시뮬레이션", description = "AI 가상 컴파일러를 통해 코드 실행 결과를 예측합니다")
+        @PostMapping("/simulator/run")
+        public ResponseEntity<AiSimulatorResponse> runSimulation(@RequestBody AiSimulatorRequest request) {
+                return ResponseEntity.ok(debugService.simulate(request.getCode(), request.getLanguage()));
         }
 
         // === DTOs ===
