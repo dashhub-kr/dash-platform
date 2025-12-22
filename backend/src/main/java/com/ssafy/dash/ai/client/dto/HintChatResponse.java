@@ -1,6 +1,7 @@
 package com.ssafy.dash.ai.client.dto;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -9,17 +10,24 @@ import lombok.NoArgsConstructor;
 import java.util.List;
 
 /**
- * 힌트 응답 DTO
+ * 힌트 대화 응답 DTO
  */
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class HintResponse {
-    private int level;
-    private String hint;
-    private String encouragement;
+public class HintChatResponse {
+    private String reply;
+
+    @JsonProperty("teachingStyle")
+    private String teachingStyle;
+
+    @JsonProperty("followUpQuestions")
+    private List<String> followUpQuestions;
+
+    @JsonProperty("relatedConcepts")
     private List<String> relatedConcepts;
-    private String nextStepSuggestion;
+
+    private String encouragement;
 }

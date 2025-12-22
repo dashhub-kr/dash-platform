@@ -454,9 +454,13 @@
         :loading="drawerLoading"
         :data="drawerData"
         :code="currentRecordCode"
+        :record-id="currentDrawerRecord?.id"
+        :user-id="user?.id"
+        :solve-status="currentDrawerRecord?.result === '맞았습니다!!' ? 'solved' : 'wrong'"
+        :wrong-reason="currentDrawerRecord?.result"
+        :problem-number="currentDrawerRecord?.problemNumber"
+        :problem-title="currentDrawerRecord?.title"
         @close="closeDrawer"
-        @request-hint-level="requestHintWithLevel"
-        @back-to-selection="backToHintSelection"
       />
     </div>
 

@@ -98,82 +98,68 @@
 
                 </div>
 
-                <!-- CONTENT: HINT (Progressive Disclosure) -->
+                <!-- CONTENT: HINT (Chat-based) -->
                 <div v-else-if="type === 'hint'" class="space-y-6 animate-fade-in">
                     
-                    <!-- Hint Level Selection (if no data yet) -->
-                    <div v-if="!data" class="space-y-4">
-                        <div class="text-center mb-6">
-                            <h4 class="text-lg font-bold text-slate-800 mb-2">어떤 힌트가 필요하신가요?</h4>
-                            <p class="text-sm text-slate-500">단계별로 힌트를 확인할 수 있습니다</p>
+                    <!-- Header -->
+                    <div class="flex items-center gap-3 mb-4">
+                        <div class="w-12 h-12 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center shadow-lg">
+                            <MessageSquare class="w-6 h-6 text-white" />
                         </div>
-
-                        <!-- Level Cards -->
-                        <div v-for="level in [1, 2, 3]" :key="level" 
-                             class="group relative bg-white rounded-2xl p-6 border-2 border-slate-200 hover:border-amber-400 transition-all cursor-pointer hover:shadow-lg"
-                             @click="$emit('request-hint-level', level)">
-                            
-                            <!-- Lock Icon Overlay -->
-                            <div class="absolute top-4 right-4 w-10 h-10 rounded-full bg-amber-50 flex items-center justify-center group-hover:bg-amber-100 transition-colors">
-                                <component :is="level === 1 ? Lightbulb : level === 2 ? Zap : Trophy" class="w-5 h-5 text-amber-600" />
-                            </div>
-
-                            <div class="pr-12">
-                                <div class="flex items-center gap-3 mb-2">
-                                    <span class="px-3 py-1 rounded-full bg-amber-100 text-amber-700 text-xs font-bold">Level {{ level }}</span>
-                                    <span class="text-lg">{{ level === 1 ? '5🌰' : level === 2 ? '10🌰' : '15🌰' }}</span>
-                                </div>
-                                <h5 class="font-bold text-slate-800 mb-1">
-                                    {{ level === 1 ? '알고리즘 유형' : level === 2 ? '접근 아이디어' : '상세 가이드' }}
-                                </h5>
-                                <p class="text-sm text-slate-600">
-                                    {{ level === 1 ? '어떤 알고리즘을 써야 할까요?' : level === 2 ? '핵심 로직 힌트' : '코드 구조 및 구현 팁' }}
-                                </p>
-                            </div>
-
-                            <div class="absolute inset-0 rounded-2xl bg-gradient-to-r from-amber-500 to-orange-500 opacity-0 group-hover:opacity-5 transition-opacity pointer-events-none"></div>
+                        <div>
+                            <h4 class="font-bold text-slate-800 text-lg">💡 AI 튜터에게 물어보세요</h4>
+                            <p class="text-sm text-slate-500">문제 풀이에 대해 힌트를 받아보세요</p>
                         </div>
                     </div>
 
-                    <!-- Hint Content (after selection) -->
-                    <div v-else class="space-y-6 animate-fade-in-up">
-                        <!-- Level Badge -->
-                        <div class="flex items-center justify-between">
-                            <div class="flex items-center gap-3">
-                                <div class="w-12 h-12 rounded-full bg-amber-100 flex items-center justify-center">
-                                    <Lightbulb class="w-6 h-6 text-amber-600" />
-                                </div>
-                                <div>
-                                    <span class="block text-xs font-bold text-amber-600 uppercase tracking-wider">Hint Level {{ data.level }}</span>
-                                    <span class="block text-sm text-slate-500">{{ data.level === 1 ? '5🌰 사용됨' : data.level === 2 ? '10🌰 사용됨' : '15🌰 사용됨' }}</span>
+                    <!-- Chat Messages -->
+                    <div class="space-y-3 mb-4 max-h-[400px] overflow-y-auto" ref="chatContainer">
+                        <div v-for="(msg, idx) in chatMessages" :key="idx"
+                             class="flex" :class="msg.role === 'user' ? 'justify-end' : 'justify-start'">
+                            <div class="max-w-[85%] px-4 py-3 rounded-2xl text-sm"
+                                 :class="msg.role === 'user' 
+                                     ? 'bg-indigo-500 text-white rounded-br-sm' 
+                                     : 'bg-white border border-slate-200 text-slate-700 rounded-bl-sm shadow-sm'">
+                                <div v-html="renderMarkdown(msg.content)"></div>
+                            </div>
+                        </div>
+                        <!-- Loading indicator -->
+                        <div v-if="chatLoading" class="flex justify-start">
+                            <div class="bg-white border border-slate-200 px-4 py-3 rounded-2xl rounded-bl-sm shadow-sm">
+                                <div class="flex gap-1.5">
+                                    <div class="w-2 h-2 bg-indigo-400 rounded-full animate-bounce"></div>
+                                    <div class="w-2 h-2 bg-indigo-400 rounded-full animate-bounce" style="animation-delay: 0.1s"></div>
+                                    <div class="w-2 h-2 bg-indigo-400 rounded-full animate-bounce" style="animation-delay: 0.2s"></div>
                                 </div>
                             </div>
-                            <button @click="$emit('back-to-selection')" class="text-sm text-slate-500 hover:text-slate-700 underline">
-                                다른 레벨 선택
-                            </button>
                         </div>
+                    </div>
 
-                        <!-- Hint Card -->
-                        <div class="bg-gradient-to-br from-amber-50 to-orange-50 rounded-2xl p-8 border border-amber-100 shadow-lg">
-                            <div class="prose prose-sm max-w-none">
-                                <div class="text-slate-700 leading-relaxed text-base prose prose-sm max-w-none" v-html="renderMarkdown(data.hint)"></div>
-                            </div>
-                        </div>
+                    <!-- Quick Replies -->
+                    <div v-if="quickReplies.length > 0 && !chatLoading" class="flex flex-wrap gap-2 mb-4">
+                        <button v-for="(reply, idx) in quickReplies" :key="idx"
+                                @click="sendChatMessage(reply)"
+                                class="px-3 py-1.5 bg-indigo-50 border border-indigo-200 text-indigo-700 rounded-full text-xs font-medium hover:bg-indigo-100 transition-colors"
+                                v-html="renderMarkdown(reply)">
+                        </button>
+                    </div>
 
-                        <!-- Next Level Suggestion -->
-                        <div v-if="data.level < 3" class="bg-white rounded-xl p-4 border border-slate-200 flex items-center justify-between">
-                            <div class="flex items-center gap-3">
-                                <div class="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center">
-                                    <ArrowRight class="w-4 h-4 text-slate-600" />
-                                </div>
-                                <span class="text-sm text-slate-600">더 자세한 힌트가 필요하신가요?</span>
-                            </div>
-                            <button 
-                                @click="$emit('request-hint-level', data.level + 1)" 
-                                class="px-4 py-2 bg-amber-500 text-white rounded-lg text-sm font-bold hover:bg-amber-600 transition-colors">
-                                Level {{ data.level + 1 }} 보기
-                            </button>
-                        </div>
+                    <!-- Chat Input -->
+                    <div class="flex gap-2 sticky bottom-0 bg-white pt-2">
+                        <input 
+                            v-model="chatInput"
+                            @keyup.enter="sendChatMessage(chatInput)"
+                            :disabled="chatLoading"
+                            type="text" 
+                            placeholder="힌트가 필요한 부분을 질문해보세요..."
+                            class="flex-1 px-4 py-3 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                        />
+                        <button 
+                            @click="sendChatMessage(chatInput)"
+                            :disabled="!chatInput.trim() || chatLoading"
+                            class="px-5 py-3 bg-gradient-to-r from-indigo-500 to-purple-600 text-white rounded-xl font-bold text-sm hover:from-indigo-600 hover:to-purple-700 transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-md">
+                            전송
+                        </button>
                     </div>
 
                 </div>
@@ -341,7 +327,7 @@
 </template>
 
 <script setup>
-import { ref } from 'vue';
+import { ref, watch } from 'vue';
 import { 
   X, Bot, Bug, Lightbulb, Copy, Check,
   XCircle, CheckCircle2, Zap, Trophy, ArrowRight,
@@ -351,6 +337,7 @@ import hljs from 'highlight.js/lib/core';
 import java from 'highlight.js/lib/languages/java';
 import 'highlight.js/styles/github.css';
 import {marked} from 'marked';
+import { aiApi } from '@/api/ai';
 
 hljs.registerLanguage('java', java);
 
@@ -360,13 +347,75 @@ const props = defineProps({
   title: String,
   loading: Boolean,
   data: Object,
-  code: String // For review mode
+  code: String, // For review mode
+  recordId: Number,      // 알고리즘 기록 ID (DB 조회용)
+  userId: Number,        // 사용자 ID
+  solveStatus: String,   // "solved" | "wrong"
+  wrongReason: String,   // 틀린 이유 (시간초과, 틀렸습니다 등)
+  problemNumber: String, // For hint chat (fallback)
+  problemTitle: String   // For hint chat (fallback)
 });
 
 const emit = defineEmits(['close']);
 
 const copied = ref(false);
 const activeTab = ref('insight');
+
+// Hint Chat State
+const chatMessages = ref([]);
+const chatInput = ref('');
+const chatLoading = ref(false);
+const quickReplies = ref(['🤔 이 문제 어떻게 접근하지?', '💡 알고리즘 유형이 뭐야?', '🐛 왜 틀렸을까?']);
+
+// Reset chat when drawer closes or hint changes
+watch(() => props.isVisible, (visible) => {
+    if (!visible) {
+        chatMessages.value = [];
+        chatInput.value = '';
+        quickReplies.value = ['🤔 이 문제 어떻게 접근하지?', '💡 알고리즘 유형이 뭐야?', '🐛 왜 틀렸을까?'];
+    }
+});
+
+const sendChatMessage = async (message) => {
+    if (!message?.trim() || chatLoading.value) return;
+    
+    const trimmedMessage = message.trim();
+    chatInput.value = '';
+    
+    // Add user message
+    chatMessages.value.push({ role: 'user', content: trimmedMessage });
+    chatLoading.value = true;
+    
+    try {
+        // AI 튜터 대화 요청
+        const response = await aiApi.tutorChat({
+            userId: props.userId,
+            recordId: props.recordId,
+            message: trimmedMessage,
+            solveStatus: props.solveStatus || 'wrong',
+            wrongReason: props.wrongReason,
+            history: chatMessages.value.slice(0, -1) // 마지막 user 메시지 제외
+        });
+        
+        // Add assistant message
+        chatMessages.value.push({ role: 'assistant', content: response.data.reply });
+        
+        // Update quick replies with follow-up questions
+        if (response.data.followUpQuestions?.length > 0) {
+            quickReplies.value = response.data.followUpQuestions.slice(0, 3);
+        } else {
+            quickReplies.value = [];
+        }
+    } catch (error) {
+        console.error('Hint chat failed:', error);
+        chatMessages.value.push({ 
+            role: 'assistant', 
+            content: '죄송해요, 일시적인 오류가 발생했어요. 다시 시도해주세요.' 
+        });
+    } finally {
+        chatLoading.value = false;
+    }
+};
 
 const getHeaderIcon = (type) => {
     switch(type) {
@@ -448,21 +497,27 @@ const copyCode = async (code) => {
   border-radius: 3px;
 }
 
-/* Notion-style inline code */
+/* Default inline code style (for AI responses - white/light bg) */
 :deep(code:not(pre code)) {
-  background-color: rgba(239, 68, 68, 0.1);
-  color: #dc2626;
+  background-color: rgba(99, 102, 241, 0.1);
+  color: #4338ca;
   padding: 0.15em 0.4em;
   border-radius: 4px;
-  font-size: 0.9em;
+  font-size: 0.85em;
   font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
   font-weight: 500;
 }
 
-/* Dark mode support for code in dark backgrounds */
-.bg-slate-900 :deep(code:not(pre code)),
-.bg-\[#282c34\] :deep(code:not(pre code)) {
-  background-color: rgba(96, 165, 250, 0.2);
-  color: #93c5fd;
+/* Inline code in user messages (indigo/blue bg) */
+.bg-indigo-500 :deep(code:not(pre code)) {
+  background-color: rgba(255, 255, 255, 0.25);
+  color: #fff;
+}
+
+/* Inline code in indigo quick replies */
+.bg-indigo-50 :deep(code:not(pre code)),
+.border-indigo-200 :deep(code:not(pre code)) {
+  background-color: rgba(99, 102, 241, 0.15);
+  color: #4338ca;
 }
 </style>
