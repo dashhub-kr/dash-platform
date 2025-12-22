@@ -42,15 +42,15 @@
         </div>
         
         <!-- Code Preview -->
-        <div class="flex-1 bg-[#1e1e2e] rounded-xl overflow-hidden flex flex-col">
-          <div class="px-4 py-2 bg-[#181825] text-slate-400 text-xs font-mono flex justify-between items-center border-b border-[#313244]">
+        <div class="flex-1 bg-white rounded-xl overflow-hidden flex flex-col border border-slate-200">
+          <div class="px-4 py-2 bg-slate-50 text-slate-500 text-xs font-mono flex justify-between items-center border-b border-slate-200">
             <span>{{ currentDrawerRecord.language }}.{{ getFileExtension(currentDrawerRecord.language) }}</span>
-            <span class="text-slate-500">제출 코드</span>
+            <span class="text-slate-400">제출 코드</span>
           </div>
           <div class="flex-1 overflow-y-auto p-4">
-            <pre class="text-sm font-mono leading-relaxed"><code class="text-slate-300" v-html="highlightCode(currentDrawerRecord.code?.substring(0, 800) || '// 코드 없음', currentDrawerRecord.language)"></code></pre>
+            <pre class="text-sm font-mono leading-relaxed"><code class="text-slate-700" v-html="highlightCode(currentDrawerRecord.code?.substring(0, 800) || '// 코드 없음', currentDrawerRecord.language)"></code></pre>
             <div v-if="currentDrawerRecord.code?.length > 800" class="text-center mt-4">
-              <span class="text-slate-500 text-xs">... 코드 더 보기는 AI 분석에서</span>
+              <span class="text-slate-400 text-xs">... 코드 더 보기는 AI 분석에서</span>
             </div>
           </div>
         </div>
@@ -75,92 +75,184 @@
         <!-- Navbar / Header Area -->
 
         <main class="container mx-auto px-6 py-8 pb-32">
-          <!-- Header Section -->
-          <div class="mb-10 animate-fade-in-down">
-            <h1 class="text-3xl font-extrabold text-slate-900 mb-2">
-          안녕하세요, <span class="text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-purple-600">{{ user?.username || '탐험가' }}님!</span> 👋
-        </h1>
-        <p class="text-slate-500">오늘도 알고리즘의 바다를 항해할 준비가 되셨나요?</p>
-      </div>
+          <!-- Header Section with Clean Metrics -->
+          <div class="mb-8 animate-fade-in-down">
+            <!-- Greeting Row -->
+            <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6">
+              <div>
+                <h1 class="text-2xl font-bold text-slate-800">
+                  안녕하세요, <span class="text-indigo-600">{{ user?.username || '탐험가' }}</span>님! 👋
+                </h1>
+                <p class="text-sm text-slate-500 mt-1">오늘도 알고리즘의 바다를 항해할 준비가 되셨나요?</p>
+              </div>
+              <!-- Streak Badge (only show if active) -->
+              <div v-if="currentStreak > 0" class="flex items-center gap-2 px-3 py-1.5 bg-orange-50 border border-orange-100 text-orange-600 rounded-full text-sm font-medium">
+                <span>🔥</span>
+                <span>{{ currentStreak }}일 연속 활동 중</span>
+              </div>
+            </div>
+
+            <!-- Clean Stats Row -->
+            <div class="grid grid-cols-4 gap-3">
+              <!-- Stat 1: Acorns -->
+              <div 
+                class="bg-white rounded-xl p-4 border border-slate-100 hover:border-amber-200 hover:shadow-sm transition-all cursor-pointer group"
+                @click="openAcornHistory"
+              >
+                <div class="flex items-center justify-between mb-2">
+                  <span class="text-2xl">🌰</span>
+                  <span class="text-xs font-medium text-slate-400 uppercase">Acorns</span>
+                </div>
+                <div class="text-2xl font-bold text-slate-800">{{ studyData?.acornCount || 0 }}</div>
+              </div>
+
+              <!-- Stat 2: Solutions -->
+              <div class="bg-white rounded-xl p-4 border border-slate-100 hover:border-indigo-200 hover:shadow-sm transition-all">
+                <div class="flex items-center justify-between mb-2">
+                  <span class="text-2xl">📊</span>
+                  <span class="text-xs font-medium text-slate-400 uppercase">Solutions</span>
+                </div>
+                <div class="text-2xl font-bold text-slate-800">{{ records.length }}</div>
+              </div>
+
+              <!-- Stat 3: Streak -->
+              <div class="bg-white rounded-xl p-4 border border-slate-100 hover:border-rose-200 hover:shadow-sm transition-all">
+                <div class="flex items-center justify-between mb-2">
+                  <span class="text-2xl">🔥</span>
+                  <span class="text-xs font-medium text-slate-400 uppercase">Streak</span>
+                </div>
+                <div class="text-2xl font-bold text-slate-800">{{ currentStreak }}<span class="text-sm font-normal text-slate-400 ml-1">일</span></div>
+              </div>
+
+              <!-- Stat 4: Members -->
+              <div class="bg-white rounded-xl p-4 border border-slate-100 hover:border-emerald-200 hover:shadow-sm transition-all">
+                <div class="flex items-center justify-between mb-2">
+                  <span class="text-2xl">👥</span>
+                  <span class="text-xs font-medium text-slate-400 uppercase">Members</span>
+                </div>
+                <div class="text-2xl font-bold text-slate-800">{{ studyData?.memberCount || 1 }}<span class="text-sm font-normal text-slate-400 ml-1">명</span></div>
+              </div>
+            </div>
+          </div>
+
+
+
+          <!-- Skill Analysis Section -->
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8 animate-fade-in-up delay-100">
+             <!-- Radar Chart -->
+             <div class="bg-white rounded-2xl p-6 shadow-sm border border-slate-100 flex flex-col items-center">
+                <h3 class="text-sm font-bold text-slate-800 mb-4 w-full flex items-center gap-2">
+                   <LayoutGrid :size="16" class="text-indigo-500" />
+                   알고리즘 역량 분포
+                </h3>
+                <div class="w-full max-w-[240px] aspect-square">
+                    <AlgorithmRadarChart :stats="tagStats" :max-tags="6" />
+                </div>
+             </div>
+
+             <!-- Quick Stats / Recommendations -->
+             <div class="md:col-span-2 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-2xl p-6 text-white shadow-lg relative overflow-hidden">
+                 <div class="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full blur-3xl -mr-16 -mt-16"></div>
+                 <div class="relative z-10">
+                     <h3 class="font-bold text-lg mb-2 flex items-center gap-2">
+                        <Trophy :size="20" class="text-amber-300" />
+                        나의 주특기 분석
+                     </h3>
+                     <div v-if="tagStats.length > 0">
+                         <p class="text-indigo-100 mb-6 font-medium">
+                            가장 자신 있는 분야는 <span class="font-bold text-white bg-white/20 px-2 py-0.5 rounded ml-1 mr-1">{{ topTagName }}</span> 입니다.
+                            <br>총 <span class="font-bold text-white">{{ totalSolvedCount }}</span>문제를 해결하며 꾸준히 성장하고 계시네요!
+                         </p>
+                         <div class="flex gap-3">
+                             <div v-for="tag in tagStats.slice(0, 3)" :key="tag.tagKey" class="bg-white/10 backdrop-blur rounded-xl p-3 flex-1 border border-white/10">
+                                 <div class="text-xs text-indigo-200 mb-1 uppercase font-bold">{{ tag.tagKey }}</div>
+                                 <div class="text-xl font-black">{{ tag.solved }} <span class="text-xs font-normal opacity-70">문제</span></div>
+                             </div>
+                         </div>
+                     </div>
+                     <div v-else class="text-indigo-100 h-32 flex items-center justify-center">
+                        아직 분석할 데이터가 충분하지 않습니다. <br> 문제를 풀기 시작해보세요!
+                     </div>
+                 </div>
+             </div>
+          </div>
 
       <!-- Content Grid -->
       <div v-if="loading" class="grid grid-cols-1 md:grid-cols-3 gap-6">
         <div v-for="i in 6" :key="i" class="h-64 rounded-3xl bg-white shadow-sm border border-slate-100 animate-pulse"></div>
       </div>
 
-      <!-- Stats & Sidebar Area -->
-      <div v-if="!loading" class="mb-10 animate-fade-in-up flex flex-col xl:flex-row items-start justify-center gap-6">
-        
-        <!-- Heatmap Card -->
-        <div class="bg-white rounded-3xl p-8 shadow-sm border border-slate-100 relative w-fit max-w-full">
-             <div class="flex items-center justify-between mb-6 gap-8">
-                <h2 class="text-xl font-bold text-slate-800 flex items-center gap-2 whitespace-nowrap">
-                    <TrendingUp class="text-indigo-500" />
-                    스터디 활동 로그
-                </h2>
-
-                <!-- Legend -->
-                <div class="flex items-center gap-2 text-xs font-medium text-slate-400">
-                    <span>Less</span>
-                    <div class="flex gap-1">
-                        <div class="w-3 h-3 rounded-sm bg-slate-100"></div>
-                        <div class="w-3 h-3 rounded-sm bg-indigo-200"></div>
-                        <div class="w-3 h-3 rounded-sm bg-indigo-400"></div>
-                        <div class="w-3 h-3 rounded-sm bg-indigo-600"></div>
-                        <div class="w-3 h-3 rounded-sm bg-indigo-800"></div>
+      <!-- Activity Section: Heatmap + Recent Activity -->
+      <div v-if="!loading" class="mb-10 animate-fade-in-up">
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-5">
+          
+          <!-- Heatmap Card (9 cols) -->
+          <div class="lg:col-span-9 bg-white rounded-2xl p-6 shadow-sm border border-slate-100">
+            <div class="flex items-center justify-between mb-5">
+              <h2 class="text-base font-bold text-slate-800 flex items-center gap-2">
+                <TrendingUp class="text-indigo-500 w-5 h-5" />
+                스터디 활동 로그
+              </h2>
+              <!-- Legend -->
+              <div class="flex items-center gap-2 text-xs font-medium text-slate-400">
+                <span>Less</span>
+                <div class="flex gap-1">
+                  <div class="w-3 h-3 rounded-sm bg-slate-100"></div>
+                  <div class="w-3 h-3 rounded-sm bg-indigo-200"></div>
+                  <div class="w-3 h-3 rounded-sm bg-indigo-400"></div>
+                  <div class="w-3 h-3 rounded-sm bg-indigo-600"></div>
+                  <div class="w-3 h-3 rounded-sm bg-indigo-800"></div>
+                </div>
+                <span>More</span>
+              </div>
+            </div>
+            
+            <div class="overflow-x-auto pb-2 custom-scrollbar">
+              <div class="min-w-max">
+                <!-- Heatmap (Grass) -->
+                <div class="flex gap-[3px]">
+                  <div v-for="(week, wIdx) in heatmapWeeks" :key="wIdx" class="flex flex-col gap-[3px]">
+                    <div 
+                      v-for="(day, dIdx) in week" 
+                      :key="dIdx"
+                      class="w-3 h-3 rounded-[2px] transition-all relative cursor-pointer hover:ring-2 hover:ring-indigo-300 hover:z-10"
+                      :class="day.colorClass"
+                      @mouseenter="showTooltip($event, day)"
+                      @mouseleave="hideTooltip"
+                    >
                     </div>
-                    <span>More</span>
+                  </div>
                 </div>
-             </div>
-             
-             <div class="overflow-x-auto pb-2 custom-scrollbar">
-                 <div class="min-w-max">
-                     <!-- Heatmap (Grass) -->
-                     <div class="flex gap-[3px]">
-                        <div v-for="(week, wIdx) in heatmapWeeks" :key="wIdx" class="flex flex-col gap-[3px]">
-                            <div 
-                                v-for="(day, dIdx) in week" 
-                                :key="dIdx"
-                                class="w-3 h-3 rounded-[2px] transition-all relative cursor-pointer hover:ring-2 hover:ring-indigo-300 hover:z-10"
-                                :class="day.colorClass"
-                                @mouseenter="showTooltip($event, day)"
-                                @mouseleave="hideTooltip"
-                            >
-                            </div>
-                        </div>
-                    </div>
-                 </div>
-             </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Recent Activity Card (3 cols) -->
+          <div class="lg:col-span-3 bg-white rounded-2xl p-5 shadow-sm border border-slate-100">
+            <h3 class="text-sm font-bold text-slate-800 mb-4 flex items-center gap-2 pb-3 border-b border-slate-100">
+              <Activity :size="14" class="text-indigo-500" /> 최근 활동
+            </h3>
+            <div v-if="acornLogs.length > 0" class="flex flex-col gap-3">
+              <div v-for="log in acornLogs.slice(0, 6)" :key="log.id" class="flex items-center justify-between text-sm group">
+                <div class="flex items-center gap-2">
+                  <div class="w-6 h-6 rounded-full bg-gradient-to-br from-indigo-400 to-purple-500 flex items-center justify-center text-[10px] font-bold text-white shadow-sm">
+                    {{ (log.username || '?').charAt(0).toUpperCase() }}
+                  </div>
+                  <span class="font-medium text-slate-600 truncate max-w-[80px] group-hover:text-slate-900 transition-colors">{{ log.username }}</span>
+                </div>
+                <span class="font-bold font-mono text-sm" :class="log.amount > 0 ? 'text-emerald-500' : 'text-rose-500'">
+                  {{ log.amount > 0 ? '+' : '' }}{{ log.amount }}
+                </span>
+              </div>
+            </div>
+            <div v-else class="text-center py-6 text-slate-400 text-sm">
+              아직 활동 기록이 없습니다
+            </div>
+          </div>
+
         </div>
-
-        <!-- Sidebar: Acorn & Ticker -->
-        <div class="flex flex-col gap-4 min-w-[220px] shrink-0">
-           <!-- Badge -->
-           <div v-if="studyData" class="bg-white px-6 py-5 rounded-3xl shadow-sm border border-slate-100 flex flex-col items-center justify-center gap-2 cursor-pointer hover:bg-slate-50 transition-colors group" @click="openAcornHistory">
-                <div class="w-12 h-12 rounded-2xl bg-amber-100 group-hover:bg-amber-200 flex items-center justify-center text-3xl shadow-sm transition-colors ring-4 ring-white">🌰</div>
-                <div class="flex flex-col leading-none text-center">
-                     <span class="text-xs font-bold text-amber-600 uppercase tracking-wider mb-1">Study Acorns</span>
-                     <span class="text-3xl font-black text-slate-800">{{ studyData.acornCount }}</span>
-                </div>
-           </div>
-
-           <!-- Recent Logs List -->
-           <div v-if="acornLogs.length > 0" class="bg-white rounded-3xl p-5 shadow-sm border border-slate-100">
-                <h3 class="text-xs font-bold text-slate-400 mb-4 uppercase tracking-wider flex items-center gap-2 pb-2 border-b border-slate-100">
-                    <Activity :size="12" /> Recent Activity
-                </h3>
-                <div class="flex flex-col gap-3">
-                     <div v-for="log in acornLogs.slice(0, 5)" :key="log.id" class="flex items-center justify-between text-sm">
-                         <span class="font-bold text-slate-700 truncate max-w-[100px]">{{ log.username }}</span>
-                         <span class="font-bold font-mono" :class="log.amount > 0 ? 'text-green-500' : 'text-red-500'">
-                             {{ log.amount > 0 ? '+' : '' }}{{ log.amount }}
-                         </span>
-                     </div>
-                </div>
-           </div>
-        </div>
-
       </div>
+
       <!-- Shared Fixed Tooltip -->
              <div v-if="tooltipData" 
                   class="fixed z-50 pointer-events-none transform -translate-x-1/2 -translate-y-full mb-2"
@@ -329,14 +421,14 @@
                 </button>
               </div>
               
-              <!-- Code Viewer (Dark Theme) -->
-              <div class="bg-[#282c34] rounded-xl overflow-hidden  shadow-lg">
-                <div class="px-4 py-2 bg-[#21252b] text-slate-400 text-xs font-mono border-b border-[#181a1f] flex justify-between items-center">
+              <!-- Code Viewer (Light Theme) -->
+              <div class="bg-white rounded-xl overflow-hidden border border-slate-200">
+                <div class="px-4 py-2 bg-slate-50 text-slate-500 text-xs font-mono border-b border-slate-200 flex justify-between items-center">
                   <span>{{ record.language }}.{{ record.language === 'Java' ? 'java' : 'py' }}</span>
-                  <span class="px-2 py-0.5 rounded bg-white/10 text-slate-300">Read Only</span>
+                  <span class="px-2 py-0.5 rounded bg-slate-100 text-slate-500">Read Only</span>
                 </div>
-                <div class="max-h-96 overflow-y-auto custom-scrollbar">
-                  <pre class="m-0 p-6 text-sm font-mono leading-relaxed"><code class="hljs language-java" v-html="highlightCode(record.code || '// 코드를 불러올 수 없습니다.', record.language.toLowerCase())"></code></pre>
+                <div class="max-h-96 overflow-y-auto">
+                  <pre class="m-0 p-6 text-sm font-mono leading-relaxed bg-white"><code class="hljs language-java text-slate-700" v-html="highlightCode(record.code || '// 코드를 불러올 수 없습니다.', record.language.toLowerCase())"></code></pre>
                 </div>
               </div>
               
@@ -373,12 +465,13 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, computed } from 'vue';
 import { dashboardApi } from '../api/dashboard';
 import { studyApi } from '../api/study';
 import { useAuth } from '../composables/useAuth';
 import http from '../api/http';
 import { aiApi } from '../api/ai';
+import AlgorithmRadarChart from '../components/charts/AlgorithmRadarChart.vue';
 import AiDrawer from '../components/AiDrawer.vue';
 import { 
   Bot, 
@@ -401,7 +494,7 @@ import {
   Check
 } from 'lucide-vue-next';
 import hljs from 'highlight.js';
-import 'highlight.js/styles/atom-one-dark.css';
+import 'highlight.js/styles/github.css';
 
 // ... (other imports)
 
@@ -411,6 +504,35 @@ const studyData = ref(null);
 const acornLogs = ref([]);
 const loading = ref(true);
 const heatmapWeeks = ref([]);
+const tagStats = ref([]);
+const topTagName = computed(() => tagStats.value.length > 0 ? tagStats.value[0].tagKey : '');
+const totalSolvedCount = computed(() => tagStats.value.reduce((acc, curr) => acc + (curr.solved || 0), 0));
+
+// Computed: Current streak (consecutive days with activity)
+const currentStreak = computed(() => {
+    if (!heatmapWeeks.value.length) return 0;
+    
+    // Flatten weeks to days array and reverse to start from today
+    const allDays = heatmapWeeks.value.flat().reverse();
+    
+    let streak = 0;
+    const today = new Date().toISOString().split('T')[0];
+    
+    for (const day of allDays) {
+        // Skip future dates
+        if (day.date > today) continue;
+        
+        if (day.count > 0) {
+            streak++;
+        } else if (streak > 0 || day.date === today) {
+            // If today has no activity, streak is 0
+            // If we had activity before and now hit a zero, stop counting
+            break;
+        }
+    }
+    
+    return streak;
+});
 
 const showModal = ref(false);
 const copiedInput = ref(false);
@@ -461,10 +583,14 @@ const hideTooltip = () => {
 
 onMounted(async () => {
   try {
-    const recordsRes = await dashboardApi.getRecords();
-    records.value = recordsRes.data;
+      const recordsRes = await dashboardApi.getRecords();
+      records.value = recordsRes.data;
+      
+      // Fetch Tag Stats for Radar Chart
+      const statsRes = await aiApi.getTagStats(user.value.id || 1, 6); // Mock ID 1 if null
+      tagStats.value = statsRes.data || [];
   } catch(e) {
-    console.error('Records error:', e);
+    console.error('Data Load Error:', e);
   }
   
   if (user.value?.studyId) {
