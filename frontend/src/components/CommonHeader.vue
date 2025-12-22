@@ -61,6 +61,14 @@
             <Map :size="24" />
           </router-link>
           <router-link
+            to="/training"
+            class="flex items-center text-slate-500 hover:text-indigo-600 transition-colors"
+            active-class="text-indigo-600"
+            title="트레이닝 센터"
+          >
+            <School :size="24" />
+          </router-link>
+          <router-link
             to="/simcity"
             class="flex items-center text-slate-500 hover:text-indigo-600 transition-colors"
             active-class="text-indigo-600"
@@ -135,7 +143,7 @@
 
 <script setup>
 import { ref, computed, onMounted, onBeforeUnmount } from "vue";
-import { Github, Map, LayoutGrid, MessageSquare } from "lucide-vue-next";
+import { Github, Map, LayoutGrid, MessageSquare, School } from "lucide-vue-next";
 
 import { useAuth } from "../composables/useAuth";
 import { authApi } from "../api/auth";
