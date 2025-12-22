@@ -71,5 +71,14 @@
     WHERE u.study_id = #{studyId} AND u.deleted_at IS NULL
   </select>
 
+  <select id="countSuccessfulSubmissionByUserIdAndProblemNumber" resultType="int">
+    SELECT COUNT(*)
+    FROM algorithm_records
+    WHERE user_id = #{userId}
+      AND problem_number = #{problemNumber}
+      AND runtime_ms IS NOT NULL
+      AND memory_kb IS NOT NULL
+  </select>
+
 
 </mapper>

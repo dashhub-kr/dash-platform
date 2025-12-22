@@ -28,4 +28,6 @@ public interface AlgorithmRecordMapper {
 
     int delete(Long id);
 
+    int countSuccessfulSubmissionByUserIdAndProblemNumber(Long userId, String problemNumber);
+
 }

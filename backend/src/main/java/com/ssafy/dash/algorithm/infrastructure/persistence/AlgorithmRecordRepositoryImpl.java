@@ -59,4 +59,9 @@ public class AlgorithmRecordRepositoryImpl implements AlgorithmRecordRepository 
         return mapper.countsByStudyId(studyId);
     }
 
+    @Override
+    public boolean existsSuccessfulSubmission(Long userId, String problemNumber) {
+        return mapper.countSuccessfulSubmissionByUserIdAndProblemNumber(userId, problemNumber) > 0;
+    }
+
 }

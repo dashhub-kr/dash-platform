@@ -21,4 +21,6 @@ public interface AlgorithmRecordRepository {
 
     StudyStats countsByStudyId(Long studyId);
 
+    boolean existsSuccessfulSubmission(Long userId, String problemNumber);
+
 }

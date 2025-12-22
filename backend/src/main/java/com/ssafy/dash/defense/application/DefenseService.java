@@ -7,6 +7,7 @@ import java.util.Random;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.ssafy.dash.algorithm.domain.AlgorithmRecordRepository;
 import com.ssafy.dash.defense.domain.DefenseProblemBank;
 import com.ssafy.dash.user.domain.User;
 import com.ssafy.dash.user.domain.UserRepository;
@@ -17,21 +18,23 @@ import com.ssafy.dash.user.domain.exception.UserNotFoundException;
 public class DefenseService {
 
     private final UserRepository userRepository;
+    private final AlgorithmRecordRepository algorithmRecordRepository;
     private final Random random = new Random();
 
-    public DefenseService(UserRepository userRepository) {
+    public DefenseService(UserRepository userRepository, AlgorithmRecordRepository algorithmRecordRepository) {
         this.userRepository = userRepository;
+        this.algorithmRecordRepository = algorithmRecordRepository;
     }
 
     public void startDefense(Long userId, String type) {
         User user = getUser(userId);
-        
+
         // 이전 세션이 존재한다면 타임아웃 체크
         checkTimeout(user);
 
         if (user.getDefenseStartTime() != null) {
             // 이미 진행 중
-           throw new IllegalStateException("이미 디펜스가 진행 중입니다.");
+            throw new IllegalStateException("이미 디펜스가 진행 중입니다.");
         }
 
         Integer problemId;
@@ -44,7 +47,7 @@ public class DefenseService {
         user.setDefenseType(type.toUpperCase());
         user.setDefenseProblemId(problemId);
         user.setDefenseStartTime(LocalDateTime.now());
-        
+
         userRepository.update(user);
         // 참고: 연승은 실패하거나 타임아웃 될 때까지 유지됨
     }
@@ -52,26 +55,24 @@ public class DefenseService {
     public DefenseStatusResult getDefenseStatus(Long userId) {
         User user = getUser(userId);
         checkTimeout(user);
-        
+
         // 타임아웃 체크는 사용자 상태를 변경할 수 있으므로 저장해야 함.
         // 하지만 getDefenseStatus는 주로 조회용이므로,
         // 상태 변경(타임아웃)이 발생했을 때만 lazy하게 업데이트.
 
-        
         return new DefenseStatusResult(
-            user.getDefenseType(),
-            user.getDefenseProblemId(),
-            user.getDefenseStartTime(),
-            user.getSilverStreak(),
-            user.getGoldStreak(),
-            user.getMaxSilverStreak(),
-            user.getMaxGoldStreak()
-        );
+                user.getDefenseType(),
+                user.getDefenseProblemId(),
+                user.getDefenseStartTime(),
+                user.getSilverStreak(),
+                user.getGoldStreak(),
+                user.getMaxSilverStreak(),
+                user.getMaxGoldStreak());
     }
 
     public void verifyDefense(Long userId, Integer solvedProblemId) {
         User user = getUser(userId);
-        
+
         if (user.getDefenseStartTime() == null) {
             return; // 디펜스 모드가 아님
         }
@@ -82,6 +83,11 @@ public class DefenseService {
         }
 
         if (user.getDefenseProblemId().equals(solvedProblemId)) {
+            // 실제 정답 제출이 있는지 확인 (runtime_ms, memory_kb가 있는 기록)
+            if (!algorithmRecordRepository.existsSuccessfulSubmission(userId, String.valueOf(solvedProblemId))) {
+                return; // 성공적인 제출 기록이 없음 (오답 또는 컴파일 에러)
+            }
+
             // 성공!
             if ("GOLD".equals(user.getDefenseType())) {
                 user.setGoldStreak(user.getGoldStreak() + 1);
@@ -94,12 +100,12 @@ public class DefenseService {
                     user.setMaxSilverStreak(user.getSilverStreak());
                 }
             }
-            
+
             // 다음 디펜스를 위해 현재 상태 초기화
             user.setDefenseProblemId(null);
             user.setDefenseStartTime(null);
             user.setDefenseType(null);
-            
+
             userRepository.update(user);
         }
     }
@@ -128,12 +134,12 @@ public class DefenseService {
     }
 
     public record DefenseStatusResult(
-        String defenseType,
-        Integer defenseProblemId,
-        LocalDateTime defenseStartTime,
-        Integer silverStreak,
-        Integer goldStreak,
-        Integer maxSilverStreak,
-        Integer maxGoldStreak
-    ) {}
+            String defenseType,
+            Integer defenseProblemId,
+            LocalDateTime defenseStartTime,
+            Integer silverStreak,
+            Integer goldStreak,
+            Integer maxSilverStreak,
+            Integer maxGoldStreak) {
+    }
 }
