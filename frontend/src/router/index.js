@@ -27,10 +27,13 @@ const routes = [
   { path: "/boards/edit/:id", name: "BoardEdit", component: BoardForm },
   { path: "/profile", name: "Profile", component: Profile },
   { path: "/youtube", name: "YouTubeSearch", component: YouTubeSearch },
-  { path: "/simcity", name: "StudySimCity", component: StudySimCity },
+  // { path: "/simcity", name: "StudySimCity", component: StudySimCity }, // 임시 비활성화
   { path: "/training", name: "TrainingView", component: () => import("../views/TrainingView.vue") },
   { path: "/defense", name: "DefenseView", component: () => import("../views/DefenseView.vue") },
   { path: "/mockexam", name: "MockExamView", component: () => import("../views/MockExamView.vue") },
+  { path: "/study/analysis", name: "StudyAnalysisView", component: () => import("../views/StudyAnalysisView.vue") },
+  { path: "/study/missions", name: "StudyMissionView", component: () => import("../views/StudyMissionView.vue") },
+  { path: "/study/ranking", name: "StudyListView", component: () => import("../views/StudyListView.vue") },
 ];
 
 const router = createRouter({

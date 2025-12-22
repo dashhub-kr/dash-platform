@@ -84,6 +84,7 @@
           >
             <MessageSquare :size="24" />
           </router-link>
+          <!-- SimCity 임시 비활성화
           <router-link
             to="/simcity"
             class="flex items-center text-slate-500 hover:text-green-600 transition-colors"
@@ -91,6 +92,31 @@
             title="심시티"
           >
             <LayoutGrid :size="24" />
+          </router-link>
+          -->
+          <router-link
+            to="/study/analysis"
+            class="flex items-center text-slate-500 hover:text-teal-600 transition-colors"
+            active-class="text-teal-600"
+            title="팀 분석"
+          >
+            <PieChart :size="24" />
+          </router-link>
+          <router-link
+            to="/study/missions"
+            class="flex items-center text-slate-500 hover:text-emerald-600 transition-colors"
+            active-class="text-emerald-600"
+            title="주차별 미션"
+          >
+            <Target :size="24" />
+          </router-link>
+          <router-link
+            to="/study/ranking"
+            class="flex items-center text-slate-500 hover:text-amber-500 transition-colors"
+            active-class="text-amber-500"
+            title="스터디 랭킹"
+          >
+            <Trophy :size="24" />
           </router-link>
         </nav>
       </div>
@@ -151,7 +177,7 @@
 
 <script setup>
 import { ref, computed, onMounted, onBeforeUnmount } from "vue";
-import { Github, Shield, LayoutGrid, MessageSquare, School, FileText } from "lucide-vue-next";
+import { Github, Shield, LayoutGrid, MessageSquare, School, FileText, PieChart, Target, Trophy } from "lucide-vue-next";
 
 import { useAuth } from "../composables/useAuth";
 import { authApi } from "../api/auth";
