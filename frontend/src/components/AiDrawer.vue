@@ -50,16 +50,16 @@
                                 {{ copied ? 'Copied!' : 'Copy Input' }}
                             </button>
                         </div>
-                        <div class="bg-[#1e1e1e] rounded-xl overflow-hidden shadow-md border border-slate-800">
-                            <div class="flex items-center px-4 py-2 bg-[#2d2d2d] border-b border-[#3e3e3e]">
+                        <div class="bg-slate-50 rounded-xl overflow-hidden border border-slate-200">
+                            <div class="flex items-center px-4 py-2 bg-slate-100 border-b border-slate-200">
                                 <div class="flex gap-1.5">
-                                    <div class="w-3 h-3 rounded-full bg-red-500"></div>
-                                    <div class="w-3 h-3 rounded-full bg-yellow-500"></div>
-                                    <div class="w-3 h-3 rounded-full bg-green-500"></div>
+                                    <div class="w-3 h-3 rounded-full bg-red-400"></div>
+                                    <div class="w-3 h-3 rounded-full bg-yellow-400"></div>
+                                    <div class="w-3 h-3 rounded-full bg-green-400"></div>
                                 </div>
-                                <span class="ml-4 text-xs text-slate-400 font-mono">input.txt</span>
+                                <span class="ml-4 text-xs text-slate-500 font-mono">input.txt</span>
                             </div>
-                            <pre class="p-4 text-sm font-mono text-slate-100 overflow-x-auto whitespace-pre-wrap">{{ data.input }}</pre>
+                            <pre class="p-4 text-sm font-mono text-slate-700 overflow-x-auto whitespace-pre-wrap bg-white">{{ data.input }}</pre>
                         </div>
                     </div>
 
@@ -274,49 +274,59 @@
                         </div>
 
                         <!-- TAB 3: FEEDBACK -->
-                        <div v-if="activeTab === 'feedback'" class="space-y-6 animate-fade-in">
+                        <div v-if="activeTab === 'feedback'" class="space-y-5 animate-fade-in">
                             <!-- Complexity Detail -->
-                            <div class="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm">
-                                <h4 class="text-sm font-bold text-slate-800 mb-4">⏱️ 복잡도 상세 분석</h4>
+                            <div class="bg-white p-5 rounded-xl border border-slate-100">
+                                <h4 class="text-sm font-semibold text-slate-800 mb-3 flex items-center gap-2">
+                                    <span class="w-6 h-6 rounded-lg bg-slate-100 flex items-center justify-center text-sm">⏱️</span>
+                                    복잡도 상세 분석
+                                </h4>
                                 <div v-if="data.complexity?.explanation" 
-                                    class="prose prose-sm prose-slate max-w-none text-slate-600 bg-slate-50 p-4 rounded-xl"
+                                    class="prose prose-sm prose-slate max-w-none text-slate-600 leading-relaxed"
                                     v-html="renderMarkdown(data.complexity.explanation)">
                                 </div>
-                                <div v-else class="text-sm text-slate-500 bg-slate-50 p-4 rounded-xl">
+                                <div v-else class="text-sm text-slate-400">
                                     복잡도 설명이 없습니다.
                                 </div>
                             </div>
 
                             <!-- Pitfalls -->
-                            <div v-if="data.pitfalls?.items?.length" class="bg-red-50 p-6 rounded-2xl border border-red-100">
-                                <h4 class="text-red-800 font-bold mb-4 flex items-center gap-2">⚠️ 주의사항 (Pitfalls)</h4>
+                            <div v-if="data.pitfalls?.items?.length" class="bg-white p-5 rounded-xl border border-slate-100">
+                                <h4 class="text-sm font-semibold text-slate-800 mb-3 flex items-center gap-2">
+                                    <span class="w-6 h-6 rounded-lg bg-amber-50 flex items-center justify-center text-sm">⚠️</span>
+                                    주의사항
+                                </h4>
                                 <ul class="space-y-2">
-                                    <li v-for="(item, idx) in data.pitfalls.items" :key="idx" class="flex gap-3 text-red-700 text-sm bg-white/50 p-3 rounded-xl">
-                                        <span class="shrink-0">•</span>
-                                        <span class="prose prose-sm prose-red max-w-none" v-html="renderMarkdown(item)"></span>
+                                    <li v-for="(item, idx) in data.pitfalls.items" :key="idx" class="flex gap-3 text-sm text-slate-600 pl-1">
+                                        <span class="text-amber-500 shrink-0 mt-0.5">•</span>
+                                        <span class="prose prose-sm prose-slate max-w-none leading-relaxed" v-html="renderMarkdown(item)"></span>
                                     </li>
                                 </ul>
                             </div>
 
                             <!-- Refactor -->
-                            <div v-if="data.refactor?.code" class="bg-emerald-50 p-6 rounded-2xl border border-emerald-100">
-                                <h4 class="text-emerald-800 font-bold mb-4 flex items-center gap-2">✨ 리팩토링 제안</h4>
-                                <div class="prose prose-sm max-w-none text-emerald-800 mb-4" v-html="renderMarkdown(data.refactor.explanation)"></div>
-                                <div class="bg-[#282c34] rounded-xl overflow-hidden shadow-sm">
-                                    <div class="px-4 py-2 bg-[#21252b] text-slate-400 text-xs font-mono border-b border-[#181a1f] flex justify-between">
-                                        <span>Refactored.java</span>
-                                        <button @click="copyCode(data.refactor.code)" class="hover:text-white">Copy</button>
+                            <div v-if="data.refactor?.code" class="bg-white p-5 rounded-xl border border-slate-100">
+                                <h4 class="text-sm font-semibold text-slate-800 mb-3 flex items-center gap-2">
+                                    <span class="w-6 h-6 rounded-lg bg-indigo-50 flex items-center justify-center text-sm">✨</span>
+                                    리팩토링 제안
+                                </h4>
+                                <div class="prose prose-sm prose-slate max-w-none text-slate-600 mb-4 leading-relaxed" v-html="renderMarkdown(data.refactor.explanation)"></div>
+                                <div class="bg-slate-50 rounded-lg overflow-hidden border border-slate-200">
+                                    <div class="px-4 py-2 bg-slate-100 text-slate-500 text-xs font-mono border-b border-slate-200 flex justify-between items-center">
+                                        <span>Refactored Code</span>
+                                        <button @click="copyCode(data.refactor.code)" class="hover:text-slate-800 transition-colors">Copy</button>
                                     </div>
-                                    <pre class="m-0 p-4 text-sm font-mono text-emerald-300 overflow-x-auto"><code>{{ data.refactor.code }}</code></pre>
+                                    <pre class="m-0 p-4 text-sm font-mono overflow-x-auto bg-white"><code class="hljs" v-html="highlightCode(data.refactor.code, 'java')"></code></pre>
                                 </div>
                             </div>
 
                             <!-- No Content Fallback -->
                             <div v-if="!data.complexity?.explanation && !data.pitfalls?.items?.length && !data.refactor?.code" 
-                                class="text-center py-10 text-slate-500">
+                                class="text-center py-10 text-slate-400">
                                 <p>피드백 데이터가 없습니다.</p>
                             </div>
                         </div>
+
 
                     </div>
                  </div>
@@ -339,7 +349,7 @@ import {
 } from 'lucide-vue-next';
 import hljs from 'highlight.js/lib/core';
 import java from 'highlight.js/lib/languages/java';
-import 'highlight.js/styles/atom-one-dark.css';
+import 'highlight.js/styles/github.css';
 import {marked} from 'marked';
 
 hljs.registerLanguage('java', java);

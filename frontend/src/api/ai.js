@@ -20,6 +20,9 @@ export const aiApi = {
   // 반례 생성
   generateCounterExample: (request) => http.post('/ai/debug/counter-example', request),
 
+  // 코드 시뮬레이터 (가상 컴파일러)
+  simulate: (request) => http.post('/ai/simulator/run', request),
+
   // Solved.ac 통계
   getTagStats: (userId, limit = 10) => http.get(`/users/${userId}/solvedac/stats/tags?limit=${limit}`),
   getClassStats: (userId) => http.get(`/users/${userId}/solvedac/stats/classes`),
