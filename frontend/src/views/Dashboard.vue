@@ -391,11 +391,7 @@
 
                     <button 
                         @click.stop="requestTutor(record)" 
-                        :disabled="record.runtimeMs > 0 && record.memoryKb > 0"
-                        class="h-12 w-12 rounded-xl flex items-center justify-center border transition-all active:scale-95"
-                        :class="!(record.runtimeMs > 0 && record.memoryKb > 0) 
-                            ? 'bg-amber-50 border-amber-100 text-amber-600 hover:bg-amber-100' 
-                            : 'bg-slate-50 border-slate-100 text-slate-300 cursor-not-allowed'"
+                        class="h-12 w-12 rounded-xl flex items-center justify-center border transition-all active:scale-95 bg-amber-50 border-amber-100 text-amber-600 hover:bg-amber-100"
                         title="AI 튜터에게 질문하기"
                     >
                         <Lightbulb :size="20" />
@@ -456,7 +452,7 @@
         :code="currentRecordCode"
         :record-id="currentDrawerRecord?.id"
         :user-id="user?.id"
-        :solve-status="currentDrawerRecord?.result === '맞았습니다!!' ? 'solved' : 'wrong'"
+        :solve-status="currentDrawerRecord?.result !== 'FAIL' ? 'solved' : 'wrong'"
         :wrong-reason="currentDrawerRecord?.result"
         :problem-number="currentDrawerRecord?.problemNumber"
         :problem-title="currentDrawerRecord?.title"

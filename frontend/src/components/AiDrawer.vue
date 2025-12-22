@@ -368,13 +368,28 @@ const chatLoading = ref(false);
 const quickReplies = ref(['🤔 이 문제 어떻게 접근하지?', '💡 알고리즘 유형이 뭐야?', '🐛 왜 틀렸을까?']);
 
 // Reset chat when drawer closes or hint changes
-watch(() => props.isVisible, (visible) => {
+watch([() => props.isVisible, () => props.solveStatus], ([visible, status]) => {
     if (!visible) {
         chatMessages.value = [];
         chatInput.value = '';
-        quickReplies.value = ['🤔 이 문제 어떻게 접근하지?', '💡 알고리즘 유형이 뭐야?', '🐛 왜 틀렸을까?'];
+        return;
     }
-});
+    
+    // Set initial quick replies based on solve status
+    if (status === 'solved') {
+        quickReplies.value = [
+            '⚡ 시간 복잡도를 더 줄일 수 있나요?', 
+            '🛠 이 코드의 개선점을 알려주세요.',
+            '🧩 다른 방식의 풀이도 있을까요?'
+        ];
+    } else {
+        quickReplies.value = [
+             '🤔 이 문제 어떻게 접근해야 해?', 
+             '💡 어떤 알고리즘을 써야 할까?', 
+             '🐛 왜 틀렸는지 힌트 좀 줘!'
+        ];
+    }
+}, { immediate: true });
 
 const sendChatMessage = async (message) => {
     if (!message?.trim() || chatLoading.value) return;
