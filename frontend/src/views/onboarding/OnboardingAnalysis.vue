@@ -48,7 +48,7 @@
           <div class="text-sm text-slate-500 mt-1">최고 클래스</div>
         </div>
         <div class="bg-white/80 backdrop-blur border border-white/60 rounded-2xl p-5 text-center shadow-sm">
-          <div class="text-3xl font-extrabold text-rose-600">{{ analysisData?.phases?.length || 0 }}</div>
+          <div class="text-3xl font-extrabold text-rose-600">{{ analysisData?.aiAnalysis?.phases?.length || 0 }}</div>
           <div class="text-sm text-slate-500 mt-1">학습 단계</div>
         </div>
       </div>
@@ -62,10 +62,7 @@
           <div class="bg-white/80 backdrop-blur border border-white/60 rounded-3xl p-6 shadow-xl shadow-indigo-500/10">
             <h3 class="text-sm font-bold text-slate-500 uppercase tracking-wide mb-4">알고리즘 역량 분포</h3>
             <div class="aspect-square">
-              <Radar v-if="radarData" :data="radarData" :options="radarOptions" />
-              <div v-else class="flex items-center justify-center h-full text-slate-400">
-                데이터 로딩 중...
-              </div>
+              <AlgorithmRadarChart :stats="topTags" :max-tags="6" />
             </div>
           </div>
 
@@ -75,13 +72,13 @@
               <div class="flex items-center gap-2 text-emerald-600 text-sm font-bold mb-1">
                 <span>💪</span> 핵심 강점
               </div>
-              <div class="text-slate-700 font-medium">{{ analysisData?.keyStrength || '-' }}</div>
+              <div class="text-slate-700 font-medium">{{ analysisData?.aiAnalysis?.keyStrength || '-' }}</div>
             </div>
             <div class="bg-amber-50 border border-amber-200 rounded-2xl p-4">
               <div class="flex items-center gap-2 text-amber-600 text-sm font-bold mb-1">
                 <span>🎯</span> 집중 영역
               </div>
-              <div class="text-slate-700 font-medium">{{ analysisData?.primaryWeakness || '-' }}</div>
+              <div class="text-slate-700 font-medium">{{ analysisData?.aiAnalysis?.primaryWeakness || '-' }}</div>
             </div>
           </div>
         </div>
@@ -91,10 +88,10 @@
           <!-- Overall Assessment -->
           <div class="bg-white/80 backdrop-blur border border-white/60 rounded-3xl p-6 shadow-xl shadow-indigo-500/10">
             <h3 class="text-sm font-bold text-slate-500 uppercase tracking-wide mb-3">📊 AI 종합 분석</h3>
-            <p class="text-slate-700 leading-relaxed">{{ analysisData?.overallAssessment }}</p>
-            <div v-if="analysisData?.personalizedAdvice" class="mt-4 pt-4 border-t border-slate-100">
+            <p class="text-slate-700 leading-relaxed">{{ analysisData?.aiAnalysis?.overallAssessment }}</p>
+            <div v-if="analysisData?.aiAnalysis?.personalizedAdvice" class="mt-4 pt-4 border-t border-slate-100">
               <div class="text-sm text-indigo-600 font-bold mb-1">💡 맞춤 조언</div>
-              <p class="text-slate-600 text-sm">{{ analysisData.personalizedAdvice }}</p>
+              <p class="text-slate-600 text-sm">{{ analysisData?.aiAnalysis?.personalizedAdvice }}</p>
             </div>
           </div>
 
@@ -103,7 +100,7 @@
             <h3 class="text-sm font-bold text-slate-500 uppercase tracking-wide mb-4">📚 학습 로드맵</h3>
             <div class="space-y-4">
               <div 
-                v-for="(phase, idx) in analysisData?.phases || []" 
+                v-for="(phase, idx) in analysisData?.aiAnalysis?.phases || []" 
                 :key="idx"
                 class="flex gap-4"
               >
@@ -112,7 +109,7 @@
                   <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white font-bold text-sm shadow-lg">
                     {{ phase.phase || idx + 1 }}
                   </div>
-                  <div v-if="idx < (analysisData?.phases?.length || 0) - 1" class="w-0.5 flex-1 bg-slate-200 my-2"></div>
+                  <div v-if="idx < (analysisData?.aiAnalysis?.phases?.length || 0) - 1" class="w-0.5 flex-1 bg-slate-200 my-2"></div>
                 </div>
                 
                 <!-- Phase content -->
@@ -169,12 +166,10 @@
 <script setup>
 import { ref, onMounted, computed } from 'vue';
 import { useRouter } from 'vue-router';
-import { Radar } from 'vue-chartjs';
-import { Chart as ChartJS, RadialLinearScale, PointElement, LineElement, Filler, Tooltip } from 'chart.js';
+// Import the new component
+import AlgorithmRadarChart from '../../components/charts/AlgorithmRadarChart.vue';
 import { aiApi } from '../../api/ai';
 import { useAuth } from '../../composables/useAuth';
-
-ChartJS.register(RadialLinearScale, PointElement, LineElement, Filler, Tooltip);
 
 const router = useRouter();
 const { user } = useAuth();
@@ -192,79 +187,7 @@ const highestClass = computed(() => {
   return maxClass ? `Class ${maxClass.classNumber}` : '-';
 });
 
-// Radar Chart Data
-const radarData = computed(() => {
-  if (topTags.value.length === 0) return null;
-  
-  const labels = topTags.value.map(t => {
-    const tagMap = {
-      'implementation': '구현',
-      'dp': 'DP',
-      'greedy': '그리디',
-      'graphs': '그래프',
-      'math': '수학',
-      'data_structures': '자료구조',
-      'string': '문자열',
-      'binary_search': '이분탐색',
-      'bfs': 'BFS',
-      'dfs': 'DFS',
-      'simulation': '시뮬레이션',
-      'sorting': '정렬'
-    };
-    return tagMap[t.tagKey] || t.tagKey;
-  });
-  
-  const maxSolved = Math.max(...topTags.value.map(t => t.solved || 0), 1);
-  const data = topTags.value.map(t => Math.round(((t.solved || 0) / maxSolved) * 100));
-  
-  return {
-    labels,
-    datasets: [{
-      data,
-      backgroundColor: 'rgba(99, 102, 241, 0.15)',
-      borderColor: 'rgba(99, 102, 241, 0.8)',
-      borderWidth: 2,
-      pointBackgroundColor: 'rgba(99, 102, 241, 1)',
-      pointBorderColor: '#fff',
-      pointBorderWidth: 2,
-      pointRadius: 5
-    }]
-  };
-});
-
-const radarOptions = {
-  responsive: true,
-  maintainAspectRatio: true,
-  plugins: {
-    legend: { display: false },
-    tooltip: {
-      callbacks: {
-        label: (ctx) => `${ctx.raw}%`
-      }
-    }
-  },
-  scales: {
-    r: {
-      beginAtZero: true,
-      max: 100,
-      ticks: {
-        stepSize: 25,
-        color: 'rgba(100, 116, 139, 0.6)',
-        backdropColor: 'transparent'
-      },
-      grid: {
-        color: 'rgba(100, 116, 139, 0.15)'
-      },
-      angleLines: {
-        color: 'rgba(100, 116, 139, 0.15)'
-      },
-      pointLabels: {
-        color: 'rgba(51, 65, 85, 0.9)',
-        font: { size: 11, weight: '600' }
-      }
-    }
-  }
-};
+// Radar Chart logic moved to component
 
 onMounted(async () => {
   const userId = user.value?.id || 1;
