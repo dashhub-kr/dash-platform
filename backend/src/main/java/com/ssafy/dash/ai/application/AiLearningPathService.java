@@ -102,6 +102,7 @@ public class AiLearningPathService {
                                 .aiAnalysis(aiResponse)
                                 .currentLevel(request.getCurrentLevel())
                                 .goalLevel(request.getGoalLevel())
+                                .solvedCount(request.getSolvedCount())
                                 .weaknessTags(request.getWeaknessTags())
                                 .strengthTags(request.getStrengthTags())
                                 .classStats(request.getClassStats())
@@ -149,10 +150,8 @@ public class AiLearningPathService {
                                                 .build())
                                 .toList();
 
-                // 총 풀이한 문제 수 (tagStats의 solved 합계)
-                int totalSolved = tagStats.stream()
-                                .mapToInt(UserTagStat::getSolved)
-                                .sum();
+                // solved.ac API에서 가져온 정확한 solvedCount 사용
+                int totalSolved = user.getSolvedCount() != null ? user.getSolvedCount() : 0;
 
                 return LearningPathRequest.builder()
                                 .currentLevel(currentLevel)

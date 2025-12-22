@@ -54,7 +54,7 @@ class UserSkillAnalysisServiceTest {
     private User createSampleUser() {
         User user = User.create("testuser", "test@test.com",
                 java.time.LocalDateTime.now(), "GITHUB", "12345", null);
-        user.updateSolvedacProfile("testhandle", 13, 1234, 3);
+        user.updateSolvedacProfile("testhandle", 13, 1234, 3, 100);
         return user;
     }
 
@@ -209,5 +209,5 @@ class UserSkillAnalysisServiceTest {
                     .hasMessageContaining("User not found");
         }
     }
-    
+
 }
