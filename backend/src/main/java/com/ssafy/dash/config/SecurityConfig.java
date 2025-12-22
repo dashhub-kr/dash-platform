@@ -49,7 +49,9 @@ public class SecurityConfig {
                                                                 "/api/users/*/analysis/**", // Analysis API endpoints
                                                                                             // for
                                                                                             // testing
-                                                                "/api/ai/**" // AI endpoints for testing
+                                                                "/api/ai/**", // AI endpoints for testing
+                                                                "/api/onboarding/solvedac/verify" // Solvedac handle
+                                                                                                  // verification
                                                 ).permitAll()
                                                 .anyRequest().authenticated())
                                 .exceptionHandling(exception -> exception
