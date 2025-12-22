@@ -15,18 +15,16 @@ import java.util.List;
 /**
  * AI API 컨트롤러
  */
-@Tag(name = "AI", description = "AI 기반 코드 분석, 힌트, 학습 경로, 스타일 분석, 대화형 튜터 API")
+@Tag(name = "AI", description = "AI 기반 코드 분석, 학습 경로, 스타일 분석, 대화형 튜터 API")
 @RestController
 @RequestMapping("/api/ai")
 @RequiredArgsConstructor
 public class AiController {
 
         private final CodeReviewService codeReviewService;
-        private final HintService hintService;
+        private final TutorChatService tutorChatService;
         private final AiLearningPathService learningPathService;
         private final CodingStyleService codingStyleService;
-
-        private final TutorService tutorService;
         private final DebugService debugService;
 
         @Operation(summary = "코드 분석 요청", description = "알고리즘 풀이 코드를 AI로 분석합니다")
@@ -48,15 +46,53 @@ public class AiController {
                                 .orElse(ResponseEntity.notFound().build());
         }
 
-        @Operation(summary = "힌트 요청", description = "문제에 대한 맞춤형 힌트를 생성합니다 (레벨 1: 유형, 2: 접근법, 3: 상세)")
-        @PostMapping("/hint")
-        public ResponseEntity<HintResponse> getHint(@RequestBody HintRequest request) {
-                HintResponse response = hintService.generateHint(
-                                request.userId(),
-                                request.problemNumber(),
-                                request.problemTitle(),
-                                request.level());
-                return ResponseEntity.ok(response);
+        @Operation(summary = "AI 튜터 대화", description = "맞은 문제/틀린 문제 모두 지원하는 대화형 AI 튜터")
+        @PostMapping("/tutor/chat")
+        public ResponseEntity<HintChatResponseDto> hintChat(@RequestBody HintChatRequestDto request) {
+                // recordId가 있으면 DB에서 조회, 없으면 기존 방식 사용
+                HintChatResponse response;
+                if (request.recordId() != null) {
+                        List<HintChatRequest.ChatMessage> history = request.history() != null
+                                        ? request.history().stream()
+                                                        .map(m -> HintChatRequest.ChatMessage.builder()
+                                                                        .role(m.role())
+                                                                        .content(m.content())
+                                                                        .build())
+                                                        .toList()
+                                        : List.of();
+
+                        response = tutorChatService.hintChatWithRecord(
+                                        request.userId(),
+                                        request.recordId(),
+                                        request.message(),
+                                        request.solveStatus(),
+                                        request.wrongReason(),
+                                        history);
+                } else {
+                        // Fallback: 기존 방식 (deprecated)
+                        HintChatRequest aiRequest = HintChatRequest.builder()
+                                        .message(request.message())
+                                        .problemNumber(request.problemNumber())
+                                        .problemTitle(request.problemTitle())
+                                        .code(request.code())
+                                        .language(request.language())
+                                        .history(request.history() != null ? request.history().stream()
+                                                        .map(m -> HintChatRequest.ChatMessage.builder()
+                                                                        .role(m.role())
+                                                                        .content(m.content())
+                                                                        .build())
+                                                        .toList() : List.of())
+                                        .userContext(request.userContext() != null ? HintChatRequest.UserContext
+                                                        .builder()
+                                                        .tierName(request.userContext().tierName())
+                                                        .solvedCount(request.userContext().solvedCount())
+                                                        .weakTags(request.userContext().weakTags())
+                                                        .build() : null)
+                                        .build();
+                        response = tutorChatService.hintChat(aiRequest);
+                }
+
+                return ResponseEntity.ok(HintChatResponseDto.from(response));
         }
 
         @Operation(summary = "AI 학습 경로", description = "분석 데이터 기반 개인화 학습 경로를 생성합니다")
@@ -71,20 +107,6 @@ public class AiController {
         public ResponseEntity<CodingStyleResponse> getCodingStyle(@PathVariable Long userId) {
                 CodingStyleResponse response = codingStyleService.analyzeCodingStyle(userId);
                 return ResponseEntity.ok(response);
-        }
-
-        @Operation(summary = "튜터 대화 (세션 기반)", description = "DB에 대화 저장. sessionId가 null이면 새 세션 생성, 응답에 sessionId 포함")
-        @PostMapping("/tutor/chat")
-        public ResponseEntity<TutorSessionResponseDto> chat(@RequestBody TutorChatRequestDto request) {
-                TutorService.TutorSessionResponse response = tutorService.chat(
-                                request.userId(),
-                                request.sessionId(),
-                                request.message(),
-                                request.problemNumber(),
-                                request.code());
-
-                return ResponseEntity.ok(TutorSessionResponseDto.from(response));
-
         }
 
         @Operation(summary = "반례 생성", description = "오답 코드에 대한 반례를 생성합니다")
@@ -128,21 +150,42 @@ public class AiController {
                         String code) {
         }
 
-        public record TutorSessionResponseDto(
-                        String sessionId,
+        // === AI Tutor Chat DTOs ===
+
+        public record HintChatRequestDto(
+                        Long userId, // 사용자 ID (필수)
+                        Long recordId, // 알고리즘 기록 ID (권장 - DB에서 코드/문제 조회)
+                        String message, // 사용자 메시지 (필수)
+                        String solveStatus, // "solved" | "wrong" (필수)
+                        String wrongReason, // 틀린 이유 (시간초과, 틀렸습니다 등)
+                        List<ChatMessageDto> history,
+                        // Fallback fields (recordId가 없을 때 사용)
+                        String problemNumber,
+                        String problemTitle,
+                        String code,
+                        String language,
+                        UserContextDto userContext) {
+        }
+
+        public record ChatMessageDto(String role, String content) {
+        }
+
+        public record UserContextDto(String tierName, int solvedCount, List<String> weakTags) {
+        }
+
+        public record HintChatResponseDto(
                         String reply,
                         String teachingStyle,
                         List<String> followUpQuestions,
-                        String conceptExplanation,
+                        List<String> relatedConcepts,
                         String encouragement) {
 
-                public static TutorSessionResponseDto from(TutorService.TutorSessionResponse response) {
-                        return new TutorSessionResponseDto(
-                                        response.getSessionId(),
+                public static HintChatResponseDto from(HintChatResponse response) {
+                        return new HintChatResponseDto(
                                         response.getReply(),
                                         response.getTeachingStyle(),
                                         response.getFollowUpQuestions(),
-                                        response.getConceptExplanation(),
+                                        response.getRelatedConcepts(),
                                         response.getEncouragement());
                 }
         }

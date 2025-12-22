@@ -26,6 +26,7 @@ public class LearningDashboardResponse {
     // 대시보드 시각화를 위한 통계 데이터 (from DB)
     private String currentLevel;
     private String goalLevel;
+    private int solvedCount;
     private List<LearningPathRequest.TagStats> weaknessTags;
     private List<LearningPathRequest.TagStats> strengthTags;
     private List<LearningPathRequest.ClassStats> classStats;

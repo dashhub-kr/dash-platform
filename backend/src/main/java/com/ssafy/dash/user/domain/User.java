@@ -27,6 +27,7 @@ public class User {
     private Integer solvedacTier;
     private Integer solvedacRating;
     private Integer solvedacClass;
+    private Integer solvedCount;
     private LocalDateTime statsLastSyncedAt;
 
     // 랜덤 디펜스 필드
@@ -74,11 +75,13 @@ public class User {
         this.studyId = studyId;
     }
 
-    public void updateSolvedacProfile(String handle, Integer tier, Integer rating, Integer classLevel) {
+    public void updateSolvedacProfile(String handle, Integer tier, Integer rating, Integer classLevel,
+            Integer solvedCount) {
         this.solvedacHandle = handle;
         this.solvedacTier = tier;
         this.solvedacRating = rating;
         this.solvedacClass = classLevel;
+        this.solvedCount = solvedCount;
         this.statsLastSyncedAt = LocalDateTime.now();
     }
 

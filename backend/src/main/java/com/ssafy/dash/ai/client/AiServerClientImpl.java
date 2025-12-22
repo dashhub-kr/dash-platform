@@ -50,30 +50,6 @@ public class AiServerClientImpl implements AiServerClient {
     }
 
     @Override
-    public HintResponse generateHint(HintRequest request) {
-        try {
-            log.debug("Requesting hint for problem: {}, level: {}",
-                    request.getProblemNumber(), request.getLevel());
-
-            return restClient.post()
-                    .uri(baseUrl + "/hint")
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .body(request)
-                    .retrieve()
-                    .body(HintResponse.class);
-        } catch (Exception e) {
-            log.warn("Failed to generate hint: {}. Using fallback.", e.getMessage());
-            return HintResponse.builder()
-                    .level(request.getLevel())
-                    .hint("AI 서버 연결 실패: 스스로 생각해보는 것도 좋은 공부가 됩니다! (임시 힌트)")
-                    .relatedConcepts(java.util.List.of("Algorithm", "Problem Solving"))
-                    .encouragement("서버가 잠시 쉬고 있네요. 화이팅!")
-                    .nextStepSuggestion("서버가 돌아오면 더 좋은 힌트를 드릴게요.")
-                    .build();
-        }
-    }
-
-    @Override
     public LearningPathResponse generateLearningPath(LearningPathRequest request) {
         try {
             log.debug("Requesting learning path for level: {}", request.getCurrentLevel());
@@ -112,26 +88,6 @@ public class AiServerClientImpl implements AiServerClient {
                     .mbtiCode("NONE")
                     .nickname("연결되지 않은 코더")
                     .summary("AI 서버와 연결할 수 없습니다.")
-                    .build();
-        }
-    }
-
-    @Override
-    public TutorChatResponse chat(TutorChatRequest request) {
-        try {
-            log.debug("Sending chat message to tutor");
-
-            return restClient.post()
-                    .uri(baseUrl + "/tutor/chat")
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .body(request)
-                    .retrieve()
-                    .body(TutorChatResponse.class);
-        } catch (Exception e) {
-            log.warn("Failed to chat with tutor: {}. Using fallback.", e.getMessage());
-            return TutorChatResponse.builder()
-                    .reply("죄송해요, AI 선생님이 잠시 자리를 비웠어요. 다시 시도해주세요.")
-                    .teachingStyle("socratic")
                     .build();
         }
     }
@@ -176,6 +132,29 @@ public class AiServerClientImpl implements AiServerClient {
                     .timeComplexity("Unknown")
                     .spaceComplexity("Unknown")
                     .analysis("시뮬레이션을 수행할 수 없습니다.")
+                    .build();
+        }
+    }
+
+    @Override
+    public HintChatResponse hintChat(HintChatRequest request) {
+        try {
+            log.debug("Sending hint chat for problem: {}", request.getProblemNumber());
+
+            return restClient.post()
+                    .uri(baseUrl + "/tutor/chat")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .body(request)
+                    .retrieve()
+                    .body(HintChatResponse.class);
+        } catch (Exception e) {
+            log.warn("Failed to hint chat: {}. Using fallback.", e.getMessage());
+            return HintChatResponse.builder()
+                    .reply("죄송해요, AI 튜터가 잠시 자리를 비웠어요. 다시 시도해주세요.")
+                    .teachingStyle("socratic")
+                    .followUpQuestions(java.util.List.of())
+                    .relatedConcepts(java.util.List.of())
+                    .encouragement("잠시 후 다시 시도해주세요!")
                     .build();
         }
     }

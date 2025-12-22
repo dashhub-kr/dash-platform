@@ -26,6 +26,7 @@
         provider_id = #{providerId}, avatar_url = #{avatarUrl}, study_id = #{studyId},
         solvedac_handle = #{solvedacHandle}, solvedac_tier = #{solvedacTier},
         solvedac_rating = #{solvedacRating}, solvedac_class = #{solvedacClass},
+        solved_count = #{solvedCount},
         stats_last_synced_at = #{statsLastSyncedAt},
         defense_type = #{defenseType},
         defense_problem_id = #{defenseProblemId},

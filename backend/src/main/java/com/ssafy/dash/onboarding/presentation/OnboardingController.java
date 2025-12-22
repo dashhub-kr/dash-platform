@@ -1,21 +1,35 @@
 package com.ssafy.dash.onboarding.presentation;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.ssafy.dash.oauth.presentation.security.CustomOAuth2User;
+import com.ssafy.dash.oauth.application.OAuthTokenService;
+import com.ssafy.dash.oauth.domain.UserOAuthToken;
 import com.ssafy.dash.onboarding.application.OnboardingService;
 import com.ssafy.dash.onboarding.application.dto.command.RepositorySetupCommand;
 import com.ssafy.dash.onboarding.application.dto.result.RepositorySetupResult;
 import com.ssafy.dash.onboarding.presentation.dto.request.RepositorySetupRequest;
 import com.ssafy.dash.onboarding.presentation.dto.response.RepositorySetupResponse;
+import com.ssafy.dash.onboarding.presentation.dto.response.RepositorySearchResponse;
+import com.ssafy.dash.onboarding.presentation.dto.response.SolvedacVerifyResponse;
+import com.ssafy.dash.external.solvedac.SolvedacApiClient;
+import com.ssafy.dash.external.solvedac.dto.SolvedacUserResponse;
+import com.ssafy.dash.external.solvedac.SolvedacApiException;
+import com.ssafy.dash.github.domain.GitHubClient;
+import com.ssafy.dash.github.domain.RepositoryInfo;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -28,10 +42,53 @@ public class OnboardingController {
 
     private final OnboardingService onboardingService;
     private final SolvedacSyncService solvedacSyncService;
+    private final SolvedacApiClient solvedacApiClient;
+    private final GitHubClient gitHubClient;
+    private final OAuthTokenService oAuthTokenService;
 
-    public OnboardingController(OnboardingService onboardingService, SolvedacSyncService solvedacSyncService) {
+    public OnboardingController(OnboardingService onboardingService, SolvedacSyncService solvedacSyncService,
+            SolvedacApiClient solvedacApiClient, GitHubClient gitHubClient, OAuthTokenService oAuthTokenService) {
         this.onboardingService = onboardingService;
         this.solvedacSyncService = solvedacSyncService;
+        this.solvedacApiClient = solvedacApiClient;
+        this.gitHubClient = gitHubClient;
+        this.oAuthTokenService = oAuthTokenService;
+    }
+
+    @GetMapping("/solvedac/verify")
+    @Operation(summary = "Solved.ac 핸들 검증", description = "Solved.ac 아이디가 유효한지 확인하고 유저 정보를 반환합니다.")
+    public ResponseEntity<SolvedacVerifyResponse> verifySolvedacHandle(
+            @RequestParam String handle) {
+        try {
+            SolvedacUserResponse userResponse = solvedacApiClient.getUserInfo(handle.trim());
+            return ResponseEntity.ok(SolvedacVerifyResponse.from(userResponse));
+        } catch (SolvedacApiException e) {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
+    @GetMapping("/repository/search")
+    @Operation(summary = "GitHub 저장소 검색", description = "사용자의 GitHub 저장소 중 검색어에 매칭되는 목록을 반환합니다.")
+    public ResponseEntity<List<RepositorySearchResponse>> searchRepositories(
+            @Parameter(hidden = true) @AuthenticationPrincipal OAuth2User principal,
+            @RequestParam(required = false, defaultValue = "") String q) {
+        if (principal instanceof CustomOAuth2User customUser) {
+            try {
+                UserOAuthToken token = oAuthTokenService.requireValidAccessToken(customUser.getUserId());
+                List<RepositoryInfo> repos = gitHubClient.listUserRepositories(token.getAccessToken());
+
+                String query = q.trim().toLowerCase();
+                List<RepositorySearchResponse> filtered = repos.stream()
+                        .filter(repo -> query.isEmpty() || repo.name().toLowerCase().contains(query))
+                        .map(RepositorySearchResponse::from)
+                        .collect(Collectors.toList());
+
+                return ResponseEntity.ok(filtered);
+            } catch (Exception e) {
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+            }
+        }
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
     }
 
     @PostMapping("/solvedac")

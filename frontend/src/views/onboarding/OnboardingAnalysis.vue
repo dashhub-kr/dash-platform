@@ -180,7 +180,7 @@ const classStats = ref([]);
 
 // Computed
 const topTags = computed(() => tagStats.value.slice(0, 6));
-const totalSolved = computed(() => tagStats.value.reduce((sum, t) => sum + (t.solved || 0), 0));
+const totalSolved = computed(() => analysisData.value?.solvedCount || 0);
 const highestClass = computed(() => {
   const completedClasses = classStats.value.filter(c => c.essentialSolved > 0);
   const maxClass = completedClasses.reduce((max, c) => c.classNumber > (max?.classNumber || 0) ? c : max, null);

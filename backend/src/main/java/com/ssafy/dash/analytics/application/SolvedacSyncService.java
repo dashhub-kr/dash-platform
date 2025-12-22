@@ -45,7 +45,7 @@ public class SolvedacSyncService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("User not found: " + userId));
         user.updateSolvedacProfile(handle, userInfo.getTier(),
-                userInfo.getRating(), userInfo.getClassLevel());
+                userInfo.getRating(), userInfo.getClassLevel(), userInfo.getSolvedCount());
         userRepository.update(user);
 
         // 3. 클래스 통계 동기화

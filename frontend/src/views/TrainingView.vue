@@ -185,115 +185,7 @@
         </div>
       </div>
 
-      <!-- 3. AI 튜터 -->
-      <div v-if="currentTab === 'tutor'" class="animate-fade-in h-[calc(100vh-180px)] min-h-[600px] flex flex-col md:flex-row gap-4">
-        <!-- 코드 에디터 -->
-        <div class="flex-1 bg-[#1e1e1e] rounded-2xl overflow-hidden flex flex-col shadow-2xl relative min-h-[400px]">
-          <!-- 툴바 -->
-          <div class="h-10 bg-[#252526] border-b border-[#333] flex items-center px-4 justify-between shrink-0">
-            <div class="flex gap-2">
-              <span class="w-3 h-3 rounded-full bg-red-500"></span>
-              <span class="w-3 h-3 rounded-full bg-amber-500"></span>
-              <span class="w-3 h-3 rounded-full bg-green-500"></span>
-            </div>
-            <div class="text-xs text-slate-400 font-mono">MyCode.java</div>
-            <button @click="runSimulation" :disabled="isSimulating" class="text-xs bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 text-white px-3 py-1.5 rounded flex items-center gap-1 font-bold transition-colors">
-              <Play v-if="!isSimulating" :size="12" fill="currentColor" /> 
-              <Loader2 v-else :size="12" class="animate-spin" />
-              {{ isSimulating ? 'Analyzing...' : 'Run' }}
-            </button>
-          </div>
-          
-          <!-- 에디터 -->
-          <div class="flex-1 relative font-mono text-sm bg-[#1e1e1e]">
-            <textarea 
-              v-model="editorCode"
-              class="w-full h-full bg-transparent text-slate-300 p-4 resize-none focus:outline-none font-mono leading-relaxed"
-              spellcheck="false"
-            ></textarea>
-            <div v-if="!editorCode" class="absolute inset-0 p-4 pointer-events-none text-slate-600">
-              // 코드를 작성하고 Run 버튼을 눌러보세요.
-            </div>
-          </div>
 
-          <!-- 터미널 -->
-          <div class="h-1/3 bg-[#1e1e1e] border-t border-[#333] flex flex-col shrink-0">
-            <div class="px-4 py-1 text-xs text-slate-400 border-b border-[#333] bg-[#252526] flex justify-between items-center">
-              <span>TERMINAL</span>
-              <button @click="terminalOutput = ''" class="hover:text-white">Clear</button>
-            </div>
-            <div class="p-4 font-mono text-sm text-slate-300 flex-1 overflow-auto whitespace-pre-wrap">
-              <div v-if="terminalOutput" v-html="renderMarkdown(terminalOutput)"></div>
-              <div v-else class="text-slate-600">$ Ready...</div>
-            </div>
-          </div>
-        </div>
-
-        <!-- AI 채팅 -->
-        <div class="w-full md:w-[380px] flex flex-col bg-white rounded-2xl shadow-xl border border-slate-200 overflow-hidden h-[600px] md:h-auto">
-          <!-- 헤더 -->
-          <div class="h-14 bg-indigo-600 flex items-center px-4 justify-between shrink-0">
-            <div class="flex items-center gap-3">
-              <div class="w-8 h-8 rounded-full bg-white flex items-center justify-center text-xl">
-                {{ tutorEmotion }}
-              </div>
-              <div>
-                <div class="text-white font-bold text-sm">AI 소크라테스</div>
-                <div class="text-indigo-200 text-xs flex items-center gap-1">
-                  <span class="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse"></span> Online
-                </div>
-              </div>
-            </div>
-            <button @click="resetChat" class="text-indigo-200 hover:text-white" title="초기화">
-              <RotateCcw :size="18"/>
-            </button>
-          </div>
-
-          <!-- 채팅 바디 -->
-          <div class="flex-1 bg-slate-50 p-4 overflow-y-auto space-y-4" ref="chatContainer">
-            <div v-for="(msg, idx) in chatMessages" :key="idx" class="flex gap-3" :class="msg.role === 'user' ? 'flex-row-reverse' : ''">
-              <div v-if="msg.role === 'ai'" class="w-8 h-8 rounded-full bg-indigo-100 flex-shrink-0 flex items-center justify-center text-indigo-600 text-xs font-bold">AI</div>
-              
-              <div 
-                class="p-3 rounded-2xl shadow-sm text-sm max-w-[85%] border"
-                :class="msg.role === 'user' ? 'bg-indigo-600 text-white rounded-tr-none border-indigo-600' : 'bg-white text-slate-700 rounded-tl-none border-slate-100'"
-              >
-                <div v-if="msg.isLoading" class="flex gap-1 justify-center py-1">
-                  <span class="w-1.5 h-1.5 bg-current rounded-full animate-bounce"></span>
-                  <span class="w-1.5 h-1.5 bg-current rounded-full animate-bounce delay-100"></span>
-                  <span class="w-1.5 h-1.5 bg-current rounded-full animate-bounce delay-200"></span>
-                </div>
-                <div v-else class="prose prose-sm max-w-none" :class="msg.role === 'user' ? 'prose-invert' : 'prose-slate'" v-html="renderMarkdown(msg.content)"></div>
-              </div>
-            </div>
-          </div>
-
-          <!-- 빠른 답변 -->
-          <div class="px-4 pt-2 pb-2 bg-white flex gap-2 overflow-x-auto no-scrollbar border-t border-slate-50">
-            <button v-for="reply in quickReplies" :key="reply" @click="sendQuickReply(reply)" 
-              class="px-3 py-1.5 rounded-full bg-slate-100 hover:bg-indigo-50 text-xs text-slate-600 hover:text-indigo-600 transition-colors whitespace-nowrap border border-slate-200">
-              {{ reply }}
-            </button>
-          </div>
-
-          <!-- 입력 -->
-          <div class="p-4 bg-white border-t border-slate-100">
-            <div class="relative">
-              <input 
-                v-model="userMessage" 
-                @keyup.enter="sendMessage"
-                type="text" 
-                placeholder="질문을 입력하세요..." 
-                class="w-full pl-4 pr-10 py-3 rounded-xl bg-slate-50 border border-slate-200 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 outline-none text-sm transition-all"
-                :disabled="isChatting"
-              />
-              <button @click="sendMessage" :disabled="isChatting || !userMessage.trim()" class="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-700 disabled:bg-slate-300 text-white transition-colors">
-                <Send :size="16" />
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
     </div>
   </div>
 </template>
@@ -315,13 +207,11 @@ import { marked } from 'marked';
 const { user } = useAuth();
 const currentTab = ref('roadmap');
 const isSimulating = ref(false);
-const isChatting = ref(false);
 const isLoadingVideos = ref(false);
 
 const tabs = [
     { id: 'roadmap', label: '⛳️ 로드맵' },
-    { id: 'videos', label: '📺 강의실' },
-    { id: 'tutor', label: '🤖 AI 튜터' }
+    { id: 'videos', label: '📺 강의실' }
 ];
 
 // 1. Roadmap Data
@@ -333,18 +223,6 @@ const allTagStats = ref([]);
 const searchKeyword = ref('');
 const recommendedKeywords = ref(['Dynamic Programming', 'BFS', 'Dijkstra', 'Greedy']);
 const videos = ref([]);
-
-// 3. Tutor Data
-const editorCode = ref('public class Solution {\n    public static void main(String[] args) {\n        System.out.println("Hello DASH!");\n    }\n}');
-const terminalOutput = ref('');
-const chatMessages = ref([
-    { role: 'ai', content: '안녕하세요! **AI 소크라테스**입니다. 👋\n\n알고리즘 공부 중 막히는 부분을 물어보세요!' }
-]);
-const userMessage = ref('');
-const tutorEmotion = ref('🤖');
-const quickReplies = ref(['💡 힌트', '🐛 버그', '📚 개념 설명', '⏰ 복잡도']);
-const chatContainer = ref(null);
-let sessionId = null;
 
 // Methods
 onMounted(async () => {
@@ -416,90 +294,7 @@ const openVideo = (videoId) => {
     window.open(`https://www.youtube.com/watch?v=${videoId}`, '_blank');
 };
 
-const scrollToBottom = () => {
-    nextTick(() => {
-        if (chatContainer.value) {
-            chatContainer.value.scrollTop = chatContainer.value.scrollHeight;
-        }
-    });
-};
 
-const resetChat = () => {
-    chatMessages.value = [{ role: 'ai', content: '대화가 초기화되었습니다. 무엇을 도와드릴까요?' }];
-    sessionId = null;
-};
-
-const sendMessage = async () => {
-    if (!userMessage.value.trim() || isChatting.value) return;
-
-    const msg = userMessage.value;
-    userMessage.value = '';
-    
-    chatMessages.value.push({ role: 'user', content: msg });
-    scrollToBottom();
-
-    isChatting.value = true;
-    chatMessages.value.push({ role: 'ai', content: '', isLoading: true });
-    tutorEmotion.value = '🤔';
-    scrollToBottom();
-
-    try {
-        const payload = {
-            userId: user.value?.id || 1,
-            sessionId: sessionId,
-            message: msg,
-            code: editorCode.value
-        };
-
-        const res = await aiApi.chat(payload);
-        chatMessages.value.pop();
-        
-        sessionId = res.data.sessionId;
-        chatMessages.value.push({ role: 'ai', content: res.data.reply });
-        tutorEmotion.value = '🎓';
-
-        if (res.data.followUpQuestions?.length > 0) {
-            quickReplies.value = res.data.followUpQuestions;
-        }
-    } catch (e) {
-        chatMessages.value.pop();
-        chatMessages.value.push({ role: 'ai', content: '오류가 발생했습니다. 다시 시도해주세요.' });
-        tutorEmotion.value = '🤖';
-    } finally {
-        isChatting.value = false;
-        scrollToBottom();
-    }
-};
-
-const sendQuickReply = (text) => {
-    userMessage.value = text;
-    sendMessage();
-};
-
-const runSimulation = async () => {
-    if (isSimulating.value) return;
-    
-    isSimulating.value = true;
-    terminalOutput.value = '$ Compiling...\n';
-    
-    try {
-        const payload = { code: editorCode.value, language: 'java' };
-        const res = await aiApi.simulate(payload);
-        const data = res.data;
-
-        let output = '';
-        if (data.stdout) output += `[Output]\n${data.stdout}\n\n`;
-        if (data.stderr) output += `[Error]\n${data.stderr}\n\n`;
-        output += `[Analysis]\nTime: ${data.timeComplexity}\nSpace: ${data.spaceComplexity}`;
-
-        terminalOutput.value = output;
-    } catch (e) {
-        terminalOutput.value = '$ Error: Failed to run simulation.';
-        console.error(e);
-    } finally {
-        isSimulating.value = false;
-    }
-};
 
 const renderMarkdown = (text) => marked(text || '');
 

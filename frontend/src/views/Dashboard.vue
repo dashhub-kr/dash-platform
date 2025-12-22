@@ -390,13 +390,13 @@
                     </button>
 
                     <button 
-                        @click.stop="requestHint(record)" 
+                        @click.stop="requestTutor(record)" 
                         :disabled="record.runtimeMs > 0 && record.memoryKb > 0"
                         class="h-12 w-12 rounded-xl flex items-center justify-center border transition-all active:scale-95"
                         :class="!(record.runtimeMs > 0 && record.memoryKb > 0) 
                             ? 'bg-amber-50 border-amber-100 text-amber-600 hover:bg-amber-100' 
                             : 'bg-slate-50 border-slate-100 text-slate-300 cursor-not-allowed'"
-                        title="힌트 보기"
+                        title="AI 튜터에게 질문하기"
                     >
                         <Lightbulb :size="20" />
                     </button>
@@ -454,9 +454,13 @@
         :loading="drawerLoading"
         :data="drawerData"
         :code="currentRecordCode"
+        :record-id="currentDrawerRecord?.id"
+        :user-id="user?.id"
+        :solve-status="currentDrawerRecord?.result === '맞았습니다!!' ? 'solved' : 'wrong'"
+        :wrong-reason="currentDrawerRecord?.result"
+        :problem-number="currentDrawerRecord?.problemNumber"
+        :problem-title="currentDrawerRecord?.title"
         @close="closeDrawer"
-        @request-hint-level="requestHintWithLevel"
-        @back-to-selection="backToHintSelection"
       />
     </div>
 
@@ -833,11 +837,11 @@ const getFileExtension = (language) => {
 
 const currentRecord = ref(null);
 
-const requestHint = (record) => {
+const requestTutor = (record) => {
     currentDrawerRecord.value = record;  // Set for Context Card
     currentRecord.value = record;
-    drawerType.value = 'hint';
-    drawerTitle.value = `스마트 힌트 · ${record.title}`;
+    drawerType.value = 'tutor';
+    drawerTitle.value = `AI 튜터 · ${record.title}`;
     showDrawer.value = true;
     drawerData.value = null;
 };
@@ -877,35 +881,7 @@ const closeDrawer = () => {
     }
 };
 
-const requestHintWithLevel = async (level) => {
-    if (!currentRecord.value) return;
-    
-    drawerLoading.value = true;
-    try {
-        const res = await http.post('/ai/hint', {
-            userId: currentRecord.value.userId, 
-            problemNumber: String(currentRecord.value.problemNumber),
-            problemTitle: currentRecord.value.title,
-            level: level
-        });
-        drawerData.value = { ...res.data, level };
-        
-        // Refresh study data to update acorn count
-        if (user.value?.studyId) {
-            const studyRes = await studyApi.get(user.value.studyId);
-            studyData.value = studyRes.data;
-        }
-    } catch(e) {
-        alert('도토리가 부족하거나 오류가 발생했습니다.');
-        console.error(e);
-    } finally {
-        drawerLoading.value = false;
-    }
-};
 
-const backToHintSelection = () => {
-    drawerData.value = null;
-};
 
 const openModal = (type, title) => {
     modalType.value = type;

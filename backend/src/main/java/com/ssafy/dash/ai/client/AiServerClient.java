@@ -16,14 +16,6 @@ public interface AiServerClient {
     CodeReviewResponse analyzeCode(CodeReviewRequest request);
 
     /**
-     * 힌트 생성 요청
-     * 
-     * @param request 힌트 요청 정보 (문제, 레벨, 사용자 컨텍스트)
-     * @return 레벨별 힌트
-     */
-    HintResponse generateHint(HintRequest request);
-
-    /**
      * AI 개인화 학습 경로 생성
      * 
      * @param request 분석 데이터 기반 학습 경로 요청
@@ -40,14 +32,6 @@ public interface AiServerClient {
     CodingStyleResponse analyzeCodingStyle(CodingStyleRequest request);
 
     /**
-     * 대화형 튜터 채팅
-     * 
-     * @param request 대화 요청 (메시지, 히스토리, 컨텍스트)
-     * @return 튜터 응답
-     */
-    TutorChatResponse chat(TutorChatRequest request);
-
-    /**
      * 반례 생성 요청
      * 
      * @param request 반례 요청 정보 (문제, 코드)
@@ -59,4 +43,12 @@ public interface AiServerClient {
      * 코드 시뮬레이션 (가상 컴파일러)
      */
     AiSimulatorResponse simulate(AiSimulatorRequest request);
+
+    /**
+     * 힌트 대화
+     * 
+     * @param request 힌트 대화 요청 (메시지, 히스토리, 컨텍스트)
+     * @return 힌트 대화 응답
+     */
+    HintChatResponse hintChat(HintChatRequest request);
 }
