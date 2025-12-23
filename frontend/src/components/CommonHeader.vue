@@ -49,65 +49,94 @@
         <!-- 로그인 시 앱 네비게이션 -->
         <nav
           v-else-if="authChecked && user"
-          class="hidden sm:flex items-center gap-6 pointer-events-auto"
+          class="hidden sm:flex items-center gap-1 pointer-events-auto"
         >
+          <!-- Dashboard -->
           <router-link
-            to="/training"
-            class="nav-tooltip flex items-center text-slate-500 hover:text-indigo-600 transition-colors"
-            active-class="text-indigo-600"
-            data-tooltip="트레이닝"
+            to="/dashboard"
+            class="flex items-center gap-2 px-3 py-2 rounded-xl text-sm font-bold text-slate-500 hover:bg-slate-100 hover:text-indigo-600 transition-all whitespace-nowrap"
+            active-class="bg-indigo-50 text-indigo-600"
           >
-            <School :size="24" />
+            <LayoutGrid :size="18" />
+            <span>대시보드</span>
           </router-link>
-          <router-link
-            to="/mockexam"
-            class="nav-tooltip flex items-center text-slate-500 hover:text-amber-600 transition-colors"
-            active-class="text-amber-600"
-            data-tooltip="모의고사"
-          >
-            <FileText :size="24" />
-          </router-link>
-          <router-link
-            to="/defense"
-            class="nav-tooltip flex items-center text-slate-500 hover:text-rose-600 transition-colors"
-            active-class="text-rose-600"
-            data-tooltip="랜덤 디펜스"
-          >
-            <Shield :size="24" />
-          </router-link>
-          <router-link
-            to="/boards"
-            class="nav-tooltip flex items-center text-slate-500 hover:text-indigo-600 transition-colors"
-            active-class="text-indigo-600"
-            data-tooltip="게시판"
-          >
-            <MessageSquare :size="24" />
-          </router-link>
-          <!-- SimCity 임시 비활성화 -->
-          <router-link
-            to="/study/analysis"
-            class="nav-tooltip flex items-center text-slate-500 hover:text-teal-600 transition-colors"
-            active-class="text-teal-600"
-            data-tooltip="팀 분석"
-          >
-            <PieChart :size="24" />
-          </router-link>
-          <router-link
-            to="/study/missions"
-            class="nav-tooltip flex items-center text-slate-500 hover:text-emerald-600 transition-colors"
-            active-class="text-emerald-600"
-            data-tooltip="주차별 미션"
-          >
-            <Target :size="24" />
-          </router-link>
-          <router-link
-            to="/study/ranking"
-            class="nav-tooltip flex items-center text-slate-500 hover:text-amber-500 transition-colors"
-            active-class="text-amber-500"
-            data-tooltip="스터디 랭킹"
-          >
-            <Trophy :size="24" />
-          </router-link>
+
+          <!-- Divider -->
+          <div class="w-px h-6 bg-slate-200 mx-2"></div>
+
+          <!-- Group 1: Study -->
+          <div class="flex items-center gap-1">
+            <router-link
+              to="/study/missions"
+              class="flex items-center gap-2 px-3 py-2 rounded-xl text-sm font-bold text-slate-500 hover:bg-slate-100 hover:text-emerald-600 transition-all whitespace-nowrap"
+              active-class="bg-emerald-50 text-emerald-600"
+            >
+              <Target :size="18" />
+              <span>미션</span>
+            </router-link>
+            <router-link
+              to="/study/analysis"
+              class="flex items-center gap-2 px-3 py-2 rounded-xl text-sm font-bold text-slate-500 hover:bg-slate-100 hover:text-teal-600 transition-all whitespace-nowrap"
+              active-class="bg-teal-50 text-teal-600"
+            >
+              <PieChart :size="18" />
+              <span>분석</span>
+            </router-link>
+          </div>
+
+          <!-- Divider -->
+          <div class="w-px h-6 bg-slate-200 mx-2"></div>
+
+          <!-- Group 2: Growth -->
+          <div class="flex items-center gap-1">
+            <router-link
+              to="/training"
+              class="flex items-center gap-2 px-3 py-2 rounded-xl text-sm font-bold text-slate-500 hover:bg-slate-100 hover:text-indigo-600 transition-all whitespace-nowrap"
+              active-class="bg-indigo-50 text-indigo-600"
+            >
+              <School :size="18" />
+              <span>트레이닝</span>
+            </router-link>
+            <router-link
+              to="/mockexam"
+              class="flex items-center gap-2 px-3 py-2 rounded-xl text-sm font-bold text-slate-500 hover:bg-slate-100 hover:text-amber-600 transition-all whitespace-nowrap"
+              active-class="bg-amber-50 text-amber-600"
+            >
+              <FileText :size="18" />
+              <span>모의고사</span>
+            </router-link>
+            <router-link
+              to="/defense"
+              class="flex items-center gap-2 px-3 py-2 rounded-xl text-sm font-bold text-slate-500 hover:bg-slate-100 hover:text-rose-600 transition-all whitespace-nowrap"
+              active-class="bg-rose-50 text-rose-600"
+            >
+              <Shield :size="18" />
+              <span>디펜스</span>
+            </router-link>
+          </div>
+
+          <!-- Divider -->
+          <div class="w-px h-6 bg-slate-200 mx-2"></div>
+
+          <!-- Group 3: Social -->
+          <div class="flex items-center gap-1">
+            <router-link
+              to="/study/ranking"
+              class="flex items-center gap-2 px-3 py-2 rounded-xl text-sm font-bold text-slate-500 hover:bg-slate-100 hover:text-amber-500 transition-all whitespace-nowrap"
+              active-class="bg-amber-50 text-amber-500"
+            >
+              <Trophy :size="18" />
+              <span>랭킹</span>
+            </router-link>
+            <router-link
+              to="/boards"
+              class="flex items-center gap-2 px-3 py-2 rounded-xl text-sm font-bold text-slate-500 hover:bg-slate-100 hover:text-indigo-600 transition-all whitespace-nowrap"
+              active-class="bg-indigo-50 text-indigo-600"
+            >
+              <MessageSquare :size="18" />
+              <span>게시판</span>
+            </router-link>
+          </div>
         </nav>
       </div>
 
