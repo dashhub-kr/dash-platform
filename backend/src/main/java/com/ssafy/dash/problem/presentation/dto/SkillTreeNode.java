@@ -20,6 +20,7 @@ public class SkillTreeNode {
     private String familyKey; // 부모 Family 키 (예: "IMPLEMENTATION")
     private String tier; // 중요도 티어 (S, A, B, C)
     private boolean isCore; // 핵심 태그 여부
+    private Integer bojTagId; // 백준 태그 ID (정수형)
     private Integer solved; // 사용자가 푼 문제 수
     private Integer total; // 전체 문제 수
     private Double progressPercent; // 진행률 (0-100)

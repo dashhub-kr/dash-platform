@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ssafy.dash.problem.infrastructure.persistence.TagPrerequisiteMapper">
+
+    <resultMap id="TagPrerequisiteResultMap" type="com.ssafy.dash.problem.domain.TagPrerequisite">
+        <id property="id" column="id"/>
+        <result property="tagKey" column="tag_key"/>
+        <result property="prerequisiteTagKey" column="prerequisite_tag_key"/>
+        <result property="strength" column="strength"/>
+        <result property="createdAt" column="created_at"/>
+    </resultMap>
+
+    <select id="findAll" resultMap="TagPrerequisiteResultMap">
+        SELECT * FROM tag_prerequisite ORDER BY tag_key, prerequisite_tag_key
+    </select>
+
+    <select id="findByTagKey" parameterType="string" resultMap="TagPrerequisiteResultMap">
+        SELECT * FROM tag_prerequisite WHERE tag_key = #{tagKey}
+    </select>
+
+    <select id="findByPrerequisiteTagKey" parameterType="string" resultMap="TagPrerequisiteResultMap">
+        SELECT * FROM tag_prerequisite WHERE prerequisite_tag_key = #{prerequisiteTagKey}
+    </select>
+
+    <insert id="insert" parameterType="com.ssafy.dash.problem.domain.TagPrerequisite">
+        INSERT INTO tag_prerequisite (tag_key, prerequisite_tag_key, strength)
+        VALUES (#{tagKey}, #{prerequisiteTagKey}, #{strength})
+    </insert>
+
+    <insert id="insertBatch" parameterType="list">
+        INSERT IGNORE INTO tag_prerequisite (tag_key, prerequisite_tag_key, strength) VALUES
+        <foreach collection="list" item="item" separator=",">
+            (#{item.tagKey}, #{item.prerequisiteTagKey}, #{item.strength})
+        </foreach>
+    </insert>
+
+    <delete id="deleteByTagKey" parameterType="string">
+        DELETE FROM tag_prerequisite WHERE tag_key = #{tagKey}
+    </delete>
+
+    <delete id="deleteAll">
+        DELETE FROM tag_prerequisite
+    </delete>
+
+</mapper>

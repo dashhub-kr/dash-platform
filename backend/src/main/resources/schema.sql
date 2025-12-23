@@ -163,6 +163,19 @@ CREATE TABLE IF NOT EXISTS tags (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 
+-- 태그 선수 관계 (그래프 스킬트리용)
+CREATE TABLE IF NOT EXISTS tag_prerequisite (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    tag_key VARCHAR(50) NOT NULL,
+    prerequisite_tag_key VARCHAR(50) NOT NULL,
+    strength INT DEFAULT 1 COMMENT '1=권장, 2=필수',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (tag_key) REFERENCES tags(tag_key),
+    FOREIGN KEY (prerequisite_tag_key) REFERENCES tags(tag_key),
+    UNIQUE KEY uk_tag_prerequisite (tag_key, prerequisite_tag_key)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+
 CREATE TABLE IF NOT EXISTS problems (
     problem_number VARCHAR(50) PRIMARY KEY,
     title VARCHAR(255),

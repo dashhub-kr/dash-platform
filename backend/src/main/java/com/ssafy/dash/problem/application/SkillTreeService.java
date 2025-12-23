@@ -120,6 +120,10 @@ public class SkillTreeService {
                                                         .average()
                                                         .orElse(0);
 
+                                        // 평균 푼 문제 수로 마스터리 레벨 계산 (UserTagStat과 동일 로직)
+                                        double avgSolved = totalTags > 0 ? (double) totalSolved / totalTags : 0;
+                                        String familyMastery = getMasteryLevelBySolved((int) avgSolved);
+
                                         return SkillTreeNode.builder()
                                                         .key(family.getFamilyKey())
                                                         .name(family.getName())
@@ -129,7 +133,7 @@ public class SkillTreeService {
                                                         .solved(totalSolved)
                                                         .total(totalTags * 10) // 태그당 10문제 기준
                                                         .progressPercent(avgProgress)
-                                                        .masteryLevel(getMasteryLevel((int) avgProgress))
+                                                        .masteryLevel(familyMastery)
                                                         .children(children)
                                                         .build();
                                 })
@@ -173,16 +177,20 @@ public class SkillTreeService {
                 int total = userStat != null && userStat.getTotal() != null ? userStat.getTotal() : 10;
                 double progress = total > 0 ? Math.min(100, (double) solved / total * 100) : 0;
 
+                // UserTagStat의 마스터리 레벨 사용 (푼 문제 수 기반)
+                String masteryLevel = userStat != null ? userStat.getMasteryLevel() : "NONE";
+
                 return SkillTreeNode.builder()
                                 .key(tag.getTagKey())
                                 .name(getTagName(tag))
                                 .familyKey(null) // Family ID는 부모에서 관리
                                 .tier(tag.getImportanceTier())
                                 .isCore(tag.getIsCore())
+                                .bojTagId(tag.getBojTagId())
                                 .solved(solved)
                                 .total(total)
                                 .progressPercent(Math.round(progress * 10) / 10.0)
-                                .masteryLevel(getMasteryLevel((int) progress))
+                                .masteryLevel(masteryLevel)
                                 .children(null) // 리프 노드
                                 .build();
         }
@@ -196,15 +204,20 @@ public class SkillTreeService {
                 return TAG_NAMES.getOrDefault(tag.getTagKey(), tag.getTagKey());
         }
 
-        private String getMasteryLevel(int progress) {
-                if (progress >= 80)
+        /**
+         * 푼 문제 수 기반 마스터리 레벨 (UserTagStat과 동일 로직)
+         */
+        private String getMasteryLevelBySolved(int solved) {
+                if (solved >= 50)
                         return "MASTER";
-                if (progress >= 50)
+                if (solved >= 30)
+                        return "EXPERT";
+                if (solved >= 15)
                         return "ADVANCED";
-                if (progress >= 20)
+                if (solved >= 5)
                         return "INTERMEDIATE";
-                if (progress > 0)
+                if (solved >= 1)
                         return "BEGINNER";
-                return "LOCKED";
+                return "NONE";
         }
 }
