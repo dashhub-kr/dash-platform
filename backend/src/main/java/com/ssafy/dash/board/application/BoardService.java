@@ -77,6 +77,21 @@ public class BoardService {
     }
 
     @Transactional(readOnly = true)
+    public BoardResult findByAlgorithmRecordId(Long recordId, Long requestUserId) {
+        Board board = boardRepository.findByAlgorithmRecordId(recordId)
+                .orElse(null);
+
+        if (board == null) {
+            return null;
+        }
+
+        User user = userRepository.findById(board.getUserId()).orElse(null);
+        boolean isLiked = (requestUserId != null) && likeService.isLikedBoard(board.getId(), requestUserId);
+
+        return toResult(board, user, isLiked);
+    }
+
+    @Transactional(readOnly = true)
     public List<BoardResult> findAll(Long requestUserId) {
 
         return boardRepository.findAll().stream()

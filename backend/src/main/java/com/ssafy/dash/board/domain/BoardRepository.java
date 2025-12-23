@@ -9,10 +9,12 @@ public interface BoardRepository {
 
     Optional<Board> findById(Long id);
 
+    Optional<Board> findByAlgorithmRecordId(Long recordId);
+
     List<Board> findAll();
 
     void update(Board board);
 
     void delete(Long id);
-    
+
 }

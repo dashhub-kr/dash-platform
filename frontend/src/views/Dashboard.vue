@@ -239,155 +239,13 @@
 
       <div v-else class="grid grid-cols-1 gap-4">
         <!-- Record Card (Horizontal) -->
+        <!-- Record Card (Expanded) -->
         <template v-for="record in records" :key="record.id">
-        <div 
-          class="group relative bg-white rounded-[24px] p-6 shadow-sm border border-slate-100 transition-all duration-300 hover:shadow-xl hover:-translate-y-1 overflow-hidden"
-        >
-          <!-- Status Indication Line (Left Border) -->
-          <div 
-             class="absolute left-0 top-0 bottom-0 w-1.5 transition-colors duration-300"
-             :class="(record.runtimeMs > 0 && record.memoryKb > 0) ? 'bg-indigo-500' : 'bg-rose-500'"
-          ></div>
-
-          <div class="flex flex-col xl:flex-row gap-6 pl-2">
-            
-            <!-- Main Content Section -->
-            <div class="flex-1 min-w-0">
-                <!-- Header: badges & meta -->
-                <div class="flex flex-wrap items-center gap-2 mb-3">
-                    <a 
-                      :href="`https://www.acmicpc.net/problem/${record.problemNumber}`" 
-                      target="_blank"
-                      class="flex items-center gap-1 text-[11px] font-black text-slate-500 bg-slate-100 px-2.5 py-1 rounded-lg hover:bg-indigo-50 hover:text-indigo-600 transition-colors uppercase tracking-wider"
-                    >
-                      #{{ record.problemNumber }}
-                      <ExternalLink :size="10" />
-                    </a>
-                    
-                    <span 
-                        class="px-2.5 py-1 rounded-lg text-[11px] font-black uppercase tracking-wider"
-                        :class="(record.runtimeMs > 0 && record.memoryKb > 0) ? 'bg-slate-100 text-slate-600' : 'bg-rose-100 text-rose-600'"
-                    >
-                        {{ record.language }}
-                    </span>
-
-                    <span v-if="!(record.runtimeMs > 0 && record.memoryKb > 0)" class="px-2.5 py-1 rounded-lg text-[11px] font-black bg-rose-500 text-white shadow-sm shadow-rose-200">
-                        FAILED
-                    </span>
-                    
-                    <div class="ml-auto text-[11px] font-medium text-slate-400 flex items-center gap-1.5 md:hidden">
-                        {{ formatDate(record.committedAt).split('.').slice(0, 3).join('.') }}
-                    </div>
-                </div>
-
-                <!-- Title -->
-                <div class="flex items-start justify-between gap-4 mb-4">
-                    <h3 class="text-xl md:text-2xl font-black text-slate-800 leading-tight group-hover:text-indigo-600 transition-colors cursor-pointer">
-                        {{ record.title }}
-                    </h3>
-                </div>
-
-                <!-- Footer: User & Date (Desktop) -->
-                <div class="hidden md:flex items-center gap-3">
-                     <div class="flex items-center gap-2 px-2.5 py-1.5 bg-slate-50 rounded-full border border-slate-100">
-                        <div class="w-5 h-5 rounded-full bg-gradient-to-br from-indigo-400 to-purple-500 flex items-center justify-center text-[10px] font-bold text-white shadow-sm">
-                            {{ (record.username || '?').charAt(0).toUpperCase() }}
-                        </div>
-                        <span class="text-xs font-bold text-slate-600 pr-1">{{ record.username || 'Unknown' }}</span>
-                     </div>
-                     <span class="text-xs font-medium text-slate-400">{{ formatDate(record.committedAt) }}</span>
-                </div>
-            </div>
-
-            <!-- Stats & Actions Section -->
-            <div class="flex flex-col gap-4 xl:w-[480px] shrink-0">
-                
-                <!-- Stats Grid -->
-                <div class="grid grid-cols-4 gap-2">
-                    <!-- Runtime -->
-                    <div class="flex flex-col items-center justify-center p-3 rounded-2xl bg-slate-50 border border-slate-100">
-                         <Zap :size="16" class="mb-1" :class="(record.runtimeMs > 0 && record.memoryKb > 0) ? 'text-amber-400' : 'text-slate-300'" />
-                         <span class="text-sm font-black text-slate-700">{{ record.runtimeMs || '-' }}<span class="text-[10px] font-normal text-slate-400 ml-0.5">ms</span></span>
-                    </div>
-                    <!-- Memory -->
-                    <div class="flex flex-col items-center justify-center p-3 rounded-2xl bg-slate-50 border border-slate-100">
-                         <Database :size="16" class="mb-1" :class="(record.runtimeMs > 0 && record.memoryKb > 0) ? 'text-blue-400' : 'text-slate-300'" />
-                         <span class="text-sm font-black text-slate-700">{{ record.memoryKb ? Math.round(record.memoryKb / 1024) : '-' }}<span class="text-[10px] font-normal text-slate-400 ml-0.5">MB</span></span>
-                    </div>
-                     <!-- Logic -->
-                    <div class="flex flex-col items-center justify-center p-3 rounded-2xl bg-slate-50 border border-slate-100">
-                         <Activity :size="16" class="mb-1" :class="record.timeComplexity ? 'text-emerald-400' : 'text-slate-300'" />
-                         <span class="text-xs font-black text-slate-700 truncate max-w-full px-1">{{ record.timeComplexity || '-' }}</span>
-                    </div>
-                    <!-- Score -->
-                    <div class="flex flex-col items-center justify-center p-3 rounded-2xl bg-slate-50 border border-slate-100 relative overflow-hidden">
-                         <Trophy :size="16" class="mb-1" :class="record.score ? 'text-purple-400' : 'text-slate-300'" />
-                         <span class="text-sm font-black text-slate-700">{{ record.score || '-' }}</span>
-                    </div>
-                </div>
-
-                <!-- Actions Buttons -->
-                <div class="flex items-center gap-2">
-                    <button 
-                        @click.stop="requestReview(record)" 
-                        class="flex-1 h-12 rounded-xl bg-slate-900 text-white font-bold text-sm flex items-center justify-center gap-2 shadow-lg shadow-slate-200 hover:bg-slate-800 hover:shadow-xl hover:-translate-y-0.5 transition-all active:scale-95"
-                    >
-                        <Bot :size="18" />
-                        <span>리뷰</span>
-                    </button>
-                    
-                    <button 
-                        v-if="!(record.runtimeMs > 0 && record.memoryKb > 0)"
-                        @click.stop="requestCounterExample(record)" 
-                        class="flex-1 h-12 rounded-xl bg-rose-50 text-rose-600 font-bold text-sm flex items-center justify-center gap-2 border border-rose-100 hover:bg-rose-100 hover:border-rose-200 transition-all active:scale-95"
-                    >
-                        <Bug :size="18" />
-                        <span>반례</span>
-                    </button>
-
-                    <button 
-                        @click.stop="requestTutor(record)" 
-                        class="h-12 w-12 rounded-xl flex items-center justify-center border transition-all active:scale-95 bg-amber-50 border-amber-100 text-amber-600 hover:bg-amber-100"
-                        title="AI 튜터에게 질문하기"
-                    >
-                        <Lightbulb :size="20" />
-                    </button>
-                </div>
-
-            </div>
-          </div>
-          
-          <!-- Expandable Code Section (Accordion) -->
-          <Transition name="expand">
-            <div v-if="expandedRecordId === record.id" class="mt-4 border-t border-slate-200 pt-4">
-              <div class="flex items-center justify-between mb-3">
-                <h4 class="text-sm font-bold text-slate-700 flex items-center gap-2">
-                  <Code class="w-4 h-4" />
-                  제출한 소스코드
-                </h4>
-                <button 
-                  @click.stop="expandedRecordId = null" 
-                  class="text-xs text-slate-500 hover:text-slate-700 underline"
-                >
-                  코드 숨기기
-                </button>
-              </div>
-              
-              <!-- Code Viewer (Light Theme) -->
-              <div class="bg-white rounded-xl overflow-hidden border border-slate-200">
-                <div class="px-4 py-2 bg-slate-50 text-slate-500 text-xs font-mono border-b border-slate-200 flex justify-between items-center">
-                  <span>{{ record.language }}.{{ record.language === 'Java' ? 'java' : 'py' }}</span>
-                  <span class="px-2 py-0.5 rounded bg-slate-100 text-slate-500">Read Only</span>
-                </div>
-                <div class="max-h-96 overflow-y-auto">
-                  <pre class="m-0 p-6 text-sm font-mono leading-relaxed bg-white"><code class="hljs language-java text-slate-700" v-html="highlightCode(record.code || '// 코드를 불러올 수 없습니다.', record.language.toLowerCase())"></code></pre>
-                </div>
-              </div>
-              
-              <!-- TODO: 전체 화면으로 보기 버튼 (추후 구현) -->
-            </div>
-          </Transition>
-        </div>
+            <DashboardRecordCard 
+                :record="record"
+                @find-counter-example="requestCounterExample"
+                @ask-tutor="requestTutor"
+            />
         </template>
       </div>
     </main>
@@ -426,6 +284,7 @@ import { useRouter } from 'vue-router';
 import { dashboardApi } from '../api/dashboard';
 import { studyApi } from '../api/study';
 import { useAuth } from '../composables/useAuth';
+import DashboardRecordCard from './dashboard/DashboardRecordCard.vue'; // Import new component
 import http from '../api/http';
 import { aiApi } from '../api/ai';
 import AlgorithmRadarChart from '../components/charts/AlgorithmRadarChart.vue';
@@ -609,7 +468,7 @@ const drawerLoading = ref(false);
 const currentDrawerRecord = ref(null);  // Record being analyzed in Context Card
 
 // Accordion state for code view
-const expandedRecordId = ref(null);
+// const expandedRecordId = ref(null); // Removed
 
 const tooltipData = ref(null);
 const tooltipPos = ref({ x: 0, y: 0 });
@@ -734,68 +593,9 @@ const copyCode = (code) => {
 
 const currentRecordCode = ref('');
 
-const adaptAnalysisData = (result) => {
-    if (result.fullResponse) {
-        try {
-            return JSON.parse(result.fullResponse);
-        } catch (e) {
-            console.error("JSON Parse failed, falling back to flat fields", e);
-        }
-    }
 
-    // Fallback Adaptor for Flat DTO
-    return {
-        summary: result.summary,
-        complexity: {
-            time: result.timeComplexity || '-',
-            space: result.spaceComplexity || '-',
-            explanation: result.complexityExplanation
-        },
-        algorithm: {
-            intuition: result.algorithmIntuition,
-            patterns: parsePatterns(result.patterns)
-        },
-        structure: [],
-        traceExample: { steps: [] },
-        pitfalls: {
-            items: parsePatterns(result.pitfalls),
-            improvements: parsePatterns(result.improvements)
-        },
-        refactor: {
-            code: result.refactorCode,
-            explanation: result.refactorExplanation
-        }
-    };
-};
 
-const requestReview = async (record) => {
-    // Set current record for Context Card
-    currentDrawerRecord.value = record;
-    expandedRecordId.value = record.id;
-    
-    drawerType.value = 'review';
-    drawerTitle.value = `AI 코드 분석 · ${record.title}`;
-    drawerLoading.value = true;
-    showDrawer.value = true;
-    drawerData.value = null;
-    currentRecordCode.value = record.code || '';
 
-    try {
-        const response = await http.get(`/ai/review/${record.id}`);
-        console.log("Analysis Result:", response.data); // Debug
-        drawerData.value = adaptAnalysisData(response.data);
-    } catch (error) {
-        console.error("Failed to fetch review:", error);
-        const status = error.response?.status || 'Unknown';
-        const msg = error.response?.data?.message || error.message;
-        drawerData.value = { 
-            summary: `분석 데이터를 불러오는 데 실패했습니다. (Error ${status}: ${msg})`,
-            complexity: { time: '-', space: '-', explanation: '서버 연결 확인 필요' }
-        };
-    } finally {
-        drawerLoading.value = false;
-    }
-};
 
 
 
@@ -879,9 +679,9 @@ const closeDrawer = () => {
     currentDrawerRecord.value = null;  // Clear Context Card
     
     // Collapse accordion if closing review drawer
-    if (drawerType.value === 'review') {
-        expandedRecordId.value = null;
-    }
+    // if (drawerType.value === 'review') {
+    //     expandedRecordId.value = null;
+    // }
 };
 
 

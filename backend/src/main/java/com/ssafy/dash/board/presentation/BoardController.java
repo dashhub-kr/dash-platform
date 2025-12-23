@@ -62,6 +62,20 @@ public class BoardController {
         return ResponseEntity.ok(response);
     }
 
+    @GetMapping("/record/{recordId}")
+    public ResponseEntity<BoardResponse> findByAlgorithmRecordId(
+            @PathVariable Long recordId,
+            @Parameter(hidden = true) @AuthenticationPrincipal OAuth2User principal) {
+        Long userId = extractUserIdNullable(principal);
+        var result = boardService.findByAlgorithmRecordId(recordId, userId);
+
+        if (result == null) {
+            return ResponseEntity.noContent().build();
+        }
+
+        return ResponseEntity.ok(BoardResponse.from(result));
+    }
+
     @PutMapping("/{id}")
     public ResponseEntity<BoardResponse> update(
             @PathVariable Long id,

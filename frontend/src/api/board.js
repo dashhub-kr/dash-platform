@@ -19,6 +19,12 @@ export const boardApi = {
         return http.get(`/boards/${id}`);
     },
 
+    // Get a board by Algorithm Record ID
+    // GET /api/boards/record/{recordId}
+    findByRecordId(recordId) {
+        return http.get(`/boards/record/${recordId}`);
+    },
+
     // Update a board post
     // PUT /api/boards/{id}
     update(id, data) {

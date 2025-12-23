@@ -29,6 +29,11 @@ public class BoardRepositoryImpl implements BoardRepository {
     }
 
     @Override
+    public Optional<Board> findByAlgorithmRecordId(Long recordId) {
+        return Optional.ofNullable(boardMapper.selectByAlgorithmRecordId(recordId));
+    }
+
+    @Override
     public List<Board> findAll() {
         return boardMapper.selectAll();
     }
@@ -42,5 +47,5 @@ public class BoardRepositoryImpl implements BoardRepository {
     public void delete(Long id) {
         boardMapper.delete(id);
     }
-    
+
 }

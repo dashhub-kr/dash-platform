@@ -1,5 +1,5 @@
 <template>
-  <div class="code-viewer bg-white rounded-xl overflow-hidden border border-slate-200">
+  <div class="code-viewer bg-white border border-slate-200">
     <!-- Header -->
     <div class="px-4 py-2 bg-slate-50 text-slate-500 text-xs font-mono border-b border-slate-200 flex justify-between items-center select-none">
       <span class="font-bold text-slate-600">{{ filename }}</span>
