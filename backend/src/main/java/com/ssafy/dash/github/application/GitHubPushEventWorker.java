@@ -18,6 +18,8 @@ import com.ssafy.dash.onboarding.domain.Onboarding;
 import com.ssafy.dash.onboarding.domain.OnboardingRepository;
 import com.ssafy.dash.user.domain.User;
 import com.ssafy.dash.user.domain.UserRepository;
+import com.ssafy.dash.mockexam.application.MockExamService;
+import com.ssafy.dash.defense.application.DefenseService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -53,6 +55,8 @@ public class GitHubPushEventWorker {
     private final com.ssafy.dash.acorn.application.AcornService acornService;
     private final com.ssafy.dash.ai.application.CodeReviewService codeReviewService;
     private final com.ssafy.dash.study.application.StudyMissionService studyMissionService;
+    private final MockExamService mockExamService;
+    private final DefenseService defenseService;
 
     public GitHubPushEventWorker(GitHubPushEventRepository pushEventRepository,
             OnboardingRepository onboardingRepository,
@@ -66,6 +70,8 @@ public class GitHubPushEventWorker {
             com.ssafy.dash.acorn.application.AcornService acornService,
             com.ssafy.dash.ai.application.CodeReviewService codeReviewService,
             com.ssafy.dash.study.application.StudyMissionService studyMissionService,
+            MockExamService mockExamService,
+            DefenseService defenseService,
             @Value("${github.push-worker.max-batch:5}") int maxBatchSize) {
         this.pushEventRepository = pushEventRepository;
         this.onboardingRepository = onboardingRepository;
@@ -80,6 +86,8 @@ public class GitHubPushEventWorker {
         this.acornService = acornService;
         this.codeReviewService = codeReviewService;
         this.studyMissionService = studyMissionService;
+        this.mockExamService = mockExamService;
+        this.defenseService = defenseService;
     }
 
     @Scheduled(fixedDelayString = "${github.push-worker.fixed-delay:10000}")
@@ -243,6 +251,16 @@ public class GitHubPushEventWorker {
 
         algorithmRecordRepository.save(record);
         log.info("AlgorithmRecord saved: id={}, problem={}, tag={}", record.getId(), record.getProblemNumber(), tag);
+
+        if (problemId != null) {
+            Integer streak = defenseService.verifyDefense(userId, problemId);
+            if (streak != null) {
+                record.setTag("DEFENSE");
+                record.setDefenseStreak(streak);
+                algorithmRecordRepository.update(record);
+            }
+            mockExamService.verifyExam(userId, problemId);
+        }
 
         // Acorn Accumulation Logic
         if (record.getStudyId() != null
