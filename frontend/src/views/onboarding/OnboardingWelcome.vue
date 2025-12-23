@@ -49,12 +49,11 @@
                 <!-- Profile Image -->
                 <div class="w-16 h-16 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-2xl font-bold text-white shadow-lg overflow-hidden">
                   <img 
-                    v-if="verifiedUser.profileImageUrl" 
-                    :src="verifiedUser.profileImageUrl" 
+                    :src="verifiedUser.profileImageUrl || '/land/default_profile.png'" 
                     :alt="verifiedUser.handle"
                     class="w-full h-full object-cover"
+                    @error="$event.target.src = '/land/default_profile.png'"
                   />
-                  <span v-else>{{ verifiedUser.handle?.charAt(0)?.toUpperCase() }}</span>
                 </div>
                 
                 <!-- User Info -->
