@@ -60,26 +60,30 @@
           </label>
 
           <!-- Search Results -->
-          <div v-if="repositories.length > 0 && !selectedRepo" class="space-y-2 max-h-64 overflow-y-auto">
             <div 
               v-for="repo in repositories" 
               :key="repo.fullName"
               @click="selectRepository(repo)"
-              class="bg-slate-50 hover:bg-indigo-50 border border-slate-200 hover:border-indigo-300 rounded-xl p-4 cursor-pointer transition-all group"
+              class="bg-white hover:bg-indigo-50 border border-slate-200 hover:border-indigo-300 rounded-2xl p-4 cursor-pointer transition-all group shadow-sm hover:shadow-md"
             >
-              <div class="flex items-center justify-between">
-                <div class="flex items-center gap-3">
-                  <div class="w-10 h-10 bg-slate-200 group-hover:bg-indigo-200 rounded-lg flex items-center justify-center transition-colors">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-slate-500 group-hover:text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z" />
+              <div class="flex items-center justify-between gap-3">
+                <div class="flex items-center gap-3 flex-1 min-w-0">
+                  <div class="w-10 h-10 bg-slate-100 group-hover:bg-white rounded-xl flex items-center justify-center transition-colors border border-slate-200 group-hover:border-indigo-200 flex-shrink-0">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-slate-400 group-hover:text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z" />
                     </svg>
                   </div>
-                  <div>
-                    <div class="font-bold text-slate-800 group-hover:text-indigo-700 transition-colors">{{ repo.fullName }}</div>
-                    <div class="text-sm text-slate-500 line-clamp-1">{{ repo.description || '설명 없음' }}</div>
+                  <div class="min-w-0 flex-1">
+                    <div class="font-bold text-slate-800 group-hover:text-indigo-700 transition-colors truncate text-sm md:text-base leading-tight">{{ repo.fullName }}</div>
+                    <div class="text-xs text-slate-500 truncate mt-0.5">{{ repo.description || '설명 없음' }}</div>
                   </div>
                 </div>
-                <span v-if="repo.isPrivate" class="text-xs bg-slate-200 text-slate-600 px-2 py-0.5 rounded-full font-medium">🔒 Private</span>
+                <span v-if="repo.isPrivate" class="flex-shrink-0 text-[10px] bg-amber-50 text-amber-600 border border-amber-200 px-2 py-1 rounded-lg font-bold flex items-center gap-1">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clip-rule="evenodd" />
+                    </svg>
+                    Private
+                </span>
               </div>
             </div>
           </div>
@@ -94,21 +98,28 @@
           <div v-if="selectedRepo" class="relative">
             <div class="bg-gradient-to-br from-emerald-50 to-white border-2 border-emerald-400 rounded-2xl p-5 shadow-lg shadow-emerald-100">
               <div class="flex items-start gap-3">
-                <div class="w-10 h-10 bg-emerald-100 rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5">
+                <div class="w-10 h-10 bg-emerald-100 rounded-xl flex items-center justify-center flex-shrink-0 mt-0.5">
                   <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z" />
                   </svg>
                 </div>
                 <div class="flex-1 min-w-0">
                   <div class="flex items-center justify-between gap-2">
-                    <div class="font-bold text-slate-800 truncate">{{ selectedRepo.fullName }}</div>
+                    <div class="flex items-center gap-2 min-w-0">
+                         <div class="font-bold text-slate-800 truncate text-sm md:text-base">{{ selectedRepo.fullName }}</div>
+                         <span v-if="selectedRepo.isPrivate" class="flex-shrink-0 text-[10px] bg-amber-50 text-amber-600 border border-amber-200 px-1.5 py-0.5 rounded font-bold flex items-center gap-0.5">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" viewBox="0 0 20 20" fill="currentColor">
+                                <path fill-rule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clip-rule="evenodd" />
+                            </svg>
+                         </span>
+                    </div>
                     <div class="text-emerald-500 flex-shrink-0">
                       <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
                         <path d="M20 6 9 17l-5-5"/>
                       </svg>
                     </div>
                   </div>
-                  <div class="text-sm text-slate-500 mt-1 line-clamp-2">{{ selectedRepo.description || '설명 없음' }}</div>
+                  <div class="text-sm text-slate-500 mt-1 truncate">{{ selectedRepo.description || '설명 없음' }}</div>
                 </div>
               </div>
               <button 
