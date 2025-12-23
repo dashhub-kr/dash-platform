@@ -73,10 +73,21 @@ public final class AlgorithmRecordFixtures {
                     null,
                     null,
                     null,
+                    null, // tag
+                    0, // defenseStreak
                     createdAt,
                     updatedAt,
                     null,
-                    null, null, null, null, null, null, null, null, null, null, null);
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null);
         }
 
         public AlgorithmRecordCreateCommand toCreateCommand(String codeOverride) {
