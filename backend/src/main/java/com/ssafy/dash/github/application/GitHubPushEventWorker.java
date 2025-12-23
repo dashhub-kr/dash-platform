@@ -196,6 +196,11 @@ public class GitHubPushEventWorker {
                 code,
                 now);
 
+        LocalDateTime committedAt = metadataExtractor.parseCommittedAt(file.committedAt());
+        if (committedAt != null) {
+            committedAt = committedAt.plusHours(9);
+        }
+
         record.enrichMetadata(
                 metadata.platform(),
                 metadata.difficulty(),
@@ -205,7 +210,7 @@ public class GitHubPushEventWorker {
                 file.path(),
                 file.commitSha(),
                 file.commitMessage(),
-                metadataExtractor.parseCommittedAt(file.committedAt()));
+                committedAt);
 
         // --- Tagging Logic ---
         String problemIdStr = metadata.problemNumber();
