@@ -260,8 +260,20 @@ const userTierName = computed(() => {
   return tier >= 0 && tier < TIER_NAMES.length ? TIER_NAMES[tier] : 'Unrated';
 });
 
-// Chart Tags for Radar Chart (from Learning Path data)
+// Chart Tags for Radar Chart (familyStats based, like OnboardingAnalysis)
+const familyStats = ref([]);
 const chartTags = computed(() => {
+  // 1. If Family Stats exist (Ideal), use them
+  if (familyStats.value && familyStats.value.length > 0) {
+    return familyStats.value.map(stat => ({
+      tagKey: stat.familyKey?.toLowerCase(),
+      solved: stat.solved || 0,
+      total: stat.total || 0,
+      label: stat.familyName === '다이나믹 프로그래밍' ? 'DP' : stat.familyName
+    }));
+  }
+
+  // 2. Fallback: Use Tags from Learning Path
   if (learningPath.value) {
     const strong = learningPath.value.strengthTags || [];
     const weak = learningPath.value.weaknessTags || [];
@@ -337,21 +349,27 @@ const loadLearningPath = async () => {
     try {
         if (!user.value) return;
         
-        const res = await aiApi.getLearningPath(user.value.id);
-        learningPath.value = res.data;
+        // Load learning path and family stats in parallel
+        const [learningPathRes, familyRes] = await Promise.all([
+            aiApi.getLearningPath(user.value.id),
+            aiApi.getFamilyStats(user.value.id).catch(() => ({ data: [] }))
+        ]);
         
-        if (res.data.weaknessTags?.length > 0) {
-            recommendedKeywords.value = res.data.weaknessTags.map(t => t.tagName);
+        learningPath.value = learningPathRes.data;
+        familyStats.value = familyRes.data || [];
+        
+        if (learningPathRes.data.weaknessTags?.length > 0) {
+            recommendedKeywords.value = learningPathRes.data.weaknessTags.map(t => t.tagName);
         }
 
-        const weak = res.data.weaknessTags || [];
-        const strong = res.data.strengthTags || [];
+        const weak = learningPathRes.data.weaknessTags || [];
+        const strong = learningPathRes.data.strengthTags || [];
         const map = new Map();
         [...weak, ...strong].forEach(t => map.set(t.tagKey, t));
         allTagStats.value = Array.from(map.values());
 
-        if (pathRes.data.weaknessTags?.length > 0) {
-            const worstTag = pathRes.data.weaknessTags[0];
+        if (learningPathRes.data.weaknessTags?.length > 0) {
+            const worstTag = learningPathRes.data.weaknessTags[0];
             const winRate = worstTag.total > 0 ? Math.round((worstTag.solved / worstTag.total) * 100) : 0;
             
             // Build tier range: userTier ~ userTier+4 (capped at 30)
