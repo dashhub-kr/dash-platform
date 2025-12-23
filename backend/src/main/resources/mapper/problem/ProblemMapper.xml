@@ -35,4 +35,20 @@
         WHERE problem_number = #{problemNumber}
     </select>
 
+    <select id="findProblemsByTagAndLevelRange" resultType="Problem">
+        SELECT p.problem_number, p.title, p.level, p.class as problemClass, p.essential, p.sprout
+        FROM problems p
+        JOIN problem_tags pt ON p.problem_number = pt.problem_number
+        WHERE pt.tag_key = #{tagKey}
+          AND p.level BETWEEN #{minLevel} AND #{maxLevel}
+        <if test="excludedIds != null and !excludedIds.isEmpty()">
+            AND p.problem_number NOT IN
+            <foreach item="id" collection="excludedIds" open="(" separator="," close=")">
+                #{id}
+            </foreach>
+        </if>
+        ORDER BY p.essential DESC, RAND()
+        LIMIT 3
+    </select>
+
 </mapper>

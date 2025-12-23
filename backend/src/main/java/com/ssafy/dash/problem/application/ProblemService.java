@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ssafy.dash.problem.domain.Problem;
 import com.ssafy.dash.problem.domain.ProblemTag;
 import com.ssafy.dash.problem.infrastructure.persistence.ProblemMapper;
+import com.ssafy.dash.algorithm.infrastructure.mapper.AlgorithmRecordMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.ClassPathResource;
@@ -20,6 +21,7 @@ import java.io.IOException;
 public class ProblemService {
 
     private final ProblemMapper problemMapper;
+    private final AlgorithmRecordMapper algorithmRecordMapper;
     private final ObjectMapper objectMapper;
 
     @Transactional
@@ -33,47 +35,62 @@ public class ProblemService {
         log.info("문제 데이터 초기화 시작...");
         try {
             File file = new ClassPathResource("problems_with_keys.json").getFile();
-            JsonNode root = objectMapper.readTree(file);
+            JsonNode rootNode = objectMapper.readTree(file);
 
-            if (root.isArray()) {
-                for (JsonNode node : root) {
-                    processProblemNode(node);
+            for (JsonNode node : rootNode) {
+                String problemId = node.get("problemId").asText();
+                String title = node.get("title").asText();
+                int level = node.get("level").asInt();
+                int problemClass = node.has("class") ? node.get("class").asInt(0) : 0;
+                boolean essential = node.has("essential") && node.get("essential").asBoolean();
+                boolean sprout = node.has("sprout") && node.get("sprout").asBoolean();
+
+                JsonNode tagsNode = node.get("tags");
+
+                // Problem 엔티티 저장 (tags JSON 제거)
+                Problem problem = Problem.create(
+                        problemId,
+                        title,
+                        level,
+                        problemClass,
+                        essential,
+                        sprout);
+                problemMapper.saveProblem(problem);
+
+                // problem_tags 테이블에만 태그 관계 저장
+                if (tagsNode != null && tagsNode.isArray()) {
+                    for (JsonNode tag : tagsNode) {
+                        String tagKey = tag.asText();
+                        ProblemTag problemTag = ProblemTag.create(problemId, tagKey);
+                        problemMapper.saveProblemTag(problemTag);
+                    }
                 }
             }
             log.info("문제 데이터 초기화 완료");
+
         } catch (IOException e) {
-            log.error("문제 데이터 로드 실패", e);
+            log.error("문제 데이터 초기화 실패", e);
+            throw new RuntimeException("문제 데이터 초기화 실패", e);
         }
     }
 
-    private void processProblemNode(JsonNode node) {
-        String problemId = node.get("problemId").asText();
-        String title = node.get("title").asText();
-        int level = node.get("level").asInt();
-        int problemClass = node.has("class") ? node.get("class").asInt(0) : 0;
-        boolean essential = node.has("essential") && node.get("essential").asBoolean();
-        boolean sprout = node.has("sprout") && node.get("sprout").asBoolean();
+    public java.util.List<com.ssafy.dash.problem.domain.ProblemRecommendationResponse> getRecommendedProblems(
+            String tag, int userTier, Long userId) {
+        // 난이도 범위: 내 티어 ~ 내 티어 + 2
+        int minLevel = Math.max(1, userTier);
+        int maxLevel = Math.min(30, userTier + 2);
 
-        JsonNode tagsNode = node.get("tags");
+        // 이미 푼 문제 목록 조회
+        java.util.List<String> solvedProblemNumbers = algorithmRecordMapper.selectSolvedProblemNumbersByUserId(userId);
 
-        // Problem 엔티티 저장 (tags JSON 제거)
-        Problem problem = Problem.create(
-                problemId,
-                title,
-                level,
-                problemClass,
-                essential,
-                sprout);
+        java.util.List<Problem> problems = problemMapper.findProblemsByTagAndLevelRange(
+                tag, minLevel, maxLevel, solvedProblemNumbers);
 
-        problemMapper.saveProblem(problem);
-
-        // problem_tags 테이블에만 태그 관계 저장
-        if (tagsNode != null && tagsNode.isArray()) {
-            for (JsonNode tag : tagsNode) {
-                String tagKey = tag.asText();
-                ProblemTag problemTag = ProblemTag.create(problemId, tagKey);
-                problemMapper.saveProblemTag(problemTag);
-            }
-        }
+        return problems.stream()
+                .map(problem -> {
+                    java.util.List<String> tags = problemMapper.findTagsByProblemNumber(problem.getProblemNumber());
+                    return com.ssafy.dash.problem.domain.ProblemRecommendationResponse.from(problem, tags);
+                })
+                .collect(java.util.stream.Collectors.toList());
     }
 }
