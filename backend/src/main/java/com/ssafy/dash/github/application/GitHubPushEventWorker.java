@@ -52,19 +52,21 @@ public class GitHubPushEventWorker {
     private final UserRepository userRepository;
     private final com.ssafy.dash.acorn.application.AcornService acornService;
     private final com.ssafy.dash.ai.application.CodeReviewService codeReviewService;
+    private final com.ssafy.dash.study.application.StudyMissionService studyMissionService;
 
     public GitHubPushEventWorker(GitHubPushEventRepository pushEventRepository,
-                                 OnboardingRepository onboardingRepository,
-                                 OAuthTokenService oauthTokenService,
-                                 GitHubClient gitHubClient,
-                                 AlgorithmRecordRepository algorithmRecordRepository,
-                                 ObjectMapper objectMapper,
-                                 GitHubSubmissionMetadataExtractor metadataExtractor,
-                                 PlatformTransactionManager transactionManager,
-                                 UserRepository userRepository,
-                                 com.ssafy.dash.acorn.application.AcornService acornService,
-                                 com.ssafy.dash.ai.application.CodeReviewService codeReviewService,
-                                 @Value("${github.push-worker.max-batch:5}") int maxBatchSize) {
+            OnboardingRepository onboardingRepository,
+            OAuthTokenService oauthTokenService,
+            GitHubClient gitHubClient,
+            AlgorithmRecordRepository algorithmRecordRepository,
+            ObjectMapper objectMapper,
+            GitHubSubmissionMetadataExtractor metadataExtractor,
+            PlatformTransactionManager transactionManager,
+            UserRepository userRepository,
+            com.ssafy.dash.acorn.application.AcornService acornService,
+            com.ssafy.dash.ai.application.CodeReviewService codeReviewService,
+            com.ssafy.dash.study.application.StudyMissionService studyMissionService,
+            @Value("${github.push-worker.max-batch:5}") int maxBatchSize) {
         this.pushEventRepository = pushEventRepository;
         this.onboardingRepository = onboardingRepository;
         this.oauthTokenService = oauthTokenService;
@@ -77,6 +79,7 @@ public class GitHubPushEventWorker {
         this.userRepository = userRepository;
         this.acornService = acornService;
         this.codeReviewService = codeReviewService;
+        this.studyMissionService = studyMissionService;
     }
 
     @Scheduled(fixedDelayString = "${github.push-worker.fixed-delay:10000}")
@@ -98,8 +101,7 @@ public class GitHubPushEventWorker {
                                 record.getId(),
                                 record.getCode(),
                                 record.getLanguage(),
-                                record.getProblemNumber()
-                        );
+                                record.getProblemNumber());
                     } catch (Exception e) {
                         log.error("Auto-analysis failed via worker for record: {}", record.getId(), e);
                     }
@@ -131,7 +133,8 @@ public class GitHubPushEventWorker {
                 if (!file.isProcessable()) {
                     continue;
                 }
-                AlgorithmRecord record = storeAlgorithmRecord(event, onboarding.getUserId(), token.getAccessToken(), file);
+                AlgorithmRecord record = storeAlgorithmRecord(event, onboarding.getUserId(), token.getAccessToken(),
+                        file);
                 createdRecords.add(record);
                 processed = true;
             }
@@ -171,18 +174,18 @@ public class GitHubPushEventWorker {
     }
 
     private AlgorithmRecord storeAlgorithmRecord(GitHubPushEvent event,
-                                      Long userId,
-                                      String accessToken,
-                                      QueuedPushFile file) {
-        GitHubSubmissionMetadataExtractor.SubmissionMetadata metadata =
-                metadataExtractor.extract(file.commitMessage(), file.path());
+            Long userId,
+            String accessToken,
+            QueuedPushFile file) {
+        GitHubSubmissionMetadataExtractor.SubmissionMetadata metadata = metadataExtractor.extract(file.commitMessage(),
+                file.path());
 
         String reference = StringUtils.hasText(file.commitSha()) ? file.commitSha() : event.getHeadCommitSha();
         String code = gitHubClient.fetchFileContent(event.getRepositoryName(), file.path(), reference, accessToken);
         LocalDateTime now = LocalDateTime.now();
-        
+
         User user = userRepository.findById(userId)
-            .orElseThrow(() -> new GitHubWebhookException("User not found: " + userId));
+                .orElseThrow(() -> new GitHubWebhookException("User not found: " + userId));
 
         AlgorithmRecord record = AlgorithmRecord.create(
                 userId,
@@ -204,27 +207,68 @@ public class GitHubPushEventWorker {
                 file.commitMessage(),
                 metadataExtractor.parseCommittedAt(file.committedAt()));
 
+        // --- Tagging Logic ---
+        String problemIdStr = metadata.problemNumber();
+        Integer problemId = null;
+        try {
+            problemId = Integer.parseInt(problemIdStr);
+        } catch (NumberFormatException ignored) {
+        }
+
+        String tag = "GENERAL";
+
+        if (problemId != null) {
+            // 1. Mission Check
+            if (user.getStudyId() != null
+                    && studyMissionService.isActiveMissionProblem(user.getStudyId(), problemId, now)) {
+                tag = "MISSION";
+            }
+            // 2. Mock Exam Check
+            else if (user.getExamType() != null && isProblemInList(user.getExamProblems(), problemId)) {
+                tag = "MOCK_EXAM";
+            }
+            // 3. Random Defense Check (Check defenseProblemId)
+            else if (user.getDefenseType() != null && user.getDefenseProblemId() != null
+                    && user.getDefenseProblemId().equals(problemId)) {
+                tag = "DEFENSE";
+            }
+        }
+        record.setTag(tag);
+        // ---------------------
+
         algorithmRecordRepository.save(record);
-        log.info("AlgorithmRecord saved: id={}, problem={}", record.getId(), record.getProblemNumber());
+        log.info("AlgorithmRecord saved: id={}, problem={}, tag={}", record.getId(), record.getProblemNumber(), tag);
 
         // Acorn Accumulation Logic
-        if (record.getStudyId() != null 
-                && metadata.runtimeMs() != null && metadata.runtimeMs() > 0 
+        if (record.getStudyId() != null
+                && metadata.runtimeMs() != null && metadata.runtimeMs() > 0
                 && metadata.memoryKb() != null && metadata.memoryKb() > 0) {
-            
+
             try {
                 acornService.accumulate(
-                    record.getStudyId(), 
-                    userId, 
-                    10, 
-                    "Problem Solved: " + metadata.problemNumber()
-                );
+                        record.getStudyId(),
+                        userId,
+                        10,
+                        "Problem Solved: " + metadata.problemNumber());
             } catch (Exception e) {
                 log.error("Acorn accumulation failed for record: {}", record.getId(), e);
             }
         }
-        
+
         return record;
+    }
+
+    private boolean isProblemInList(String problemsJson, Integer problemId) {
+        if (!StringUtils.hasText(problemsJson) || problemId == null) {
+            return false;
+        }
+        try {
+            List<Integer> problems = objectMapper.readValue(problemsJson, new TypeReference<List<Integer>>() {
+            });
+            return problems.contains(problemId);
+        } catch (JsonProcessingException e) {
+            return false;
+        }
     }
 
     private record QueuedPushFile(
@@ -232,13 +276,12 @@ public class GitHubPushEventWorker {
             String status,
             String commitSha,
             String commitMessage,
-            String committedAt
-        ) {
+            String committedAt) {
 
         boolean isProcessable() {
             return StringUtils.hasText(path) && !"removed".equalsIgnoreCase(status);
         }
-        
+
     }
 
 }

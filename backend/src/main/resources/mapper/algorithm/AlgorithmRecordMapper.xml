@@ -6,11 +6,11 @@
     INSERT INTO algorithm_records (
       user_id, study_id, problem_number, title, code, language, platform, difficulty,
       runtime_ms, memory_kb, repository_name, file_path, commit_sha, commit_message,
-      committed_at, created_at, updated_at, record_type
+      committed_at, created_at, updated_at, record_type, tag
     ) VALUES (
       #{userId}, #{studyId}, #{problemNumber}, #{title}, #{code}, #{language}, #{platform}, #{difficulty},
       #{runtimeMs}, #{memoryKb}, #{repositoryName}, #{filePath}, #{commitSha}, #{commitMessage},
-      #{committedAt}, #{createdAt}, #{updatedAt}, #{recordType}
+      #{committedAt}, #{createdAt}, #{updatedAt}, #{recordType}, #{tag}
     )
   </insert>
 
@@ -19,8 +19,10 @@
   </select>
 
   <select id="selectAll" resultType="AlgorithmRecord">
-    SELECT r.*, u.username,
-           car.score, car.time_complexity, car.complexity_explanation, car.patterns
+    SELECT r.*, r.tag, u.username,
+           car.score, car.time_complexity, car.space_complexity, car.complexity_explanation, 
+           car.patterns, car.algorithm_intuition, car.pitfalls, car.key_blocks, 
+           car.refactor_provided, car.refactor_code, car.refactor_explanation
     FROM algorithm_records r
     LEFT JOIN users u ON r.user_id = u.id
     LEFT JOIN code_analysis_results car ON r.id = car.algorithm_record_id
@@ -29,7 +31,9 @@
 
   <select id="selectByUserId" resultType="AlgorithmRecord" parameterType="long">
     SELECT r.*, u.username,
-           car.score, car.time_complexity, car.complexity_explanation, car.patterns
+           car.score, car.time_complexity, car.space_complexity, car.complexity_explanation, 
+           car.patterns, car.algorithm_intuition, car.pitfalls, car.key_blocks, 
+           car.refactor_provided, car.refactor_code, car.refactor_explanation
     FROM algorithm_records r
     LEFT JOIN users u ON r.user_id = u.id
     LEFT JOIN code_analysis_results car ON r.id = car.algorithm_record_id
@@ -39,7 +43,9 @@
 
   <select id="selectByStudyId" resultType="AlgorithmRecord" parameterType="long">
     SELECT r.*, u.username,
-           car.score, car.time_complexity, car.complexity_explanation, car.patterns
+           car.score, car.time_complexity, car.space_complexity, car.complexity_explanation, 
+           car.patterns, car.algorithm_intuition, car.pitfalls, car.key_blocks, 
+           car.refactor_provided, car.refactor_code, car.refactor_explanation
     FROM algorithm_records r
     LEFT JOIN users u ON r.user_id = u.id
     LEFT JOIN code_analysis_results car ON r.id = car.algorithm_record_id

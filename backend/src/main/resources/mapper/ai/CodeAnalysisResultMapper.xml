@@ -6,13 +6,12 @@
         INSERT INTO code_analysis_results (
             algorithm_record_id, summary, time_complexity, space_complexity,
             complexity_explanation, patterns, algorithm_intuition,
-            pitfalls, improvements, refactor_provided, refactor_code,
+            pitfalls, improvements, key_blocks, refactor_provided, refactor_code,
             refactor_explanation, score, full_response, analyzed_at
         ) VALUES (
-            #{algorithmRecordId}, #{summary}, #{timeComplexity}, #{spaceComplexity},
-            #{complexityExplanation}, #{patterns}, #{algorithmIntuition},
-            #{pitfalls}, #{improvements}, #{refactorProvided}, #{refactorCode},
-            #{refactorExplanation}, #{score}, #{fullResponse}, #{analyzedAt}
+            #{algorithmRecordId},      #{summary}, #{timeComplexity}, #{spaceComplexity}, #{complexityExplanation},
+      #{patterns}, #{algorithmIntuition}, #{pitfalls}, #{improvements}, #{keyBlocks},
+      #{refactorProvided}, #{refactorCode}, #{refactorExplanation}, #{score}, #{fullResponse}, #{analyzedAt}
         )
     </insert>
 
@@ -31,6 +30,7 @@
             algorithm_intuition = #{algorithmIntuition},
             pitfalls = #{pitfalls},
             improvements = #{improvements},
+            key_blocks = #{keyBlocks},
             refactor_provided = #{refactorProvided},
             refactor_code = #{refactorCode},
             refactor_explanation = #{refactorExplanation},

@@ -79,7 +79,10 @@
           <div class="mb-8 animate-fade-in-down">
             <!-- Weekly Mission Section -->
             <div class="mb-6">
-              <div v-if="currentMission" class="bg-gradient-to-r from-indigo-500 to-indigo-600 rounded-2xl p-5 shadow-lg text-white relative overflow-hidden">
+              <div v-if="currentMission" 
+                   class="rounded-2xl p-5 shadow-lg text-white relative overflow-hidden transition-all duration-500"
+                   :class="missionThemeClass">
+                
                 <div class="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full blur-3xl -mr-16 -mt-16 pointer-events-none"></div>
                 
                 <div class="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-4">
@@ -88,12 +91,20 @@
                        <span class="px-2 py-0.5 bg-white/20 rounded-lg text-xs font-bold uppercase tracking-wider backdrop-blur-sm">
                          Week {{ currentMission.week }}
                        </span>
-                       <span class="flex items-center gap-1 text-xs font-medium text-indigo-100">
+                       <span class="flex items-center gap-1 text-xs font-medium text-white/90">
                          <Calendar :size="12" />
                          ~ {{ formatDate(currentMission.deadline) }}
                        </span>
+                       <span v-if="isUrgent && !isMissionCompleted" class="px-2 py-0.5 bg-red-500/20 text-red-100 rounded text-xs font-bold animate-pulse">
+                         마감 임박
+                       </span>
                     </div>
-                    <h2 class="text-xl font-black mb-1">{{ currentMission.title }}</h2>
+                    <div class="flex items-center gap-2">
+                        <h2 class="text-xl font-black mb-1">{{ currentMission.title }}</h2>
+                        <span v-if="isMissionCompleted" class="bg-white/20 px-2 py-0.5 rounded text-xs font-bold flex items-center gap-1">
+                            <Check :size="12" /> 해결 완료!
+                        </span>
+                    </div>
                   </div>
                   
                   <div class="flex flex-wrap gap-2">
@@ -102,10 +113,16 @@
                       :key="problemId"
                       :href="getProblemLink(problemId)" 
                       target="_blank"
-                      class="flex items-center gap-2 bg-white text-indigo-600 px-4 py-2.5 rounded-xl font-bold text-sm hover:bg-indigo-50 hover:scale-105 transition-all shadow-sm"
+                      class="flex items-center gap-2 px-4 py-2.5 rounded-xl font-bold text-sm transition-all shadow-sm group"
+                      :class="isProblemSolved(problemId) 
+                        ? 'bg-white/20 text-white hover:bg-white/30' 
+                        : 'bg-white text-indigo-600 hover:bg-indigo-50 hover:scale-105'"
                     >
-                      <span>{{ problemId }}번</span>
-                      <ExternalLink :size="14" class="opacity-50" />
+                      <span class="flex items-center gap-1">
+                          {{ problemId }}번
+                          <Check v-if="isProblemSolved(problemId)" :size="14" />
+                      </span>
+                      <ExternalLink v-if="!isProblemSolved(problemId)" :size="14" class="opacity-50 group-hover:opacity-100" />
                     </a>
                   </div>
                 </div>
@@ -226,25 +243,44 @@
                   <div class="w-2 h-2 bg-slate-800 transform rotate-45 absolute bottom-1 left-1/2 -translate-x-1/2 shadow-sm"></div>
              </div>
 
-      <div v-if="records.length === 0 && !loading" class="flex flex-col items-center justify-center py-20 bg-white rounded-3xl border border-dashed border-slate-300">
+      
+      <div class="mb-6 flex items-center justify-between">
+          <h2 class="text-xl font-bold text-slate-800 flex items-center gap-2">
+              <Activity :size="20" class="text-indigo-500"/>
+              Timeline
+          </h2>
+          <!-- Filter Tabs -->
+          <div class="flex p-1 bg-slate-200 rounded-xl">
+              <button 
+                  v-for="filter in ['ALL', 'MISSION', 'MOCK_EXAM', 'DEFENSE', 'GENERAL']" 
+                  :key="filter"
+                  @click="selectedFilter = filter"
+                  class="px-4 py-1.5 rounded-lg text-xs font-bold transition-all"
+                  :class="selectedFilter === filter ? 'bg-white text-slate-800 shadow-sm' : 'text-slate-500 hover:text-slate-700'"
+              >
+                  {{ filter === 'ALL' ? '전체' : filter === 'MOCK_EXAM' ? '모의고사' : filter === 'MISSION' ? '과제' : filter === 'DEFENSE' ? '디펜스' : '일반' }}
+              </button>
+          </div>
+      </div>
+
+      
+
+      <div v-if="filteredRecords.length === 0 && !loading" class="flex flex-col items-center justify-center py-20 bg-white rounded-3xl border border-dashed border-slate-300">
         <div class="w-20 h-20 bg-indigo-50 rounded-full flex items-center justify-center mb-6">
           <Code2 :size="40" class="text-indigo-400" />
         </div>
         <h3 class="text-xl font-bold text-slate-800 mb-2">기록된 모험이 없습니다</h3>
-        <p class="text-slate-500 mb-6">첫 번째 알고리즘 문제를 해결하고 커밋해보세요!</p>
-        <button class="px-6 py-3 bg-slate-900 text-white rounded-xl font-bold hover:bg-slate-800 transition-colors">
-          가이드 보기
-        </button>
+        <p class="text-slate-500 mb-6 font-medium">
+             {{ selectedFilter === 'ALL' ? '첫 번째 알고리즘 문제를 해결하고 커밋해보세요!' : '해당 카테고리의 기록이 없습니다.' }}
+        </p>
       </div>
 
       <div v-else class="grid grid-cols-1 gap-4">
-        <!-- Record Card (Horizontal) -->
-        <!-- Record Card (Expanded) -->
-        <template v-for="record in records" :key="record.id">
+        <template v-for="record in filteredRecords" :key="record.id">
             <DashboardRecordCard 
                 :record="record"
-                @find-counter-example="requestCounterExample"
-                @ask-tutor="requestTutor"
+                :is-expanded="expandedRecordId === record.id"
+                @toggle-expand="handleToggleExpand"
             />
         </template>
       </div>
@@ -327,6 +363,21 @@ const loading = ref(true);
 const heatmapWeeks = ref([]);
 const heatmapScrollRef = ref(null);
 
+const selectedFilter = ref('ALL');
+const filteredRecords = computed(() => {
+    if (selectedFilter.value === 'ALL') return records.value;
+    return records.value.filter(r => r.tag === selectedFilter.value);
+});
+
+const expandedRecordId = ref(null);
+const handleToggleExpand = (recordId) => {
+    if (expandedRecordId.value === recordId) {
+        expandedRecordId.value = null;  // Close if already open
+    } else {
+        expandedRecordId.value = recordId;  // Open this one, close others
+    }
+};
+
 const acornLogs = ref([]);
 const missions = ref([]);
 
@@ -339,6 +390,38 @@ const currentMission = computed(() => {
 const tagStats = ref([]);
 const topTagName = computed(() => tagStats.value.length > 0 ? tagStats.value[0].tagKey : '');
 const totalSolvedCount = computed(() => tagStats.value.reduce((acc, curr) => acc + (curr.solved || 0), 0));
+
+// Check if a specific problem is solved
+const isProblemSolved = (problemId) => {
+    return records.value.some(r => r.problemNumber == problemId && (r.result === 'SUCCESS' || r.result === 'PASSED' || (r.runtimeMs && r.runtimeMs > 0)));
+};
+
+// Check if all mission problems are solved
+const isMissionCompleted = computed(() => {
+    if (!currentMission.value) return false;
+    return currentMission.value.problemIds.every(pid => isProblemSolved(pid));
+});
+
+// Check if deadline is urgent (within 3 days)
+const isUrgent = computed(() => {
+    if (!currentMission.value || isMissionCompleted.value) return false;
+    const now = new Date();
+    const deadline = new Date(currentMission.value.deadline);
+    const diffTime = deadline - now;
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)); 
+    return diffDays <= 3 && diffDays >= 0;
+});
+
+// Dynamic theme class for mission banner
+const missionThemeClass = computed(() => {
+    if (isMissionCompleted.value) {
+        return 'bg-gradient-to-r from-emerald-500 to-teal-600'; // Success Theme
+    }
+    if (isUrgent.value) {
+        return 'bg-gradient-to-r from-rose-500 to-orange-600'; // Urgent Theme
+    }
+    return 'bg-gradient-to-r from-indigo-500 to-indigo-600'; // Default Theme
+});
 
 const processHeatmap = (data) => {
     console.log('processHeatmap called with:', data?.length); // Debug

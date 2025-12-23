@@ -148,6 +148,16 @@ public class StudyMissionService {
         for (StudyMission mission : missions) {
             List<Integer> problems = parseProblems(mission.getProblemIds());
             if (problems.contains(problemId)) {
+                // Submission 레코드가 존재하는지 확인하고, 없으면 생성
+                StudyMissionSubmission submission = submissionRepository
+                        .findByMissionIdAndUserIdAndProblemId(mission.getId(), userId, problemId);
+
+                if (submission == null) {
+                    submission = StudyMissionSubmission.create(mission.getId(), userId, problemId);
+                    submissionRepository.save(submission);
+                }
+
+                // 완료 처리
                 submissionRepository.markCompleted(mission.getId(), userId, problemId);
             }
         }
@@ -161,6 +171,28 @@ public class StudyMissionService {
                 submissionRepository.save(submission);
             }
         }
+    }
+
+    /**
+     * 특정 문제가 현재 진행 중인 미션에 포함되는지 확인
+     */
+    @Transactional(readOnly = true)
+    public boolean isActiveMissionProblem(Long studyId, Integer problemId, java.time.LocalDateTime now) {
+        List<StudyMission> missions = missionRepository.findByStudyId(studyId);
+        for (StudyMission mission : missions) {
+            // Check deadline (assuming mission is active if before deadline or within same
+            // week? Logic: Deadline is date.)
+            // Logic: If now is before deadline + 1 day (end of deadline day).
+            if (mission.getDeadline() != null && now.toLocalDate().isAfter(mission.getDeadline())) {
+                continue;
+            }
+
+            List<Integer> problems = parseProblems(mission.getProblemIds());
+            if (problems.contains(problemId)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     private String toJson(List<Integer> problems) {

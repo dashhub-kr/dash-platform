@@ -31,14 +31,22 @@ public class AlgorithmRecord {
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
     private String recordType; // USER_SOLUTION or TOP100_PROBLEM
+    private String tag; // MISSION, MOCK_EXAM, DEFENSE, GENERAL
 
     // Joined fields
     private String username;
     // Analysis Join fields
     private Integer score;
     private String timeComplexity;
+    private String spaceComplexity;
     private String complexityExplanation;
     private String patterns;
+    private String algorithmIntuition;
+    private String pitfalls;
+    private String keyBlocks;
+    private Boolean refactorProvided;
+    private String refactorCode;
+    private String refactorExplanation;
 
     private AlgorithmRecord(Long userId, Long studyId, String problemNumber, String title, String language, String code,
             LocalDateTime createdAt, LocalDateTime updatedAt) {

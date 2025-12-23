@@ -35,6 +35,9 @@ public class CodeAnalysisResult {
     private String pitfalls;
     private String improvements;
 
+    // 핵심 블록 (JSON)
+    private String keyBlocks;
+
     // 리팩토링 제안
     private boolean refactorProvided;
     private String refactorCode;

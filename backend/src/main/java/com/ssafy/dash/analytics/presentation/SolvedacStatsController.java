@@ -37,7 +37,7 @@ public class SolvedacStatsController {
     public ResponseEntity<Map<String, String>> registerHandle(
             @PathVariable Long userId,
             @RequestBody @Valid RegisterHandleRequest request) {
-        syncService.registerSolvedacHandle(userId, request.getHandle());
+        syncService.registerSolvedacHandle(userId, request.getHandle(), request.getProfileImageUrl());
         return ResponseEntity.ok(Map.of(
                 "message", "Solved.ac 핸들이 성공적으로 등록되었습니다",
                 "handle", request.getHandle()));

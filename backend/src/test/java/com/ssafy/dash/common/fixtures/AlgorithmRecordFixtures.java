@@ -73,9 +73,8 @@ public final class AlgorithmRecordFixtures {
                     null,
                     null,
                     null,
-                    createdAt,
-                    updatedAt,
-                    null, null, null, null);
+                    createdAt,\r\n                    updatedAt,\r\n                    null,
+                    null, null, null, null, null, null, null, null, null, null, null);
         }
 
         public AlgorithmRecordCreateCommand toCreateCommand(String codeOverride) {
@@ -91,3 +90,5 @@ public final class AlgorithmRecordFixtures {
     }
 
 }
+
+

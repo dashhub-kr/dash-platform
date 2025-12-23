@@ -20,14 +20,14 @@ public record AlgorithmRecordResponse(
         String commitSha,
         String commitMessage,
         LocalDateTime committedAt,
+        String tag,
         LocalDateTime createdAt,
         LocalDateTime updatedAt,
         // Analysis Fields
         Integer score,
         String timeComplexity,
         String complexityExplanation,
-        String patterns
-) {
+        String patterns) {
 
     public static AlgorithmRecordResponse from(AlgorithmRecordResult result) {
         return new AlgorithmRecordResponse(
@@ -46,13 +46,13 @@ public record AlgorithmRecordResponse(
                 result.commitSha(),
                 result.commitMessage(),
                 result.committedAt(),
+                result.tag(),
                 result.createdAt(),
                 result.updatedAt(),
                 result.score(),
                 result.timeComplexity(),
                 result.complexityExplanation(),
-                result.patterns()
-            );
+                result.patterns());
     }
 
 }

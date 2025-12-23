@@ -13,7 +13,7 @@
     </div>
     
     <!-- Code Content -->
-    <div class="overflow-auto max-h-[600px] custom-scrollbar bg-white">
+    <div class="overflow-x-auto custom-scrollbar bg-white">
       <table class="w-full border-collapse">
         <tbody>
           <template v-for="(line, index) in codeLines" :key="index">
@@ -32,10 +32,19 @@
               <!-- Code -->
               <td 
                 class="pl-4 pr-4 py-0.5 font-mono text-sm whitespace-pre text-slate-700 relative cursor-pointer"
+                :class="{'bg-amber-50 border-l-2 border-amber-400': keyBlocksByLine[index + 1]?.length > 0}"
                 @click="toggleLine(index + 1)"
+                @mouseenter="handleLineHover(index + 1, $event)"
+                @mouseleave="hoveredLine = null"
               >
                 <div class="absolute left-0 top-0 bottom-0 w-1 bg-indigo-500 opacity-0 group-hover:opacity-100 transition-opacity"></div>
                 <code v-html="highlightLine(line)"></code>
+                <!-- AI Annotation Indicator -->
+                <span v-if="keyBlocksByLine[index + 1]?.length > 0" 
+                      class="absolute right-1 top-1/2 -translate-y-1/2 text-amber-500 text-xs"
+                      title="AI 코드 설명 있음">
+                  💡
+                </span>
               </td>
               
               <!-- Comment Badge (Right side indicator) -->
@@ -60,7 +69,7 @@
             </tr>
 
             <!-- Inline Comment Row -->
-            <tr v-if="expandedLines.has(index + 1) || commentsByLine[index + 1]?.length > 0" class="bg-slate-50">
+            <tr v-if="expandedLine === index + 1 || commentsByLine[index + 1]?.length > 0" class="bg-slate-50">
               <td class="border-r border-slate-100 bg-slate-50/50"></td>
               <td colspan="2" class="p-4 border-b border-slate-100 border-t border-slate-100">
                 <!-- Existing Comments -->
@@ -84,7 +93,7 @@
                 </div>
 
                 <!-- New Comment Form (Only if explicitely toggled/selected) -->
-                <div v-if="expandedLines.has(index + 1)" class="flex gap-3 pl-11 animate-fade-in">
+                <div v-if="expandedLine === index + 1" class="flex gap-3 pl-11 animate-fade-in">
                     <div class="flex-1">
                       <textarea
                         v-model="newCommentContent"
@@ -95,7 +104,7 @@
                       ></textarea>
                       <div class="flex justify-end gap-2">
                         <button 
-                          @click="expandedLines.delete(index + 1)"
+                          @click="expandedLine = null"
                           class="px-3 py-1.5 rounded-lg text-xs font-bold text-slate-500 hover:bg-slate-100 transition-colors"
                         >
                           취소
@@ -115,6 +124,27 @@
           </template>
         </tbody>
       </table>
+    </div>
+
+    <!-- AI Annotation Tooltip -->
+    <div v-if="hoveredLine && keyBlocksByLine[hoveredLine]?.length > 0"
+         class="fixed z-50 bg-slate-900 text-white rounded-lg shadow-2xl p-4 max-w-md pointer-events-none border border-amber-500/30"
+         :style="{ left: tooltipPosition.x + 'px', top: tooltipPosition.y + 'px', transform: 'translate(-50%, -100%) translateY(-10px)' }">
+      <div class="flex items-center gap-2 mb-2 text-amber-400 font-bold text-sm">
+        <span>💡</span>
+        <span>AI 코드 설명</span>
+      </div>
+      <div v-for="(block, idx) in keyBlocksByLine[hoveredLine]" :key="idx" class="space-y-2">
+        <div v-if="block.code" class="bg-slate-800 rounded p-2 text-xs font-mono text-slate-300 border border-slate-700">
+          {{ block.code }}
+        </div>
+        <p class="text-sm text-slate-300 leading-relaxed">{{ block.explanation }}</p>
+      </div>
+      <!-- Arrow -->
+      <div class="absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-full">
+        <div class="w-0 h-0 border-l-[8px] border-r-[8px] border-t-[8px] border-transparent border-t-amber-500/30"></div>
+        <div class="w-0 h-0 border-l-[6px] border-r-[6px] border-t-[6px] border-transparent border-t-slate-900 absolute top-0 left-1/2 -translate-x-1/2"></div>
+      </div>
     </div>
   </div>
 </template>
@@ -141,13 +171,18 @@ const props = defineProps({
   comments: { // Changed from lineComments count object to full array
     type: Array,
     default: () => []
+  },
+  keyBlocks: { // AI-generated code block annotations
+    type: Array,
+    default: () => []
   }
 });
 
 const emit = defineEmits(['submit-comment']);
 
-const expandedLines = ref(new Set()); // Set of line numbers where the form is open
+const expandedLine = ref(null); // Changed from Set to single line number
 const newCommentContent = ref('');
+const selectedLine = ref(null);
 
 const codeLines = computed(() => {
   return props.code ? props.code.split('\n') : [];
@@ -163,26 +198,60 @@ const commentsByLine = computed(() => {
     return map;
 });
 
+// Map keyBlocks to code lines
+const keyBlocksByLine = computed(() => {
+    const map = {};
+    props.keyBlocks.forEach(block => {
+        if (!block.code) return;
+        // Find which line(s) contain this code snippet
+        const codeSnippet = block.code.trim();
+        codeLines.value.forEach((line, idx) => {
+            if (line.includes(codeSnippet) || codeSnippet.includes(line.trim())) {
+                const lineNum = idx + 1;
+                if (!map[lineNum]) map[lineNum] = [];
+                map[lineNum].push(block);
+            }
+        });
+    });
+    return map;
+});
+
+const hoveredLine = ref(null);
+const tooltipPosition = ref({ x: 0, y: 0 });
+
 const highlightLine = (line) => {
   if (!line && line !== '') return '';
   // Empty line handling
   if (line.trim() === '') return '&nbsp;';
   
   try {
-    return hljs.highlight(line, { language: props.language }).value;
+    return hljs.highlightAuto(line).value;
   } catch (e) {
     return line;
   }
 };
 
 const toggleLine = (lineNumber) => {
-    if (expandedLines.value.has(lineNumber)) {
-        expandedLines.value.delete(lineNumber);
+    if (expandedLine.value === lineNumber) {
+        // Close if clicking the same line
+        expandedLine.value = null;
+        selectedLine.value = null;
     } else {
-        // Close others? GitHub allows multiple open. Let's allow multiple.
-        expandedLines.value.add(lineNumber);
-        // Clear input when opening new? Ideally we persist input per line but for simplicity global ref
+        // Open this line, close others
+        expandedLine.value = lineNumber;
+        selectedLine.value = lineNumber;
         newCommentContent.value = '';
+    }
+};
+
+const handleLineHover = (lineNumber, event) => {
+    if (keyBlocksByLine.value[lineNumber]?.length > 0) {
+        hoveredLine.value = lineNumber;
+        const rect = event.target.getBoundingClientRect();
+        tooltipPosition.value = {
+            x: rect.left + rect.width / 2,
+            y: rect.top
+        };
     }
 };
 
@@ -197,15 +266,18 @@ const formatDate = (dateString) => {
 };
 
 const submitLineComment = (lineNumber) => {
-  if (!newCommentContent.value.trim()) return;
-  
-  emit('submit-comment', { 
-    lineNumber, 
-    content: newCommentContent.value 
-  });
-  
-  newCommentContent.value = '';
-  expandedLines.value.delete(lineNumber);
+    if (!newCommentContent.value.trim()) {
+        alert('댓글 내용을 입력해주세요.');
+        return;
+    }
+
+    emit('submit-comment', {
+        lineNumber,
+        content: newCommentContent.value.trim()
+    });
+
+    newCommentContent.value = '';
+    expandedLine.value = null; // Close after submit
 };
 </script>
 
