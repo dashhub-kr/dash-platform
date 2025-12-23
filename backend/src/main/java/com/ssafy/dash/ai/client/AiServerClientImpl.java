@@ -63,8 +63,11 @@ public class AiServerClientImpl implements AiServerClient {
         } catch (Exception e) {
             log.warn("Failed to generate learning path: {}. Using fallback.", e.getMessage());
             return LearningPathResponse.builder()
-                    .overallAssessment("AI 서버 연결 실패")
+                    .analysisSummary("AI 서버 연결 실패")
                     .personalizedAdvice("현재 AI 분석을 이용할 수 없습니다.")
+                    .growthPrediction("데이터 없음")
+                    .strategicAdvice("AI 서버를 확인해주세요.")
+                    .efficiencyAnalysis("분석 불가")
                     .phases(java.util.List.of())
                     .build();
         }

@@ -24,6 +24,7 @@ public class LearningPathRequest {
     public static class TagStats {
         private String tagKey; // 태그 키
         private String tagName; // 태그명
+        private Integer bojTagId; // 백준 태그 ID (정수형)
         private int solved; // 푼 문제 수
         private int total; // 전체 문제 수
     }

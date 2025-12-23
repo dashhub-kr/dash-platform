@@ -18,12 +18,14 @@ import java.util.List;
 @AllArgsConstructor
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class LearningPathResponse {
-    private String overallAssessment; // 현재 상태 종합 평가
+    private String analysisSummary; // 분석 요약 (객관적 사실)
+    private String growthPrediction; // 성장 예측
+    private String strategicAdvice; // 전략적 조언
+    private String efficiencyAnalysis; // 효율성 분석
     private String keyStrength; // 핵심 강점
     private String primaryWeakness; // 주요 약점
     private String personalizedAdvice; // 개인화 조언
     private List<LearningPhase> phases; // AI 추천 학습 단계
-    private String motivationalMessage; // 동기부여 메시지
 
     @Data
     @Builder

@@ -9,6 +9,7 @@ import com.ssafy.dash.analytics.domain.UserClassStat;
 import com.ssafy.dash.analytics.domain.UserTagStat;
 import com.ssafy.dash.analytics.infrastructure.persistence.UserClassStatMapper;
 import com.ssafy.dash.analytics.infrastructure.persistence.UserTagStatMapper;
+import com.ssafy.dash.problem.infrastructure.persistence.TagMapper;
 import com.ssafy.dash.user.domain.User;
 import com.ssafy.dash.user.domain.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -41,6 +42,9 @@ class AiLearningPathServiceTest {
     private UserClassStatMapper classStatMapper;
 
     @Mock
+    private TagMapper tagMapper;
+
+    @Mock
     private UserRepository userRepository;
 
     @Mock
@@ -54,7 +58,7 @@ class AiLearningPathServiceTest {
     @BeforeEach
     void setUp() {
         learningPathService = new AiLearningPathService(
-                aiClient, tagStatMapper, classStatMapper, userRepository, cacheMapper, objectMapper);
+                aiClient, tagStatMapper, classStatMapper, tagMapper, userRepository, cacheMapper, objectMapper);
     }
 
     @Test
@@ -89,7 +93,7 @@ class AiLearningPathServiceTest {
         // then
         assertThat(result).isNotNull();
         assertThat(result.getAiAnalysis()).isNotNull();
-        assertThat(result.getAiAnalysis().getOverallAssessment()).isEqualTo("현재 상태 평가");
+        assertThat(result.getAiAnalysis().getAnalysisSummary()).isEqualTo("분석 요약");
 
         ArgumentCaptor<LearningPathRequest> captor = ArgumentCaptor.forClass(LearningPathRequest.class);
         verify(aiClient).generateLearningPath(captor.capture());
@@ -123,12 +127,14 @@ class AiLearningPathServiceTest {
 
     private LearningPathResponse createMockResponse() {
         LearningPathResponse response = new LearningPathResponse();
-        response.setOverallAssessment("현재 상태 평가");
+        response.setAnalysisSummary("분석 요약");
+        response.setGrowthPrediction("성장 예측");
+        response.setStrategicAdvice("전략 조언");
+        response.setEfficiencyAnalysis("효율 분석");
         response.setKeyStrength("강점");
         response.setPrimaryWeakness("약점");
         response.setPersonalizedAdvice("조언");
         response.setPhases(List.of());
-        response.setMotivationalMessage("화이팅!");
         return response;
     }
 }

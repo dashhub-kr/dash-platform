@@ -24,5 +24,6 @@ export const aiApi = {
 
   // Solved.ac 통계
   getTagStats: (userId, limit = 10) => http.get(`/users/${userId}/solvedac/stats/tags?limit=${limit}`),
+  getFamilyStats: (userId) => http.get(`/users/${userId}/solvedac/stats/families`),
   getClassStats: (userId) => http.get(`/users/${userId}/solvedac/stats/classes`),
 };

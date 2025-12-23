@@ -11,6 +11,8 @@ import com.ssafy.dash.analytics.domain.UserClassStat;
 import com.ssafy.dash.analytics.domain.UserTagStat;
 import com.ssafy.dash.analytics.infrastructure.persistence.UserClassStatMapper;
 import com.ssafy.dash.analytics.infrastructure.persistence.UserTagStatMapper;
+import com.ssafy.dash.problem.domain.Tag;
+import com.ssafy.dash.problem.infrastructure.persistence.TagMapper;
 import com.ssafy.dash.user.domain.User;
 import com.ssafy.dash.user.domain.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -32,6 +34,7 @@ public class AiLearningPathService {
         private final AiServerClient aiClient;
         private final UserTagStatMapper tagStatMapper;
         private final UserClassStatMapper classStatMapper;
+        private final TagMapper tagMapper;
         private final UserRepository userRepository;
         private final LearningPathCacheMapper cacheMapper;
         private final ObjectMapper objectMapper;
@@ -120,24 +123,32 @@ public class AiLearningPathService {
                                 .filter(t -> t.getSolved() > 0 && t.getSolved() < 10)
                                 .sorted(Comparator.comparing(UserTagStat::getSolved))
                                 .limit(5)
-                                .map(t -> LearningPathRequest.TagStats.builder()
-                                                .tagKey(t.getTagKey())
-                                                .tagName(t.getTagKey())
-                                                .solved(t.getSolved())
-                                                .total(t.getTotal())
-                                                .build())
+                                .map(t -> {
+                                        Tag tag = tagMapper.findTagByKey(t.getTagKey());
+                                        return LearningPathRequest.TagStats.builder()
+                                                        .tagKey(t.getTagKey())
+                                                        .tagName(t.getTagKey())
+                                                        .bojTagId(tag != null ? tag.getBojTagId() : null)
+                                                        .solved(t.getSolved())
+                                                        .total(t.getTotal())
+                                                        .build();
+                                })
                                 .toList();
 
                 // 강점 태그 (상위 5개)
                 List<LearningPathRequest.TagStats> strengthTags = tagStats.stream()
                                 .sorted(Comparator.comparing(UserTagStat::getSolved).reversed())
                                 .limit(5)
-                                .map(t -> LearningPathRequest.TagStats.builder()
-                                                .tagKey(t.getTagKey())
-                                                .tagName(t.getTagKey())
-                                                .solved(t.getSolved())
-                                                .total(t.getTotal())
-                                                .build())
+                                .map(t -> {
+                                        Tag tag = tagMapper.findTagByKey(t.getTagKey());
+                                        return LearningPathRequest.TagStats.builder()
+                                                        .tagKey(t.getTagKey())
+                                                        .tagName(t.getTagKey())
+                                                        .bojTagId(tag != null ? tag.getBojTagId() : null)
+                                                        .solved(t.getSolved())
+                                                        .total(t.getTotal())
+                                                        .build();
+                                })
                                 .toList();
 
                 // 클래스 통계
