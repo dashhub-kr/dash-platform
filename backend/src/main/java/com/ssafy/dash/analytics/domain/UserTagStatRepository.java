@@ -7,5 +7,7 @@ public interface UserTagStatRepository {
 
     List<UserTagStat> findByUserId(Long userId);
 
+    List<UserFamilyStat> findFamilyStatsByUserId(Long userId);
+
     void deleteByUserId(Long userId);
 }

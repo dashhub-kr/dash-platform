@@ -1,6 +1,7 @@
 package com.ssafy.dash.analytics.infrastructure.persistence;
 
 import com.ssafy.dash.analytics.domain.UserTagStat;
+import com.ssafy.dash.analytics.domain.UserFamilyStat;
 import org.apache.ibatis.annotations.Mapper;
 import java.util.List;
 
@@ -17,7 +18,15 @@ public interface UserTagStatMapper {
     /**
      * 사용자의 모든 태그 통계 조회
      */
+    /**
+     * 사용자의 모든 태그 통계 조회
+     */
     List<UserTagStat> findByUserId(Long userId);
+
+    /**
+     * 사용자의 패밀리 태그 통계 조회 (집계)
+     */
+    List<UserFamilyStat> findFamilyStatsByUserId(Long userId);
 
     /**
      * 특정 태그 통계 조회

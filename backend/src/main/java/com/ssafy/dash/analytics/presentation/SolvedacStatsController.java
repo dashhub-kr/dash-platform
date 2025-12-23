@@ -6,6 +6,7 @@ import com.ssafy.dash.analytics.domain.UserClassStat;
 import com.ssafy.dash.analytics.domain.UserClassStatRepository;
 import com.ssafy.dash.analytics.domain.UserTagStat;
 import com.ssafy.dash.analytics.domain.UserTagStatRepository;
+import com.ssafy.dash.analytics.domain.UserFamilyStat;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -65,6 +66,16 @@ public class SolvedacStatsController {
         return ResponseEntity.ok(limit != null && stats.size() > limit
                 ? stats.subList(0, limit)
                 : stats);
+    }
+
+    /**
+     * 패밀리 태그별 통계 조회 (집계)
+     */
+    @Operation(summary = "패밀리 태그별 통계 조회", description = "사용자의 Solved.ac 패밀리 태그별(집계된) 통계를 조회합니다")
+    @GetMapping("/stats/families")
+    public ResponseEntity<List<UserFamilyStat>> getFamilyStats(@PathVariable Long userId) {
+        List<UserFamilyStat> stats = tagStatRepository.findFamilyStatsByUserId(userId);
+        return ResponseEntity.ok(stats);
     }
 
     /**
