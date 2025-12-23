@@ -137,57 +137,12 @@
 
 
 
-          <!-- Skill Analysis Section -->
-          <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8 animate-fade-in-up delay-100">
-             <!-- Radar Chart -->
-             <div class="bg-white rounded-2xl p-6 shadow-sm border border-slate-100 flex flex-col items-center">
-                <h3 class="text-sm font-bold text-slate-800 mb-4 w-full flex items-center gap-2">
-                   <LayoutGrid :size="16" class="text-indigo-500" />
-                   알고리즘 역량 분포
-                </h3>
-                <div class="w-full max-w-[240px] aspect-square">
-                    <AlgorithmRadarChart :stats="tagStats" :max-tags="6" />
-                </div>
-             </div>
-
-             <!-- Quick Stats / Recommendations -->
-             <div class="md:col-span-2 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-2xl p-6 text-white shadow-lg relative overflow-hidden">
-                 <div class="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full blur-3xl -mr-16 -mt-16"></div>
-                 <div class="relative z-10">
-                     <h3 class="font-bold text-lg mb-2 flex items-center gap-2">
-                        <Trophy :size="20" class="text-amber-300" />
-                        나의 주특기 분석
-                     </h3>
-                     <div v-if="tagStats.length > 0">
-                         <p class="text-indigo-100 mb-6 font-medium">
-                            가장 자신 있는 분야는 <span class="font-bold text-white bg-white/20 px-2 py-0.5 rounded ml-1 mr-1">{{ topTagName }}</span> 입니다.
-                            <br>총 <span class="font-bold text-white">{{ totalSolvedCount }}</span>문제를 해결하며 꾸준히 성장하고 계시네요!
-                         </p>
-                         <div class="flex gap-3">
-                             <div v-for="tag in tagStats.slice(0, 3)" :key="tag.tagKey" class="bg-white/10 backdrop-blur rounded-xl p-3 flex-1 border border-white/10">
-                                 <div class="text-xs text-indigo-200 mb-1 uppercase font-bold">{{ tag.tagKey }}</div>
-                                 <div class="text-xl font-black">{{ tag.solved }} <span class="text-xs font-normal opacity-70">문제</span></div>
-                             </div>
-                         </div>
-                     </div>
-                     <div v-else class="text-indigo-100 h-32 flex items-center justify-center">
-                        아직 분석할 데이터가 충분하지 않습니다. <br> 문제를 풀기 시작해보세요!
-                     </div>
-                 </div>
-             </div>
-          </div>
-
-      <!-- Content Grid -->
-      <div v-if="loading" class="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div v-for="i in 6" :key="i" class="h-64 rounded-3xl bg-white shadow-sm border border-slate-100 animate-pulse"></div>
-      </div>
-
-      <!-- Activity Section: Heatmap + Recent Activity -->
+      <!-- Activity Section: Heatmap -->
       <div v-if="!loading" class="mb-10 animate-fade-in-up">
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-5">
           
-          <!-- Heatmap Card (9 cols) -->
-          <div class="lg:col-span-9 bg-white rounded-2xl p-6 shadow-sm border border-slate-100">
+          <!-- Heatmap Card (Full Width) -->
+          <div class="lg:col-span-12 bg-white rounded-2xl p-6 shadow-sm border border-slate-100">
             <div class="flex items-center justify-between mb-5">
               <h2 class="text-base font-bold text-slate-800 flex items-center gap-2">
                 <TrendingUp class="text-indigo-500 w-5 h-5" />
@@ -224,29 +179,6 @@
                   </div>
                 </div>
               </div>
-            </div>
-          </div>
-
-          <!-- Recent Activity Card (3 cols) -->
-          <div class="lg:col-span-3 bg-white rounded-2xl p-5 shadow-sm border border-slate-100">
-            <h3 class="text-sm font-bold text-slate-800 mb-4 flex items-center gap-2 pb-3 border-b border-slate-100">
-              <Activity :size="14" class="text-indigo-500" /> 최근 활동
-            </h3>
-            <div v-if="acornLogs.length > 0" class="flex flex-col gap-3">
-              <div v-for="log in acornLogs.slice(0, 6)" :key="log.id" class="flex items-center justify-between text-sm group">
-                <div class="flex items-center gap-2">
-                  <div class="w-6 h-6 rounded-full bg-gradient-to-br from-indigo-400 to-purple-500 flex items-center justify-center text-[10px] font-bold text-white shadow-sm">
-                    {{ (log.username || '?').charAt(0).toUpperCase() }}
-                  </div>
-                  <span class="font-medium text-slate-600 truncate max-w-[80px] group-hover:text-slate-900 transition-colors">{{ log.username }}</span>
-                </div>
-                <span class="font-bold font-mono text-sm" :class="log.amount > 0 ? 'text-emerald-500' : 'text-rose-500'">
-                  {{ log.amount > 0 ? '+' : '' }}{{ log.amount }}
-                </span>
-              </div>
-            </div>
-            <div v-else class="text-center py-6 text-slate-400 text-sm">
-              아직 활동 기록이 없습니다
             </div>
           </div>
 
