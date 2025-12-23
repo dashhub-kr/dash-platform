@@ -149,13 +149,12 @@
               ref="profileRef"
             >
               <!-- 프로필 아바타 -->
-              <div 
-                class="w-9 h-9 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-600 font-bold text-sm cursor-pointer hover:ring-2 hover:ring-indigo-100 transition-all"
+              <img 
+                :src="userProfileImage" 
+                class="w-9 h-9 rounded-full object-cover bg-indigo-100 cursor-pointer hover:ring-2 hover:ring-indigo-100 transition-all"
                 @click.stop="toggleProfileMenu"
-                :title="user.username || user.email"
-              >
-                {{ userInitial }}
-              </div>
+                :alt="user.username || user.email"
+              />
 
               <transition name="slide-down">
                 <div
@@ -213,6 +212,21 @@ const emit = defineEmits(["scroll"]);
 
 const profileMenuOpen = ref(false);
 const profileRef = ref(null);
+
+const profileImages = [
+  '/profile/bag.png',
+  '/profile/proud.png',
+  '/profile/smart.png',
+  '/profile/smile.png'
+];
+
+const userProfileImage = computed(() => {
+  if (!user.value) return '';
+  const id = user.value.id || 0;
+  // Deterministic selection based on ID
+  const index = id % profileImages.length;
+  return profileImages[index];
+});
 
 const userInitial = computed(() => {
   const name = user.value?.username || user.value?.email || "";

@@ -15,9 +15,7 @@
       <div class="bg-white/70 backdrop-blur-xl border border-white/40 rounded-3xl p-8 shadow-xl shadow-indigo-100/50 animate-fade-in-up delay-100">
         <div class="flex flex-col sm:flex-row items-center gap-8 mb-10 pb-10 border-b border-slate-100">
           <div class="relative group">
-            <div class="w-24 h-24 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-4xl font-bold text-white shadow-lg group-hover:scale-105 transition-transform duration-300">
-              {{ userInitial }}
-            </div>
+            <img :src="userProfileImage" class="w-24 h-24 rounded-full object-cover bg-white shadow-lg group-hover:scale-105 transition-transform duration-300" />
             <div class="absolute -bottom-2 -right-2 w-8 h-8 bg-white rounded-full flex items-center justify-center shadow-md border border-slate-100 text-indigo-500">
                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
             </div>
@@ -164,6 +162,19 @@ const userData = ref({
 const updating = ref(false);
 const syncingSolvedac = ref(false);
 const syncingRepo = ref(false);
+
+const profileImages = [
+    '/profile/bag.png',
+    '/profile/proud.png',
+    '/profile/smart.png',
+    '/profile/smile.png'
+];
+
+const userProfileImage = computed(() => {
+    if (!userData.value.id) return profileImages[0]; // fallback
+    const index = userData.value.id % profileImages.length;
+    return profileImages[index];
+});
 
 const userInitial = computed(() => {
     return userData.value.username ? userData.value.username.charAt(0).toUpperCase() : 'U';
