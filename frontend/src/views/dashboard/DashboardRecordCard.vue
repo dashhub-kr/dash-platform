@@ -260,7 +260,29 @@
                                     <div class="max-w-[85%] rounded-2xl p-3 text-xs shadow-sm leading-relaxed"
                                         :class="msg.role === 'user' ? 'bg-indigo-600 text-white rounded-tr-none' : 'bg-white border border-slate-200 text-slate-700 rounded-tl-none'">
                                         <span v-if="msg.role === 'user'">{{ msg.content }}</span>
-                                        <div v-else v-html="renderMarkdown(msg.content)" class="prose prose-sm max-w-none prose-p:my-1 prose-strong:text-emerald-700"></div>
+                                        <div v-else>
+                                            <div v-html="renderMarkdown(msg.content)" class="prose prose-sm max-w-none prose-p:my-1 prose-strong:text-emerald-700"></div>
+                                            
+                                            <!-- Encouragement -->
+                                            <div v-if="msg.encouragement" class="mt-3 p-2 bg-emerald-50 rounded text-emerald-700 italic border border-emerald-100 flex gap-2 items-start">
+                                                <Lightbulb :size="12" class="mt-0.5 shrink-0"/>
+                                                <span>{{ msg.encouragement }}</span>
+                                            </div>
+                                            
+                                            <!-- Related Concepts -->
+                                            <div v-if="msg.concepts && msg.concepts.length > 0" class="mt-2 flex flex-wrap gap-1">
+                                                <span v-for="c in msg.concepts" :key="c" class="px-1.5 py-0.5 bg-slate-100 text-slate-500 rounded text-[10px]">#{{c}}</span>
+                                            </div>
+
+                                            <!-- Suggested Questions -->
+                                            <div v-if="msg.suggestions && msg.suggestions.length > 0" class="mt-3 space-y-1">
+                                                <div class="text-[10px] font-bold text-slate-400 mb-1">💡 추천 질문</div>
+                                                <button v-for="q in msg.suggestions" :key="q" @click="sendSuggestion(q)" 
+                                                    class="block w-full text-left p-2 rounded bg-slate-50 hover:bg-indigo-50 text-slate-600 hover:text-indigo-600 transition-colors border border-transparent hover:border-indigo-100 text-[11px] group">
+                                                    <span class="group-hover:mr-1 transition-all">💬</span> {{ q }}
+                                                </button>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                                 <div v-if="loadingTutorResponse" class="flex gap-3">
@@ -431,7 +453,13 @@ const sendTutorMessage = async () => {
              wrongReason: !isPassed.value ? '틀렸습니다' : null,
              history: history
         });
-        tutorMessages.value.push({ role: 'assistant', content: res.data.reply || res.data.answer || "답변을 생성할 수 없습니다." });
+        tutorMessages.value.push({ 
+            role: 'assistant', 
+            content: res.data.reply || res.data.answer || "답변을 생성할 수 없습니다.",
+            suggestions: res.data.followUpQuestions,
+            concepts: res.data.relatedConcepts,
+            encouragement: res.data.encouragement
+        });
     } catch (e) {
         console.error(e);
         tutorMessages.value.push({ role: 'assistant', content: "AI 서버 연결에 실패했습니다. 잠시 후 다시 시도해주세요." });
@@ -439,6 +467,11 @@ const sendTutorMessage = async () => {
         loadingTutorResponse.value = false;
         nextTick(() => { if(chatContainer.value) chatContainer.value.scrollTop = chatContainer.value.scrollHeight; });
     }
+};
+
+const sendSuggestion = (q) => {
+    tutorInput.value = q;
+    sendTutorMessage();
 };
 
 // Helpers

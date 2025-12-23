@@ -58,13 +58,14 @@ class OnboardingServiceTest {
         when(oauthTokenService.requireValidAccessToken(USER_ID)).thenReturn(createToken());
         doNothing().when(gitHubWebhookService).ensureWebhook(REPOSITORY, TestFixtures.TEST_ACCESS_TOKEN);
 
-        RepositorySetupResult result = onboardingService.setupRepository(new RepositorySetupCommand(USER_ID, REPOSITORY));
+        RepositorySetupResult result = onboardingService
+                .setupRepository(new RepositorySetupCommand(USER_ID, REPOSITORY));
 
         ArgumentCaptor<Onboarding> repositoryCaptor = ArgumentCaptor.forClass(Onboarding.class);
         // 저장은 두 번 호출됨: 한 번은 최초 생성 시, 한 번은 웹훅 설정 후
         verify(onboardingRepository, times(2)).save(repositoryCaptor.capture());
         verify(gitHubWebhookService).ensureWebhook(REPOSITORY, TestFixtures.TEST_ACCESS_TOKEN);
-        
+
         // 최근 저장이 웹훅 설정 후의 상태임
         assertThat(repositoryCaptor.getAllValues().get(1).isWebhookConfigured()).isTrue();
 
@@ -81,7 +82,7 @@ class OnboardingServiceTest {
         when(onboardingRepository.findByUserId(USER_ID)).thenReturn(Optional.of(existing));
         when(oauthTokenService.requireValidAccessToken(USER_ID)).thenReturn(createToken());
         doThrow(new GitHubWebhookException("GitHub 오류"))
-            .when(gitHubWebhookService).ensureWebhook(REPOSITORY, TestFixtures.TEST_ACCESS_TOKEN);
+                .when(gitHubWebhookService).ensureWebhook(REPOSITORY, TestFixtures.TEST_ACCESS_TOKEN);
 
         assertThatThrownBy(() -> onboardingService.setupRepository(new RepositorySetupCommand(USER_ID, REPOSITORY)))
                 .isInstanceOf(WebhookRegistrationException.class)
@@ -90,7 +91,7 @@ class OnboardingServiceTest {
         verify(gitHubWebhookService).ensureWebhook(REPOSITORY, TestFixtures.TEST_ACCESS_TOKEN);
         // 저장 2번 호출 -> 이름/웹훅 재설정 시, 예외 처리 블록
         verify(onboardingRepository, times(2)).save(eq(existing));
-        
+
         // 웹훅 호출 전에 리셋된 상태 유지 확인
         assertThat(existing.isWebhookConfigured()).isFalse();
     }
@@ -99,11 +100,12 @@ class OnboardingServiceTest {
     @DisplayName("유효한 토큰이 없으면 WebhookRegistrationException으로 wrapping된 OAuthAccessTokenUnavailableException이 발생한다")
     void setupRepository_missingToken() {
         when(onboardingRepository.findByUserId(USER_ID)).thenReturn(Optional.empty());
-        when(oauthTokenService.requireValidAccessToken(USER_ID)).thenThrow(new OAuthAccessTokenUnavailableException("토큰 없음"));
+        when(oauthTokenService.requireValidAccessToken(USER_ID))
+                .thenThrow(new OAuthAccessTokenUnavailableException("토큰 없음"));
 
         assertThatThrownBy(() -> onboardingService.setupRepository(new RepositorySetupCommand(USER_ID, REPOSITORY)))
-            .isInstanceOf(WebhookRegistrationException.class)
-            .hasMessageContaining("토큰 없음");
+                .isInstanceOf(WebhookRegistrationException.class)
+                .hasMessageContaining("토큰 없음");
 
         verify(onboardingRepository).save(any(Onboarding.class));
         verify(gitHubWebhookService, times(0)).ensureWebhook(eq(REPOSITORY), eq(TestFixtures.TEST_ACCESS_TOKEN));
@@ -112,5 +114,5 @@ class OnboardingServiceTest {
     private UserOAuthToken createToken() {
         return TestFixtures.userOAuthTokenFixture(USER_ID).toDomain();
     }
-    
+
 }

@@ -73,7 +73,9 @@ public final class AlgorithmRecordFixtures {
                     null,
                     null,
                     null,
-                    createdAt,\r\n                    updatedAt,\r\n                    null,
+                    createdAt,
+                    updatedAt,
+                    null,
                     null, null, null, null, null, null, null, null, null, null, null);
         }
 
@@ -90,5 +92,3 @@ public final class AlgorithmRecordFixtures {
     }
 
 }
-
-
