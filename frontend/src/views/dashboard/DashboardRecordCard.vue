@@ -293,7 +293,8 @@ import { ref, watch, computed, nextTick } from 'vue';
 import { ExternalLink, ChevronDown, ChevronUp, Bot, Bug, Send, Loader2, Activity, LayoutList, Lightbulb, Tag, MessageSquare, Wand2, CheckCircle2 } from 'lucide-vue-next';
 import CodeViewer from '../../components/CodeViewer.vue';
 import { boardApi, commentApi } from '../../api/board';
-import { aiApi } from '../../api/ai'; // Added aiApi import
+import { aiApi } from '../../api/ai'; 
+import { useAuth } from '../../composables/useAuth';
 import { marked } from 'marked';
 
 const props = defineProps({
@@ -301,6 +302,8 @@ const props = defineProps({
 });
 
 const emit = defineEmits(['find-counter-example', 'ask-tutor']);
+
+const { user } = useAuth();
 
 const expanded = ref(false);
 const loadingBoard = ref(false);
@@ -413,18 +416,24 @@ const sendTutorMessage = async () => {
     // Auto-scroll
     nextTick(() => { if(chatContainer.value) chatContainer.value.scrollTop = chatContainer.value.scrollHeight; });
 
+    // History excludes the current message which is sent in 'message' field
+    const history = tutorMessages.value.slice(0, -1).map(m => ({ 
+        role: m.role === 'user' ? 'user' : 'assistant', 
+        content: m.content 
+    }));
+
     try {
-        // Mock response for now or actual API call if ready
-        const res = await aiApi.chatWithTutor({
+        const res = await aiApi.tutorChat({
+             userId: user.value?.id,
+             recordId: props.record.id,
              message: userMsg,
-             context: {
-                 code: props.record.code,
-                 problemNumber: props.record.problemNumber,
-                 language: props.record.language
-             }
+             solveStatus: isPassed.value ? 'solved' : 'wrong',
+             wrongReason: !isPassed.value ? '틀렸습니다' : null,
+             history: history
         });
-        tutorMessages.value.push({ role: 'assistant', content: res.data.answer || "죄송합니다. 답변을 생성할 수 없습니다." });
+        tutorMessages.value.push({ role: 'assistant', content: res.data.reply || res.data.answer || "답변을 생성할 수 없습니다." });
     } catch (e) {
+        console.error(e);
         tutorMessages.value.push({ role: 'assistant', content: "AI 서버 연결에 실패했습니다. 잠시 후 다시 시도해주세요." });
     } finally {
         loadingTutorResponse.value = false;
