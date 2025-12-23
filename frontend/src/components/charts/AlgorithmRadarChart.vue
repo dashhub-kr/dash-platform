@@ -39,6 +39,9 @@ const chartData = computed(() => {
   if (topTags.value.length === 0) return null;
   
   const labels = topTags.value.map(t => {
+    // If explicit label is provided (e.g. from family stats), use it
+    if (t.label) return t.label;
+
     const tagMap = {
       'implementation': '구현',
       'dp': 'DP',
@@ -53,7 +56,8 @@ const chartData = computed(() => {
       'simulation': '시뮬레이션',
       'sorting': '정렬',
       'bruteforcing': '완전탐색',
-      'trees': '트리'
+      'trees': '트리',
+      'advanced': '고급'
     };
     return tagMap[t.tagKey] || t.tagKey;
   });

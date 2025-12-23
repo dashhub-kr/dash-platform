@@ -1,6 +1,7 @@
 package com.ssafy.dash.analytics.infrastructure.persistence;
 
 import com.ssafy.dash.analytics.domain.UserTagStat;
+import com.ssafy.dash.analytics.domain.UserFamilyStat;
 import com.ssafy.dash.analytics.domain.UserTagStatRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
@@ -21,6 +22,11 @@ public class UserTagStatRepositoryImpl implements UserTagStatRepository {
     @Override
     public List<UserTagStat> findByUserId(Long userId) {
         return tagStatMapper.findByUserId(userId);
+    }
+
+    @Override
+    public List<UserFamilyStat> findFamilyStatsByUserId(Long userId) {
+        return tagStatMapper.findFamilyStatsByUserId(userId);
     }
 
     @Override
