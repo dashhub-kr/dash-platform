@@ -16,4 +16,9 @@ public interface ProblemMapper {
     Problem findProblemByNumber(String problemNumber);
 
     List<String> findTagsByProblemNumber(String problemNumber);
+
+    List<Problem> findProblemsByTagAndLevelRange(@org.apache.ibatis.annotations.Param("tagKey") String tagKey,
+            @org.apache.ibatis.annotations.Param("minLevel") int minLevel,
+            @org.apache.ibatis.annotations.Param("maxLevel") int maxLevel,
+            @org.apache.ibatis.annotations.Param("excludedIds") List<String> excludedIds);
 }

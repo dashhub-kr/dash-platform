@@ -57,38 +57,37 @@ public final class AlgorithmRecordFixtures {
 
         public AlgorithmRecordResult toResult(LocalDateTime createdAt, LocalDateTime updatedAt) {
             return new AlgorithmRecordResult(
-                id, // Long id
-                userId, // Long userId
-                "testuser", // String username
-                problemNumber, // String problemNumber
-                title, // String title
-                code, // String code
-                language, // String language
-                "UNKNOWN", // String platform
-                null, // String difficulty
-                null, // Integer runtimeMs
-                null, // Integer memoryKb
-                null, // String repositoryName
-                null, // String filePath
-                null, // String commitSha
-                null, // String commitMessage
-                null, // LocalDateTime committedAt
-                null, // String tag
-                null, // Integer defenseStreak
-                createdAt, // LocalDateTime createdAt
-                updatedAt, // LocalDateTime updatedAt
-                null, // Integer score
-                null, // String timeComplexity
-                null, // String spaceComplexity
-                null, // String complexityExplanation
-                null, // String patterns
-                null, // String algorithmIntuition
-                null, // String pitfalls
-                null, // String keyBlocks
-                null, // Boolean refactorProvided
-                null, // String refactorCode
-                null // String refactorExplanation
-            );
+                    id,
+                    userId,
+                    "testuser",
+                    problemNumber,
+                    title,
+                    code,
+                    language,
+                    "UNKNOWN",
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null, // tag
+                    0, // defenseStreak
+                    createdAt,
+                    updatedAt,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null);
         }
 
         public AlgorithmRecordCreateCommand toCreateCommand(String codeOverride) {

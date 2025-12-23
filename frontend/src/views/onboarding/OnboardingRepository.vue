@@ -59,7 +59,7 @@
             </div>
           </label>
 
-          <!-- Search Results -->
+            <!-- Search Results -->
             <div 
               v-for="repo in repositories" 
               :key="repo.fullName"
@@ -86,10 +86,9 @@
                 </span>
               </div>
             </div>
-          </div>
 
           <!-- No Results -->
-          <div v-else-if="searchQuery && !searching && repositories.length === 0 && !selectedRepo" class="text-center py-6 text-slate-500">
+          <div v-if="searchQuery && !searching && repositories.length === 0 && !selectedRepo" class="text-center py-6 text-slate-500">
             <p class="font-medium">일치하는 저장소가 없습니다.</p>
             <p class="text-sm mt-1">다른 이름으로 검색해보세요.</p>
           </div>
@@ -333,6 +332,7 @@ const submitRepository = async () => {
 .line-clamp-1 {
   display: -webkit-box;
   -webkit-line-clamp: 1;
+  line-clamp: 1;
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
