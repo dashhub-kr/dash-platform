@@ -16,6 +16,8 @@ import java.util.List;
 import com.ssafy.dash.dashboard.application.dto.result.HeatmapItem;
 import java.util.Map;
 import java.util.stream.Collectors;
+import com.ssafy.dash.defense.application.DefenseService;
+import com.ssafy.dash.mockexam.application.MockExamService;
 
 @Service
 public class AlgorithmRecordService {
@@ -23,12 +25,17 @@ public class AlgorithmRecordService {
     private final AlgorithmRecordRepository algorithmRecordRepository;
     private final UserRepository userRepository;
     private final com.ssafy.dash.study.application.StudyMissionService studyMissionService;
+    private final DefenseService defenseService;
+    private final MockExamService mockExamService;
 
     public AlgorithmRecordService(AlgorithmRecordRepository algorithmRecordRepository, UserRepository userRepository,
-            com.ssafy.dash.study.application.StudyMissionService studyMissionService) {
+            com.ssafy.dash.study.application.StudyMissionService studyMissionService,
+            DefenseService defenseService, MockExamService mockExamService) {
         this.algorithmRecordRepository = algorithmRecordRepository;
         this.userRepository = userRepository;
         this.studyMissionService = studyMissionService;
+        this.defenseService = defenseService;
+        this.mockExamService = mockExamService;
     }
 
     @Transactional
@@ -50,10 +57,12 @@ public class AlgorithmRecordService {
 
         algorithmRecordRepository.save(record);
 
-        // 스터디 미션 완료 체크
+        // 스터디 미션, 디펜스, 모의고사 완료 체크
         try {
             int problemId = Integer.parseInt(command.problemNumber());
             studyMissionService.checkAndMarkCompleted(command.userId(), problemId);
+            defenseService.verifyDefense(command.userId(), problemId);
+            mockExamService.verifyExam(command.userId(), problemId);
         } catch (NumberFormatException e) {
             // ignore non-integer problem numbers
         }
