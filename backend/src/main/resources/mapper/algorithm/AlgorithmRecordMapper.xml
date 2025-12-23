@@ -6,11 +6,11 @@
     INSERT INTO algorithm_records (
       user_id, study_id, problem_number, title, code, language, platform, difficulty,
       runtime_ms, memory_kb, repository_name, file_path, commit_sha, commit_message,
-      committed_at, created_at, updated_at, record_type, tag
+      committed_at, created_at, updated_at, record_type, tag, defense_streak
     ) VALUES (
       #{userId}, #{studyId}, #{problemNumber}, #{title}, #{code}, #{language}, #{platform}, #{difficulty},
       #{runtimeMs}, #{memoryKb}, #{repositoryName}, #{filePath}, #{commitSha}, #{commitMessage},
-      #{committedAt}, #{createdAt}, #{updatedAt}, #{recordType}, #{tag}
+      #{committedAt}, #{createdAt}, #{updatedAt}, #{recordType}, #{tag}, #{defenseStreak}
     )
   </insert>
 
@@ -58,7 +58,8 @@
     SET problem_number = #{problemNumber}, title = #{title}, code = #{code}, language = #{language},
         platform = #{platform}, difficulty = #{difficulty}, runtime_ms = #{runtimeMs}, memory_kb = #{memoryKb},
         repository_name = #{repositoryName}, file_path = #{filePath}, commit_sha = #{commitSha},
-        commit_message = #{commitMessage}, committed_at = #{committedAt}, updated_at = #{updatedAt}
+        commit_message = #{commitMessage}, committed_at = #{committedAt}, updated_at = #{updatedAt},
+        defense_streak = #{defenseStreak}, tag = #{tag}
     WHERE id = #{id}
   </update>
 

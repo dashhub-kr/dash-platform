@@ -61,7 +61,12 @@ public class AlgorithmRecordService {
         try {
             int problemId = Integer.parseInt(command.problemNumber());
             studyMissionService.checkAndMarkCompleted(command.userId(), problemId);
-            defenseService.verifyDefense(command.userId(), problemId);
+            Integer defenseStreak = defenseService.verifyDefense(command.userId(), problemId);
+            if (defenseStreak != null) {
+                record.setTag("DEFENSE");
+                record.setDefenseStreak(defenseStreak);
+                algorithmRecordRepository.update(record);
+            }
             mockExamService.verifyExam(command.userId(), problemId);
         } catch (NumberFormatException e) {
             // ignore non-integer problem numbers

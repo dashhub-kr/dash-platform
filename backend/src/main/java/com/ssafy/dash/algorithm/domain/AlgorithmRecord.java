@@ -32,6 +32,7 @@ public class AlgorithmRecord {
     private LocalDateTime updatedAt;
     private String recordType; // USER_SOLUTION or TOP100_PROBLEM
     private String tag; // MISSION, MOCK_EXAM, DEFENSE, GENERAL
+    private Integer defenseStreak;
 
     // Joined fields
     private String username;

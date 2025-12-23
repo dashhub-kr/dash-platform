@@ -79,32 +79,36 @@ public class DefenseService {
                 user.getMaxGoldStreak());
     }
 
-    public void verifyDefense(Long userId, Integer solvedProblemId) {
+    public Integer verifyDefense(Long userId, Integer solvedProblemId) {
         User user = getUser(userId);
 
         if (user.getDefenseStartTime() == null) {
-            return; // 디펜스 모드가 아님
+            return null; // 디펜스 모드가 아님
         }
 
         checkTimeout(user);
         if (user.getDefenseStartTime() == null) {
-            return; // 방금 타임아웃됨
+            return null; // 방금 타임아웃됨
         }
 
         if (user.getDefenseProblemId().equals(solvedProblemId)) {
             // 실제 정답 제출이 있는지 확인 (runtime_ms, memory_kb가 있는 기록)
             if (!algorithmRecordRepository.existsSuccessfulSubmission(userId, String.valueOf(solvedProblemId))) {
-                return; // 성공적인 제출 기록이 없음 (오답 또는 컴파일 에러)
+                return null; // 성공적인 제출 기록이 없음 (오답 또는 컴파일 에러)
             }
+
+            Integer currentStreak = 0;
 
             // 성공!
             if ("GOLD".equals(user.getDefenseType())) {
                 user.setGoldStreak(user.getGoldStreak() + 1);
+                currentStreak = user.getGoldStreak();
                 if (user.getGoldStreak() > user.getMaxGoldStreak()) {
                     user.setMaxGoldStreak(user.getGoldStreak());
                 }
             } else {
                 user.setSilverStreak(user.getSilverStreak() + 1);
+                currentStreak = user.getSilverStreak();
                 if (user.getSilverStreak() > user.getMaxSilverStreak()) {
                     user.setMaxSilverStreak(user.getSilverStreak());
                 }
@@ -116,7 +120,9 @@ public class DefenseService {
             user.setDefenseType(null);
 
             userRepository.update(user);
+            return currentStreak;
         }
+        return null;
     }
 
     private void checkTimeout(User user) {

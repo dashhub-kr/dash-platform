@@ -466,7 +466,7 @@ const hasAnyAnalysis = computed(() => props.record.timeComplexity || parsedPitfa
 const isPassed = computed(() => props.record.result === 'SUCCESS' || props.record.result === 'PASSED' || (props.record.runtimeMs > 0 && props.record.memoryKb > 0));
 
 const taskTypeLabel = computed(() => ({'MISSION':'과제','MOCK_EXAM':'모의고사','DEFENSE':'디펜스','GENERAL':'일반'}[props.record.tag]));
-const defenseStreak = ref(0);
+const defenseStreak = computed(() => props.record.defenseStreak || 0);
 
 const statusHeaderClass = computed(() => {
     if (props.record.tag === 'DEFENSE') return isPassed.value ? 'bg-indigo-50 text-indigo-700 border-b border-indigo-100' : 'bg-red-50 text-red-700 border-b border-red-100';

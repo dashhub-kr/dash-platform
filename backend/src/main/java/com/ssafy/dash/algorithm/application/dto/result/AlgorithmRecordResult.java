@@ -22,6 +22,7 @@ public record AlgorithmRecordResult(
         String commitMessage,
         LocalDateTime committedAt,
         String tag,
+        Integer defenseStreak,
         LocalDateTime createdAt,
         LocalDateTime updatedAt,
         // Analysis Fields
@@ -59,6 +60,7 @@ public record AlgorithmRecordResult(
                 record.getCommitMessage(),
                 record.getCommittedAt(),
                 record.getTag(),
+                record.getDefenseStreak(),
                 record.getCreatedAt(),
                 record.getUpdatedAt(),
                 record.getScore(),
