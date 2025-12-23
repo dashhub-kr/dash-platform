@@ -157,20 +157,78 @@
       </div>
     </div>
   </div>
+    <!-- 액션 모달 -->
+    <div v-if="selectedActionTag" class="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm" @click="closeActionModal">
+      <div class="bg-white rounded-2xl shadow-2xl p-8 max-w-md w-full relative transform transition-all scale-100" @click.stop>
+        <!-- 닫기 버튼 -->
+        <button 
+          @click="closeActionModal"
+          class="absolute top-4 right-4 text-slate-400 hover:text-slate-600 transition-colors"
+        >
+          <X :size="24" />
+        </button>
+
+        <!-- 타이틀 -->
+        <div class="text-center mb-8">
+          <div class="text-3xl mb-2">🚀</div>
+          <h3 class="text-2xl font-bold text-slate-800">{{ selectedActionTag.name }}</h3>
+          <p class="text-slate-500 mt-1">어떤 학습을 진행하시겠습니까?</p>
+        </div>
+
+        <!-- 액션 버튼들 -->
+        <div class="grid grid-cols-2 gap-4">
+          <button 
+            @click="solveProblem(selectedActionTag)"
+            class="flex flex-col items-center justify-center gap-3 p-6 rounded-xl bg-indigo-50 border-2 border-indigo-100 hover:border-indigo-500 hover:bg-indigo-100 transition-all group"
+          >
+            <div class="w-12 h-12 rounded-full bg-indigo-100 text-indigo-600 flex items-center justify-center group-hover:bg-indigo-500 group-hover:text-white transition-colors">
+              <Code :size="24" stroke-width="2.5" />
+            </div>
+            <span class="font-bold text-indigo-900">문제 풀기</span>
+          </button>
+
+          <button 
+            @click="openLecture(selectedActionTag)"
+            class="flex flex-col items-center justify-center gap-3 p-6 rounded-xl bg-rose-50 border-2 border-rose-100 hover:border-rose-500 hover:bg-rose-100 transition-all group"
+          >
+            <div class="w-12 h-12 rounded-full bg-rose-100 text-rose-600 flex items-center justify-center group-hover:bg-rose-500 group-hover:text-white transition-colors">
+              <Youtube :size="24" stroke-width="2.5" />
+            </div>
+            <span class="font-bold text-rose-900">강의 영상</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 강의 모달 (재사용 가능 컴포넌트) -->
+    <LectureModal 
+      :is-open="lectureModalOpen"
+      :tag-name="lectureTag?.name"
+      :tag-key="lectureTag?.key"
+      :boj-tag-id="lectureTag?.bojTagId"
+      @close="closeLectureModal"
+    />
 </template>
 
 <script setup>
 import { ref, computed, onMounted } from 'vue';
+import { useRouter } from 'vue-router';
 import { tagApi } from '@/api/tags';
 import { useAuth } from '@/composables/useAuth';
 import SkillTreeGraphView from '@/components/SkillTreeGraphView.vue';
+import LectureModal from '@/components/LectureModal.vue';
 import { X, Network } from 'lucide-vue-next';
 
+const router = useRouter();
 const { user } = useAuth();
 const loading = ref(true);
 const skillTree = ref(null);
 const selectedFamily = ref(null);
 const viewMode = ref('card'); // 'card' or 'graph'
+
+// Lecture Modal State
+const lectureModalOpen = ref(false);
+const lectureTag = ref(null);
 
 // Family 아이콘
 const familyIcons = {
@@ -342,18 +400,86 @@ const selectFamily = (family) => {
   selectedFamily.value = selectedFamily.value?.key === family.key ? null : family;
 };
 
+
+
+// --- 액션 모달 로직 ---
+const selectedActionTag = ref(null);
+
 const onTagClick = (tag) => {
-  // 백준 problemset URL 생성 (티어 필터링 + 미해결 문제만)
+  console.log('Tag Clicked:', tag.name);
+  openLecture(tag); // 바로 강의 모달 띄우기
+};
+
+const closeActionModal = () => {
+  selectedActionTag.value = null;
+};
+
+const openLecture = async (tag) => {
+  closeActionModal();
+  lectureTag.value = tag;
+  lectureModalOpen.value = true;
+  lectureLoading.value = true;
+  lectureVideos.value = [];
+  lectureProblems.value = [];
+  
+  try {
+    const query = `${tag.name} 알고리즘 강의`;
+    const [videoRes, probRes] = await Promise.all([
+      youtubeApi.search(query),
+      problemApi.getRecommendations(tag.key, userTier.value || 1)
+    ]);
+    lectureVideos.value = videoRes.data || [];
+    lectureProblems.value = probRes.data || [];
+  } catch (e) {
+    console.error('Failed to load lecture data:', e);
+  } finally {
+    lectureLoading.value = false;
+  }
+};
+
+const closeLectureModal = () => {
+  lectureModalOpen.value = false;
+  lectureTag.value = null;
+};
+
+const playVideo = (videoId) => {
+  selectedVideoId.value = videoId;
+};
+
+const goToProblemModal = (problemId) => {
+  window.open(`https://www.acmicpc.net/problem/${problemId}`, '_blank');
+};
+
+const goToMoreProblemsModal = () => {
+  const tierStart = userTier.value || 1;
+  const tierEnd = Math.min(tierStart + 4, 30);
+  
+  if (lectureTag.value?.bojTagId) {
+    const tierRange = Array.from({ length: tierEnd - tierStart + 1 }, (_, i) => tierStart + i).join('%2C');
+    const url = `https://www.acmicpc.net/problemset?sort=ac_desc&submit=pac%2Cfa%2Cus&tier=${tierRange}&algo=${lectureTag.value.bojTagId}&algo_if=and`;
+    window.open(url, '_blank');
+  } else if (lectureTag.value?.key) {
+    const query = `*tag:${lectureTag.value.key} tier:${tierStart}..${tierEnd} -s@${user.value?.solvedacHandle || ''}`;
+    window.open(`https://solved.ac/search?query=${encodeURIComponent(query)}`, '_blank');
+  }
+};
+
+// 기존 onTagClick 로직을 재사용 (solveProblem)
+const solveProblem = (tag) => {
+  const tierStart = userTier.value || 1;
+  const tierEnd = Math.min(tierStart + 4, 30);
+  
   if (tag.bojTagId) {
-    const tierStart = userTier.value || 1;
-    const tierEnd = Math.min(tierStart + 4, 30);
     const tierRange = Array.from({ length: tierEnd - tierStart + 1 }, (_, i) => tierStart + i).join('%2C');
     const url = `https://www.acmicpc.net/problemset?sort=ac_desc&submit=pac%2Cfa%2Cus&tier=${tierRange}&algo=${tag.bojTagId}&algo_if=and`;
     window.open(url, '_blank');
   } else {
-    // bojTagId가 없으면 solved.ac로 fallback
-    window.open(`https://solved.ac/problems/tags/${tag.key}`, '_blank');
+    // Solved.ac fallback (tagKey 기반 검색) -> 여기도 필터링 적용 가능하면 좋으나 일단 기존 유지 혹은 업데이트
+    // 사용자 요청인 "로드맵의 todays review와 완전히 동일하게"를 따르자면 Solved.ac 검색도 userTier 조건이 들어가야 함.
+    const query = `*tag:${tag.key} tier:${tierStart}..${tierEnd} -s@${user.value?.solvedacHandle || ''}`;
+    window.open(`https://solved.ac/search?query=${encodeURIComponent(query)}`, '_blank');
   }
+  closeActionModal();
 };
 
 const fetchSkillTree = async () => {
@@ -381,5 +507,24 @@ onMounted(() => fetchSkillTree());
 .expand-leave-to {
   opacity: 0;
   transform: translateY(-10px);
+}
+
+/* Modal fade transitions */
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.2s ease;
+}
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
+}
+
+/* Line clamp utility */
+.line-clamp-2 {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 </style>

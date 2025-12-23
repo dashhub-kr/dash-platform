@@ -44,7 +44,7 @@
             <p class="text-sm text-slate-500 mb-4 line-clamp-2">{{ dailyReview?.reason || '꾸준한 학습으로 실력을 키워보세요!' }}</p>
             <button 
               v-if="dailyReview"
-              @click="goToProblem(dailyReview.problemNumber, dailyReview.link)"
+              @click="openDailyReviewModal"
               class="w-full py-3 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl font-bold transition-colors flex items-center justify-center gap-2"
             >
               <Play :size="16" />
@@ -71,92 +71,16 @@
           </div>
         </div>
 
-        <!-- 현재 실력 분석 (OnboardingAnalysis Style) -->
+        <!-- 현재 실력 분석 (재사용 컴포넌트) -->
         <section class="mb-8">
-          <h2 class="text-xl font-bold text-slate-800 mb-5 flex items-center gap-2 pl-2 border-l-4 border-indigo-500">
-            현재 실력 분석
-          </h2>
-          
-          <div class="grid grid-cols-1 lg:grid-cols-12 gap-5">
-            
-            <!-- Left Column: Tier + Radar + Strength/Weakness (5 cols) -->
-            <div class="lg:col-span-5 flex flex-col gap-4">
-              
-              <!-- Tier Card (Compact) -->
-              <div class="bg-white/80 backdrop-blur-xl border border-slate-200 rounded-2xl p-4 shadow-sm relative overflow-hidden group">
-                <div class="absolute inset-0 bg-gradient-to-br from-indigo-50/50 to-purple-50/50 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-                <div class="relative z-10 flex items-center gap-4">
-                  <div class="relative flex-shrink-0">
-                    <div class="absolute inset-0 bg-indigo-500/20 blur-xl rounded-full"></div>
-                    <img 
-                      v-if="userTier"
-                      :src="`https://static.solved.ac/tier_small/${userTier}.svg`" 
-                      class="w-14 h-14 relative drop-shadow-lg"
-                      alt="Tier Badge"
-                    />
-                  </div>
-                  <div>
-                    <div class="text-xs font-bold text-slate-400 uppercase tracking-wider flex items-center gap-1">
-                      <Zap :size="12" />
-                      현재 티어
-                    </div>
-                    <div class="text-xl font-black text-indigo-900">{{ userTierName || 'Unranked' }}</div>
-                  </div>
-                </div>
-              </div>
-
-              <!-- Radar Chart Card -->
-              <div class="bg-white/80 backdrop-blur-xl border border-slate-200 rounded-2xl p-4 shadow-sm flex-1">
-                <h3 class="text-sm font-bold text-slate-600 mb-3 flex items-center gap-2">
-                   <LayoutGrid :size="14" class="text-indigo-500" />
-                   알고리즘 역량
-                </h3>
-                <div class="flex items-center justify-center">
-                   <div class="w-full aspect-square max-w-[240px]">
-                      <AlgorithmRadarChart :stats="allTagStats" :max-tags="8" />
-                   </div>
-                </div>
-              </div>
-
-              <!-- Strength & Weakness Cards -->
-              <div class="grid grid-cols-2 gap-3">
-                <!-- Strength Card -->
-                <div class="bg-emerald-50/80 border border-emerald-200 rounded-xl p-3">
-                  <div class="flex items-center gap-2 mb-1.5">
-                    <div class="w-6 h-6 rounded-lg bg-emerald-100 flex items-center justify-center text-emerald-600">
-                      <Zap :size="12" />
-                    </div>
-                    <span class="text-xs font-bold text-emerald-700 uppercase">강점</span>
-                  </div>
-                  <div class="text-slate-700 text-xs font-medium leading-relaxed line-clamp-2">
-                    {{ learningPath?.aiAnalysis?.keyStrength || '-' }}
-                  </div>
-                </div>
-
-                <!-- Weakness Card -->
-                <div class="bg-rose-50/80 border border-rose-200 rounded-xl p-3">
-                  <div class="flex items-center gap-2 mb-1.5">
-                     <div class="w-6 h-6 rounded-lg bg-rose-100 flex items-center justify-center text-rose-500">
-                        <AlertTriangle :size="12" />
-                     </div>
-                    <span class="text-xs font-bold text-rose-600 uppercase">약점</span>
-                  </div>
-                  <div class="text-slate-700 text-xs font-medium leading-relaxed line-clamp-2">
-                    {{ learningPath?.aiAnalysis?.primaryWeakness || '-' }}
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <!-- Right Column: Learning Roadmap (7 cols) -->
-            <div class="lg:col-span-7 bg-white/80 backdrop-blur-xl border border-slate-200 rounded-2xl p-5 shadow-sm">
-              <h3 class="text-sm font-bold text-slate-600 mb-4 flex items-center gap-2">
-                 <MapIcon :size="14" class="text-indigo-500" />
-                 맞춤형 학습 로드맵
-              </h3>
-              <LearningRoadmap :phases="learningPath?.aiAnalysis?.phases || []" class="w-full" />
-            </div>
-          </div>
+          <SkillAnalysisCard 
+            :tier="userTier"
+            :tier-name="userTierName"
+            :chart-tags="chartTags"
+            :key-strength="learningPath?.aiAnalysis?.keyStrength"
+            :primary-weakness="learningPath?.aiAnalysis?.primaryWeakness"
+            :phases="learningPath?.aiAnalysis?.phases || []"
+          />
         </section>
 
         <!-- AI 종합 분석 리포트 -->
@@ -235,68 +159,53 @@
         <SkillTreeView />
       </div>
 
-      <!-- 2. 강의실 (Youtube) -->
-      <div v-if="currentTab === 'videos'" class="animate-fade-in-up">
-        <!-- 검색 및 필터 -->
-        <div class="bg-white rounded-2xl p-6 shadow-sm border border-slate-200 mb-6">
-          <h2 class="text-lg font-bold text-slate-800 mb-4">📺 알고리즘 강의</h2>
-          <div class="flex flex-wrap gap-2 mb-4">
-            <button v-for="tag in recommendedKeywords" :key="tag" 
-               @click="searchVideos(tag)"
-               class="px-4 py-2 rounded-full border transition-colors"
-               :class="searchKeyword === tag ? 'bg-indigo-600 text-white border-indigo-600' : 'bg-white text-slate-600 border-slate-200 hover:border-indigo-400'"
-            >
-              #{{ tag }}
-            </button>
-          </div>
-          <div class="relative">
-            <input 
-              v-model="searchKeyword" 
-              @keyup.enter="searchVideos(searchKeyword)"
-              type="text" 
-              placeholder="검색어 입력 (예: DP, BFS)" 
-              class="w-full pl-4 pr-12 py-3 rounded-xl bg-slate-50 border border-slate-200 focus:outline-none focus:border-indigo-500"
-            />
-            <button @click="searchVideos(searchKeyword)" class="absolute right-2 top-1/2 -translate-y-1/2 p-2 text-indigo-600 hover:bg-indigo-50 rounded-lg">
-              <Search :size="20"/>
-            </button>
-          </div>
-        </div>
-        
-        <!-- 비디오 그리드 -->
-        <div v-if="isLoadingVideos" class="text-center py-20">
-          <div class="animate-spin text-indigo-600 mb-2"><Loader2 :size="40"/></div>
-          <p class="text-slate-500">강의를 찾고 있습니다...</p>
-        </div>
-        <div v-else-if="videos.length > 0" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          <div v-for="video in videos" :key="video.videoId" class="bg-white rounded-2xl overflow-hidden shadow-sm border border-slate-200 hover:shadow-md transition-shadow group cursor-pointer" @click="openVideo(video.videoId)">
-            <div class="aspect-video bg-slate-200 relative overflow-hidden">
-              <img :src="video.thumbnailUrl" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
-              <div class="absolute inset-0 bg-black/20 group-hover:bg-black/40 transition-colors flex items-center justify-center text-white opacity-0 group-hover:opacity-100">
-                <Play :size="40" fill="currentColor" />
-              </div>
-            </div>
-            <div class="p-4">
-              <h3 class="font-bold text-slate-800 line-clamp-2 mb-2 h-12">{{ video.title }}</h3>
-              <div class="flex items-center justify-between text-xs text-slate-500">
-                <span>{{ video.channelTitle }}</span>
-                <span>{{ formatDate(video.publishedAt) }}</span>
-              </div>
-            </div>
-          </div>
-        </div>
-        <div v-else class="text-center py-20 text-slate-500">
-          검색 결과가 없습니다. 키워드를 클릭해보세요!
-        </div>
-      </div>
-
-
     </div>
   </div>
+
+  <!-- YouTube 임베드 모달 -->
+  <Teleport to="body">
+    <Transition name="fade">
+      <div v-if="selectedVideoId" class="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm" @click="closeVideoModal">
+        <div class="relative w-full max-w-5xl aspect-video" @click.stop>
+          <!-- 닫기 버튼 -->
+          <button 
+            @click="closeVideoModal"
+            class="absolute -top-12 right-0 text-white/80 hover:text-white transition-colors flex items-center gap-2 text-sm font-medium"
+          >
+            <span>닫기</span>
+            <div class="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center transition-colors">
+              <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </div>
+          </button>
+          
+          <!-- YouTube Embed -->
+          <iframe 
+            :src="`https://www.youtube.com/embed/${selectedVideoId}?autoplay=1&rel=0`"
+            class="w-full h-full rounded-2xl shadow-2xl"
+            frameborder="0"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+            allowfullscreen
+          ></iframe>
+        </div>
+      </div>
+    </Transition>
+  </Teleport>
+
+  <!-- 강의 모달 (재사용 가능 컴포넌트) -->
+  <LectureModal 
+    :is-open="lectureModalOpen"
+    :tag-name="lectureTagName"
+    :tag-key="lectureTagKey"
+    :boj-tag-id="lectureBojTagId"
+    @close="closeLectureModal"
+  />
 </template>
 
 <script setup>
-import { ref, computed, onMounted, nextTick } from 'vue';
+import { ref, computed, onMounted, nextTick, watch } from 'vue';
+import { useRoute } from 'vue-router'; // useRoute 추가
 import { 
     RefreshCw, Trophy, Swords, Play,
     Search, Loader2, Send, RotateCcw, LayoutGrid,
@@ -305,21 +214,27 @@ import {
 import AlgorithmRadarChart from '../components/charts/AlgorithmRadarChart.vue';
 import LearningRoadmap from '../components/LearningRoadmap.vue';
 import SkillTreeView from '../components/SkillTreeView.vue';
+import SkillAnalysisCard from '../components/SkillAnalysisCard.vue';
+import LectureModal from '../components/LectureModal.vue';
 import { useAuth } from '../composables/useAuth';
 import { aiApi } from '../api/ai';
-import { youtubeApi } from '../api/youtube';
 import { marked } from 'marked';
 
 // State
 const { user } = useAuth();
 const currentTab = ref('roadmap');
 const isSimulating = ref(false);
-const isLoadingVideos = ref(false);
+const selectedVideoId = ref(null); // YouTube 모달용
+
+// Lecture Modal State
+const lectureModalOpen = ref(false);
+const lectureTagName = ref('');
+const lectureTagKey = ref('');
+const lectureBojTagId = ref('');
 
 const tabs = [
     { id: 'roadmap', label: '⛳️ 로드맵' },
-    { id: 'skilltree', label: '🌳 스킬 트리' },
-    { id: 'videos', label: '📺 강의실' }
+    { id: 'skilltree', label: '🌳 스킬 트리' }
 ];
 
 // 1. Roadmap Data
@@ -345,35 +260,116 @@ const userTierName = computed(() => {
   return tier >= 0 && tier < TIER_NAMES.length ? TIER_NAMES[tier] : 'Unrated';
 });
 
+// Chart Tags for Radar Chart (familyStats based, like OnboardingAnalysis)
+const familyStats = ref([]);
+const chartTags = computed(() => {
+  // 1. If Family Stats exist (Ideal), use them
+  if (familyStats.value && familyStats.value.length > 0) {
+    return familyStats.value.map(stat => ({
+      tagKey: stat.familyKey?.toLowerCase(),
+      solved: stat.solved || 0,
+      total: stat.total || 0,
+      label: stat.familyName === '다이나믹 프로그래밍' ? 'DP' : stat.familyName
+    }));
+  }
+
+  // 2. Fallback: Use Tags from Learning Path
+  if (learningPath.value) {
+    const strong = learningPath.value.strengthTags || [];
+    const weak = learningPath.value.weaknessTags || [];
+    const merged = [...strong, ...weak];
+    const uniqueMap = new Map();
+    merged.forEach(t => {
+      if (!uniqueMap.has(t.tagKey)) {
+        uniqueMap.set(t.tagKey, {
+          tagKey: t.tagKey,
+          solved: t.solved || 0,
+          total: t.total || 0,
+          label: t.tagName === '다이나믹 프로그래밍' ? 'DP' : t.tagName
+        });
+      }
+    });
+    return Array.from(uniqueMap.values());
+  }
+  return [];
+});
+
 // 2. Videos Data
 const searchKeyword = ref('');
 const recommendedKeywords = ref(['Dynamic Programming', 'BFS', 'Dijkstra', 'Greedy']);
 const videos = ref([]);
+const recommendedProblems = ref([]); // 추천 문제 상태 추가
 
-// Methods
-onMounted(async () => {
-    if (user.value) {
-        loadLearningPath();
+const route = useRoute(); // 라우트 인스턴스
+
+// URL 쿼리 파라미터 처리 (초기 로드 + URL 변경 감지)
+const handleQueryParams = () => {
+    if (route.query.tab) {
+        currentTab.value = route.query.tab;
     }
-});
+    
+    if (route.query.q) {
+        if (currentTab.value !== 'videos') currentTab.value = 'videos';
+        // 이미 같은 검색어면 재검색 방지, 단 태그변경시 재검색
+        if (searchKeyword.value !== route.query.q || currentTagKey.value !== route.query.tagKey) {
+            // tagKey, bojId가 있으면 함께 전달
+            searchVideos(route.query.q, route.query.tagKey, route.query.bojId);
+        }
+    }
+};
+
+const goToProblem = (problemNumber, link) => {
+    if (link) window.open(link, '_blank');
+    else if (problemNumber) window.open(`https://www.acmicpc.net/problem/${problemNumber}`, '_blank');
+};
+
+const currentTagKey = ref(''); // 현재 추천된 태그 키 저장
+const currentBojId = ref('');  // 현재 백준 태그 ID 저장
+
+const goToMoreProblems = () => {
+    if (!user.value) return;
+    
+    const tierStart = userTier.value || 1;
+    // 범위: 내 티어 ~ +4 (넓게 탐색)
+    const tierEnd = Math.min(tierStart + 4, 30); 
+    
+    if (currentBojId.value) {
+        // 1. BOJ Tag ID가 있으면 백준 문제집으로 이동 (사용자가 원한 방식)
+        const tierRange = Array.from({ length: tierEnd - tierStart + 1 }, (_, i) => tierStart + i).join('%2C');
+        const url = `https://www.acmicpc.net/problemset?sort=ac_desc&submit=pac%2Cfa%2Cus&tier=${tierRange}&algo=${currentBojId.value}&algo_if=and`;
+        window.open(url, '_blank');
+    } else if (currentTagKey.value) {
+        // 2. 없으면 Solved.ac 검색 (fallback)
+        const query = `*tag:${currentTagKey.value} tier:${tierStart}..${tierEnd} -s@${user.value.username}`;
+        window.open(`https://solved.ac/search?query=${encodeURIComponent(query)}`, '_blank');
+    }
+};
 
 const loadLearningPath = async () => {
     try {
-        const res = await aiApi.getLearningPath(user.value.id);
-        learningPath.value = res.data;
+        if (!user.value) return;
         
-        if (res.data.weaknessTags?.length > 0) {
-            recommendedKeywords.value = res.data.weaknessTags.map(t => t.tagName);
+        // Load learning path and family stats in parallel
+        const [learningPathRes, familyRes] = await Promise.all([
+            aiApi.getLearningPath(user.value.id),
+            aiApi.getFamilyStats(user.value.id).catch(() => ({ data: [] }))
+        ]);
+        
+        learningPath.value = learningPathRes.data;
+        familyStats.value = familyRes.data || [];
+        
+        if (learningPathRes.data.weaknessTags?.length > 0) {
+            recommendedKeywords.value = learningPathRes.data.weaknessTags.map(t => t.tagName);
         }
 
-        const weak = res.data.weaknessTags || [];
-        const strong = res.data.strengthTags || [];
+        const weak = learningPathRes.data.weaknessTags || [];
+        const strong = learningPathRes.data.strengthTags || [];
         const map = new Map();
         [...weak, ...strong].forEach(t => map.set(t.tagKey, t));
         allTagStats.value = Array.from(map.values());
 
-        if (res.data.weaknessTags?.length > 0) {
-            const worstTag = res.data.weaknessTags[0];
+        if (learningPathRes.data.weaknessTags?.length > 0) {
+            const worstTag = learningPathRes.data.weaknessTags[0];
             const winRate = worstTag.total > 0 ? Math.round((worstTag.solved / worstTag.total) * 100) : 0;
             
             // Build tier range: userTier ~ userTier+4 (capped at 30)
@@ -408,27 +404,78 @@ const loadLearningPath = async () => {
     }
 };
 
-const goToProblem = (problemNumber, link) => {
-    if (link) window.open(link, '_blank');
-    else if (problemNumber) window.open(`https://www.acmicpc.net/problem/${problemNumber}`, '_blank');
-};
+onMounted(async () => {
+    handleQueryParams();
+    if (user.value) {
+        await loadLearningPath();
+    }
+});
 
-const searchVideos = async (keyword) => {
+watch(user, async (newUser) => {
+    if (newUser) {
+        await loadLearningPath();
+    }
+});
+
+watch(() => route.query, () => {
+    handleQueryParams();
+});
+
+const searchVideos = async (keyword, explicitTagKey = null, explicitBojId = null) => {
     currentTab.value = 'videos';
     searchKeyword.value = keyword;
     isLoadingVideos.value = true;
+    recommendedProblems.value = []; 
+
     try {
-        const res = await youtubeApi.search(keyword + " 알고리즘 강의");
-        videos.value = res.data;
+        const youtubeQuery = keyword.includes('알고리즘') ? keyword : keyword + " 알고리즘 강의";
+        const videoRes = await youtubeApi.search(youtubeQuery);
+        videos.value = videoRes.data;
+
+        let tag = explicitTagKey;
+        if (!tag) {
+             tag = keyword.replace(' 알고리즘', '').trim();
+        }
+        
+        if (tag) {
+            currentTagKey.value = tag; 
+            currentBojId.value = explicitBojId; // BoJ ID 저장
+            
+            const tier = userTier.value || 1;
+            const probRes = await problemApi.getRecommendations(tag, tier);
+            recommendedProblems.value = probRes.data;
+        } else {
+            currentTagKey.value = '';
+            currentBojId.value = '';
+        }
+
     } catch (e) {
-        console.error("Youtube search failed:", e);
+        console.error("Search failed:", e);
     } finally {
         isLoadingVideos.value = false;
     }
 };
 
 const openVideo = (videoId) => {
-    window.open(`https://www.youtube.com/watch?v=${videoId}`, '_blank');
+    selectedVideoId.value = videoId;
+};
+
+const closeVideoModal = () => {
+    selectedVideoId.value = null;
+};
+
+// Lecture Modal 함수
+const openDailyReviewModal = () => {
+    if (!dailyReview.value) return;
+    // dailyReview의 태그 정보로 모달 열기
+    lectureTagName.value = dailyReview.value.title?.replace('집중 공략', '').replace(' ', '') || dailyReview.value.tag || 'binary_search';
+    lectureTagKey.value = dailyReview.value.tagKey || dailyReview.value.tag || 'binary_search';
+    lectureBojTagId.value = dailyReview.value.bojTagId || '';
+    lectureModalOpen.value = true;
+};
+
+const closeLectureModal = () => {
+    lectureModalOpen.value = false;
 };
 
 
@@ -448,5 +495,15 @@ const formatDate = (isoString) => {
 .no-scrollbar {
     -ms-overflow-style: none;
     scrollbar-width: none;
+}
+
+/* YouTube 모달 페이드 트랜지션 */
+.fade-enter-active,
+.fade-leave-active {
+    transition: opacity 0.2s ease;
+}
+.fade-enter-from,
+.fade-leave-to {
+    opacity: 0;
 }
 </style>
