@@ -12,6 +12,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ssafy.dash.study.domain.StudyMission;
 import com.ssafy.dash.study.domain.StudyMissionRepository;
+import com.ssafy.dash.algorithm.domain.AlgorithmRecordRepository;
 import com.ssafy.dash.study.domain.StudyMissionSubmission;
 import com.ssafy.dash.study.domain.StudyMissionSubmissionRepository;
 import com.ssafy.dash.user.domain.User;
@@ -29,6 +30,7 @@ public class StudyMissionService {
 
     private final StudyMissionRepository missionRepository;
     private final StudyMissionSubmissionRepository submissionRepository;
+    private final AlgorithmRecordRepository algorithmRecordRepository;
     private final UserRepository userRepository;
     private final ObjectMapper objectMapper;
 
@@ -168,6 +170,12 @@ public class StudyMissionService {
         for (User member : members) {
             for (Integer problemId : problemIds) {
                 StudyMissionSubmission submission = StudyMissionSubmission.create(missionId, member.getId(), problemId);
+
+                // Check if already solved
+                if (algorithmRecordRepository.existsSuccessfulSubmission(member.getId(), String.valueOf(problemId))) {
+                    submission.markCompleted();
+                }
+
                 submissionRepository.save(submission);
             }
         }

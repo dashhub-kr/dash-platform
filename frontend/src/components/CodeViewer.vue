@@ -32,19 +32,12 @@
               <!-- Code -->
               <td 
                 class="pl-4 pr-4 py-0.5 font-mono text-sm whitespace-pre text-slate-700 relative cursor-pointer"
-                :class="{'bg-amber-50 border-l-2 border-amber-400': keyBlocksByLine[index + 1]?.length > 0}"
                 @click="toggleLine(index + 1)"
                 @mouseenter="handleLineHover(index + 1, $event)"
                 @mouseleave="hoveredLine = null"
               >
                 <div class="absolute left-0 top-0 bottom-0 w-1 bg-indigo-500 opacity-0 group-hover:opacity-100 transition-opacity"></div>
                 <code v-html="highlightLine(line)"></code>
-                <!-- AI Annotation Indicator -->
-                <span v-if="keyBlocksByLine[index + 1]?.length > 0" 
-                      class="absolute right-1 top-1/2 -translate-y-1/2 text-amber-500 text-xs"
-                      title="AI 코드 설명 있음">
-                  💡
-                </span>
               </td>
               
               <!-- Comment Badge (Right side indicator) -->
@@ -127,25 +120,27 @@
     </div>
 
     <!-- AI Annotation Tooltip -->
-    <div v-if="hoveredLine && keyBlocksByLine[hoveredLine]?.length > 0"
-         class="fixed z-50 bg-slate-900 text-white rounded-lg shadow-2xl p-4 max-w-md pointer-events-none border border-amber-500/30"
-         :style="{ left: tooltipPosition.x + 'px', top: tooltipPosition.y + 'px', transform: 'translate(-50%, -100%) translateY(-10px)' }">
-      <div class="flex items-center gap-2 mb-2 text-amber-400 font-bold text-sm">
-        <span>💡</span>
-        <span>AI 코드 설명</span>
-      </div>
-      <div v-for="(block, idx) in keyBlocksByLine[hoveredLine]" :key="idx" class="space-y-2">
-        <div v-if="block.code" class="bg-slate-800 rounded p-2 text-xs font-mono text-slate-300 border border-slate-700">
-          {{ block.code }}
+    <Teleport to="body">
+      <div v-if="hoveredLine && keyBlocksByLine[hoveredLine]?.length > 0"
+           class="fixed z-[9999] bg-slate-900 text-white rounded-lg shadow-2xl p-4 max-w-md pointer-events-none border border-amber-500/30"
+           :style="{ left: tooltipPosition.x + 'px', top: tooltipPosition.y + 'px', transform: 'translate(-50%, -100%) translateY(-10px)' }">
+        <div class="flex items-center gap-2 mb-2 text-amber-400 font-bold text-sm">
+          <span>💡</span>
+          <span>AI 코드 설명</span>
         </div>
-        <p class="text-sm text-slate-300 leading-relaxed">{{ block.explanation }}</p>
+        <div v-for="(block, idx) in keyBlocksByLine[hoveredLine]" :key="idx" class="space-y-2">
+          <div v-if="block.code" class="bg-slate-800 rounded p-2 text-xs font-mono text-slate-300 border border-slate-700">
+            {{ block.code }}
+          </div>
+          <p class="text-sm text-slate-300 leading-relaxed">{{ block.explanation }}</p>
+        </div>
+        <!-- Arrow -->
+        <div class="absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-full">
+          <div class="w-0 h-0 border-l-[8px] border-r-[8px] border-t-[8px] border-transparent border-t-amber-500/30"></div>
+          <div class="w-0 h-0 border-l-[6px] border-r-[6px] border-t-[6px] border-transparent border-t-slate-900 absolute top-0 left-1/2 -translate-x-1/2"></div>
+        </div>
       </div>
-      <!-- Arrow -->
-      <div class="absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-full">
-        <div class="w-0 h-0 border-l-[8px] border-r-[8px] border-t-[8px] border-transparent border-t-amber-500/30"></div>
-        <div class="w-0 h-0 border-l-[6px] border-r-[6px] border-t-[6px] border-transparent border-t-slate-900 absolute top-0 left-1/2 -translate-x-1/2"></div>
-      </div>
-    </div>
+    </Teleport>
   </div>
 </template>
 
@@ -202,16 +197,26 @@ const commentsByLine = computed(() => {
 const keyBlocksByLine = computed(() => {
     const map = {};
     props.keyBlocks.forEach(block => {
-        if (!block.code) return;
-        // Find which line(s) contain this code snippet
-        const codeSnippet = block.code.trim();
-        codeLines.value.forEach((line, idx) => {
-            if (line.includes(codeSnippet) || codeSnippet.includes(line.trim())) {
-                const lineNum = idx + 1;
-                if (!map[lineNum]) map[lineNum] = [];
-                map[lineNum].push(block);
+        // Priority 1: Use explicit line numbers (startLine ~ endLine)
+        if (block.startLine && block.endLine) {
+            for (let i = block.startLine; i <= block.endLine; i++) {
+                if (!map[i]) map[i] = [];
+                map[i].push(block);
             }
-        });
+            return; // processed
+        }
+
+        // Priority 2: Fallback to code string matching
+        if (block.code) {
+            const codeSnippet = block.code.trim();
+            codeLines.value.forEach((line, idx) => {
+                if (line.includes(codeSnippet) || codeSnippet.includes(line.trim())) {
+                    const lineNum = idx + 1;
+                    if (!map[lineNum]) map[lineNum] = [];
+                    map[lineNum].push(block);
+                }
+            });
+        }
     });
     return map;
 });

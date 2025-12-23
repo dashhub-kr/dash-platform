@@ -91,12 +91,9 @@
                                 @click="scrollToLine(block.startLine)"
                             >
                                 <div class="flex items-center justify-between mb-2">
-                                    <span class="text-[10px] font-bold bg-slate-100 text-slate-600 px-1.5 py-0.5 rounded">
-                                        L{{ block.startLine }}-{{ block.endLine }}
-                                    </span>
                                     <span class="text-[10px] font-bold text-indigo-600 opacity-0 group-hover:opacity-100 transition-opacity">이동</span>
                                 </div>
-                                <h5 class="text-xs font-bold text-slate-800 mb-1">{{ block.role || '주요 로직' }}</h5>
+                                <h5 class="text-xs font-bold text-slate-800 mb-1">{{ block.role || `Lines ${block.startLine} ~ ${block.endLine}` }}</h5>
                                 <p class="text-[11px] text-slate-500 leading-relaxed">{{ block.explanation }}</p>
                             </div>
                         </div>
