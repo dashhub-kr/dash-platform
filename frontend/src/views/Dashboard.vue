@@ -77,18 +77,42 @@
         <main class="container mx-auto px-6 py-8 pb-32">
           <!-- Header Section with Clean Metrics -->
           <div class="mb-8 animate-fade-in-down">
-            <!-- Greeting Row -->
-            <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6">
-              <div>
-                <h1 class="text-2xl font-bold text-slate-800">
-                  안녕하세요, <span class="text-indigo-600">{{ user?.username || '탐험가' }}</span>님! 👋
-                </h1>
-                <p class="text-sm text-slate-500 mt-1">오늘도 알고리즘의 바다를 항해할 준비가 되셨나요?</p>
+            <!-- Weekly Mission Section -->
+            <div class="mb-6">
+              <div v-if="currentMission" class="bg-gradient-to-r from-indigo-500 to-indigo-600 rounded-2xl p-5 shadow-lg text-white relative overflow-hidden">
+                <div class="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full blur-3xl -mr-16 -mt-16 pointer-events-none"></div>
+                
+                <div class="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-4">
+                  <div>
+                    <div class="flex items-center gap-2 mb-2">
+                       <span class="px-2 py-0.5 bg-white/20 rounded-lg text-xs font-bold uppercase tracking-wider backdrop-blur-sm">
+                         Week {{ currentMission.week }}
+                       </span>
+                       <span class="flex items-center gap-1 text-xs font-medium text-indigo-100">
+                         <Calendar :size="12" />
+                         ~ {{ formatDate(currentMission.deadline) }}
+                       </span>
+                    </div>
+                    <h2 class="text-xl font-black mb-1">{{ currentMission.title }}</h2>
+                  </div>
+                  
+                  <div class="flex flex-wrap gap-2">
+                    <a 
+                      v-for="problemId in currentMission.problemIds" 
+                      :key="problemId"
+                      :href="getProblemLink(problemId)" 
+                      target="_blank"
+                      class="flex items-center gap-2 bg-white text-indigo-600 px-4 py-2.5 rounded-xl font-bold text-sm hover:bg-indigo-50 hover:scale-105 transition-all shadow-sm"
+                    >
+                      <span>{{ problemId }}번</span>
+                      <ExternalLink :size="14" class="opacity-50" />
+                    </a>
+                  </div>
+                </div>
               </div>
-              <!-- Streak Badge (only show if active) -->
-              <div v-if="currentStreak > 0" class="flex items-center gap-2 px-3 py-1.5 bg-orange-50 border border-orange-100 text-orange-600 rounded-full text-sm font-medium">
-                <span>🔥</span>
-                <span>{{ currentStreak }}일 연속 활동 중</span>
+              <div v-else class="bg-white rounded-2xl p-6 border border-slate-100 shadow-sm flex items-center justify-center gap-3 text-slate-400">
+                 <Map :size="20" />
+                 <span class="font-medium">진행 중인 미션이 없어요!</span>
               </div>
             </div>
 
@@ -397,7 +421,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted, computed } from 'vue';
+import { ref, onMounted, computed, watch } from 'vue';
 import { useRouter } from 'vue-router';
 import { dashboardApi } from '../api/dashboard';
 import { studyApi } from '../api/study';
@@ -424,23 +448,111 @@ import {
   Trophy,
   Activity,
   Copy,
-  Check
+  Check,
+  ExternalLink,
+  Calendar,
+  Map as MapIcon,
+  TrendingUp,
+  School
 } from 'lucide-vue-next';
 import hljs from 'highlight.js';
 import 'highlight.js/styles/github.css';
+import { marked } from 'marked';
 
 // ... (other imports)
 
 const { user } = useAuth();
 const records = ref([]);
 const studyData = ref(null);
-const acornLogs = ref([]);
 const loading = ref(true);
 const heatmapWeeks = ref([]);
 const heatmapScrollRef = ref(null);
+
+const acornLogs = ref([]);
+const missions = ref([]);
+
+const currentMission = computed(() => {
+    if (!missions.value || missions.value.length === 0) return null;
+    const sorted = [...missions.value].sort((a, b) => b.week - a.week);
+    return sorted[0];
+});
+
 const tagStats = ref([]);
 const topTagName = computed(() => tagStats.value.length > 0 ? tagStats.value[0].tagKey : '');
 const totalSolvedCount = computed(() => tagStats.value.reduce((acc, curr) => acc + (curr.solved || 0), 0));
+
+const processHeatmap = (data) => {
+    console.log('processHeatmap called with:', data?.length); // Debug
+    try {
+        const activityMap = new Map();
+        (data || []).forEach(item => {
+             if(item?.date) activityMap.set(item.date, item);
+        });
+
+        const weeks = [];
+        const today = new Date();
+        const end = new Date(today);
+        const start = new Date(end);
+        start.setDate(start.getDate() - (52 * 7) + 1);
+
+        let current = new Date(start);
+        let currentWeek = [];
+
+        for (let i = 0; i < 52 * 7; i++) {
+             const dateStr = current.toISOString().split('T')[0];
+             const activity = activityMap.get(dateStr);
+             
+             // --- Participation Logic Start ---
+             const totalMembers = studyData.value?.memberCount || 1;
+             const contributors = Array.isArray(activity?.contributors) ? activity.contributors : [];
+             const activeCount = contributors.length;
+             const totalSolvedCount = activity?.count || 0;
+             
+             let participationRate = 0;
+             if (totalMembers > 0) {
+                 participationRate = activeCount / totalMembers;
+             }
+             
+             let colorClass = 'bg-slate-100';
+             if (participationRate > 0) colorClass = 'bg-indigo-200';
+             if (participationRate >= 0.25) colorClass = 'bg-indigo-300';
+             if (participationRate >= 0.50) colorClass = 'bg-indigo-500';
+             if (participationRate >= 0.75) colorClass = 'bg-indigo-700';
+             if (participationRate >= 1.0) colorClass = 'bg-indigo-900';
+             // --- Participation Logic End ---
+
+             currentWeek.push({
+                 date: dateStr,
+                 dateFormatted: current.toLocaleDateString('ko-KR', { month: 'short', day: 'numeric' }),
+                 count: totalSolvedCount,
+                 contributors: contributors,
+                 colorClass: colorClass
+             });
+
+             if (currentWeek.length === 7) {
+                 weeks.push(currentWeek);
+                 currentWeek = [];
+             }
+             current.setDate(current.getDate() + 1);
+        }
+        if (currentWeek.length > 0) weeks.push(currentWeek);
+        console.log('Heatmap Generated:', weeks.length, 'weeks'); // Debug
+        heatmapWeeks.value = weeks;
+    } catch(err) {
+        console.error("Heatmap Gen Error", err);
+    }
+};
+
+
+const heatmapResData = ref([]);
+
+watch(() => studyData.value, () => {
+    // Re-process heatmap when study data (member count) loads
+    if (heatmapResData.value) {
+        processHeatmap(heatmapResData.value);
+    }
+});
+
 
 // Computed: Current streak (consecutive days with activity)
 const currentStreak = computed(() => {
@@ -515,48 +627,64 @@ const hideTooltip = () => {
     tooltipData.value = null;
 };
 
+
+
 onMounted(async () => {
   try {
-      const recordsRes = await dashboardApi.getRecords();
-      records.value = recordsRes.data;
-      
-      // Fetch Tag Stats for Radar Chart
-      const statsRes = await aiApi.getTagStats(user.value.id || 1, 6); // Mock ID 1 if null
-      tagStats.value = statsRes.data || [];
-  } catch(e) {
-    console.error('Data Load Error:', e);
-  }
-  
-  if (user.value?.studyId) {
+      // 1. Fetch User Records
       try {
-          // Fetch Study Data
-          const studyRes = await studyApi.get(user.value.studyId);
-          studyData.value = studyRes.data;
-
-          // Fetch Acorn Logs for Ticker
-          const logsRes = await studyApi.getAcornLogs(user.value.studyId);
-          acornLogs.value = logsRes.data || [];
-      } catch (e) {
-          console.error("Study data error", e);
+          const recordsRes = await dashboardApi.getRecords();
+          records.value = recordsRes.data;
+      } catch(e) {
+          console.error('Records Load Error:', e);
       }
-  }
-
-  try {
-    const heatmapRes = await dashboardApi.getHeatmap();
-    processHeatmap(heatmapRes.data || []);
-    // 최신 날짜(우측)로 스크롤
-    setTimeout(() => {
-      if (heatmapScrollRef.value) {
-        heatmapScrollRef.value.scrollLeft = heatmapScrollRef.value.scrollWidth;
+      
+      // 2. Fetch Tag Stats
+      try {
+          const statsRes = await aiApi.getTagStats(user.value?.id || 1, 6);
+          tagStats.value = statsRes.data || [];
+      } catch(e) {
+          console.error('TagStats Load Error:', e);
       }
-    }, 100);
-  } catch(e) {
-    console.error('Heatmap error:', e);
-    processHeatmap([]);
+      
+      // 3. Fetch Study Data (if applicable)
+      if (user.value?.studyId) {
+          try {
+              const studyRes = await studyApi.get(user.value.studyId);
+              studyData.value = studyRes.data;
+
+              const logsRes = await studyApi.getAcornLogs(user.value.studyId);
+              acornLogs.value = logsRes.data || [];
+
+              const missionsRes = await studyApi.getMissions(user.value.studyId);
+              missions.value = missionsRes.data || [];
+          } catch (e) {
+              console.error("Study Data Load Error", e);
+          }
+      }
+
+      // 4. Fetch Heatmap
+      try {
+        const heatmapRes = await dashboardApi.getHeatmap();
+        heatmapResData.value = heatmapRes.data || [];
+        processHeatmap(heatmapResData.value);
+        setTimeout(() => {
+          if (heatmapScrollRef.value) {
+            heatmapScrollRef.value.scrollLeft = heatmapScrollRef.value.scrollWidth;
+          }
+        }, 100);
+      } catch(e) {
+        console.error('Heatmap Load Error:', e);
+        processHeatmap([]);
+      }
+  } catch (globalError) {
+      console.error("Critical Dashboard Error:", globalError);
+  } finally {
+      loading.value = false;
   }
-  
-  loading.value = false;
 });
+
+const getProblemLink = (problemId) => `https://www.acmicpc.net/problem/${problemId}`;
 
 const router = useRouter();
 
@@ -564,60 +692,7 @@ const goToPlayground = () => {
     router.push('/playground');
 };
 
-const processHeatmap = (data) => {
-    // 1. Map data for quick lookup
-    const activityMap = new Map();
-    data.forEach(item => {
-        activityMap.set(item.date, item);
-    });
 
-    // 2. Generate last 365 days (approx 52 weeks)
-    const weeks = [];
-    const today = new Date();
-    // Align to Saturday of this week to fill to the right
-    const end = new Date(today);
-    // Go back 52 weeks * 7 days
-    const start = new Date(end);
-    start.setDate(start.getDate() - (52 * 7) + 1); 
-    
-    // Adjust start to be Sunday
-    // while(start.getDay() !== 0) start.setDate(start.getDate() - 1);
-
-    let current = new Date(start);
-    let currentWeek = [];
-
-    // Loop until we cover enough days
-    for (let i = 0; i < 52 * 7; i++) {
-        const dateStr = current.toISOString().split('T')[0];
-        const activity = activityMap.get(dateStr);
-        const count = activity ? activity.count : 0;
-        
-        // Determine color
-        let colorClass = 'bg-slate-100';
-        if (count > 0) colorClass = 'bg-indigo-200';
-        if (count >= 3) colorClass = 'bg-indigo-400';
-        if (count >= 6) colorClass = 'bg-indigo-600';
-        if (count >= 9) colorClass = 'bg-indigo-800';
-
-        currentWeek.push({
-            date: dateStr,
-            dateFormatted: current.toLocaleDateString('ko-KR', { month: 'short', day: 'numeric' }),
-            count: count,
-            contributors: activity ? activity.contributors : [],
-            colorClass: colorClass
-        });
-
-        if (currentWeek.length === 7) {
-            weeks.push(currentWeek);
-            currentWeek = [];
-        }
-        
-        current.setDate(current.getDate() + 1);
-    }
-    
-    if (currentWeek.length > 0) weeks.push(currentWeek);
-    heatmapWeeks.value = weeks;
-};
 
 const formatDate = (dateString) => {
     if (!dateString) return '';
@@ -631,7 +706,7 @@ const formatDate = (dateString) => {
     });
 };
 
-import { marked } from 'marked';
+// Markdown Renderer
 
 // Markdown Renderer
 const renderMarkdown = (text) => {

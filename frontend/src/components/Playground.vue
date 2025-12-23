@@ -10,6 +10,32 @@
         <span class="icon">⬅️</span>
         <span class="text">대시보드로</span>
       </button>
+
+      <!-- Recent Activity Panel -->
+      <transition name="float-panel">
+        <div v-if="acornLogs.length > 0" class="recent-activity-panel">
+          <h3 class="panel-title flex items-center gap-2">
+            <Activity :size="16" class="text-indigo-500" />
+            <span class="text-slate-500 font-bold text-xs uppercase tracking-wider">Recent Activity</span>
+          </h3>
+          <div class="activity-list custom-scrollbar">
+            <div v-for="log in acornLogs" :key="log.id" class="activity-item group">
+              <div class="flex items-center gap-3">
+                <div class="avatar-circle">
+                  {{ (log.username || '?').charAt(0).toUpperCase() }}
+                </div>
+                <div class="flex flex-col">
+                  <span class="username">{{ log.username }}</span>
+                  <span class="timestamp">{{ formatDate(log.createdAt) }}</span>
+                </div>
+              </div>
+              <span class="amount" :class="log.amount > 0 ? 'text-emerald-500' : 'text-rose-500'">
+                {{ log.amount > 0 ? '+' : '' }}{{ log.amount }}
+              </span>
+            </div>
+          </div>
+        </div>
+      </transition>
     </div>
   </div>
 </template>
@@ -19,6 +45,7 @@ import { ref, watch, onMounted } from "vue";
 import AcornStack from "./AcornStack.vue";
 import { useAuth } from "../composables/useAuth";
 import { studyApi } from "../api/study";
+import { Activity } from "lucide-vue-next";
 
 const { user } = useAuth();
 const currentTotalSolved = ref(0);
@@ -27,6 +54,7 @@ const spawnBronze = ref(0);
 const spawnSilver = ref(0);
 const spawnGold = ref(0);
 const spawnPlatinum = ref(0);
+const acornLogs = ref([]);
 
 const fetchAndSpawn = async () => {
   if (!user.value || !user.value.studyId) return;
@@ -62,6 +90,11 @@ const fetchAndSpawn = async () => {
         spawnInit();
       }, 500);
     }
+
+    // Fetch Acorn Logs
+    const logsRes = await studyApi.getAcornLogs(user.value.studyId);
+    acornLogs.value = logsRes.data || [];
+
   } catch (e) {
     console.error("Failed to fetch study info:", e);
   }
@@ -99,6 +132,20 @@ const spawnInit = async () => {
   if (b > 0) {
     if (stackRef.value?.spawnTiers) stackRef.value.spawnTiers({ bronze: b });
   }
+};
+
+const formatDate = (dateString) => {
+    if (!dateString) return '';
+    const date = new Date(dateString);
+    const now = new Date();
+    const diff = now - date;
+    const minutes = Math.floor(diff / 60000);
+    const hours = Math.floor(diff / 3600000);
+    
+    if (minutes < 1) return '방금 전';
+    if (minutes < 60) return `${minutes}분 전`;
+    if (hours < 24) return `${hours}시간 전`;
+    return date.toLocaleDateString('ko-KR', { month: 'short', day: 'numeric' });
 };
 </script>
 
@@ -150,115 +197,124 @@ const spawnInit = async () => {
   box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
 }
 
-/* Stats Glass Panel */
-.stats-glass-panel {
+/* Recent Activity Panel (Center Stage) */
+.recent-activity-panel {
   pointer-events: auto;
-  align-self: flex-end;
   position: absolute;
-  top: 40px;
-  right: 40px;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%); /* Centered */
   
-  width: 280px;
-  background: rgba(255, 255, 255, 0.8);
-  backdrop-filter: blur(20px);
-  border: 1px solid rgba(255, 255, 255, 0.6);
-  border-radius: 24px;
+  width: 360px;
+  max-height: 480px;
+  background: rgba(255, 255, 255, 0.65); /* More transparent */
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  border-radius: 32px;
   padding: 24px;
-  box-shadow: 0 20px 50px -12px rgba(0, 0, 0, 0.1);
+  box-shadow: 
+    0 20px 40px -12px rgba(0, 0, 0, 0.1),
+    0 0 0 1px rgba(255, 255, 255, 0.5) inset;
   color: #1e293b;
-  animation: floatPanel 1s ease-out forwards;
+  display: flex;
+  flex-direction: column;
+  animation: floatPanel 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
-@keyframes floatPanel {
-  from { opacity: 0; transform: translateY(20px); }
-  to { opacity: 1; transform: translateY(0); }
+.float-panel-enter-active,
+.float-panel-leave-active {
+  transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-.storage-title {
-  font-size: 14px;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-  color: #64748b;
-  margin-bottom: 8px;
-  font-weight: 800;
+.float-panel-enter-from,
+.float-panel-leave-to {
+  opacity: 0;
+  transform: translate(-50%, -40%) scale(0.95);
 }
 
-.total-count {
-  margin-bottom: 24px;
+.panel-title {
+  padding-bottom: 16px;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+  margin-bottom: 16px;
 }
 
-.total-count .number {
-  display: block;
-  font-size: 48px;
-  font-weight: 900;
-  line-height: 1;
-  background: linear-gradient(to right, #4f46e5, #06b6d4);
-  -webkit-background-clip: text;
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
-}
-
-.tier-breakdown {
+.activity-list {
   display: flex;
   flex-direction: column;
   gap: 12px;
-  margin-bottom: 24px;
+  overflow-y: auto;
+  padding-right: 4px;
+  /* Hide scrollbar logic if needed or custom scrollbar */
 }
 
-.tier-item {
+.activity-item {
   display: flex;
   align-items: center;
-  gap: 10px;
-  font-size: 14px;
-  font-weight: 600;
-}
-
-.tier-item .dot {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-}
-
-.tier-item .name {
-  flex-grow: 1;
-  color: #475569;
-}
-
-.tier-item .count {
-  font-weight: 800;
-  color: #1e293b;
-}
-
-/* Colors for Tiers */
-.bronze .dot { background: #d97706; box-shadow: 0 0 8px rgba(217, 119, 6, 0.4); }
-.silver .dot { background: #94a3b8; box-shadow: 0 0 8px rgba(148, 163, 184, 0.4); }
-.gold   .dot { background: #eab308; box-shadow: 0 0 8px rgba(234, 179, 8, 0.4); }
-.platinum .dot { background: #10b981; box-shadow: 0 0 8px rgba(16, 185, 129, 0.4); }
-
-.actions {
-  display: flex;
-  justify-content: center;
-}
-
-.refresh-btn {
-  width: 100%;
+  justify-content: space-between;
   padding: 12px;
-  background: white;
-  border: 1px solid #e2e8f0;
   border-radius: 16px;
-  color: #475569;
-  font-size: 13px;
-  font-weight: 700;
-  cursor: pointer;
+  background: rgba(255, 255, 255, 0.4);
+  border: 1px solid rgba(255, 255, 255, 0.4);
   transition: all 0.2s;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
 }
 
-.refresh-btn:hover {
-  background: #f8fafc;
+.activity-item:hover {
+  background: rgba(255, 255, 255, 0.8);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+.avatar-circle {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #6366f1, #a855f7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-weight: 800;
+  font-size: 14px;
+  box-shadow: 0 4px 10px rgba(99, 102, 241, 0.3);
+}
+
+.username {
+  font-size: 14px;
+  font-weight: 700;
   color: #334155;
-  border-color: #cbd5e1;
-  transform: translateY(-1px);
+}
+
+.timestamp {
+  font-size: 11px;
+  font-weight: 500;
+  color: #94a3b8;
+}
+
+.amount {
+  font-family: monospace;
+  font-size: 16px;
+  font-weight: 800;
+}
+
+/* Custom Scrollbar for the list */
+.custom-scrollbar::-webkit-scrollbar {
+  width: 4px;
+}
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: rgba(0,0,0,0.1);
+  border-radius: 4px;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: rgba(0,0,0,0.2);
+}
+
+@keyframes floatPanel {
+  from { opacity: 0; transform: translate(-50%, -45%); }
+  to { opacity: 1; transform: translate(-50%, -50%); }
 }
 </style>
 
