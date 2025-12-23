@@ -28,9 +28,7 @@
             :class="getNodeClass(data)"
             @click.stop="onNodeClick(data)"
           >
-            <!-- 관계 표시 뱃지 -->
-            <div v-if="selectedNodeId && isPrerequisite(data.id)" class="absolute -top-3 -right-2 px-2 py-1 bg-emerald-500 text-white text-[10px] font-bold rounded-full shadow-sm z-10">선수</div>
-            <div v-if="selectedNodeId && isDependent(data.id)" class="absolute -top-3 -right-2 px-2 py-1 bg-orange-500 text-white text-[10px] font-bold rounded-full shadow-sm z-10">이후</div>
+            <!-- 관계 표시 뱃지 제거 (심플 유지) -->
             
             <div class="text-base font-bold whitespace-pre-wrap break-words line-clamp-2 leading-tight max-w-[140px]" :class="selectedNodeId && !isRelated(data.id) ? 'text-slate-400' : 'text-slate-800'">
               {{ data.label }}
@@ -42,9 +40,9 @@
     <!-- 범례 -->
     <div v-if="selectedNodeId" class="absolute bottom-4 left-4 bg-white/90 backdrop-blur-sm p-3 rounded-lg shadow-lg text-xs">
       <div class="font-bold mb-2">{{ selectedNodeLabel }}</div>
-      <div class="flex gap-3">
-        <span class="flex items-center gap-1"><span class="w-3 h-3 bg-emerald-500 rounded-full"></span> 선수 태그 ({{ prerequisiteIds.length }})</span>
-        <span class="flex items-center gap-1"><span class="w-3 h-3 bg-orange-500 rounded-full"></span> 의존 태그 ({{ dependentIds.length }})</span>
+      <div class="flex gap-4 font-medium text-xs">
+        <span class="flex items-center gap-1 text-emerald-600"><span class="w-2.5 h-2.5 bg-emerald-500 rounded-full"></span> 선수: {{ prerequisiteIds.length }}</span>
+        <span class="flex items-center gap-1 text-slate-500"><span class="w-2.5 h-2.5 bg-slate-500 rounded-full"></span> 이후: {{ dependentIds.length }}</span>
       </div>
       <div class="mt-2 text-slate-400">다른 곳 클릭하여 해제</div>
     </div>
@@ -180,13 +178,13 @@ const computedEdges = computed(() => {
       id: `e-${idx}`,
       source: edge.source,
       target: edge.target,
-      animated: isHighlighted || edge.strength === 2,
+      animated: true,
       style: {
         stroke: isHighlighted 
-          ? (isPrereqPath ? '#10b981' : '#f97316') // 선수=녹색, 의존=주황
-          : (selectedNodeId.value ? '#e2e8f0' : (edge.strength === 2 ? '#f59e0b' : '#cbd5e1')),
-        strokeWidth: isHighlighted ? 2 : (edge.strength === 2 ? 1.5 : 0.5),
-        opacity: selectedNodeId.value && !isHighlighted ? 0.1 : 0.8
+          ? (isPrereqPath ? '#10b981' : '#475569') // 선수=녹색 강조, 의존=기본 회색 유지
+          : (selectedNodeId.value ? '#e2e8f0' : '#475569'), // 선택 안된 거: 연한 회색, 기본: 진한 회색
+        strokeWidth: (isHighlighted && isPrereqPath) ? 2 : 1.5,
+        opacity: selectedNodeId.value && !isHighlighted ? 0.1 : (isPrereqPath ? 0.8 : 0.3) // 의존/기본 라인 투명도 0.3으로 낮춤 (은은하게)
       }
     };
   });
@@ -284,12 +282,12 @@ const getNodeClass = (data) => {
   
   // 의존 태그
   if (selectedNodeId.value && isDependent(id)) {
-    return `${familyColor.bg} ${familyColor.border} shadow-md ring-2 ${familyColor.ring}`;
+    return `${familyColor.bg} ${familyColor.border} shadow-md ring-2 ${familyColor.ring} opacity-40`; // 투명도 조절
   }
   
   // 관련 없는 노드 (선택 상태일 때)
   if (selectedNodeId.value && !isRelated(id)) {
-    return 'bg-slate-100 border-slate-200 opacity-40';
+    return 'bg-slate-100 border-slate-200 opacity-10';
   }
   
   // 기본 상태 - 패밀리 색상
