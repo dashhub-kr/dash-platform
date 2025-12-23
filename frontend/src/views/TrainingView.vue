@@ -71,99 +71,16 @@
           </div>
         </div>
 
-        <!-- 현재 실력 분석 (통합 대시보드 카드) -->
+        <!-- 현재 실력 분석 (재사용 컴포넌트) -->
         <section class="mb-8">
-          <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
-            <!-- 헤더 -->
-            <div class="px-6 py-4 border-b border-slate-100 bg-slate-50">
-              <h2 class="text-lg font-bold text-slate-800 flex items-center gap-2">
-                <LayoutGrid :size="20" class="text-indigo-500" />
-                현재 실력 분석
-              </h2>
-            </div>
-            
-            <!-- 콘텐츠 (원래 5:7 비율 유지) -->
-            <div class="p-6">
-              <div class="grid grid-cols-1 lg:grid-cols-12 gap-5">
-                
-                <!-- Left Column: Tier + Radar + Strength/Weakness (5 cols) -->
-                <div class="lg:col-span-5 flex flex-col gap-4">
-                  
-                  <!-- Tier Card (Compact) -->
-                  <div class="bg-gradient-to-br from-indigo-50 to-purple-50 border border-indigo-100 rounded-2xl p-4 relative overflow-hidden group">
-                    <div class="relative z-10 flex items-center gap-4">
-                      <div class="relative flex-shrink-0">
-                        <div class="absolute inset-0 bg-indigo-500/20 blur-xl rounded-full"></div>
-                        <img 
-                          v-if="userTier"
-                          :src="`https://static.solved.ac/tier_small/${userTier}.svg`" 
-                          class="w-14 h-14 relative drop-shadow-lg"
-                          alt="Tier Badge"
-                        />
-                      </div>
-                      <div>
-                        <div class="text-xs font-bold text-slate-400 uppercase tracking-wider flex items-center gap-1">
-                          <Zap :size="12" />
-                          현재 티어
-                        </div>
-                        <div class="text-xl font-black text-indigo-900">{{ userTierName || 'Unranked' }}</div>
-                      </div>
-                    </div>
-                  </div>
-
-                  <!-- Radar Chart Card -->
-                  <div class="bg-slate-50 border border-slate-100 rounded-2xl p-4 flex-1">
-                    <h3 class="text-sm font-bold text-slate-600 mb-3 flex items-center gap-2">
-                       알고리즘 역량
-                    </h3>
-                    <div class="flex items-center justify-center">
-                       <div class="w-full aspect-square max-w-[240px]">
-                          <AlgorithmRadarChart :stats="allTagStats" :max-tags="8" />
-                       </div>
-                    </div>
-                  </div>
-
-                  <!-- Strength & Weakness Cards -->
-                  <div class="grid grid-cols-2 gap-3">
-                    <!-- Strength Card -->
-                    <div class="bg-emerald-50 border border-emerald-200 rounded-xl p-3">
-                      <div class="flex items-center gap-2 mb-1.5">
-                        <div class="w-6 h-6 rounded-lg bg-emerald-100 flex items-center justify-center text-emerald-600">
-                          <Zap :size="12" />
-                        </div>
-                        <span class="text-xs font-bold text-emerald-700 uppercase">강점</span>
-                      </div>
-                      <div class="text-slate-700 text-xs font-medium leading-relaxed">
-                        {{ learningPath?.aiAnalysis?.keyStrength || '-' }}
-                      </div>
-                    </div>
-
-                    <!-- Weakness Card -->
-                    <div class="bg-rose-50 border border-rose-200 rounded-xl p-3">
-                      <div class="flex items-center gap-2 mb-1.5">
-                         <div class="w-6 h-6 rounded-lg bg-rose-100 flex items-center justify-center text-rose-500">
-                            <AlertTriangle :size="12" />
-                         </div>
-                        <span class="text-xs font-bold text-rose-600 uppercase">약점</span>
-                      </div>
-                      <div class="text-slate-700 text-xs font-medium leading-relaxed">
-                        {{ learningPath?.aiAnalysis?.primaryWeakness || '-' }}
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                <!-- Right Column: Learning Roadmap (7 cols) -->
-                <div class="lg:col-span-7 bg-slate-50 border border-slate-100 rounded-2xl p-5">
-                  <h3 class="text-sm font-bold text-slate-600 mb-4 flex items-center gap-2">
-                     <MapIcon :size="14" class="text-indigo-500" />
-                     맞춤형 학습 로드맵
-                  </h3>
-                  <LearningRoadmap :phases="learningPath?.aiAnalysis?.phases || []" class="w-full" />
-                </div>
-              </div>
-            </div>
-          </div>
+          <SkillAnalysisCard 
+            :tier="userTier"
+            :tier-name="userTierName"
+            :chart-tags="chartTags"
+            :key-strength="learningPath?.aiAnalysis?.keyStrength"
+            :primary-weakness="learningPath?.aiAnalysis?.primaryWeakness"
+            :phases="learningPath?.aiAnalysis?.phases || []"
+          />
         </section>
 
         <!-- AI 종합 분석 리포트 -->
@@ -297,6 +214,7 @@ import {
 import AlgorithmRadarChart from '../components/charts/AlgorithmRadarChart.vue';
 import LearningRoadmap from '../components/LearningRoadmap.vue';
 import SkillTreeView from '../components/SkillTreeView.vue';
+import SkillAnalysisCard from '../components/SkillAnalysisCard.vue';
 import LectureModal from '../components/LectureModal.vue';
 import { useAuth } from '../composables/useAuth';
 import { aiApi } from '../api/ai';
@@ -340,6 +258,28 @@ const userTier = computed(() => user.value?.solvedacTier || 0);
 const userTierName = computed(() => {
   const tier = userTier.value;
   return tier >= 0 && tier < TIER_NAMES.length ? TIER_NAMES[tier] : 'Unrated';
+});
+
+// Chart Tags for Radar Chart (from Learning Path data)
+const chartTags = computed(() => {
+  if (learningPath.value) {
+    const strong = learningPath.value.strengthTags || [];
+    const weak = learningPath.value.weaknessTags || [];
+    const merged = [...strong, ...weak];
+    const uniqueMap = new Map();
+    merged.forEach(t => {
+      if (!uniqueMap.has(t.tagKey)) {
+        uniqueMap.set(t.tagKey, {
+          tagKey: t.tagKey,
+          solved: t.solved || 0,
+          total: t.total || 0,
+          label: t.tagName === '다이나믹 프로그래밍' ? 'DP' : t.tagName
+        });
+      }
+    });
+    return Array.from(uniqueMap.values());
+  }
+  return [];
 });
 
 // 2. Videos Data
@@ -396,6 +336,7 @@ const goToMoreProblems = () => {
 const loadLearningPath = async () => {
     try {
         if (!user.value) return;
+        
         const res = await aiApi.getLearningPath(user.value.id);
         learningPath.value = res.data;
         
@@ -409,8 +350,8 @@ const loadLearningPath = async () => {
         [...weak, ...strong].forEach(t => map.set(t.tagKey, t));
         allTagStats.value = Array.from(map.values());
 
-        if (res.data.weaknessTags?.length > 0) {
-            const worstTag = res.data.weaknessTags[0];
+        if (pathRes.data.weaknessTags?.length > 0) {
+            const worstTag = pathRes.data.weaknessTags[0];
             const winRate = worstTag.total > 0 ? Math.round((worstTag.solved / worstTag.total) * 100) : 0;
             
             // Build tier range: userTier ~ userTier+4 (capped at 30)
