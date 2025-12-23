@@ -24,5 +24,9 @@ export const studyApi = {
     // Get acorn logs
     getAcornLogs(studyId) {
         return http.get(`/studies/${studyId}/acorns`);
+    },
+    // Get weekly missions
+    getMissions(studyId) {
+        return http.get(`/studies/${studyId}/missions`);
     }
 };

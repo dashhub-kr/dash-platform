@@ -49,21 +49,8 @@
             </div>
           </div>
 
-          <!-- 진행바 -->
-          <div class="mb-4">
-            <div class="flex justify-between text-sm mb-2">
-              <span class="text-slate-500">내 진행률</span>
-              <span class="font-bold text-emerald-600">{{ mission.solvedCount }} / {{ mission.totalProblems }}</span>
-            </div>
-            <div class="h-3 bg-slate-200 rounded-full overflow-hidden">
-              <div class="h-full bg-gradient-to-r from-emerald-400 to-emerald-500 rounded-full transition-all"
-                   :style="{ width: `${(mission.solvedCount / mission.totalProblems) * 100}%` }">
-              </div>
-            </div>
-          </div>
-
           <!-- 문제 목록 -->
-          <div class="flex flex-wrap gap-2 mb-4">
+          <div class="flex flex-wrap gap-2 mb-6">
             <a v-for="(problemId, idx) in mission.problemIds" :key="problemId"
                :href="`https://www.acmicpc.net/problem/${problemId}`"
                target="_blank"
@@ -75,11 +62,42 @@
             </a>
           </div>
 
-          <!-- 진행 현황 보기 버튼 -->
-          <button @click="viewProgress(mission.id)"
-                  class="text-indigo-600 hover:text-indigo-500 font-medium text-sm">
-            팀원 진행 현황 보기 →
-          </button>
+          <!-- 팀원별 진행 레이스 (달리기) -->
+          <div class="mt-6 pt-6 border-t border-slate-100">
+            <h4 class="text-sm font-bold text-slate-500 mb-4 flex items-center gap-2">
+              <span>🏃 팀원 진행 레이스</span>
+            </h4>
+            
+            <div class="space-y-4">
+              <div v-for="member in mission.memberProgressList" :key="member.userId" class="relative">
+                <!-- 트랙 -->
+                <div class="h-2 w-full bg-slate-100 rounded-full relative overflow-visible mt-6 mb-2">
+                   <!-- 내 트랙 하이라이트 -->
+                   <div v-if="member.userId === currentUserId" 
+                        class="absolute inset-0 bg-indigo-50/50 rounded-full -m-1"></div>
+                </div>
+
+                <!-- 러너 (Emoji) -->
+                <div class="absolute top-0 left-0 w-full h-8 pointer-events-none" style="top: -4px;">
+                   <div class="absolute transform -translate-x-1/2 transition-all duration-700 ease-out flex flex-col items-center"
+                        :style="{ left: `${(member.completedCount / Math.max(member.totalProblems, 1)) * 100}%` }">
+                      <span class="text-2xl filter drop-shadow-md z-10">
+                        {{ member.allCompleted ? '🚩' : '🏃' }}
+                      </span>
+                      <!-- 이름표 -->
+                      <span class="text-xs font-bold mt-1 px-2 py-0.5 rounded-full whitespace-nowrap shadow-sm border"
+                            :class="member.userId === currentUserId ? 'bg-indigo-600 text-white border-indigo-600' : 'bg-white text-slate-600 border-slate-200'">
+                        {{ member.username }}
+                      </span>
+                      <!-- 퍼센트 -->
+                      <span class="text-[10px] font-medium text-slate-400 mt-0.5">
+                        {{ member.completedCount }}/{{ member.totalProblems }}
+                      </span>
+                   </div>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -150,31 +168,6 @@
         </div>
       </div>
     </div>
-
-    <!-- 진행 현황 Modal -->
-    <div v-if="showProgressModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
-      <div class="bg-white rounded-3xl p-8 w-full max-w-lg shadow-2xl">
-        <div class="flex justify-between items-center mb-6">
-          <h2 class="text-2xl font-bold text-slate-900">팀원 진행 현황</h2>
-          <button @click="showProgressModal = false" class="text-slate-400 hover:text-slate-600 text-2xl">×</button>
-        </div>
-        
-        <div class="space-y-3">
-          <div v-for="member in progressData" :key="member.userId"
-               class="flex items-center justify-between p-4 rounded-xl"
-               :class="member.allCompleted ? 'bg-emerald-50' : 'bg-slate-50'">
-            <div class="flex items-center gap-3">
-              <span v-if="member.allCompleted" class="text-2xl">✅</span>
-              <span v-else class="text-2xl">⏳</span>
-              <span class="font-medium text-slate-800">{{ member.username }}</span>
-            </div>
-            <span class="font-bold" :class="member.allCompleted ? 'text-emerald-600' : 'text-slate-500'">
-              {{ member.completedCount }} / {{ member.totalProblems }}
-            </span>
-          </div>
-        </div>
-      </div>
-    </div>
   </div>
 </template>
 
@@ -185,9 +178,8 @@ import axios from 'axios';
 const loading = ref(true);
 const missions = ref([]);
 const studyId = ref(null);
+const currentUserId = ref(null);
 const showCreateModal = ref(false);
-const showProgressModal = ref(false);
-const progressData = ref([]);
 
 const newMission = ref({
   week: 1,
@@ -200,6 +192,7 @@ onMounted(async () => {
   try {
     const userRes = await axios.get('/api/users/me');
     studyId.value = userRes.data.studyId;
+    currentUserId.value = userRes.data.id;
     
     if (studyId.value) {
       await loadMissions();
@@ -241,16 +234,6 @@ const createMission = async () => {
     await loadMissions();
   } catch (e) {
     console.error('미션 생성 실패', e);
-  }
-};
-
-const viewProgress = async (missionId) => {
-  try {
-    const res = await axios.get(`/api/studies/${studyId.value}/missions/${missionId}/progress`);
-    progressData.value = res.data;
-    showProgressModal.value = true;
-  } catch (e) {
-    console.error('진행현황 로드 실패', e);
   }
 };
 </script>

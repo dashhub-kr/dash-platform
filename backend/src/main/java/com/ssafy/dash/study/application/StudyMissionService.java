@@ -64,15 +64,34 @@ public class StudyMissionService {
     /**
      * 스터디의 미션 목록 조회
      */
+    /**
+     * 스터디의 미션 목록 조회
+     */
     @Transactional(readOnly = true)
     public List<MissionWithProgress> getMissions(Long studyId, Long requestUserId) {
         List<StudyMission> missions = missionRepository.findByStudyIdOrderByWeekDesc(studyId);
+        List<User> members = userRepository.findByStudyId(studyId);
         List<MissionWithProgress> result = new ArrayList<>();
 
         for (StudyMission mission : missions) {
             List<Integer> problemIds = parseProblems(mission.getProblemIds());
             int totalProblems = problemIds.size();
+
+            // Calculate progress for requesting user (legacy field support if needed)
             int solvedCount = submissionRepository.countCompletedByMissionIdAndUserId(mission.getId(), requestUserId);
+
+            // Calculate progress for ALL members
+            List<MemberProgress> memberProgressList = new ArrayList<>();
+            for (User member : members) {
+                int memberCompleted = submissionRepository.countCompletedByMissionIdAndUserId(mission.getId(),
+                        member.getId());
+                memberProgressList.add(new MemberProgress(
+                        member.getId(),
+                        member.getUsername(),
+                        memberCompleted,
+                        totalProblems,
+                        totalProblems > 0 && memberCompleted == totalProblems));
+            }
 
             result.add(new MissionWithProgress(
                     mission.getId(),
@@ -82,7 +101,8 @@ public class StudyMissionService {
                     mission.getSourceType(),
                     mission.getDeadline(),
                     solvedCount,
-                    totalProblems));
+                    totalProblems,
+                    memberProgressList));
         }
 
         return result;
@@ -109,7 +129,7 @@ public class StudyMissionService {
                     member.getUsername(),
                     completed,
                     totalProblems,
-                    completed == totalProblems));
+                    totalProblems > 0 && completed == totalProblems));
         }
 
         return result;
@@ -171,7 +191,8 @@ public class StudyMissionService {
             String sourceType,
             LocalDate deadline,
             int solvedCount,
-            int totalProblems) {
+            int totalProblems,
+            List<MemberProgress> memberProgressList) {
     }
 
     public record MemberProgress(

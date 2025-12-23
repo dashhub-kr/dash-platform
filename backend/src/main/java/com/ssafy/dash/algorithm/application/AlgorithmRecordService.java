@@ -17,16 +17,18 @@ import com.ssafy.dash.dashboard.application.dto.result.HeatmapItem;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-
 @Service
 public class AlgorithmRecordService {
 
     private final AlgorithmRecordRepository algorithmRecordRepository;
     private final UserRepository userRepository;
+    private final com.ssafy.dash.study.application.StudyMissionService studyMissionService;
 
-    public AlgorithmRecordService(AlgorithmRecordRepository algorithmRecordRepository, UserRepository userRepository) {
+    public AlgorithmRecordService(AlgorithmRecordRepository algorithmRecordRepository, UserRepository userRepository,
+            com.ssafy.dash.study.application.StudyMissionService studyMissionService) {
         this.algorithmRecordRepository = algorithmRecordRepository;
         this.userRepository = userRepository;
+        this.studyMissionService = studyMissionService;
     }
 
     @Transactional
@@ -40,14 +42,21 @@ public class AlgorithmRecordService {
                 userRepository.findById(command.userId())
                         .map(com.ssafy.dash.user.domain.User::getStudyId)
                         .orElse(null),
-                command.problemNumber(), 
-                command.title(), 
-                command.language(), 
-                command.code(), 
-                now
-        );
+                command.problemNumber(),
+                command.title(),
+                command.language(),
+                command.code(),
+                now);
 
         algorithmRecordRepository.save(record);
+
+        // 스터디 미션 완료 체크
+        try {
+            int problemId = Integer.parseInt(command.problemNumber());
+            studyMissionService.checkAndMarkCompleted(command.userId(), problemId);
+        } catch (NumberFormatException e) {
+            // ignore non-integer problem numbers
+        }
 
         return AlgorithmRecordResult.from(record);
     }
@@ -116,16 +125,14 @@ public class AlgorithmRecordService {
 
         // Group by Date (YYYY-MM-DD)
         Map<String, List<AlgorithmRecord>> groupedByDate = records.stream()
-                .collect(Collectors.groupingBy(record -> 
-                    record.getCommittedAt().toLocalDate().toString()
-                ));
+                .collect(Collectors.groupingBy(record -> record.getCommittedAt().toLocalDate().toString()));
 
         return groupedByDate.entrySet().stream()
                 .map(entry -> {
                     String date = entry.getKey();
                     List<AlgorithmRecord> dailyRecords = entry.getValue();
                     Long count = (long) dailyRecords.size();
-                    
+
                     List<String> contributors = dailyRecords.stream()
                             .map(AlgorithmRecord::getUsername)
                             .filter(java.util.Objects::nonNull)
