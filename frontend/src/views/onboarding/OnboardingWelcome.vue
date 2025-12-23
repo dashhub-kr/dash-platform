@@ -200,7 +200,15 @@ const submitHandle = async () => {
   
   loading.value = true;
   try {
-    await onboardingApi.registerSolvedac(handle.value);
+    const profileImages = [
+      '/profile/bag.png',
+      '/profile/proud.png',
+      '/profile/smart.png',
+      '/profile/smile.png'
+    ];
+    const randomImage = profileImages[Math.floor(Math.random() * profileImages.length)];
+    
+    await onboardingApi.registerSolvedac(handle.value, randomImage);
     router.push('/onboarding/analysis');
   } catch (error) {
     console.error(error);

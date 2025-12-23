@@ -97,7 +97,8 @@ public class OnboardingController {
             @Parameter(hidden = true) @AuthenticationPrincipal OAuth2User principal,
             @Validated @RequestBody RegisterHandleRequest request) {
         if (principal instanceof CustomOAuth2User customUser) {
-            solvedacSyncService.registerSolvedacHandle(customUser.getUserId(), request.getHandle());
+            solvedacSyncService.registerSolvedacHandle(customUser.getUserId(), request.getHandle(),
+                    request.getProfileImageUrl());
             return ResponseEntity.ok().build();
         }
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();

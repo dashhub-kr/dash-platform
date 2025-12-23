@@ -35,7 +35,7 @@ public class SolvedacSyncService {
      * 사용자 Solved.ac 핸들 등록 및 초기 데이터 동기화
      */
     @Transactional
-    public void registerSolvedacHandle(Long userId, String handle) {
+    public void registerSolvedacHandle(Long userId, String handle, String profileImageUrl) {
         log.info("Registering Solved.ac handle for user {}: {}", userId, handle);
 
         // 1. 사용자 기본 정보 조회
@@ -44,8 +44,19 @@ public class SolvedacSyncService {
         // 2. User 테이블 업데이트
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("User not found: " + userId));
+
+        // 프로필 이미지가 제공되면 사용, 아니면 solved.ac 이미지 사용 (또는 기존 로직 유지)
+        // 여기서는 random profile image가 우선순위가 높다고 가정 (가입 시점)
+        // 하지만 solved.ac 정보도 중요하므로, profileImageUrl이 있으면 그걸 쓰고, 없으면 기존 로직?
+        // User.updateSolvedacProfile does not update avatarUrl. We need to handle it.
+
         user.updateSolvedacProfile(handle, userInfo.getTier(),
                 userInfo.getRating(), userInfo.getClassLevel(), userInfo.getSolvedCount());
+
+        if (profileImageUrl != null && !profileImageUrl.isBlank()) {
+            user.setAvatarUrl(profileImageUrl);
+        }
+
         userRepository.update(user);
 
         // 3. 클래스 통계 동기화
@@ -166,6 +177,6 @@ public class SolvedacSyncService {
             throw new IllegalStateException("User has no Solved.ac handle registered");
         }
 
-        registerSolvedacHandle(userId, handle);
+        registerSolvedacHandle(userId, handle, null);
     }
 }

@@ -12,4 +12,5 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class RegisterHandleRequest {
     private String handle;
+    private String profileImageUrl;
 }

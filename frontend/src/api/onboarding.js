@@ -14,7 +14,7 @@ export const onboardingApi = {
         return http.get(`/onboarding/solvedac/verify?handle=${encodeURIComponent(handle)}`);
     },
     // Register Solved.ac handle
-    registerSolvedac(handle) {
-        return http.post('/onboarding/solvedac', { handle });
+    registerSolvedac(handle, profileImageUrl) {
+        return http.post('/onboarding/solvedac', { handle, profileImageUrl });
     },
 };
