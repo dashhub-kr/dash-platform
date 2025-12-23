@@ -71,90 +71,97 @@
           </div>
         </div>
 
-        <!-- 현재 실력 분석 (OnboardingAnalysis Style) -->
+        <!-- 현재 실력 분석 (통합 대시보드 카드) -->
         <section class="mb-8">
-          <h2 class="text-xl font-bold text-slate-800 mb-5 flex items-center gap-2 pl-2 border-l-4 border-indigo-500">
-            현재 실력 분석
-          </h2>
-          
-          <div class="grid grid-cols-1 lg:grid-cols-12 gap-5">
-            
-            <!-- Left Column: Tier + Radar + Strength/Weakness (5 cols) -->
-            <div class="lg:col-span-5 flex flex-col gap-4">
-              
-              <!-- Tier Card (Compact) -->
-              <div class="bg-white/80 backdrop-blur-xl border border-slate-200 rounded-2xl p-4 shadow-sm relative overflow-hidden group">
-                <div class="absolute inset-0 bg-gradient-to-br from-indigo-50/50 to-purple-50/50 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-                <div class="relative z-10 flex items-center gap-4">
-                  <div class="relative flex-shrink-0">
-                    <div class="absolute inset-0 bg-indigo-500/20 blur-xl rounded-full"></div>
-                    <img 
-                      v-if="userTier"
-                      :src="`https://static.solved.ac/tier_small/${userTier}.svg`" 
-                      class="w-14 h-14 relative drop-shadow-lg"
-                      alt="Tier Badge"
-                    />
-                  </div>
-                  <div>
-                    <div class="text-xs font-bold text-slate-400 uppercase tracking-wider flex items-center gap-1">
-                      <Zap :size="12" />
-                      현재 티어
-                    </div>
-                    <div class="text-xl font-black text-indigo-900">{{ userTierName || 'Unranked' }}</div>
-                  </div>
-                </div>
-              </div>
-
-              <!-- Radar Chart Card -->
-              <div class="bg-white/80 backdrop-blur-xl border border-slate-200 rounded-2xl p-4 shadow-sm flex-1">
-                <h3 class="text-sm font-bold text-slate-600 mb-3 flex items-center gap-2">
-                   <LayoutGrid :size="14" class="text-indigo-500" />
-                   알고리즘 역량
-                </h3>
-                <div class="flex items-center justify-center">
-                   <div class="w-full aspect-square max-w-[240px]">
-                      <AlgorithmRadarChart :stats="allTagStats" :max-tags="8" />
-                   </div>
-                </div>
-              </div>
-
-              <!-- Strength & Weakness Cards -->
-              <div class="grid grid-cols-2 gap-3">
-                <!-- Strength Card -->
-                <div class="bg-emerald-50/80 border border-emerald-200 rounded-xl p-3">
-                  <div class="flex items-center gap-2 mb-1.5">
-                    <div class="w-6 h-6 rounded-lg bg-emerald-100 flex items-center justify-center text-emerald-600">
-                      <Zap :size="12" />
-                    </div>
-                    <span class="text-xs font-bold text-emerald-700 uppercase">강점</span>
-                  </div>
-                  <div class="text-slate-700 text-xs font-medium leading-relaxed">
-                    {{ learningPath?.aiAnalysis?.keyStrength || '-' }}
-                  </div>
-                </div>
-
-                <!-- Weakness Card -->
-                <div class="bg-rose-50/80 border border-rose-200 rounded-xl p-3">
-                  <div class="flex items-center gap-2 mb-1.5">
-                     <div class="w-6 h-6 rounded-lg bg-rose-100 flex items-center justify-center text-rose-500">
-                        <AlertTriangle :size="12" />
-                     </div>
-                    <span class="text-xs font-bold text-rose-600 uppercase">약점</span>
-                  </div>
-                  <div class="text-slate-700 text-xs font-medium leading-relaxed">
-                    {{ learningPath?.aiAnalysis?.primaryWeakness || '-' }}
-                  </div>
-                </div>
-              </div>
+          <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+            <!-- 헤더 -->
+            <div class="px-6 py-4 border-b border-slate-100 bg-slate-50">
+              <h2 class="text-lg font-bold text-slate-800 flex items-center gap-2">
+                <LayoutGrid :size="20" class="text-indigo-500" />
+                현재 실력 분석
+              </h2>
             </div>
+            
+            <!-- 콘텐츠 (원래 5:7 비율 유지) -->
+            <div class="p-6">
+              <div class="grid grid-cols-1 lg:grid-cols-12 gap-5">
+                
+                <!-- Left Column: Tier + Radar + Strength/Weakness (5 cols) -->
+                <div class="lg:col-span-5 flex flex-col gap-4">
+                  
+                  <!-- Tier Card (Compact) -->
+                  <div class="bg-gradient-to-br from-indigo-50 to-purple-50 border border-indigo-100 rounded-2xl p-4 relative overflow-hidden group">
+                    <div class="relative z-10 flex items-center gap-4">
+                      <div class="relative flex-shrink-0">
+                        <div class="absolute inset-0 bg-indigo-500/20 blur-xl rounded-full"></div>
+                        <img 
+                          v-if="userTier"
+                          :src="`https://static.solved.ac/tier_small/${userTier}.svg`" 
+                          class="w-14 h-14 relative drop-shadow-lg"
+                          alt="Tier Badge"
+                        />
+                      </div>
+                      <div>
+                        <div class="text-xs font-bold text-slate-400 uppercase tracking-wider flex items-center gap-1">
+                          <Zap :size="12" />
+                          현재 티어
+                        </div>
+                        <div class="text-xl font-black text-indigo-900">{{ userTierName || 'Unranked' }}</div>
+                      </div>
+                    </div>
+                  </div>
 
-            <!-- Right Column: Learning Roadmap (7 cols) -->
-            <div class="lg:col-span-7 bg-white/80 backdrop-blur-xl border border-slate-200 rounded-2xl p-5 shadow-sm">
-              <h3 class="text-sm font-bold text-slate-600 mb-4 flex items-center gap-2">
-                 <MapIcon :size="14" class="text-indigo-500" />
-                 맞춤형 학습 로드맵
-              </h3>
-              <LearningRoadmap :phases="learningPath?.aiAnalysis?.phases || []" class="w-full" />
+                  <!-- Radar Chart Card -->
+                  <div class="bg-slate-50 border border-slate-100 rounded-2xl p-4 flex-1">
+                    <h3 class="text-sm font-bold text-slate-600 mb-3 flex items-center gap-2">
+                       알고리즘 역량
+                    </h3>
+                    <div class="flex items-center justify-center">
+                       <div class="w-full aspect-square max-w-[240px]">
+                          <AlgorithmRadarChart :stats="allTagStats" :max-tags="8" />
+                       </div>
+                    </div>
+                  </div>
+
+                  <!-- Strength & Weakness Cards -->
+                  <div class="grid grid-cols-2 gap-3">
+                    <!-- Strength Card -->
+                    <div class="bg-emerald-50 border border-emerald-200 rounded-xl p-3">
+                      <div class="flex items-center gap-2 mb-1.5">
+                        <div class="w-6 h-6 rounded-lg bg-emerald-100 flex items-center justify-center text-emerald-600">
+                          <Zap :size="12" />
+                        </div>
+                        <span class="text-xs font-bold text-emerald-700 uppercase">강점</span>
+                      </div>
+                      <div class="text-slate-700 text-xs font-medium leading-relaxed">
+                        {{ learningPath?.aiAnalysis?.keyStrength || '-' }}
+                      </div>
+                    </div>
+
+                    <!-- Weakness Card -->
+                    <div class="bg-rose-50 border border-rose-200 rounded-xl p-3">
+                      <div class="flex items-center gap-2 mb-1.5">
+                         <div class="w-6 h-6 rounded-lg bg-rose-100 flex items-center justify-center text-rose-500">
+                            <AlertTriangle :size="12" />
+                         </div>
+                        <span class="text-xs font-bold text-rose-600 uppercase">약점</span>
+                      </div>
+                      <div class="text-slate-700 text-xs font-medium leading-relaxed">
+                        {{ learningPath?.aiAnalysis?.primaryWeakness || '-' }}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Right Column: Learning Roadmap (7 cols) -->
+                <div class="lg:col-span-7 bg-slate-50 border border-slate-100 rounded-2xl p-5">
+                  <h3 class="text-sm font-bold text-slate-600 mb-4 flex items-center gap-2">
+                     <MapIcon :size="14" class="text-indigo-500" />
+                     맞춤형 학습 로드맵
+                  </h3>
+                  <LearningRoadmap :phases="learningPath?.aiAnalysis?.phases || []" class="w-full" />
+                </div>
+              </div>
             </div>
           </div>
         </section>
