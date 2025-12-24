@@ -177,38 +177,89 @@
                     <div class="flex-1 overflow-y-auto p-0 custom-scrollbar bg-slate-50">
                         
                         <!-- 1. OVERVIEW TAB -->
-                        <div v-if="activeTab === 'overview'" class="p-5 space-y-6">
-                            <!-- Core Idea -->
-                            <div v-if="record.algorithmIntuition" class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
-                                <h4 class="text-xs font-bold text-slate-800 mb-3 flex items-center gap-2">
-                                    <Lightbulb :size="14" class="text-amber-500"/> 핵심 아이디어
-                                </h4>
-                                <p class="text-sm text-slate-700 leading-relaxed whitespace-pre-line">{{ record.algorithmIntuition }}</p>
-                            </div>
-                            
-                            <!-- Pattern Tags Detail -->
-                            <div v-if="extractPatterns(record.patterns).length > 0" class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
-                                <h4 class="text-xs font-bold text-slate-800 mb-3 flex items-center gap-2">
-                                    <Tag :size="14" class="text-indigo-500"/> 알고리즘 & 자료구조
-                                </h4>
-                                <div class="flex flex-wrap gap-2">
-                                    <span v-for="pattern in extractPatterns(record.patterns)" :key="pattern"
-                                          class="px-2.5 py-1 bg-indigo-50 text-indigo-700 text-xs font-medium rounded-lg border border-indigo-100">
-                                        {{ pattern }}
-                                    </span>
+                        <!-- 1. OVERVIEW TAB -->
+                        <div v-if="activeTab === 'overview'" class="p-5 space-y-6 flex flex-col h-full">
+                            <div class="space-y-6 flex-1">
+                                <!-- Summary -->
+                                <div v-if="parsedSummary" class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
+                                    <h4 class="text-xs font-bold text-slate-800 mb-3 flex items-center gap-2">
+                                        <BookOpen :size="14" class="text-indigo-500"/> 요약
+                                    </h4>
+                                    <p class="text-sm text-slate-700 leading-relaxed">{{ parsedSummary }}</p>
                                 </div>
-                            </div>
 
-                            <!-- Comments Preview -->
-                            <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
-                                <h4 class="text-xs font-bold text-slate-800 mb-3 flex items-center gap-2">
-                                    <MessageSquare :size="14" class="text-slate-400"/> 댓글 ({{ comments.length }})
-                                </h4>
-                                <div  v-for="comment in comments" :key="comment.id" class="text-xs text-slate-600 bg-slate-50 p-2 rounded mb-2 last:mb-0">
-                                    <span class="font-bold">{{ comment.author || 'User' }}:</span> {{ comment.content }}
+                                <!-- Core Idea (Intuition) -->
+                                <div v-if="record.algorithmIntuition" class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
+                                    <h4 class="text-xs font-bold text-slate-800 mb-3 flex items-center gap-2">
+                                        <Lightbulb :size="14" class="text-amber-500"/> 핵심 아이디어
+                                    </h4>
+                                    <p class="text-sm text-slate-700 leading-relaxed whitespace-pre-line">{{ record.algorithmIntuition }}</p>
                                 </div>
-                                <div v-if="comments.length === 0" class="text-center text-xs text-slate-400 py-2">
-                                    등록된 댓글이 없습니다.
+
+                                <!-- Trace Example -->
+                                <div v-if="parsedTraceExample && parsedTraceExample.hasExample" class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+                                    <button @click="toggleTrace" class="w-full flex items-center justify-between p-4 bg-slate-50 hover:bg-slate-100 transition-colors">
+                                        <h4 class="text-xs font-bold text-slate-800 flex items-center gap-2">
+                                            <Footprints :size="14" class="text-emerald-500"/> 실행 흐름 예시
+                                        </h4>
+                                        <ChevronDown :class="{ 'rotate-180': showTrace }" class="transition-transform duration-300 text-slate-400" :size="16"/>
+                                    </button>
+                                    <div v-if="showTrace" class="p-4 border-t border-slate-200 bg-white space-y-4 animate-slide-down">
+                                        <p v-if="parsedTraceExample.note" class="text-xs text-slate-500 italic bg-slate-50 p-2 rounded border border-slate-100">
+                                            💡 {{ parsedTraceExample.note }}
+                                        </p>
+                                        <div class="space-y-3">
+                                            <div v-for="(step, idx) in parsedTraceExample.steps" :key="idx" class="flex gap-3">
+                                                 <div class="flex-col items-center flex">
+                                                     <div class="w-5 h-5 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center text-[10px] font-bold border border-emerald-200">
+                                                         {{ idx + 1 }}
+                                                     </div>
+                                                     <div v-if="idx < parsedTraceExample.steps.length - 1" class="w-0.5 flex-1 bg-emerald-100 my-1"></div>
+                                                 </div>
+                                                 <div class="text-xs text-slate-700 pt-0.5 leading-relaxed">
+                                                     {{ step }}
+                                                 </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Comments List -->
+                                <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
+                                    <h4 class="text-xs font-bold text-slate-800 mb-3 flex items-center gap-2">
+                                        <MessageSquare :size="14" class="text-slate-400"/> 댓글 ({{ comments.length }})
+                                    </h4>
+                                    <div class="space-y-2 max-h-[200px] overflow-y-auto custom-scrollbar pr-1">
+                                        <div v-for="comment in comments" :key="comment.id" class="text-xs text-slate-600 bg-slate-50 p-2 rounded border border-slate-100">
+                                            <div class="flex justify-between items-center mb-1">
+                                                <span class="font-bold text-slate-700">{{ comment.author || 'User' }}</span>
+                                                <span class="text-[10px] text-slate-400">{{ formatDate(comment.createdAt) }}</span>
+                                            </div>
+                                            <p>{{ comment.content }}</p>
+                                        </div>
+                                        <div v-if="comments.length === 0" class="text-center text-xs text-slate-400 py-4">
+                                            첫 댓글을 남겨보세요!
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Fixed Comment Input -->
+                                    <div class="mt-4 pt-4 border-t border-slate-100">
+                                        <div class="flex gap-2">
+                                            <input 
+                                                v-model="overviewCommentInput" 
+                                                @keypress.enter="submitOverviewComment"
+                                                placeholder="댓글을 입력하세요..." 
+                                                class="flex-1 bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-xs focus:ring-1 focus:ring-indigo-500 focus:outline-none transition-all"
+                                            />
+                                            <button 
+                                                @click="submitOverviewComment" 
+                                                :disabled="!overviewCommentInput.trim()"
+                                                class="px-3 py-2 bg-indigo-600 text-white rounded-lg text-xs font-bold hover:bg-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                                            >
+                                                등록
+                                            </button>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -363,7 +414,7 @@
 
 <script setup>
 import { ref, watch, computed, nextTick } from 'vue';
-import { ExternalLink, ChevronDown, ChevronUp, Bot, Bug, Send, Loader2, Activity, LayoutList, Lightbulb, Tag, MessageSquare, Wand2, CheckCircle2 } from 'lucide-vue-next';
+import { ExternalLink, ChevronDown, ChevronUp, Bot, Bug, Send, Loader2, Activity, LayoutList, Lightbulb, Tag, MessageSquare, Wand2, CheckCircle2, BookOpen, Footprints } from 'lucide-vue-next';
 import CodeViewer from '../../components/CodeViewer.vue';
 import { boardApi, commentApi } from '../../api/board';
 import { aiApi } from '../../api/ai'; 
@@ -400,6 +451,20 @@ const tutorMessages = ref([]);
 const loadingTutorResponse = ref(false);
 const chatContainer = ref(null);
 const codeViewerRef = ref(null);
+
+// Overview Tab State
+const showTrace = ref(false);
+const overviewCommentInput = ref('');
+
+const toggleTrace = () => {
+    showTrace.value = !showTrace.value;
+};
+
+const submitOverviewComment = async () => {
+    if (!overviewCommentInput.value.trim()) return;
+    await submitLineComment({ lineNumber: null, content: overviewCommentInput.value.trim() });
+    overviewCommentInput.value = '';
+};
 
 // Methods
 const toggleExpand = async () => {
@@ -552,6 +617,22 @@ const parsedStructure = computed(() => {
         const full = JSON.parse(props.record.fullResponse);
         return Array.isArray(full.structure) ? full.structure : [];
     } catch { return []; }
+});
+
+const parsedSummary = computed(() => {
+    if (!props.record.fullResponse) return null;
+    try {
+        const full = JSON.parse(props.record.fullResponse);
+        return full.summary || null;
+    } catch { return null; }
+});
+
+const parsedTraceExample = computed(() => {
+    if (!props.record.fullResponse) return null;
+    try {
+        const full = JSON.parse(props.record.fullResponse);
+        return full.traceExample ? full.traceExample : null;
+    } catch { return null; }
 });
 
 const combinedHighlights = computed(() => {
