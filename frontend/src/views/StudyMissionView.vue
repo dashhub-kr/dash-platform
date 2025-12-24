@@ -68,40 +68,61 @@
             </a>
           </div>
 
-          <!-- 팀원별 진행 레이스 (달리기) -->
+          <!-- 팀원별 진행 레이스 (New Shared Gauge) -->
           <div class="mt-6 pt-6 border-t border-slate-100">
             <h4 class="text-sm font-bold text-slate-500 mb-4 flex items-center gap-2">
-              <span>🏃 팀원 진행 레이스</span>
+              <span>🏃 팀원 진행 현황</span>
             </h4>
             
-            <div class="space-y-4">
-              <div v-for="member in mission.memberProgressList" :key="member.userId" class="relative">
-                <!-- 트랙 -->
-                <div class="h-2 w-full bg-slate-100 rounded-full relative overflow-visible mt-6 mb-2">
-                   <!-- 내 트랙 하이라이트 -->
-                   <div v-if="member.userId === currentUserId" 
-                        class="absolute inset-0 bg-indigo-50/50 rounded-full -m-1"></div>
+            <div class="relative h-14 w-full mt-8 mb-2">
+                <!-- Progress Track -->
+                <div class="absolute top-[28px] left-0 right-0 h-3 bg-slate-100 rounded-full overflow-hidden shadow-inner">
+                    <div class="w-full h-full opacity-30 bg-[linear-gradient(90deg,transparent_99%,rgba(0,0,0,0.05)_100%)] bg-[length:20%_100%]"></div>
+                </div>
+                
+                <!-- Goal Flag (Right End) -->
+                <div class="absolute top-[18px] -right-2 z-10 bg-white p-1.5 rounded-full border border-slate-200 shadow-sm">
+                    <Trophy class="w-4 h-4 text-yellow-500" />
                 </div>
 
-                <!-- 러너 (Emoji) -->
-                <div class="absolute top-0 left-0 w-full h-8 pointer-events-none" style="top: -4px;">
-                   <div class="absolute transform -translate-x-1/2 transition-all duration-700 ease-out flex flex-col items-center"
-                        :style="{ left: `${(member.completedCount / Math.max(member.totalProblems, 1)) * 100}%` }">
-                      <span class="text-2xl filter drop-shadow-md z-10">
-                        {{ member.allCompleted ? '🚩' : '🏃' }}
-                      </span>
-                      <!-- 이름표 -->
-                      <span class="text-xs font-bold mt-1 px-2 py-0.5 rounded-full whitespace-nowrap shadow-sm border"
-                            :class="member.userId === currentUserId ? 'bg-indigo-600 text-white border-indigo-600' : 'bg-white text-slate-600 border-slate-200'">
-                        {{ member.username }}
-                      </span>
-                      <!-- 퍼센트 -->
-                      <span class="text-[10px] font-medium text-slate-400 mt-0.5">
-                        {{ member.completedCount }}/{{ member.totalProblems }}
-                      </span>
-                   </div>
+                <!-- Member Markers -->
+                <div v-for="member in sortMembers(mission.memberProgressList)" :key="member.userId" 
+                     class="absolute top-0 transform -translate-x-1/2 transition-all duration-700 ease-out z-20 group"
+                     :style="{ left: getMemberProgressPercent(member, mission) + '%' }"
+                     :class="{'z-30': isMe(member.userId)}">
+                     
+                     <div class="flex flex-col items-center cursor-help">
+                        <!-- Avatar -->
+                        <div class="relative">
+                            <img :src="getMemberProfileImage(member)" :alt="member.username"
+                                 class="w-8 h-8 rounded-full object-cover border-2 shadow-md transition-transform hover:scale-110 bg-white"
+                                 :class="[
+                                   isMe(member.userId) 
+                                     ? 'border-emerald-500 ring-2 ring-emerald-500/30' 
+                                     : member.allCompleted 
+                                       ? 'border-orange-500' 
+                                       : 'border-slate-200 grayscale-[0.3]'
+                                 ]" />
+                             
+                             <!-- Completed Badge -->
+                             <div v-if="member.allCompleted" class="absolute -top-1 -right-1 w-3.5 h-3.5 bg-orange-500 rounded-full flex items-center justify-center border border-white shadow-sm animate-bounce">
+                                 <Check class="w-2 h-2 text-white" stroke-width="4" />
+                             </div>
+                        </div>
+
+                        <!-- Arrow -->
+                        <div class="w-0 h-0 border-l-[5px] border-l-transparent border-r-[5px] border-r-transparent border-t-[6px] transition-colors mt-0.5 drop-shadow-sm"
+                             :class="isMe(member.userId) ? 'border-t-emerald-500' : 'border-t-slate-300'"></div>
+
+                        <!-- Tooltip -->
+                        <div class="absolute bottom-full mb-1 px-2 py-1 bg-slate-800 text-white text-[10px] rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none shadow-xl flex flex-col items-center gap-0.5 z-50">
+                            <span class="font-bold text-indigo-200">{{ member.username }} {{ isMe(member.userId) ? '(나)' : '' }}</span>
+                            <span class="font-mono">{{ member.completedCount }} / {{ mission.problemIds.length }}</span>
+                            <!-- Tooltip Arrow -->
+                            <div class="absolute -bottom-1 left-1/2 -translate-x-1/2 w-2 h-2 bg-slate-800 rotate-45"></div>
+                        </div>
+                     </div>
                 </div>
-              </div>
             </div>
           </div>
         </div>
@@ -150,6 +171,14 @@ import { useRoute, useRouter } from 'vue-router';
 import axios from 'axios';
 import StudyMissionCreateModal from '@/components/StudyMissionCreateModal.vue';
 import StudyMissionDetailDrawer from '@/components/StudyMissionDetailDrawer.vue';
+import { Trophy, Check, Flame } from 'lucide-vue-next';
+
+const profileImages = [
+    '/profile/bag.png',
+    '/profile/proud.png',
+    '/profile/smart.png',
+    '/profile/smile.png'
+];
 
 const route = useRoute();
 const router = useRouter(); // 쿼리 제거용
@@ -231,6 +260,34 @@ const closeDetailDrawer = () => {
 const openAddModalForMission = (missionId) => {
   preSelectedMissionId.value = missionId;
   showCreateModal.value = true;
+};
+
+// --- Helper Functions for Mission Gauge ---
+const isMe = (userId) => currentUserId.value === userId;
+
+const getMemberProfileImage = (member) => {
+    if (member.avatarUrl) return member.avatarUrl;
+    const id = member.userId || 0;
+    const index = id % profileImages.length;
+    return profileImages[index];
+};
+
+const getMemberProgressPercent = (member, mission) => {
+    if (!mission || !mission.problemIds || mission.problemIds.length === 0) return 0;
+    const total = mission.problemIds.length;
+    const completed = member.completedCount || 0;
+    
+    if (member.allCompleted) return 100;
+    return Math.min(100, Math.max(0, (completed / total) * 100));
+};
+
+const sortMembers = (members) => {
+    if (!members) return [];
+    return [...members].sort((a, b) => {
+        if (a.userId === currentUserId.value) return -1;
+        if (b.userId === currentUserId.value) return 1;
+        return a.username.localeCompare(b.username);
+    });
 };
 </script>
 
