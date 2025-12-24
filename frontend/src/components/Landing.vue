@@ -1,12 +1,12 @@
 <template>
   <div
-    class="min-h-screen bg-slate-50 text-slate-800 flex flex-col selection:bg-indigo-500/30 font-[Pretendard]"
+    class="min-h-screen bg-white text-slate-800 flex flex-col selection:bg-brand-500/30 font-[Pretendard]"
   >
     <!-- 배경: Light Mode Gradients -->
     <div class="fixed inset-0 z-0 pointer-events-none overflow-hidden">
       <!-- Top Left Gradient -->
       <div
-        class="absolute top-[-10%] left-[-10%] w-[50vw] h-[50vw] bg-indigo-200/40 rounded-full blur-[120px] mix-blend-multiply opacity-70 animate-blob"
+        class="absolute top-[-10%] left-[-10%] w-[50vw] h-[50vw] bg-brand-200/40 rounded-full blur-[120px] mix-blend-multiply opacity-70 animate-blob"
       ></div>
       <!-- Bottom Right Gradient -->
       <div
@@ -36,10 +36,10 @@
           id="hero"
           class="container mx-auto px-6 pt-32 pb-24 text-center relative max-w-5xl"
         >
-          <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-50 border border-indigo-100 text-indigo-600 text-sm font-bold mb-6 animate-fade-in-up">
+          <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-brand-50 border border-brand-100 text-brand-600 text-sm font-bold mb-6 animate-fade-in-up">
              <span class="relative flex h-2 w-2">
-                <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-indigo-400 opacity-75"></span>
-                <span class="relative inline-flex rounded-full h-2 w-2 bg-indigo-500"></span>
+                <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-brand-400 opacity-75"></span>
+                <span class="relative inline-flex rounded-full h-2 w-2 bg-brand-500"></span>
               </span>
              GitHub 연동으로 3초 만에 시작
           </div>
@@ -49,7 +49,7 @@
           >
             알고리즘 스터디, <br />
             <span
-              class="text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600"
+              class="text-transparent bg-clip-text bg-gradient-to-r from-brand-600 via-purple-600 to-pink-600"
             >
               '제출'만 하세요.
             </span>
@@ -59,7 +59,7 @@
             class="text-xl md:text-2xl text-slate-500 max-w-2xl mx-auto mb-12 text-pretty font-medium animate-fade-in-up delay-200"
           >
             번거로운 파일 관리, 리팩토링, 코드 리뷰...<br/>
-            이제 <span class="text-indigo-600 font-bold bg-indigo-50 px-1 rounded">Dash</span>가 전부 자동으로 처리해드립니다.
+            이제 <span class="text-brand-600 font-bold bg-brand-50 px-1 rounded">Dash</span>가 전부 자동으로 처리해드립니다.
           </p>
 
           <div
@@ -67,7 +67,7 @@
           >
             <button
               @click="handleLogin"
-              class="group relative inline-flex h-14 items-center justify-center overflow-hidden rounded-2xl bg-slate-900 px-10 font-bold text-white transition-all duration-300 hover:bg-slate-800 hover:shadow-xl hover:shadow-indigo-500/20 hover:-translate-y-1"
+              class="group relative inline-flex h-14 items-center justify-center overflow-hidden rounded-2xl bg-slate-900 px-10 font-bold text-white transition-all duration-300 hover:bg-slate-800 hover:shadow-xl hover:shadow-brand-500/20 hover:-translate-y-1"
             >
               <span class="mr-3"><Github :size="24" /></span>
               <span class="text-lg">GitHub로 시작하기</span>
@@ -92,7 +92,7 @@
         >
           <div class="text-center mb-20 max-w-3xl mx-auto">
             <h2 class="text-4xl font-extrabold mb-6 text-slate-900">
-              Dash가 해결하는 <span class="underline decoration-wavy decoration-indigo-300 underline-offset-4">3가지 문제</span>
+              Dash가 해결하는 <span class="underline decoration-wavy decoration-brand-300 underline-offset-4">3가지 문제</span>
             </h2>
             <p class="text-xl text-slate-500">
                스터디원들의 '귀차니즘'을 기술적으로 해결했습니다.
@@ -114,7 +114,7 @@
                   </h3>
                   <p class="text-lg text-slate-500 mb-8 leading-relaxed">
                     그냥 백준에서 <code class="bg-slate-100 px-1.5 py-0.5 rounded text-red-500 font-bold">Main</code>으로 풀고 제출하세요.
-                    Dash가 자동으로 <span class="text-slate-900 font-bold underline decoration-indigo-200">파일 구조를 변환</span>하고,
+                    Dash가 자동으로 <span class="text-slate-900 font-bold underline decoration-brand-200">파일 구조를 변환</span>하고,
                     실패한 기록까지 잔디로 심어드립니다.
                   </p>
                </div>
@@ -147,7 +147,7 @@
               class="group reveal bg-white rounded-[40px] p-8 md:p-12 shadow-sm border border-slate-100 hover:shadow-2xl transition-all duration-500 grid grid-cols-1 lg:grid-cols-2 gap-12 items-center"
             >
                <div class="relative group-hover:scale-[1.02] transition-transform duration-500">
-                  <div class="absolute -inset-4 bg-gradient-to-l from-indigo-50 to-purple-50 rounded-[40px] -z-10 transform -rotate-2"></div>
+                  <div class="absolute -inset-4 bg-gradient-to-l from-brand-50 to-purple-50 rounded-[40px] -z-10 transform -rotate-2"></div>
                    <div class="bg-white rounded-3xl shadow-xl border border-slate-200 p-6 relative overflow-hidden">
                        <div class="absolute top-0 left-0 bg-green-500 text-white text-[10px] font-bold px-3 py-1 rounded-br-xl">Dash AI Analysis</div>
                        <div class="flex gap-4 mt-4">
@@ -252,9 +252,9 @@
             >
               <!-- Icon -->
               <div
-                class="w-12 h-12 rounded-2xl bg-indigo-50 flex items-center justify-center mb-6 group-hover:bg-indigo-600 transition-colors duration-300"
+                class="w-12 h-12 rounded-2xl bg-brand-50 flex items-center justify-center mb-6 group-hover:bg-brand-600 transition-colors duration-300"
               >
-                 <component :is="feature.icon" :size="24" class="text-indigo-600 group-hover:text-white transition-colors duration-300" />
+                 <component :is="feature.icon" :size="24" class="text-brand-600 group-hover:text-white transition-colors duration-300" />
               </div>
               
               <h3 class="text-xl font-bold mb-3 text-slate-800">

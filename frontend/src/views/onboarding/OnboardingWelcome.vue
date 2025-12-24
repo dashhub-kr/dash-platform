@@ -1,13 +1,9 @@
 <template>
-  <div class="min-h-screen flex items-center justify-center bg-slate-50 text-slate-800 p-6 relative overflow-hidden font-[Pretendard]">
-    
-    <!-- Background Decor -->
-    <div class="absolute top-[-10%] right-[-5%] w-[40vw] h-[40vw] bg-indigo-200/40 rounded-full blur-[100px] animate-blob mix-blend-multiply"></div>
-    <div class="absolute bottom-[-10%] left-[-5%] w-[40vw] h-[40vw] bg-sky-200/40 rounded-full blur-[100px] animate-blob animation-delay-2000 mix-blend-multiply"></div>
+  <div class="min-h-screen flex items-center justify-center bg-slate-50 text-slate-800 p-6">
 
     <div class="max-w-md w-full space-y-8 animate-fade-in-up relative z-10">
       <div class="text-center space-y-2">
-        <h1 class="text-4xl font-extrabold tracking-tight bg-gradient-to-r from-indigo-600 to-cyan-500 bg-clip-text text-transparent">
+        <h1 class="text-4xl font-extrabold tracking-tight bg-gradient-to-r from-brand-600 to-cyan-500 bg-clip-text text-transparent">
           Solved.ac 연동
         </h1>
         <p class="text-slate-500 font-medium">
@@ -15,7 +11,7 @@
         </p>
       </div>
 
-      <div class="bg-white/80 border border-white/60 rounded-3xl p-8 shadow-xl shadow-indigo-500/10 backdrop-blur-md">
+      <div class="bg-white/80 border border-white/60 rounded-3xl p-8 shadow-xl shadow-brand-500/10 backdrop-blur-md">
         <form @submit.prevent="submitHandle" class="space-y-6">
           <div class="space-y-2">
             <label class="text-sm font-bold text-slate-700 ml-1">Solved.ac ID</label>
@@ -23,7 +19,7 @@
               v-model="handle"
               type="text"
               placeholder="백준 핸들을 입력하세요"
-              class="w-full bg-white border border-slate-200 rounded-2xl px-5 py-4 text-slate-800 placeholder:text-slate-400 focus:outline-none focus:ring-4 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all font-medium"
+              class="w-full bg-white border border-slate-200 rounded-2xl px-5 py-4 text-slate-800 placeholder:text-slate-400 focus:outline-none focus:ring-4 focus:ring-brand-500/20 focus:border-brand-500 transition-all font-medium"
               :disabled="loading || confirmed"
               @input="onHandleInput"
               required
@@ -32,22 +28,19 @@
 
           <!-- Verification Status -->
           <div v-if="verifying" class="flex items-center justify-center gap-2 text-slate-500 py-4">
-            <svg class="animate-spin h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-              <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-            </svg>
+            <Loader2 class="animate-spin h-5 w-5" />
             <span class="font-medium">아이디 확인 중...</span>
           </div>
 
           <!-- User Preview Card -->
           <div v-else-if="verifiedUser && !verifyError" class="relative">
             <div 
-              class="bg-gradient-to-br from-slate-50 to-white border-2 rounded-2xl p-5 transition-all"
-              :class="confirmed ? 'border-emerald-400 shadow-lg shadow-emerald-100' : 'border-slate-200'"
+              class="bg-gradient-to-br from-slate-50 to-white border rounded-2xl p-5 transition-all"
+              :class="confirmed ? 'border-emerald-400 shadow-lg shadow-emerald-100 ring-2 ring-emerald-50' : 'border-slate-200 shadow-sm'"
             >
               <div class="flex items-center gap-4">
                 <!-- Profile Image -->
-                <div class="w-16 h-16 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-2xl font-bold text-white shadow-lg overflow-hidden">
+                <div class="w-16 h-16 rounded-full bg-gradient-to-br from-brand-500 to-purple-600 flex items-center justify-center text-2xl font-bold text-white shadow-lg overflow-hidden">
                   <img 
                     :src="verifiedUser.profileImageUrl || '/land/default_profile.png'" 
                     :alt="verifiedUser.handle"
@@ -68,16 +61,14 @@
                     </span>
                   </div>
                   <div class="text-sm text-slate-500 mt-1 flex items-center gap-3">
-                    <span>🧩 {{ verifiedUser.solvedCount || 0 }}문제 해결</span>
-                    <span v-if="verifiedUser.classLevel">📚 Class {{ verifiedUser.classLevel }}</span>
+                    <span class="flex items-center gap-1"><Puzzle :size="14"/> {{ verifiedUser.solvedCount || 0 }}문제 해결</span>
+                    <span v-if="verifiedUser.classLevel" class="flex items-center gap-1"><BookOpen :size="14"/> Class {{ verifiedUser.classLevel }}</span>
                   </div>
                 </div>
 
                 <!-- Confirmed Badge -->
                 <div v-if="confirmed" class="text-emerald-500">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M20 6 9 17l-5-5"/>
-                  </svg>
+                  <CheckCircle2 :size="28" />
                 </div>
               </div>
 
@@ -111,14 +102,13 @@
 
           <button
             type="submit"
-            class="w-full bg-gradient-to-r from-indigo-600 to-indigo-500 hover:from-indigo-500 hover:to-indigo-400 text-white font-bold py-4 rounded-2xl transition-all shadow-lg shadow-indigo-500/30 hover:shadow-indigo-500/40 hover:-translate-y-0.5 disabled:opacity-70 disabled:cursor-not-allowed disabled:transform-none flex items-center justify-center gap-2"
+            class="w-full bg-gradient-to-r from-brand-600 to-brand-500 hover:from-brand-500 hover:to-brand-400 text-white font-bold py-4 rounded-2xl transition-all shadow-lg shadow-brand-500/30 hover:shadow-brand-500/40 hover:-translate-y-0.5 disabled:opacity-70 disabled:cursor-not-allowed disabled:transform-none flex items-center justify-center gap-2"
             :disabled="loading || !confirmed"
           >
-            <svg v-if="loading" class="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-              <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-            </svg>
-            <span>{{ loading ? '연동 중...' : (confirmed ? '다음으로' : '위에서 계정을 확인해주세요') }}</span>
+            <Loader2 v-if="loading" class="animate-spin h-5 w-5 text-white" />
+            <span class="flex items-center gap-2" v-else>
+                {{ confirmed ? '다음으로' : '위에서 계정을 확인해주세요' }} <ArrowRight v-if="confirmed" :size="20"/>
+            </span>
           </button>
         </form>
       </div>
@@ -131,6 +121,7 @@ import { ref } from 'vue';
 import { useRouter } from 'vue-router';
 import { onboardingApi } from '../../api/onboarding';
 import { useAuth } from '../../composables/useAuth';
+import { Loader2, Puzzle, BookOpen, Check, ArrowRight, CheckCircle2 } from 'lucide-vue-next';
 
 const router = useRouter();
 const { user } = useAuth();

@@ -1,18 +1,18 @@
 <template>
-  <div class="min-h-screen bg-[#f0f9ff] text-slate-800 selection:bg-indigo-500/30 font-[Pretendard]">
+  <div class="min-h-screen bg-white text-slate-800 selection:bg-brand-500/30 font-[Pretendard]">
 
-    <main class="container mx-auto px-6 py-10 max-w-5xl">
+    <main class="container mx-auto px-6 py-10 max-w-4xl">
       <!-- Back Button -->
       <button 
         @click="$router.push('/boards')" 
-        class="flex items-center gap-2 text-slate-500 hover:text-indigo-600 mb-6 transition-colors animate-fade-in-up"
+        class="flex items-center gap-2 text-slate-500 hover:text-brand-600 mb-6 transition-colors animate-fade-in-up"
       >
         <ArrowLeft :size="20" />
         목록으로
       </button>
 
       <!-- Post Content -->
-      <article v-if="post" class="bg-white/80 border border-white/60 shadow-xl shadow-indigo-500/5 backdrop-blur-md rounded-3xl p-8 mb-6 animate-fade-in-up delay-100">
+      <article v-if="post" class="bg-white/80 border border-white/60 shadow-xl shadow-brand-500/5 backdrop-blur-md rounded-3xl p-8 mb-6 animate-fade-in-up delay-100">
         <!-- Header -->
         <div class="border-b border-slate-100 pb-6 mb-6">
           <div class="flex items-center gap-3 mb-4">
@@ -24,8 +24,8 @@
             <div class="flex items-center gap-2">
               <img v-if="post.authorProfileImageUrl" 
                    :src="post.authorProfileImageUrl" 
-                   class="w-8 h-8 rounded-full object-cover border border-indigo-100" />
-              <div v-else class="w-8 h-8 rounded-full bg-indigo-50 flex items-center justify-center text-indigo-600 font-bold border border-indigo-100">
+                   class="w-8 h-8 rounded-full object-cover border border-brand-100" />
+              <div v-else class="w-8 h-8 rounded-full bg-brand-50 flex items-center justify-center text-brand-600 font-bold border border-brand-100">
                  {{ post.authorName?.charAt(0).toUpperCase() || 'U' }}
               </div>
               <span class="text-slate-700 font-medium">{{ post.authorName || '익명' }}</span>
@@ -70,7 +70,7 @@
               'flex items-center gap-2 px-6 py-3 rounded-xl font-bold transition-all shadow-sm',
               isLiked 
                 ? 'bg-rose-50 text-rose-500 border border-rose-100' 
-                : 'bg-white border border-slate-200 text-slate-600 hover:text-indigo-600 hover:border-indigo-200'
+                : 'bg-white border border-slate-200 text-slate-600 hover:text-brand-600 hover:border-brand-200'
             ]"
           >
             <ThumbsUp :size="20" :fill="isLiked ? 'currentColor' : 'none'" />
@@ -88,7 +88,7 @@
       </div>
 
       <!-- Comments Section -->
-      <section v-if="post" class="bg-white/80 border border-white/60 shadow-xl shadow-indigo-500/5 backdrop-blur-md rounded-3xl p-8 animate-fade-in-up delay-200">
+      <section v-if="post" class="bg-white/80 border border-white/60 shadow-xl shadow-brand-500/5 backdrop-blur-md rounded-3xl p-8 animate-fade-in-up delay-200">
         <h2 class="text-xl font-bold text-slate-800 mb-6 flex items-center gap-2">
           <MessageCircle :size="22" />
           일반 댓글
@@ -99,14 +99,14 @@
           <textarea
             v-model="newComment"
             placeholder="따뜻한 댓글을 남겨주세요..."
-            class="w-full bg-white border border-slate-200 rounded-2xl p-4 text-slate-800 placeholder-slate-400 resize-none focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent shadow-inner transition-all"
+            class="w-full bg-white border border-slate-200 rounded-2xl p-4 text-slate-800 placeholder-slate-400 resize-none focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-transparent shadow-inner transition-all"
             rows="3"
           ></textarea>
           <div class="flex justify-end mt-3">
             <button 
               @click="submitComment"
               :disabled="!newComment.trim()"
-              class="px-6 py-2.5 bg-indigo-600 hover:bg-indigo-500 disabled:bg-slate-200 disabled:text-slate-400 text-white rounded-xl font-bold transition-all shadow-lg shadow-indigo-500/20"
+              class="px-6 py-2.5 bg-brand-600 hover:bg-brand-500 disabled:bg-slate-200 disabled:text-slate-400 text-white rounded-xl font-bold transition-all shadow-lg shadow-brand-500/20"
             >
               댓글 작성
             </button>
@@ -178,7 +178,7 @@
         </button>
         <button 
           @click="$router.push(`/boards/edit/${post.id}`)"
-          class="px-5 py-2 rounded-xl bg-white text-slate-600 border border-slate-200 hover:border-indigo-500 hover:text-indigo-600 transition-all text-sm font-bold shadow-sm"
+          class="px-5 py-2 rounded-xl bg-white text-slate-600 border border-slate-200 hover:border-brand-500 hover:text-brand-600 transition-all text-sm font-bold shadow-sm"
         >
           수정
         </button>

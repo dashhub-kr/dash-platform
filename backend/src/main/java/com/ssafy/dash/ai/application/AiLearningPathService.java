@@ -54,9 +54,23 @@ public class AiLearningPathService {
                         log.info("Returning cached learning path for user: {} (generated at: {})", userId,
                                         cache.getGeneratedAt());
                         try {
-                                return objectMapper.readValue(cache.getAnalysisJson(), LearningDashboardResponse.class);
+                                LearningDashboardResponse response = objectMapper.readValue(cache.getAnalysisJson(),
+                                                LearningDashboardResponse.class);
+
+                                // 1-1. Patch missing Daily Challenge (for backward compatibility)
+                                if (response.getDailyChallenge() == null && response.getClassStats() != null) {
+                                        LearningDashboardResponse.DailyChallenge challenge = determineDailyChallengeFromDto(
+                                                        response.getClassStats());
+                                        response.setDailyChallenge(challenge);
+
+                                        // Update cache with patched data
+                                        String updatedJson = objectMapper.writeValueAsString(response);
+                                        cacheMapper.update(userId, updatedJson, today);
+                                }
+
+                                return response;
                         } catch (Exception e) {
-                                log.warn("Failed to parse cached data, regenerating: {}", e.getMessage());
+                                log.warn("Failed to parse or patch cached data, regenerating: {}", e.getMessage());
                         }
                 }
 
@@ -100,6 +114,9 @@ public class AiLearningPathService {
                 // AI 서버에 학습 경로 요청
                 LearningPathResponse aiResponse = aiClient.generateLearningPath(request);
 
+                // Daily Challenge 생성
+                LearningDashboardResponse.DailyChallenge dailyChallenge = determineDailyChallenge(classStats);
+
                 // 종합 응답 생성
                 return LearningDashboardResponse.builder()
                                 .aiAnalysis(aiResponse)
@@ -109,6 +126,7 @@ public class AiLearningPathService {
                                 .weaknessTags(request.getWeaknessTags())
                                 .strengthTags(request.getStrengthTags())
                                 .classStats(request.getClassStats())
+                                .dailyChallenge(dailyChallenge)
                                 .build();
         }
 
@@ -127,7 +145,7 @@ public class AiLearningPathService {
                                         Tag tag = tagMapper.findTagByKey(t.getTagKey());
                                         return LearningPathRequest.TagStats.builder()
                                                         .tagKey(t.getTagKey())
-                                                        .tagName(t.getTagKey())
+                                                        .tagName(tag != null ? tag.getKoreanName() : t.getTagKey())
                                                         .bojTagId(tag != null ? tag.getBojTagId() : null)
                                                         .solved(t.getSolved())
                                                         .total(t.getTotal())
@@ -143,7 +161,7 @@ public class AiLearningPathService {
                                         Tag tag = tagMapper.findTagByKey(t.getTagKey());
                                         return LearningPathRequest.TagStats.builder()
                                                         .tagKey(t.getTagKey())
-                                                        .tagName(t.getTagKey())
+                                                        .tagName(tag != null ? tag.getKoreanName() : t.getTagKey())
                                                         .bojTagId(tag != null ? tag.getBojTagId() : null)
                                                         .solved(t.getSolved())
                                                         .total(t.getTotal())
@@ -166,6 +184,7 @@ public class AiLearningPathService {
 
                 return LearningPathRequest.builder()
                                 .currentLevel(currentLevel)
+                                .tier(user.getSolvedacTier())
                                 .goalLevel(goalLevel)
                                 .solvedCount(totalSolved)
                                 .weaknessTags(weaknessTags)
@@ -203,6 +222,47 @@ public class AiLearningPathService {
                                 .map(c -> String.format("Class %d 에센셜 완성 (남은 문제: %d개)",
                                                 c.getClassNumber(), c.getEssentials() - c.getEssentialSolved()))
                                 .orElse("다음 클래스에 도전하기!");
+        }
+
+        private LearningDashboardResponse.DailyChallenge determineDailyChallenge(List<UserClassStat> classStats) {
+                return classStats.stream()
+                                .filter(c -> c.getEssentialCompletionRate() < 100)
+                                .min(Comparator.comparing(UserClassStat::getClassNumber))
+                                .map(c -> LearningDashboardResponse.DailyChallenge.builder()
+                                                .title(String.format("Class %d 에센셜 완성 (남은 문제: %d개)",
+                                                                c.getClassNumber(),
+                                                                c.getEssentials() - c.getEssentialSolved()))
+                                                .description("다음 단계로 나아가기 위한 도전입니다.")
+                                                .targetClass(c.getClassNumber())
+                                                .remainingProblems(c.getEssentials() - c.getEssentialSolved())
+                                                .link(String.format("https://solved.ac/class/%d", c.getClassNumber()))
+                                                .build())
+                                .orElse(LearningDashboardResponse.DailyChallenge.builder()
+                                                .title("모든 클래스 정복 완료!")
+                                                .description("새로운 목표를 찾아보세요.")
+                                                .link("https://solved.ac/classes")
+                                                .build());
+        }
+
+        private LearningDashboardResponse.DailyChallenge determineDailyChallengeFromDto(
+                        List<LearningPathRequest.ClassStats> classStats) {
+                return classStats.stream()
+                                .filter(c -> c.getEssentials() > 0 && c.getEssentialSolved() < c.getEssentials())
+                                .min(Comparator.comparing(LearningPathRequest.ClassStats::getClassNumber))
+                                .map(c -> LearningDashboardResponse.DailyChallenge.builder()
+                                                .title(String.format("Class %d 에센셜 완성 (남은 문제: %d개)",
+                                                                c.getClassNumber(),
+                                                                c.getEssentials() - c.getEssentialSolved()))
+                                                .description("다음 단계로 나아가기 위한 도전입니다.")
+                                                .targetClass(c.getClassNumber())
+                                                .remainingProblems(c.getEssentials() - c.getEssentialSolved())
+                                                .link(String.format("https://solved.ac/class/%d", c.getClassNumber()))
+                                                .build())
+                                .orElse(LearningDashboardResponse.DailyChallenge.builder()
+                                                .title("모든 클래스 정복 완료!")
+                                                .description("새로운 목표를 찾아보세요.")
+                                                .link("https://solved.ac/classes")
+                                                .build());
         }
 
 }

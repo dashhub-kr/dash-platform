@@ -13,6 +13,7 @@ import java.util.List;
 @Builder
 public class LearningPathRequest {
     private String currentLevel; // 현재 레벨 (예: "Gold V")
+    private Integer tier; // 숫자형 티어 (1-30)
     private int solvedCount; // 총 푼 문제 수
     private String goalLevel; // 목표 레벨 (Optional)
     private List<TagStats> strengthTags; // 강점 태그 목록

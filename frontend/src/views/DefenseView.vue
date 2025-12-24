@@ -1,11 +1,5 @@
 <template>
-  <div class="defense-container relative w-full h-screen overflow-hidden bg-slate-50 font-[Pretendard]">
-    <!-- Background Effects -->
-    <div class="absolute inset-0 bg-gradient-to-br from-indigo-50 via-white to-slate-100"></div>
-    <div class="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none">
-       <div class="absolute top-1/4 left-1/4 w-96 h-96 bg-indigo-200/40 rounded-full blur-3xl animate-pulse mix-blend-multiply"></div>
-       <div class="absolute bottom-1/3 right-1/4 w-80 h-80 bg-rose-200/40 rounded-full blur-3xl animate-pulse delay-1000 mix-blend-multiply"></div>
-    </div>
+  <div class="min-h-screen bg-white text-slate-800 overflow-hidden">
 
     <div class="relative z-10 flex flex-col items-center justify-center h-full px-4">
       
@@ -18,9 +12,9 @@
       <div v-else-if="status.defenseProblemId" class="w-full max-w-4xl animate-fade-in-up">
         <div class="bg-white/80 backdrop-blur-xl border border-white/50 rounded-3xl p-8 md:p-12 shadow-2xl text-center relative overflow-hidden ring-1 ring-black/5">
             <!-- Glow behind -->
-            <div class="absolute top-0 left-1/2 -translate-x-1/2 w-full h-1 bg-gradient-to-r from-transparent via-indigo-500 to-transparent shadow-[0_0_20px_rgba(99,102,241,0.5)]"></div>
+            <div class="absolute top-0 left-1/2 -translate-x-1/2 w-full h-1 bg-gradient-to-r from-transparent via-brand-500 to-transparent shadow-[0_0_20px_rgba(99,102,241,0.5)]"></div>
 
-            <div class="inline-block px-4 py-1 rounded-full bg-slate-100 text-indigo-600 text-sm font-bold mb-6 border border-slate-200">
+            <div class="inline-block px-4 py-1 rounded-full bg-slate-100 text-brand-600 text-sm font-bold mb-6 border border-slate-200">
                 {{ status.defenseType === 'GOLD' ? '🟡 골드 등급' : '⚪ 실버 등급' }} 디펜스
             </div>
 
@@ -32,7 +26,7 @@
                 <!-- Timer Card -->
                 <div class="bg-slate-50 p-6 rounded-2xl border border-slate-200 flex flex-col items-center justify-center group hover:bg-slate-100 transition-colors shadow-sm">
                     <span class="text-slate-500 text-sm uppercase tracking-widest mb-2 font-semibold">남은 시간</span>
-                    <div class="text-5xl font-mono font-bold text-slate-900 tabular-nums tracking-tight group-hover:text-indigo-600 transition-colors">
+                    <div class="text-5xl font-mono font-bold text-slate-900 tabular-nums tracking-tight group-hover:text-brand-600 transition-colors">
                         {{ formattedTimeLeft }}
                     </div>
                 </div>
@@ -49,7 +43,7 @@
 
             <div class="flex flex-col items-center gap-4">
                <button @click="refreshStatus" 
-                class="px-8 py-4 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl font-bold text-lg shadow-lg shadow-indigo-500/30 transition-all active:scale-95 flex items-center gap-2">
+                class="px-8 py-4 bg-brand-600 hover:bg-brand-500 text-white rounded-xl font-bold text-lg shadow-lg shadow-brand-500/30 transition-all active:scale-95 flex items-center gap-2">
                  <span>🔄 상태 확인</span>
                </button>
                <p class="text-slate-500 text-sm max-w-md leading-relaxed break-keep">
@@ -61,7 +55,7 @@
       </div>
 
       <!-- Selection View -->
-      <div v-else class="w-full max-w-6xl animate-fade-in">
+      <div v-else class="w-full max-w-4xl animate-fade-in">
         <div class="text-center mb-12">
             <h1 class="text-4xl md:text-6xl font-black text-slate-900 mb-4 tracking-tight drop-shadow-sm">
                 랜덤 디펜스
@@ -73,40 +67,30 @@
 
         <div class="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12 px-4">
             <!-- Silver Card -->
-            <div @click="startDefense('SILVER')" class="group relative cursor-pointer">
-                <div class="absolute inset-0 bg-gradient-to-b from-white to-slate-50 rounded-[2rem] transform transition-transform duration-300 group-hover:scale-[1.02] group-hover:shadow-2xl border border-slate-200 shadow-lg"></div>
-                <div class="relative p-8 flex flex-col items-center h-full">
-                    <div class="w-48 h-48 mb-6 drop-shadow-xl transition-transform duration-500 group-hover:-translate-y-4">
-                        <img src="/defense/silver-def.png" alt="Silver Defense" class="w-full h-full object-contain filter drop-shadow-md" />
-                    </div>
-                    <h2 class="text-3xl font-bold text-slate-800 mb-2 font-[Outfit]">실버 등급</h2>
-                    <p class="text-slate-500 mb-6 text-center text-sm break-keep">기본적인 알고리즘 역량을 테스트합니다.</p>
-                    <div class="mt-auto flex items-center gap-3 bg-slate-100 px-6 py-2 rounded-full border border-slate-200">
-                        <span class="text-slate-500 text-xs font-bold uppercase">현재 연승</span>
-                        <span class="text-2xl font-bold text-slate-800">{{ status.silverStreak }}</span>
-                        <span class="text-slate-300 mx-1">|</span>
-                         <span class="text-slate-500 text-xs font-bold uppercase">최고 기록</span>
-                        <span class="text-xl font-bold text-slate-600">{{ status.maxSilverStreak }}</span>
-                    </div>
+            <!-- Silver Card -->
+            <div @click="startDefense('SILVER')" class="group cursor-pointer flex flex-col items-center p-6 hover:bg-slate-50 rounded-[2rem] transition-all active:scale-95">
+                <div class="relative mb-6 transition-transform duration-500 group-hover:scale-110 group-hover:-rotate-3">
+                    <img src="/defense/silver-def.png" alt="Silver Defense" class="w-48 h-48 object-contain drop-shadow-2xl" />
+                </div>
+                <h2 class="text-3xl font-black text-slate-800 mb-2 font-[Outfit]">실버 등급</h2>
+                <p class="text-slate-400 mb-6 text-center text-sm font-bold break-keep">기본적인 알고리즘 역량 테스트</p>
+                <div class="mt-auto flex items-center gap-3 bg-slate-100 px-6 py-2 rounded-full">
+                    <span class="text-slate-500 text-xs font-black uppercase">연승</span>
+                    <span class="text-xl font-black text-slate-800">{{ status.silverStreak }}</span>
                 </div>
             </div>
 
             <!-- Gold Card -->
-            <div @click="startDefense('GOLD')" class="group relative cursor-pointer">
-                <div class="absolute inset-0 bg-gradient-to-b from-amber-50 to-yellow-50 rounded-[2rem] transform transition-transform duration-300 group-hover:scale-[1.02] group-hover:shadow-2xl border border-amber-200 shadow-lg"></div>
-                <div class="relative p-8 flex flex-col items-center h-full">
-                     <div class="w-48 h-48 mb-6 drop-shadow-xl transition-transform duration-500 group-hover:-translate-y-4">
-                        <img src="/defense/gold-def.png" alt="Gold Defense" class="w-full h-full object-contain filter drop-shadow-md" />
-                    </div>
-                    <h2 class="text-3xl font-bold text-amber-900 mb-2 font-[Outfit]">골드 등급</h2>
-                    <p class="text-amber-800/80 mb-6 text-center text-sm break-keep">심화 알고리즘 문제해결 능력을 요구합니다.</p>
-                    <div class="mt-auto flex items-center gap-3 bg-amber-100/50 px-6 py-2 rounded-full border border-amber-200">
-                         <span class="text-amber-700 text-xs font-bold uppercase">현재 연승</span>
-                        <span class="text-2xl font-bold text-amber-900">{{ status.goldStreak }}</span>
-                        <span class="text-amber-300/50 mx-1">|</span>
-                        <span class="text-amber-700 text-xs font-bold uppercase">최고 기록</span>
-                        <span class="text-xl font-bold text-amber-800/80">{{ status.maxGoldStreak }}</span>
-                    </div>
+            <!-- Gold Card -->
+            <div @click="startDefense('GOLD')" class="group cursor-pointer flex flex-col items-center p-6 hover:bg-slate-50 rounded-[2rem] transition-all active:scale-95">
+                <div class="relative mb-6 transition-transform duration-500 group-hover:scale-110 group-hover:rotate-3">
+                    <img src="/defense/gold-def.png" alt="Gold Defense" class="w-48 h-48 object-contain drop-shadow-2xl" />
+                </div>
+                <h2 class="text-3xl font-black text-amber-900 mb-2 font-[Outfit]">골드 등급</h2>
+                <p class="text-amber-800/60 mb-6 text-center text-sm font-bold break-keep">심화 알고리즘 문제해결 능력</p>
+                <div class="mt-auto flex items-center gap-3 bg-amber-50 px-6 py-2 rounded-full">
+                     <span class="text-amber-700 text-xs font-black uppercase">연승</span>
+                    <span class="text-xl font-black text-amber-900">{{ status.goldStreak }}</span>
                 </div>
             </div>
         </div>
@@ -128,7 +112,7 @@
                 <button @click="showSuccessModal = false" class="px-6 py-3 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-xl font-bold transition-all">
                     닫기
                 </button>
-                <button @click="resetAndPlayAgain" class="px-6 py-3 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl font-bold shadow-lg shadow-indigo-500/30 transition-all">
+                <button @click="resetAndPlayAgain" class="px-6 py-3 bg-brand-600 hover:bg-brand-500 text-white rounded-xl font-bold shadow-lg shadow-brand-500/30 transition-all">
                     다음 도전 ➡
                 </button>
             </div>

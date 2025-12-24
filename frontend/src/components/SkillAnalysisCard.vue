@@ -3,7 +3,7 @@
     <!-- 헤더 -->
     <div class="px-6 py-4 border-b border-slate-100 bg-slate-50">
       <h2 class="text-lg font-bold text-slate-800 flex items-center gap-2">
-        <svg class="w-5 h-5 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <svg class="w-5 h-5 text-brand-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 002 2h2a2 2 0 002-2z"></path>
         </svg>
         현재 실력 분석
@@ -18,11 +18,11 @@
         <div class="lg:col-span-5 flex flex-col gap-5">
           
           <!-- Tier Card (Compact) -->
-          <div class="bg-gradient-to-br from-indigo-50 to-purple-50 border border-indigo-100 rounded-2xl p-5 relative overflow-hidden group">
-            <div class="absolute inset-0 bg-gradient-to-br from-indigo-50/50 to-purple-50/50 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+          <div class="bg-gradient-to-br from-brand-50 to-purple-50 border border-brand-100 rounded-2xl p-5 relative overflow-hidden group">
+            <div class="absolute inset-0 bg-gradient-to-br from-brand-50/50 to-purple-50/50 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
             <div class="relative z-10 flex items-center gap-5">
               <div class="relative flex-shrink-0">
-                <div class="absolute inset-0 bg-indigo-500/20 blur-xl rounded-full group-hover:bg-indigo-500/30 transition-all duration-500"></div>
+                <div class="absolute inset-0 bg-brand-500/20 blur-xl rounded-full group-hover:bg-brand-500/30 transition-all duration-500"></div>
                 <img 
                   v-if="tier"
                   :src="`https://static.solved.ac/tier_small/${tier}.svg`" 
@@ -35,7 +35,7 @@
                   <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
                   현재 티어
                 </div>
-                <div class="text-2xl font-black text-indigo-900">{{ tierName || 'Unranked' }}</div>
+                <div class="text-2xl font-black text-brand-900">{{ tierName || 'Unranked' }}</div>
               </div>
             </div>
           </div>
@@ -43,7 +43,7 @@
           <!-- Radar Chart Card -->
           <div class="bg-slate-50 border border-slate-100 rounded-2xl p-5 flex-1">
             <h3 class="text-sm font-bold text-slate-500 uppercase tracking-wide mb-4 flex items-center gap-2">
-               <svg class="w-4 h-4 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 002 2h2a2 2 0 002-2z"></path></svg>
+               <svg class="w-4 h-4 text-brand-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 002 2h2a2 2 0 002-2z"></path></svg>
                알고리즘 역량
             </h3>
             <div class="flex items-center justify-center">
@@ -86,7 +86,7 @@
         <!-- Right Column: Learning Roadmap (7 cols) -->
         <div class="lg:col-span-7 bg-slate-50 border border-slate-100 rounded-2xl p-6">
           <h3 class="text-sm font-bold text-slate-500 uppercase tracking-wide mb-5 flex items-center gap-2">
-             <svg class="w-4 h-4 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"></path></svg>
+             <svg class="w-4 h-4 text-brand-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"></path></svg>
              맞춤형 학습 로드맵
           </h3>
           <LearningRoadmap :phases="phases" class="w-full" />

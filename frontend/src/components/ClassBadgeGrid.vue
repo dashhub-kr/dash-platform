@@ -1,5 +1,5 @@
 <template>
-  <div class="class-badge-grid bg-white/50 backdrop-blur border border-white/60 rounded-3xl p-6 shadow-xl shadow-indigo-500/5">
+  <div class="class-badge-grid bg-white/50 backdrop-blur border border-white/60 rounded-3xl p-6 shadow-xl shadow-brand-500/5">
     <div class="flex items-center justify-between mb-6">
       <h3 class="text-sm font-bold text-slate-500 uppercase tracking-wide">Class Badges</h3>
       <span class="text-xs font-medium text-slate-400">Earned: {{ filteredStats.length }}</span>

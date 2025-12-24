@@ -1,5 +1,5 @@
 <template>
-  <div class="min-h-screen bg-slate-950 text-slate-100 selection:bg-indigo-500/30">
+  <div class="min-h-screen bg-slate-950 text-slate-100 selection:bg-brand-500/30">
     <main class="container mx-auto px-6 py-10">
       <!-- Header -->
       <div class="mb-8 animate-fade-in-up">

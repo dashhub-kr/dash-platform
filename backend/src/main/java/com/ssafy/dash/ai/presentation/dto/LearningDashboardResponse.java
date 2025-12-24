@@ -30,4 +30,17 @@ public class LearningDashboardResponse {
     private List<LearningPathRequest.TagStats> weaknessTags;
     private List<LearningPathRequest.TagStats> strengthTags;
     private List<LearningPathRequest.ClassStats> classStats;
+    private DailyChallenge dailyChallenge;
+
+    @Data
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class DailyChallenge {
+        private String title;
+        private String description;
+        private String link;
+        private Integer targetClass;
+        private int remainingProblems;
+    }
 }

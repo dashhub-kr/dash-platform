@@ -1,11 +1,5 @@
 <template>
-  <div class="mockexam-container relative w-full h-screen overflow-hidden bg-slate-50 font-[Pretendard]">
-    <!-- Background Effects -->
-    <div class="absolute inset-0 bg-gradient-to-br from-violet-50 via-white to-slate-100"></div>
-    <div class="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none">
-       <div class="absolute top-1/4 left-1/4 w-96 h-96 bg-violet-200/40 rounded-full blur-3xl animate-pulse mix-blend-multiply"></div>
-       <div class="absolute bottom-1/3 right-1/4 w-80 h-80 bg-amber-200/40 rounded-full blur-3xl animate-pulse delay-1000 mix-blend-multiply"></div>
-    </div>
+  <div class="min-h-screen bg-white text-slate-800 overflow-hidden">
 
     <div class="relative z-10 flex flex-col items-center justify-center h-full px-4">
       
@@ -15,7 +9,7 @@
       </div>
 
       <!-- Active Exam View -->
-      <div v-else-if="status.examType" class="w-full max-w-5xl animate-fade-in-up">
+      <div v-else-if="status.examType" class="w-full max-w-4xl animate-fade-in-up">
         <div class="bg-white/80 backdrop-blur-xl border border-white/50 rounded-3xl p-8 md:p-12 shadow-2xl text-center relative overflow-hidden ring-1 ring-black/5">
             <!-- Glow behind -->
             <div class="absolute top-0 left-1/2 -translate-x-1/2 w-full h-1 bg-gradient-to-r from-transparent via-violet-500 to-transparent shadow-[0_0_20px_rgba(139,92,246,0.5)]"></div>
@@ -77,7 +71,7 @@
       </div>
 
       <!-- Selection View -->
-      <div v-else class="w-full max-w-6xl animate-fade-in py-8 px-4">
+      <div v-else class="w-full max-w-4xl animate-fade-in py-8 px-4">
         <div class="text-center mb-12">
             <h1 class="text-4xl md:text-6xl font-black text-slate-900 mb-4 tracking-tight drop-shadow-sm">
                 모의고사 / 코딩테스트
@@ -95,45 +89,36 @@
             </h2>
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6 overflow-hidden p-1">
                 <!-- IM -->
-                <div @click="startExam('IM')" class="group relative cursor-pointer">
-                    <div class="absolute inset-0 bg-gradient-to-b from-white to-slate-50 rounded-2xl transform transition-transform duration-300 group-hover:scale-[1.02] group-hover:shadow-xl border border-slate-200 shadow-lg"></div>
-                    <div class="relative p-6 flex flex-col items-center">
-                        <div class="w-16 h-16 mb-4 bg-slate-100 rounded-2xl flex items-center justify-center text-3xl">🌱</div>
-                        <h3 class="text-xl font-bold text-slate-800 mb-1">IM 모의고사</h3>
-                        <p class="text-slate-500 text-sm text-center mb-4">삼성 IM 등급 대비</p>
-                        <div class="flex gap-3 text-xs text-slate-400">
-                            <span class="bg-slate-100 px-2 py-1 rounded">1문제</span>
-                            <span class="bg-slate-100 px-2 py-1 rounded">2시간</span>
-                        </div>
+                <div @click="startExam('IM')" class="group cursor-pointer flex flex-col items-center p-4 rounded-3xl hover:bg-slate-50 transition-all active:scale-95">
+                    <div class="relative mb-4 transition-transform duration-300 group-hover:scale-110">
+                        <div class="w-24 h-24 bg-slate-100 rounded-full flex items-center justify-center text-5xl shadow-sm border-b-4 border-slate-200 group-hover:border-b-[6px] transition-all">🌱</div>
+                        <div class="absolute -top-1 -right-1 bg-rose-500 text-white text-xs font-bold px-2 py-0.5 rounded-full shadow-sm">기초</div>
                     </div>
+                    <h3 class="text-xl font-black text-slate-800 mb-1">IM 모의고사</h3>
+                    <p class="text-slate-400 font-bold text-sm mb-1">삼성 IM 등급 대비</p>
+                    <div class="text-slate-300 text-xs font-bold">1문제 · 2시간</div>
                 </div>
 
                 <!-- A -->
-                <div @click="startExam('A')" class="group relative cursor-pointer">
-                    <div class="absolute inset-0 bg-gradient-to-b from-blue-50 to-white rounded-2xl transform transition-transform duration-300 group-hover:scale-[1.02] group-hover:shadow-xl border border-blue-200 shadow-lg"></div>
-                    <div class="relative p-6 flex flex-col items-center">
-                        <div class="w-16 h-16 mb-4 bg-blue-100 rounded-2xl flex items-center justify-center text-3xl">🔷</div>
-                        <h3 class="text-xl font-bold text-blue-900 mb-1">A형 모의고사</h3>
-                        <p class="text-blue-600/70 text-sm text-center mb-4">1문제=A, 2문제=A+</p>
-                        <div class="flex gap-3 text-xs text-blue-400">
-                            <span class="bg-blue-50 px-2 py-1 rounded">2문제</span>
-                            <span class="bg-blue-50 px-2 py-1 rounded">2시간</span>
-                        </div>
+                <div @click="startExam('A')" class="group cursor-pointer flex flex-col items-center p-4 rounded-3xl hover:bg-slate-50 transition-all active:scale-95">
+                    <div class="relative mb-4 transition-transform duration-300 group-hover:scale-110">
+                        <div class="w-24 h-24 bg-blue-100 rounded-full flex items-center justify-center text-5xl shadow-sm border-b-4 border-blue-200 group-hover:border-b-[6px] transition-all">🔷</div>
+                        <div class="absolute -top-1 -right-1 bg-blue-500 text-white text-xs font-bold px-2 py-0.5 rounded-full shadow-sm">중급</div>
                     </div>
+                    <h3 class="text-xl font-black text-slate-800 mb-1">A형 모의고사</h3>
+                    <p class="text-slate-400 font-bold text-sm mb-1">1문제=A / 2문제=A+</p>
+                    <div class="text-slate-300 text-xs font-bold">2문제 · 2시간</div>
                 </div>
 
                 <!-- B -->
-                <div @click="startExam('B')" class="group relative cursor-pointer">
-                    <div class="absolute inset-0 bg-gradient-to-b from-purple-50 to-white rounded-2xl transform transition-transform duration-300 group-hover:scale-[1.02] group-hover:shadow-xl border border-purple-200 shadow-lg"></div>
-                    <div class="relative p-6 flex flex-col items-center">
-                        <div class="w-16 h-16 mb-4 bg-purple-100 rounded-2xl flex items-center justify-center text-3xl">💎</div>
-                        <h3 class="text-xl font-bold text-purple-900 mb-1">B형 모의고사</h3>
-                        <p class="text-purple-600/70 text-sm text-center mb-4">고급 알고리즘 대비</p>
-                        <div class="flex gap-3 text-xs text-purple-400">
-                            <span class="bg-purple-50 px-2 py-1 rounded">1문제</span>
-                            <span class="bg-purple-50 px-2 py-1 rounded">4시간</span>
-                        </div>
+                <div @click="startExam('B')" class="group cursor-pointer flex flex-col items-center p-4 rounded-3xl hover:bg-slate-50 transition-all active:scale-95">
+                    <div class="relative mb-4 transition-transform duration-300 group-hover:scale-110">
+                        <div class="w-24 h-24 bg-purple-100 rounded-full flex items-center justify-center text-5xl shadow-sm border-b-4 border-purple-200 group-hover:border-b-[6px] transition-all">💎</div>
+                        <div class="absolute -top-1 -right-1 bg-purple-500 text-white text-xs font-bold px-2 py-0.5 rounded-full shadow-sm">고급</div>
                     </div>
+                    <h3 class="text-xl font-black text-slate-800 mb-1">B형 모의고사</h3>
+                    <p class="text-slate-400 font-bold text-sm mb-1">고급 알고리즘 대비</p>
+                    <div class="text-slate-300 text-xs font-bold">1문제 · 4시간</div>
                 </div>
             </div>
         </div>
@@ -146,31 +131,23 @@
             </h2>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6 overflow-hidden p-1">
                 <!-- Samsung -->
-                <div @click="startExam('SAMSUNG')" class="group relative cursor-pointer">
-                    <div class="absolute inset-0 bg-gradient-to-b from-sky-50 to-white rounded-2xl transform transition-transform duration-300 group-hover:scale-[1.02] group-hover:shadow-xl border border-sky-200 shadow-lg"></div>
-                    <div class="relative p-6 flex flex-col items-center">
-                        <div class="w-16 h-16 mb-4 bg-sky-100 rounded-2xl flex items-center justify-center text-3xl">🏢</div>
-                        <h3 class="text-xl font-bold text-sky-900 mb-1">삼성 코딩테스트</h3>
-                        <p class="text-sky-600/70 text-sm text-center mb-4">삼성 SW 역량테스트 기출</p>
-                        <div class="flex gap-3 text-xs text-sky-400">
-                            <span class="bg-sky-50 px-2 py-1 rounded">3문제</span>
-                            <span class="bg-sky-50 px-2 py-1 rounded">2시간</span>
-                        </div>
+                <div @click="startExam('SAMSUNG')" class="group cursor-pointer flex flex-col items-center p-4 rounded-3xl hover:bg-slate-50 transition-all active:scale-95">
+                    <div class="relative mb-4 transition-transform duration-300 group-hover:scale-110">
+                        <div class="w-24 h-24 bg-sky-100 rounded-full flex items-center justify-center text-5xl shadow-sm border-b-4 border-sky-200 group-hover:border-b-[6px] transition-all">🏢</div>
                     </div>
+                    <h3 class="text-xl font-black text-slate-800 mb-1">삼성 코딩테스트</h3>
+                    <p class="text-slate-400 font-bold text-sm mb-1">삼성 SW 역량테스트 기출</p>
+                    <div class="text-slate-300 text-xs font-bold">3문제 · 2시간</div>
                 </div>
 
                 <!-- Kakao -->
-                <div @click="startExam('KAKAO')" class="group relative cursor-pointer">
-                    <div class="absolute inset-0 bg-gradient-to-b from-amber-50 to-yellow-50 rounded-2xl transform transition-transform duration-300 group-hover:scale-[1.02] group-hover:shadow-xl border border-amber-200 shadow-lg"></div>
-                    <div class="relative p-6 flex flex-col items-center">
-                        <div class="w-16 h-16 mb-4 bg-amber-100 rounded-2xl flex items-center justify-center text-3xl">🟡</div>
-                        <h3 class="text-xl font-bold text-amber-900 mb-1">카카오 코딩테스트</h3>
-                        <p class="text-amber-700/70 text-sm text-center mb-4">카카오 코딩테스트 대비</p>
-                        <div class="flex gap-3 text-xs text-amber-500">
-                            <span class="bg-amber-50 px-2 py-1 rounded">3문제</span>
-                            <span class="bg-amber-50 px-2 py-1 rounded">2시간</span>
-                        </div>
+                <div @click="startExam('KAKAO')" class="group cursor-pointer flex flex-col items-center p-4 rounded-3xl hover:bg-slate-50 transition-all active:scale-95">
+                    <div class="relative mb-4 transition-transform duration-300 group-hover:scale-110">
+                        <div class="w-24 h-24 bg-amber-100 rounded-full flex items-center justify-center text-5xl shadow-sm border-b-4 border-amber-200 group-hover:border-b-[6px] transition-all">🟡</div>
                     </div>
+                    <h3 class="text-xl font-black text-slate-800 mb-1">카카오 코딩테스트</h3>
+                    <p class="text-slate-400 font-bold text-sm mb-1">카카오 코딩테스트 대비</p>
+                    <div class="text-slate-300 text-xs font-bold">3문제 · 2시간</div>
                 </div>
             </div>
         </div>

@@ -109,7 +109,9 @@ public class GitHubPushEventWorker {
                                 record.getId(),
                                 record.getCode(),
                                 record.getLanguage(),
-                                record.getProblemNumber());
+                                record.getProblemNumber(),
+                                record.getPlatform(),
+                                record.getTitle());
                     } catch (Exception e) {
                         log.error("Auto-analysis failed via worker for record: {}", record.getId(), e);
                     }

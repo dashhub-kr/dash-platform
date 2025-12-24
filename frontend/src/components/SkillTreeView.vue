@@ -3,7 +3,7 @@
     <!-- 로딩 -->
     <div v-if="loading" class="flex items-center justify-center py-16 bg-white rounded-2xl border border-slate-200">
       <div class="text-center">
-        <div class="w-10 h-10 mx-auto mb-3 border-4 border-indigo-500 border-t-transparent rounded-full animate-spin"></div>
+        <div class="w-10 h-10 mx-auto mb-3 border-4 border-brand-500 border-t-transparent rounded-full animate-spin"></div>
         <p class="text-slate-500 text-sm">스킬 트리 로딩 중...</p>
       </div>
     </div>
@@ -14,7 +14,7 @@
       <!-- 헤더 (그래프 모드일 때는 숨김) -->
       <div v-if="viewMode === 'card'" class="px-6 py-4 border-b border-slate-100 flex items-center justify-between bg-slate-50">
         <div class="flex items-center gap-3">
-          <span class="text-2xl">⚔️</span>
+          <Sword class="text-brand-500" :size="24" />
           <h3 class="text-lg font-bold text-slate-800">알고리즘 스킬트리</h3>
         </div>
         <div class="flex gap-4 text-xs">
@@ -57,7 +57,7 @@
         <!-- 그래프 모드 진입 버튼 (Floating) -->
         <button 
             @click="viewMode = 'graph'"
-            class="fixed bottom-8 left-1/2 -translate-x-1/2 w-14 h-14 bg-indigo-600 rounded-full shadow-lg hover:shadow-xl shadow-indigo-500/30 flex items-center justify-center text-white hover:bg-indigo-700 hover:scale-110 transition-all z-40"
+            class="fixed bottom-8 left-1/2 -translate-x-1/2 w-14 h-14 bg-brand-600 rounded-full shadow-lg hover:shadow-xl shadow-brand-500/30 flex items-center justify-center text-white hover:bg-brand-700 hover:scale-110 transition-all z-40"
         >
             <Network :size="32" stroke-width="2.5" />
         </button>
@@ -70,17 +70,17 @@
             @click="selectFamily(family)"
           >
             <div 
-              class="relative p-4 rounded-xl border-2 transition-all hover:shadow-md"
+              class="relative p-4 rounded-xl transition-all hover:bg-slate-50"
               :class="[
                 selectedFamily?.key === family.key 
-                  ? 'bg-indigo-50 border-indigo-400 shadow-md' 
-                  : 'bg-white border-slate-200 hover:border-indigo-300',
+                  ? 'bg-brand-50 shadow-sm ring-1 ring-brand-100' 
+                  : 'bg-white hover:bg-slate-50',
                 getCompletionClass(family.progressPercent)
               ]"
             >
               <!-- 아이콘 + 별 표시 -->
               <div class="flex items-center justify-between mb-3">
-                <span class="text-3xl">{{ getFamilyIcon(family.key) }}</span>
+                <component :is="getFamilyIcon(family.key)" :size="28" class="text-slate-700" :class="selectedFamily?.key === family.key ? 'text-brand-600' : ''" />
                 <div class="flex gap-0.5">
                   <span v-for="i in 5" :key="i" class="text-base" :class="i <= getFilledStars(family.masteryLevel) ? 'text-amber-400' : 'text-slate-300'">★</span>
                 </div>
@@ -111,7 +111,7 @@
             <!-- 헤더 -->
             <div class="flex items-center justify-between mb-4">
               <div class="flex items-center gap-3">
-                <span class="text-2xl">{{ getFamilyIcon(selectedFamily.key) }}</span>
+                <component :is="getFamilyIcon(selectedFamily.key)" :size="24" class="text-brand-600" />
                 <span class="font-bold text-slate-800 text-lg">{{ selectedFamily.name }}</span>
                 <span class="text-xs text-slate-400">({{ selectedFamily.children?.length || 0 }}개)</span>
               </div>
@@ -127,28 +127,33 @@
                 @click="onTagClick(tag)"
               >
                 <div 
-                  class="relative p-5 rounded-xl border-2 text-center transition-all hover:shadow-lg"
-                  :class="getEnhancedSubNodeClass(tag)"
+                  class="relative p-4 rounded-3xl flex flex-col items-center hover:bg-slate-50 transition-all cursor-pointer group active:scale-95"
                 >
-                  <!-- 추천 뱃지 (더 크게 + 글로우) -->
-                  <div v-if="isRecommendedTag(tag)" class="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-1 bg-gradient-to-r from-rose-500 to-pink-500 text-white text-xs font-bold rounded-full shadow-lg animate-bounce">
-                    🎯 추천
-                  </div>
-                  
-                  <!-- 마스터 뱃지 (4개 이상) - 왼쪽 상단 -->
-                  <div v-if="getFilledStars(tag.masteryLevel) >= 4" class="absolute -top-2 -left-2 text-xl drop-shadow-md">🏆</div>
-                  
-                  <!-- 별 표시 (크기 증가) -->
-                  <div class="flex justify-center gap-1 text-xl">
-                    <span 
-                      v-for="i in getMaxStars(tag.tier)" 
-                      :key="i" 
-                      :class="getStarClass(tag.tier, i, getFilledStars(tag.masteryLevel))"
-                    >★</span>
+                  <!-- Icon Circle Badge -->
+                  <div class="relative w-20 h-20 mb-3 transition-transform duration-300 group-hover:scale-105">
+                    <div 
+                        class="w-full h-full rounded-full flex items-center justify-center text-3xl font-black shadow-sm border-b-4 transition-all"
+                        :class="getIconBadgeClass(tag)"
+                    >
+                        {{ tag.tier }}
+                    </div>
+
+                    <!-- Master/Recommended Badge -->
+                    <div v-if="isRecommendedTag(tag)" class="absolute -top-2 left-1/2 -translate-x-1/2 bg-rose-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full shadow-sm animate-bounce whitespace-nowrap z-10">
+                        추천
+                    </div>
+                    <div v-if="getFilledStars(tag.masteryLevel) >= 4" class="absolute -bottom-1 -right-1 bg-amber-500 rounded-full p-1.5 border-2 border-white shadow-sm">
+                        <Trophy :size="14" class="text-white" />
+                    </div>
                   </div>
                   
                   <!-- 이름 -->
-                  <div class="mt-3 text-sm font-medium truncate" :class="getFilledStars(tag.masteryLevel) >= 4 ? 'text-amber-700' : 'text-slate-600'">{{ tag.name }}</div>
+                  <div class="text-base font-black text-slate-800 mb-1 text-center leading-tight">{{ tag.name }}</div>
+
+                  <!-- 레벨/상태 -->
+                  <div class="text-xs font-bold" :class="tag.progressPercent > 0 ? 'text-slate-400' : 'text-slate-300'">
+                     Lv. {{ getFilledStars(tag.masteryLevel) }}
+                  </div>
                 </div>
               </div>
             </div>
@@ -170,7 +175,9 @@
 
         <!-- 타이틀 -->
         <div class="text-center mb-8">
-          <div class="text-3xl mb-2">🚀</div>
+          <div class="flex justify-center mb-2">
+            <Rocket class="w-10 h-10 text-brand-500 animate-bounce" />
+          </div>
           <h3 class="text-2xl font-bold text-slate-800">{{ selectedActionTag.name }}</h3>
           <p class="text-slate-500 mt-1">어떤 학습을 진행하시겠습니까?</p>
         </div>
@@ -179,12 +186,12 @@
         <div class="grid grid-cols-2 gap-4">
           <button 
             @click="solveProblem(selectedActionTag)"
-            class="flex flex-col items-center justify-center gap-3 p-6 rounded-xl bg-indigo-50 border-2 border-indigo-100 hover:border-indigo-500 hover:bg-indigo-100 transition-all group"
+            class="flex flex-col items-center justify-center gap-3 p-6 rounded-xl bg-brand-50 border-2 border-brand-100 hover:border-brand-500 hover:bg-brand-100 transition-all group"
           >
-            <div class="w-12 h-12 rounded-full bg-indigo-100 text-indigo-600 flex items-center justify-center group-hover:bg-indigo-500 group-hover:text-white transition-colors">
+            <div class="w-12 h-12 rounded-full bg-brand-100 text-brand-600 flex items-center justify-center group-hover:bg-brand-500 group-hover:text-white transition-colors">
               <Code :size="24" stroke-width="2.5" />
             </div>
-            <span class="font-bold text-indigo-900">문제 풀기</span>
+            <span class="font-bold text-brand-900">문제 풀기</span>
           </button>
 
           <button 
@@ -217,7 +224,7 @@ import { tagApi } from '@/api/tags';
 import { useAuth } from '@/composables/useAuth';
 import SkillTreeGraphView from '@/components/SkillTreeGraphView.vue';
 import LectureModal from '@/components/LectureModal.vue';
-import { X, Network } from 'lucide-vue-next';
+import { X, Network, Zap, Puzzle, Calculator, Target, FileText, Package, Rocket, Sword, Code, Youtube, Trophy } from 'lucide-vue-next';
 
 const router = useRouter();
 const { user } = useAuth();
@@ -232,14 +239,14 @@ const lectureTag = ref(null);
 
 // Family 아이콘
 const familyIcons = {
-  'IMPLEMENTATION': '⚡',
-  'DP': '🧩',
-  'GRAPH': '🕸️',
-  'MATH': '🔢',
-  'GREEDY': '🎯',
-  'STRING': '📝',
-  'DATA_STRUCTURE': '📦',
-  'ADVANCED': '🚀'
+  'IMPLEMENTATION': Zap,
+  'DP': Puzzle,
+  'GRAPH': Network,
+  'MATH': Calculator,
+  'GREEDY': Target,
+  'STRING': FileText,
+  'DATA_STRUCTURE': Package,
+  'ADVANCED': Rocket
 };
 
 // 사용자 티어
@@ -299,7 +306,7 @@ const sortedFamilies = computed(() => {
   return [...skillTree.value.families].sort((a, b) => (a.orderIndex || 0) - (b.orderIndex || 0));
 });
 
-const getFamilyIcon = (key) => familyIcons[key] || '📌';
+const getFamilyIcon = (key) => familyIcons[key] || Target;
 
 // 정렬된 태그 (S/A 먼저)
 const sortedTags = computed(() => {
@@ -336,17 +343,26 @@ const getSubNodeClass = (tag) => {
   return 'bg-slate-50 border-slate-200';
 };
 
-// 강화된 태그 카드 스타일 (별 4개 이상시 특별 효과)
-const getEnhancedSubNodeClass = (tag) => {
+// 듀오링고 스타일 아이콘 뱃지 클래스
+const getIconBadgeClass = (tag) => {
   const filled = getFilledStars(tag.masteryLevel);
   
-  // 4개 이상 채움: 골드 그라데이션 + 글로우
+  // 1. 마스터 (Gold)
   if (filled >= 4) {
-    return 'bg-gradient-to-br from-amber-50 to-yellow-100 border-amber-400 shadow-lg shadow-amber-200/50 ring-2 ring-amber-300/30';
+    return 'bg-amber-400 border-amber-600 text-white';
   }
   
-  // 기본 스타일 - 뉴트럴 색상
-  return 'bg-white border-slate-200 hover:border-slate-300';
+  // 2. 학습 중 (Coloured by Tier or Green) -> 레퍼런스처럼 Green/Color로 통일하거나 Tier별 색상
+  // 여기서는 '진행 중' 느낌을 위해 Green(Leaf) 사용, 또는 이미 Tier가 있으니 Tier Color 사용?
+  // 듀오링고는 색상이 다양함. Tier 색상을 쓰되 듀오링고 스타일(Solid+Border)로.
+  // S/A: Purple/Blue, B/C: Green/Teal?
+  // 일단 Leaf(Green)으로 통일하여 '학습' 느낌 강조.
+  if (filled >= 1 || tag.progressPercent > 0) {
+    return 'bg-leaf border-green-700 text-white';
+  }
+  
+  // 3. 시작 전 (Gray)
+  return 'bg-slate-100 border-slate-300 text-slate-300';
 };
 
 // 티어 뱃지 클래스
@@ -358,9 +374,17 @@ const getTierBadgeClass = (tier) => {
 };
 
 // 별 색상 (통일 골드 색상)
-const getStarClass = (tier, starIndex, filledCount) => {
-  if (starIndex > filledCount) return 'text-slate-300';
-  return 'text-amber-400 drop-shadow-sm';
+// 별 색상 (배경이 진하므로 밝은 색 사용)
+const getStarClass = (tag, starIndex) => {
+  const filledCount = getFilledStars(tag.masteryLevel);
+  const isDarkBackground = filledCount >= 1 || tag.progressPercent > 0;
+  
+  if (starIndex > filledCount) {
+    // 빈 별 (배경이 진하면 반투명 흰색, 아니면 연한 회색)
+    return isDarkBackground ? 'text-white/30' : 'text-slate-300';
+  }
+  // 채운 별 (배경이 진하면 흰색/밝은 노랑, 아니면 골드)
+  return isDarkBackground ? 'text-white drop-shadow-sm' : 'text-amber-400';
 };
 
 const getTierBadge = (tier) => {

@@ -18,14 +18,31 @@ import java.util.List;
 @AllArgsConstructor
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class LearningPathResponse {
-    private String analysisSummary; // 분석 요약 (객관적 사실)
-    private String growthPrediction; // 성장 예측
-    private String strategicAdvice; // 전략적 조언
-    private String efficiencyAnalysis; // 효율성 분석
-    private String keyStrength; // 핵심 강점
-    private String primaryWeakness; // 주요 약점
-    private String personalizedAdvice; // 개인화 조언
-    private List<LearningPhase> phases; // AI 추천 학습 단계
+    // 분석 섹션
+    private String analysisSummary;
+    private String keyStrength;
+    private String primaryWeakness;
+
+    // 예측 섹션
+    private Integer estimatedDaysToGoal;
+    private String growthPrediction;
+
+    // 전략 섹션
+    private String weeklyGoal;
+    private List<String> recommendedTags;
+    private String difficultySuggestion;
+    private String strategicAdvice;
+
+    // 로드맵 섹션
+    private List<LearningPhase> phases;
+    private Integer nextClassToClear;
+
+    // 동기부여
+    private String motivationMessage;
+
+    // 레거시 필드 (호환성)
+    private String efficiencyAnalysis;
+    private String personalizedAdvice;
 
     @Data
     @Builder
@@ -33,11 +50,17 @@ public class LearningPathResponse {
     @AllArgsConstructor
     @JsonIgnoreProperties(ignoreUnknown = true)
     public static class LearningPhase {
-        private int phase; // Phase 번호
-        private String title; // 단계 제목
-        private String duration; // 기간 (예: "2주")
-        private String focus; // 집중 분야
-        private List<String> goals; // 목표
-        private List<String> milestones; // 마일스톤
+        private int phase;
+        private String title;
+        private Integer durationDays;
+        private List<String> focusTags;
+        private Integer targetProblems;
+        private String difficultyRange;
+        private List<String> goals;
+        private List<String> milestones;
+
+        // 레거시 필드 (호환성)
+        private String duration;
+        private String focus;
     }
 }
