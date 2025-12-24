@@ -108,7 +108,7 @@
                         </div>
                         <div>
                             <h4 class="font-bold text-slate-800 text-lg">💡 AI 튜터에게 물어보세요</h4>
-                            <p class="text-sm text-slate-500">문제 풀이에 대해 힌트를 받아보세요</p>
+                            <p class="text-sm text-slate-500">질문당 도토리 <span class="text-amber-500 font-bold">3개</span>가 사용됩니다.</p>
                         </div>
                     </div>
 
@@ -151,7 +151,7 @@
                             @keyup.enter="sendChatMessage(chatInput)"
                             :disabled="chatLoading"
                             type="text" 
-                            placeholder="힌트가 필요한 부분을 질문해보세요..."
+                            placeholder="질문 시 도토리 3개가 차감됩니다..."
                             class="flex-1 px-4 py-3 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
                         />
                         <button 
