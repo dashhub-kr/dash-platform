@@ -19,7 +19,7 @@ public class GitHubSubmissionMetadataExtractor {
     private static final Logger log = LoggerFactory.getLogger(GitHubSubmissionMetadataExtractor.class);
 
     private static final Pattern COMMIT_MESSAGE_PATTERN = Pattern.compile(
-            "\\[(?<difficulty>[^]]+)]\\s*Title\\s*:\\s*(?<title>[^,]+),\\s*Time\\s*:\\s*(?<time>\\d+)\\s*ms,\\s*Memory\\s*:\\s*(?<memory>\\d+)\\s*KB",
+            "\\[(?<difficulty>[^]]+)]\\s*Title\\s*:\\s*(?<title>[^,]+),\\s*Time\\s*:\\s*(?<time>[\\d,]+)\\s*ms,\\s*Memory\\s*:\\s*(?<memory>[\\d,]+)\\s*KB",
             Pattern.CASE_INSENSITIVE);
 
     // Pattern for "문제번호.문제이름" format (e.g., "12865.평범한배낭" or "1000.A+B")
@@ -97,16 +97,31 @@ public class GitHubSubmissionMetadataExtractor {
     }
 
     private Integer parseInteger(String value) {
+        if (!StringUtils.hasText(value)) {
+            return null;
+        }
         try {
-            return value == null ? null : Integer.parseInt(value);
+            // Remove commas before parsing
+            String cleaned = value.replace(",", "");
+            return Integer.parseInt(cleaned);
         } catch (NumberFormatException ex) {
             return null;
         }
     }
 
     private String detectPlatform(String commitMessage, String filePath) {
-        String source = ((commitMessage == null ? "" : commitMessage) + " " + (filePath == null ? "" : filePath))
+        String message = (commitMessage == null ? "" : commitMessage);
+
+        // Check for SWEA specific patterns in commit message only (case-insensitive
+        // checks might be safer, but tags are usually consistently cased)
+        // SWEA tags: [D1], [D2], ..., [Professional]
+        if (message.contains("[Professional]") || message.matches(".*\\[D\\d+].*")) {
+            return "SWEA";
+        }
+
+        String source = (message + " " + (filePath == null ? "" : filePath))
                 .toLowerCase(Locale.ROOT);
+
         if (source.contains("baekjoon") || source.contains("백준")) {
             return "BAEKJOON";
         }

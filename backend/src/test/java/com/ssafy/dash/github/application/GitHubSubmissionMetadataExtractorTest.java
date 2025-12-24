@@ -61,4 +61,36 @@ class GitHubSubmissionMetadataExtractorTest {
         assertThat(metadata.title()).isEqualTo("2×n타일링");
     }
 
+    @Test
+    void extractParsesSweaCommitMessage() {
+        // [D4] Title: [Professional] 키 순서, Time: 257 ms, Memory: 96,036 KB -BaekjoonHub
+        String message = "[D4] Title: [Professional] 키 순서, Time: 257 ms, Memory: 96,036 KB -BaekjoonHub";
+        String path = "SWEA/D4/1234.키순서/Solution.java";
+
+        GitHubSubmissionMetadataExtractor.SubmissionMetadata metadata = extractor.extract(message, path);
+
+        assertThat(metadata.platform()).isEqualTo("SWEA");
+        assertThat(metadata.difficulty()).isEqualTo("D4");
+        // Title logic might need check: matcher extracts "[Professional] 키 순서" if not
+        // handled carefully,
+        // but regex is `Title\s*:\s*(?<title>[^,]+)`, so it should capture
+        // `[Professional] 키 순서`.
+        assertThat(metadata.title()).isEqualTo("[Professional] 키 순서");
+        assertThat(metadata.runtimeMs()).isEqualTo(257);
+        assertThat(metadata.memoryKb()).isEqualTo(96036);
+    }
+
+    @Test
+    void extractParsesSweaProfessionalCommitMessage() {
+        // Example: [Professional] Title: ...
+        String message = "[Professional] Title: 지하철 노선, Time: 130 ms, Memory: 1,024 KB -BaekjoonHub";
+        String path = "some/path/Solution.cpp";
+
+        GitHubSubmissionMetadataExtractor.SubmissionMetadata metadata = extractor.extract(message, path);
+
+        assertThat(metadata.platform()).isEqualTo("SWEA");
+        assertThat(metadata.difficulty()).isEqualTo("Professional");
+        assertThat(metadata.memoryKb()).isEqualTo(1024);
+    }
+
 }
