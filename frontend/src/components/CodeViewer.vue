@@ -19,12 +19,14 @@
           <template v-for="(line, index) in codeLines" :key="index">
             <!-- Code Line Row -->
             <tr 
-              class="group hover:bg-slate-50 transition-colors"
+              class="group transition-colors duration-200"
+              :class="{ 'hover:bg-slate-50': !highlightedLines.has(index + 1), 'bg-indigo-50/50': highlightedLines.has(index + 1) }"
+              :data-line-number="index + 1"
             >
               <!-- Line Number -->
               <td 
                 class="w-12 text-right pr-4 py-0.5 text-slate-400 select-none font-mono text-sm border-r border-slate-100 bg-slate-50/50"
-                :class="{'text-slate-600 font-bold': selectedLine === index + 1}"
+                :class="{'text-slate-600 font-bold': selectedLine === index + 1, 'bg-indigo-100/50 text-indigo-600 font-bold': highlightedLines.has(index + 1)}"
               >
                 {{ index + 1 }}
               </td>
@@ -34,7 +36,7 @@
                 class="pl-4 pr-4 py-0.5 font-mono text-sm whitespace-pre text-slate-700 relative cursor-pointer"
                 @click="toggleLine(index + 1)"
                 @mouseenter="handleLineHover(index + 1, $event)"
-                @mouseleave="hoveredLine = null"
+                @mouseleave="handleLineLeave"
               >
                 <div class="absolute left-0 top-0 bottom-0 w-1 bg-indigo-500 opacity-0 group-hover:opacity-100 transition-opacity"></div>
                 <code v-html="highlightLine(line)"></code>
@@ -209,8 +211,14 @@ const keyBlocksByLine = computed(() => {
         // Priority 2: Fallback to code string matching
         if (block.code) {
             const codeSnippet = block.code.trim();
+            if (codeSnippet.length < 3) return; // Skip very short blocks
+
             codeLines.value.forEach((line, idx) => {
-                if (line.includes(codeSnippet) || codeSnippet.includes(line.trim())) {
+                const trimmedLine = line.trim();
+                if (trimmedLine.length < 3) return; // Skip short lines (prevents matching '}', '{', etc.)
+                if (/^[}\])];]+$/.test(trimmedLine)) return; // Skip structural lines
+
+                if (line.includes(codeSnippet) || codeSnippet.includes(trimmedLine)) {
                     const lineNum = idx + 1;
                     if (!map[lineNum]) map[lineNum] = [];
                     map[lineNum].push(block);
@@ -223,6 +231,7 @@ const keyBlocksByLine = computed(() => {
 
 const hoveredLine = ref(null);
 const tooltipPosition = ref({ x: 0, y: 0 });
+const highlightedLines = ref(new Set());
 
 const highlightLine = (line) => {
   if (!line && line !== '') return '';
@@ -250,14 +259,48 @@ const toggleLine = (lineNumber) => {
 };
 
 const handleLineHover = (lineNumber, event) => {
-    if (keyBlocksByLine.value[lineNumber]?.length > 0) {
+    const lineContent = codeLines.value[lineNumber - 1];
+    if (!lineContent) return;
+    
+    // Ignore empty lines
+    const trimmed = lineContent.trim();
+    if (trimmed === '') return;
+
+    // Ignore lines that are just closing braces/brackets (likely just structure)
+    // Matches: }, };, ], ];, ), );
+    if (/^[}\])];]+$/.test(trimmed)) return;
+
+    const blocks = keyBlocksByLine.value[lineNumber];
+    if (blocks && blocks.length > 0) {
         hoveredLine.value = lineNumber;
+        
+        // Find all lines that share ANY of these blocks
+        const relatedLines = new Set();
+        relatedLines.add(lineNumber);
+        
+        // For each block on this line
+        blocks.forEach(block => {
+             // Search all lines to find where this block appears
+             for (const [lineNumStr, lineBlocks] of Object.entries(keyBlocksByLine.value)) {
+                 if (lineBlocks.includes(block)) {
+                     relatedLines.add(Number(lineNumStr));
+                 }
+             }
+        });
+        
+        highlightedLines.value = relatedLines;
+
         const rect = event.target.getBoundingClientRect();
         tooltipPosition.value = {
             x: rect.left + rect.width / 2,
             y: rect.top
         };
     }
+};
+
+const handleLineLeave = () => {
+    hoveredLine.value = null;
+    highlightedLines.value = new Set();
 };
 
 const copyCode = () => {
@@ -284,6 +327,24 @@ const submitLineComment = (lineNumber) => {
     newCommentContent.value = '';
     expandedLine.value = null; // Close after submit
 };
+const scrollToLine = (lineNumber) => {
+    // 1. Logic to expand/select the line visually
+    selectedLine.value = lineNumber;
+    expandedLine.value = lineNumber; // Optional: if you want to open the comment box
+    highlightedLines.value = new Set([lineNumber]);
+
+    // 2. DOM Scroll
+    // We can find the element since we added data-line-number
+    // We use setTimeout to allow Vue to update DOM if needed (e.g. if code was just loaded)
+    setTimeout(() => {
+        const lineEl = document.querySelector(`tr[data-line-number="${lineNumber}"]`);
+        if (lineEl) {
+            lineEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+    }, 0);
+};
+
+defineExpose({ scrollToLine });
 </script>
 
 <style scoped>

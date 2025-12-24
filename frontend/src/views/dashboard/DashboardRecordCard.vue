@@ -4,7 +4,6 @@
     :class="{ 'hover:shadow-md hover:-translate-y-0.5': !expanded, 'shadow-xl': expanded, ...cardBorderClass }"
   >
     <!-- STATUS HEADER BAR -->
-    <!-- STATUS HEADER BAR -->
     <div :class="statusHeaderClass" class="px-4 py-2 flex items-center gap-2 text-sm font-bold">
       <span v-if="record.tag === 'DEFENSE'">{{ isPassed ? '🛡️' : '💥' }}</span>
       <span v-else>{{ isPassed ? '✅' : '❌' }}</span>
@@ -25,8 +24,8 @@
       <div class="ml-auto flex items-center gap-3">
           <!-- Submitter Name & Date -->
           <div class="flex items-center gap-2 text-xs opacity-50">
-              <span class="font-bold border-r border-slate-400/30 pr-2">{{ record.memberName || 'Unknown' }}</span>
-              <span v-if="!expanded">{{ formatDate(record.committedAt) }}</span>
+              <span class="font-bold border-r border-slate-400/30 pr-2">{{ record.username || 'Unknown' }}</span>
+              <span>{{ formatDate(record.committedAt) }}</span>
           </div>
       </div>
     </div>
@@ -114,7 +113,8 @@
                             </h4>
                             <div class="space-y-3">
                                 <div v-for="(item, idx) in parsedStructure" :key="idx" 
-                                        class="p-3 bg-slate-50 rounded-lg border border-slate-200 hover:border-indigo-300 transition-colors group">
+                                        class="p-3 bg-slate-50 rounded-lg border border-slate-200 hover:border-indigo-300 transition-colors group cursor-pointer"
+                                        @click="scrollToStructure(item.name)">
                                     <div class="font-mono text-xs font-bold text-indigo-700 mb-1 bg-indigo-50 inline-block px-1.5 py-0.5 rounded group-hover:bg-indigo-100">
                                         {{ item.name }}
                                     </div>
@@ -133,14 +133,14 @@
                                     class="bg-white border border-slate-200 rounded-lg p-3 shadow-sm hover:border-indigo-300 transition-colors cursor-pointer group"
                                     @click="scrollToLine(block.startLine)"
                                 >
-                                    <div class="flex items-center justify-between mb-2">
-                                        <span class="text-[10px] font-bold text-indigo-600 opacity-0 group-hover:opacity-100 transition-opacity">이동</span>
+                                    <h5 v-if="block.role" class="text-xs font-bold text-slate-800 mb-1">{{ block.role }}</h5>
+                                    <div v-else-if="block.startLine" class="text-[10px] text-slate-400 font-bold mb-1">
+                                        Lines {{ block.startLine }} ~ {{ block.endLine }}
                                     </div>
-                                    <h5 class="text-xs font-bold text-slate-800 mb-1">{{ block.role || (block.startLine ? `Lines ${block.startLine} ~ ${block.endLine}` : 'Code Block') }}</h5>
                                     
                                     <!-- Code Preview in Panel -->
                                     <div class="mb-2 bg-slate-50 border border-slate-200 rounded p-1.5" v-if="block.code">
-                                        <code class="font-mono text-[10px] text-slate-600 block truncate">{{ block.code }}</code>
+                                        <code class="font-mono text-[10px] text-slate-600 block truncate">{{ block.code.trim() }}</code>
                                     </div>
 
                                     <p class="text-[11px] text-slate-500 leading-relaxed">{{ block.explanation }}</p>
@@ -169,14 +169,13 @@
                             :class="activeTab === tab.id ? 'text-indigo-600 bg-indigo-50/50' : 'text-slate-500 hover:text-slate-700 hover:bg-slate-50'"
                         >
                             {{ tab.label }}
-                            <div v-if="activeTab === tab.id" class="absolute bottom-0 left-0 w-full h-0.5 bg-indigo-600"></div>
+                            <span v-if="activeTab === tab.id" class="absolute bottom-0 left-0 w-full h-0.5 bg-indigo-600"></span>
                         </button>
                     </div>
 
                     <!-- Tab Content -->
                     <div class="flex-1 overflow-y-auto p-0 custom-scrollbar bg-slate-50">
                         
-                        <!-- 1. OVERVIEW TAB -->
                         <!-- 1. OVERVIEW TAB -->
                         <div v-if="activeTab === 'overview'" class="p-5 space-y-6 flex flex-col h-full">
                             <div class="space-y-6 flex-1">
@@ -189,19 +188,19 @@
                                 </div>
 
                                 <!-- Core Idea (Intuition) -->
-                                <div v-if="record.algorithmIntuition" class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
+                                <div v-if="parsedIntuition" class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
                                     <h4 class="text-xs font-bold text-slate-800 mb-3 flex items-center gap-2">
                                         <Lightbulb :size="14" class="text-amber-500"/> 핵심 아이디어
                                     </h4>
-                                    <p class="text-sm text-slate-700 leading-relaxed whitespace-pre-line">{{ record.algorithmIntuition }}</p>
+                                    <p class="text-sm text-slate-700 leading-relaxed whitespace-pre-line">{{ parsedIntuition }}</p>
                                 </div>
 
                                 <!-- Trace Example -->
                                 <div v-if="parsedTraceExample && parsedTraceExample.hasExample" class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
                                     <button @click="toggleTrace" class="w-full flex items-center justify-between p-4 bg-slate-50 hover:bg-slate-100 transition-colors">
-                                        <h4 class="text-xs font-bold text-slate-800 flex items-center gap-2">
+                                        <span class="text-xs font-bold text-slate-800 flex items-center gap-2">
                                             <Footprints :size="14" class="text-emerald-500"/> 실행 흐름 예시
-                                        </h4>
+                                        </span>
                                         <ChevronDown :class="{ 'rotate-180': showTrace }" class="transition-transform duration-300 text-slate-400" :size="16"/>
                                     </button>
                                     <div v-if="showTrace" class="p-4 border-t border-slate-200 bg-white space-y-4 animate-slide-down">
@@ -325,9 +324,16 @@
                         <!-- 3. COUNTER TAB -->
                         <div v-if="activeTab === 'counter'" class="p-5 flex flex-col h-full">
                             <div v-if="isPassed" class="flex flex-col items-center justify-center flex-1 text-center p-6 text-slate-400 bg-slate-100 rounded-xl border border-dashed border-slate-300">
-                                <CheckCircle2 :size="32" class="mb-2 text-emerald-500 opacity-50"/>
-                                <p class="text-xs font-bold text-slate-600 mb-1">이미 해결된 문제입니다!</p>
-                                <p class="text-[10px]">정답 코드는 반례 생성 기능을 사용할 수 없습니다.</p>
+                                <template v-if="record.tag === 'MOCK_EXAM' || record.tag === 'TEST'">
+                                    <Trophy :size="32" class="mb-2 text-amber-500 opacity-80"/>
+                                    <p class="text-xs font-bold text-slate-600 mb-1">시험 통과!</p>
+                                    <p class="text-[10px]">문제 해결을 축하합니다. 훌륭한 성과입니다!</p>
+                                </template>
+                                <template v-else>
+                                    <CheckCircle2 :size="32" class="mb-2 text-emerald-500 opacity-50"/>
+                                    <p class="text-xs font-bold text-slate-600 mb-1">이미 해결된 문제입니다!</p>
+                                    <p class="text-[10px]">정답 코드는 반례 생성 기능을 사용할 수 없습니다.</p>
+                                </template>
                             </div>
                             <div v-else class="flex flex-col h-full">
                                 <div v-if="!aiData && !loadingAi" class="flex-1 flex flex-col items-center justify-center text-center">
@@ -365,7 +371,18 @@
                             <div class="flex-1 overflow-y-auto p-4 space-y-4 custom-scrollbar" ref="chatContainer">
                                 <div v-if="tutorMessages.length === 0" class="flex flex-col items-center justify-center h-full text-slate-400 text-center opacity-70">
                                     <Bot :size="32" class="mb-2"/>
-                                    <p class="text-xs">코드에 대해 궁금한 점을 물어보세요!</p>
+                                    <p class="text-xs mb-4">코드에 대해 궁금한 점을 물어보세요!</p>
+                                    <div class="flex flex-wrap justify-center gap-2 max-w-[80%]">
+                                        <button @click="sendSuggestion('코드의 핵심 로직을 설명해줘')" class="px-3 py-1.5 bg-white border border-slate-200 rounded-full text-[10px] hover:border-indigo-400 hover:text-indigo-600 transition-colors shadow-sm">
+                                            🧠 핵심 로직 설명
+                                        </button>
+                                        <button @click="sendSuggestion('시간 복잡도를 분석해줘')" class="px-3 py-1.5 bg-white border border-slate-200 rounded-full text-[10px] hover:border-indigo-400 hover:text-indigo-600 transition-colors shadow-sm">
+                                            ⚡ 시간 복잡도 분석
+                                        </button>
+                                        <button @click="sendSuggestion('이 코드를 어떻게 개선할 수 있어?')" class="px-3 py-1.5 bg-white border border-slate-200 rounded-full text-[10px] hover:border-indigo-400 hover:text-indigo-600 transition-colors shadow-sm">
+                                            ✨ 코드 개선점
+                                        </button>
+                                    </div>
                                 </div>
                                 <div v-for="(msg, idx) in tutorMessages" :key="idx" 
                                     class="flex gap-3" :class="msg.role === 'user' ? 'flex-row-reverse' : ''">
@@ -390,22 +407,24 @@
                                             <div v-if="msg.concepts && msg.concepts.length > 0" class="mt-2 flex flex-wrap gap-1">
                                                 <span v-for="c in msg.concepts" :key="c" class="px-1.5 py-0.5 bg-slate-100 text-slate-500 rounded text-[10px]">#{{c}}</span>
                                             </div>
+
+                                            <!-- Inline Suggestions -->
+                                            <div v-if="msg.suggestions && msg.suggestions.length > 0" class="mt-3 pt-3 border-t border-slate-100 flex flex-wrap gap-2 animate-fade-in">
+                                                <button v-for="q in msg.suggestions" :key="q" @click="sendSuggestion(q)" 
+                                                    class="px-2.5 py-1.5 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 rounded-lg text-[10px] font-bold transition-colors flex items-center gap-1.5">
+                                                    <span>💬</span> {{ q }}
+                                                </button>
+                                            </div>
                                     </div>
                                 </div>
                                 </div>
+                                </div>
+
                                 <div v-if="loadingTutorResponse" class="flex gap-3">
                                     <div class="w-7 h-7 rounded-full bg-white border border-slate-200 flex items-center justify-center text-emerald-600"><Bot :size="14"/></div>
                                     <div class="bg-white border border-slate-200 px-4 py-2.5 rounded-2xl rounded-tl-none"><Loader2 :size="14" class="animate-spin text-slate-400"/></div>
                                 </div>
-                            </div>
 
-                            <!-- Suggestions above input -->
-                            <div v-if="latestSuggestions.length > 0" class="px-3 pt-2 pb-0 bg-white border-t border-slate-100 flex gap-2 overflow-x-auto custom-scrollbar">
-                                <button v-for="q in latestSuggestions" :key="q" @click="sendSuggestion(q)" 
-                                    class="whitespace-nowrap px-3 py-1.5 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 rounded-full text-[10px] font-medium border border-indigo-100 transition-colors flex items-center gap-1">
-                                    <span>💬</span> {{ q }}
-                                </button>
-                            </div>
 
                             <div class="p-3 bg-white border-t border-slate-200 sticky bottom-0">
                                 <div class="flex gap-2">
@@ -429,7 +448,7 @@
 
 <script setup>
 import { ref, watch, computed, nextTick } from 'vue';
-import { ExternalLink, ChevronDown, ChevronUp, Bot, Bug, Send, Loader2, Activity, LayoutList, Lightbulb, Tag, MessageSquare, Wand2, CheckCircle2, BookOpen, Footprints, HelpCircle } from 'lucide-vue-next';
+import { ExternalLink, ChevronDown, ChevronUp, Bot, Bug, Send, Loader2, Activity, LayoutList, Lightbulb, Tag, MessageSquare, Wand2, CheckCircle2, BookOpen, Footprints, HelpCircle, Trophy } from 'lucide-vue-next';
 import CodeViewer from '../../components/CodeViewer.vue';
 import { boardApi, commentApi } from '../../api/board';
 import { aiApi } from '../../api/ai'; 
@@ -486,9 +505,6 @@ const submitOverviewComment = async () => {
 // Methods
 const toggleExpand = async () => {
     expanded.value = !expanded.value;
-    if (expanded.value && !board.value) {
-        await loadBoardAndComments();
-    }
 };
 
 const loadBoardAndComments = async () => {
@@ -511,12 +527,21 @@ const loadBoardAndComments = async () => {
 };
 
 const scrollToLine = (lineNumber) => {
-    // This requires CodeViewer to expose a scrollToLine method or we handle it via scrollIntoView
-    // For now, we can try to select the element if possible, or assume CodeViewer is doing it.
-    // If CodeViewer component exposes a method, we can call it. 
-    // Assuming we might add `scrollToLine` to CodeViewer later or simply use the DOM.
-    const codeLine = document.querySelector(`[data-line-number="${lineNumber}"]`);
-    if(codeLine) codeLine.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    if (codeViewerRef.value && lineNumber) {
+        codeViewerRef.value.scrollToLine(lineNumber);
+    }
+};
+
+const scrollToStructure = (name) => {
+    if (!name || !props.record.code) return;
+    const lines = props.record.code.split('\n');
+    const target = name.trim();
+    // Simple search: find first line containing the name
+    // Could be improved with regex or exact match, but contains is usually sufficient for navigation
+    const index = lines.findIndex(line => line.includes(target));
+    if (index !== -1) {
+        scrollToLine(index + 1);
+    }
 };
 
 const ensureBoardExists = async () => {
@@ -636,27 +661,22 @@ const parsedStructure = computed(() => {
     } catch { return []; }
 });
 
-const parsedSummary = computed(() => {
+const parsedFullResponse = computed(() => {
     if (!props.record.fullResponse) return null;
-    try {
-        const full = JSON.parse(props.record.fullResponse);
-        return full.summary || null;
-    } catch { return null; }
+    try { return JSON.parse(props.record.fullResponse); } catch { return null; }
+});
+
+const parsedSummary = computed(() => parsedFullResponse.value?.summary || null);
+
+const parsedTraceExample = computed(() => parsedFullResponse.value?.traceExample || null);
+
+const parsedIntuition = computed(() => {
+    return parsedFullResponse.value?.algorithm?.intuition || props.record.algorithmIntuition || null;
 });
 
 const latestSuggestions = computed(() => {
     const lastMsg = tutorMessages.value.slice().reverse().find(m => m.role === 'assistant');
     return lastMsg && lastMsg.suggestions ? lastMsg.suggestions : [];
-});
-
-const parsedTraceExample = computed(() => {
-
-const parsedTraceExample = computed(() => {
-    if (!props.record.fullResponse) return null;
-    try {
-        const full = JSON.parse(props.record.fullResponse);
-        return full.traceExample ? full.traceExample : null;
-    } catch { return null; }
 });
 
 const combinedHighlights = computed(() => {

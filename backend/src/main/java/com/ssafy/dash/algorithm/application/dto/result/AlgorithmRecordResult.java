@@ -36,7 +36,8 @@ public record AlgorithmRecordResult(
         String keyBlocks,
         Boolean refactorProvided,
         String refactorCode,
-        String refactorExplanation) {
+        String refactorExplanation,
+        String fullResponse) {
 
     public static AlgorithmRecordResult from(AlgorithmRecord record) {
         // NOTE: Analysis result is not directly on AlgorithmRecord entity yet (OneToOne
@@ -73,7 +74,8 @@ public record AlgorithmRecordResult(
                 record.getKeyBlocks(),
                 record.getRefactorProvided(),
                 record.getRefactorCode(),
-                record.getRefactorExplanation());
+                record.getRefactorExplanation(),
+                record.getFullResponse());
     }
 
 }
