@@ -1,24 +1,8 @@
 <template>
-  <div class="min-h-screen bg-[#f0f9ff] text-slate-800 font-[Pretendard] relative overflow-hidden">
-    
-    <!-- Background Decor -->
-    <div class="absolute top-0 right-0 w-[500px] h-[500px] bg-slate-200/50 rounded-full blur-[120px] mix-blend-multiply opacity-50 z-0 pointer-events-none"></div>
+  <div class="min-h-screen bg-white text-slate-800">
 
-    <main class="container mx-auto px-6 py-10 max-w-5xl relative z-10">
-      <!-- Page Header -->
-      <div class="flex justify-between items-end mb-6 animate-fade-in-up">
-        <div>
-          <h1 class="text-4xl font-extrabold mb-3 tracking-tight text-slate-900">게시판</h1>
-          <p class="text-slate-500 font-medium text-lg">전국 스터디원들과 자유롭게 지식을 공유하세요.</p>
-        </div>
-        <button
-          @click="$router.push('/boards/write')"
-          class="flex items-center gap-2 px-6 py-3 bg-indigo-600 hover:bg-indigo-500 text-white rounded-2xl font-bold transition-all hover:-translate-y-1 shadow-lg shadow-indigo-500/20 active:scale-95"
-        >
-          <PenSquare :size="20" />
-          글쓰기
-        </button>
-      </div>
+    <main class="container mx-auto px-6 py-10 max-w-4xl">
+
 
       <!-- Search Bar -->
       <div class="mb-6 animate-fade-in-up">
@@ -30,7 +14,7 @@
               @keyup.enter="searchPosts"
               type="number"
               placeholder="문제 번호로 검색 (예: 1234)"
-              class="w-full pl-12 pr-4 py-3 bg-white border border-slate-200 rounded-xl text-slate-700 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:border-transparent"
+              class="w-full pl-12 pr-4 py-3 bg-white border border-slate-200 rounded-xl text-slate-700 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-brand-400 focus:border-transparent"
             />
           </div>
           <button @click="searchPosts" class="px-6 py-3 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl font-bold transition-colors">
@@ -38,6 +22,14 @@
           </button>
           <button v-if="searchProblemNumber" @click="clearSearch" class="px-4 py-3 text-slate-500 hover:text-slate-700 transition-colors">
             초기화
+          </button>
+          <div class="w-px h-full bg-slate-200 mx-1"></div>
+          <button
+            @click="$router.push('/boards/write')"
+            class="flex items-center gap-2 px-5 py-3 bg-brand-600 hover:bg-brand-500 text-white rounded-xl font-bold transition-all shadow-md shadow-brand-200 hover:-translate-y-0.5 shrink-0"
+          >
+            <PenSquare :size="18" />
+            글쓰기
           </button>
         </div>
       </div>
@@ -63,7 +55,7 @@
             <h3 class="font-bold text-slate-800 truncate mb-2">{{ post.title }}</h3>
             <div class="flex items-center gap-2 text-xs text-slate-500">
               <img v-if="post.authorProfileImageUrl" :src="post.authorProfileImageUrl" class="w-5 h-5 rounded-full" />
-              <span v-if="post.studyName" class="text-indigo-600">[{{ post.studyName }}]</span>
+              <span v-if="post.studyName" class="text-brand-600">[{{ post.studyName }}]</span>
               <span>{{ post.authorName }}</span>
             </div>
           </div>
@@ -104,20 +96,20 @@
             v-for="post in filteredPosts"
             :key="post.id"
             @click="$router.push(`/boards/${post.id}`)"
-            class="grid grid-cols-12 px-8 py-5 border-b border-slate-100 hover:bg-indigo-50/30 cursor-pointer transition-colors group items-center"
+            class="grid grid-cols-12 px-8 py-5 border-b border-slate-100 hover:bg-brand-50/30 cursor-pointer transition-colors group items-center"
           >
-            <div class="col-span-1 text-center text-slate-400 font-mono text-sm group-hover:text-indigo-500 transition-colors">{{ post.id }}</div>
+            <div class="col-span-1 text-center text-slate-400 font-mono text-sm group-hover:text-brand-500 transition-colors">{{ post.id }}</div>
             <div class="col-span-5 pl-2 pr-4 flex items-center gap-2">
               <span v-if="post.boardType === 'CODE_REVIEW'" class="px-2 py-0.5 text-xs font-bold rounded-full bg-emerald-100 text-emerald-700">코드리뷰</span>
               <span v-if="post.problemNumber" class="px-2 py-0.5 text-xs font-bold rounded-full bg-blue-100 text-blue-700">P{{ post.problemNumber }}</span>
-              <h3 class="text-slate-800 font-bold text-lg group-hover:text-indigo-600 transition-colors truncate">
+              <h3 class="text-slate-800 font-bold text-lg group-hover:text-brand-600 transition-colors truncate">
                 {{ post.title }}
               </h3>
             </div>
             <div class="col-span-2 text-center text-sm font-medium text-slate-600 flex items-center justify-center gap-2">
               <img v-if="post.authorProfileImageUrl" :src="post.authorProfileImageUrl" class="w-6 h-6 rounded-full border border-slate-200" />
               <div class="flex flex-col items-start">
-                <span v-if="post.studyName" class="text-[10px] text-indigo-500 font-bold">[{{ post.studyName }}]</span>
+                <span v-if="post.studyName" class="text-[10px] text-brand-500 font-bold">[{{ post.studyName }}]</span>
                 <span>{{ post.authorName || '익명' }}</span>
               </div>
             </div>
@@ -127,7 +119,7 @@
                 {{ post.likeCount || 0 }}
               </span>
               <span class="flex items-center gap-1" title="댓글">
-                <MessageCircle :size="14" class="text-indigo-400" />
+                <MessageCircle :size="14" class="text-brand-400" />
                 {{ post.commentCount || 0 }}
               </span>
             </div>
