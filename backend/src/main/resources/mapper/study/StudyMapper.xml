@@ -3,7 +3,7 @@
 <mapper namespace="com.ssafy.dash.study.infrastructure.mapper.StudyMapper">
 
   <insert id="save" parameterType="Study" useGeneratedKeys="true" keyProperty="id">
-    INSERT INTO studies (name, created_at, acorn_count) VALUES (#{name}, #{createdAt}, #{acornCount})
+    INSERT INTO studies (name, creator_id, created_at, acorn_count) VALUES (#{name}, #{creatorId}, #{createdAt}, #{acornCount})
   </insert>
 
   <select id="findById" resultType="Study" parameterType="long">
