@@ -28,5 +28,22 @@ export const studyApi = {
     // Get weekly missions
     getMissions(studyId) {
         return http.get(`/studies/${studyId}/missions`);
+    },
+    // Application Management
+    getApplications(studyId) {
+        return http.get(`/studies/${studyId}/applications`);
+    },
+    approveApplication(applicationId) {
+        return http.post(`/studies/applications/${applicationId}/approve`);
+    },
+    leaveStudy() {
+        return http.post(`/studies/leave`);
+    },
+    // User Application
+    getMyApplication() {
+        return http.get(`/studies/applications/me`);
+    },
+    cancelApplication(applicationId) {
+        return http.delete(`/studies/applications/${applicationId}`);
     }
 };

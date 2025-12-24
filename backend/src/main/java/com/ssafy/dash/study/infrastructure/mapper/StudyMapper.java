@@ -6,6 +6,7 @@ import java.util.Optional;
 import org.apache.ibatis.annotations.Mapper;
 
 import com.ssafy.dash.study.domain.Study;
+import com.ssafy.dash.study.domain.StudyApplication;
 
 @Mapper
 public interface StudyMapper {
@@ -19,5 +20,18 @@ public interface StudyMapper {
     void update(Study study);
 
     int delete(Long id);
+
+    // Application Methods
+    void saveApplication(com.ssafy.dash.study.domain.StudyApplication application);
+
+    com.ssafy.dash.study.domain.StudyApplication findApplicationById(Long id);
+    
+    com.ssafy.dash.study.domain.StudyApplication findApplicationByStudyIdAndUserId(@org.apache.ibatis.annotations.Param("studyId") Long studyId, @org.apache.ibatis.annotations.Param("userId") Long userId);
+
+    void updateApplicationStatus(@org.apache.ibatis.annotations.Param("id") Long id, @org.apache.ibatis.annotations.Param("status") com.ssafy.dash.study.domain.StudyApplication.ApplicationStatus status);
+
+    List<StudyApplication> findPendingApplicationsByStudyId(Long studyId);
+
+    StudyApplication findPendingApplicationByUserId(Long userId);
 
 }

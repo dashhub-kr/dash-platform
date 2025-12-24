@@ -53,23 +53,84 @@ public class StudyController {
             @Parameter(hidden = true) @AuthenticationPrincipal OAuth2User principal,
             @RequestBody CreateStudyRequest request) {
         if (principal instanceof CustomOAuth2User customUser) {
-            Study study = studyService.createStudy(customUser.getUserId(), request.getName());
+            Study study = studyService.createStudy(customUser.getUserId(), request.getName(), request.getDescription(), request.getVisibility());
             return ResponseEntity.ok(study);
         }
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
     }
 
-    @Operation(summary = "스터디 가입", description = "기존 스터디에 가입합니다.")
-    @PostMapping("/{studyId}/join")
-    public ResponseEntity<Void> joinStudy(
+    @Operation(summary = "스터디 가입 신청", description = "스터디에 가입 신청을 보냅니다.")
+    @PostMapping("/{studyId}/apply")
+    public ResponseEntity<Void> applyForStudy(
             @Parameter(hidden = true) @AuthenticationPrincipal OAuth2User principal,
-            @PathVariable Long studyId) {
+            @PathVariable Long studyId,
+            @RequestBody ApplyStudyRequest request) {
         if (principal instanceof CustomOAuth2User customUser) {
-            studyService.joinStudy(customUser.getUserId(), studyId);
+            studyService.applyForStudy(customUser.getUserId(), studyId, request.message());
             return ResponseEntity.ok().build();
         }
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
     }
+    
+    @Operation(summary = "가입 신청 승인", description = "스터디장이 가입 신청을 승인합니다.")
+    @PostMapping("/applications/{applicationId}/approve")
+    public ResponseEntity<Void> approveApplication(
+            @Parameter(hidden = true) @AuthenticationPrincipal OAuth2User principal,
+            @PathVariable Long applicationId) {
+        if (principal instanceof CustomOAuth2User customUser) {
+            studyService.approveApplication(customUser.getUserId(), applicationId);
+            return ResponseEntity.ok().build();
+        }
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+    }
+    
+    @Operation(summary = "가입 신청 목록 조회", description = "스터디장이 대기 중인 가입 신청 목록을 조회합니다.")
+    @GetMapping("/{studyId}/applications")
+    public ResponseEntity<List<com.ssafy.dash.study.domain.StudyApplication>> getApplications(
+            @Parameter(hidden = true) @AuthenticationPrincipal OAuth2User principal,
+            @PathVariable Long studyId) {
+        if (principal instanceof CustomOAuth2User customUser) {
+             return ResponseEntity.ok(studyService.getPendingApplications(customUser.getUserId(), studyId));
+        }
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+    }
+    
+    @Operation(summary = "내 가입 신청 상태 조회", description = "자신의 현재 대기 중인 가입 신청을 조회합니다.")
+    @GetMapping("/applications/me")
+    public ResponseEntity<com.ssafy.dash.study.domain.StudyApplication> getMyApplication(
+            @Parameter(hidden = true) @AuthenticationPrincipal OAuth2User principal) {
+        if (principal instanceof CustomOAuth2User customUser) {
+             return studyService.getMyPendingApplication(customUser.getUserId())
+                     .map(ResponseEntity::ok)
+                     .orElse(ResponseEntity.noContent().build());
+        }
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+    }
+    
+    @Operation(summary = "가입 신청 취소", description = "자신의 가입 신청을 취소합니다.")
+    @DeleteMapping("/applications/{applicationId}")
+    public ResponseEntity<Void> cancelApplication(
+            @Parameter(hidden = true) @AuthenticationPrincipal OAuth2User principal,
+            @PathVariable Long applicationId) {
+        if (principal instanceof CustomOAuth2User customUser) {
+             studyService.cancelApplication(customUser.getUserId(), applicationId);
+             return ResponseEntity.ok().build();
+        }
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+    }
+
+    @Operation(summary = "스터디 탈퇴", description = "현재 소속된 스터디에서 탈퇴합니다.")
+    @PostMapping("/leave")
+    public ResponseEntity<Void> leaveStudy(
+            @Parameter(hidden = true) @AuthenticationPrincipal OAuth2User principal) {
+        if (principal instanceof CustomOAuth2User customUser) {
+            studyService.leaveStudy(customUser.getUserId());
+            return ResponseEntity.ok().build();
+        }
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+    }
+
+    public record ApplyStudyRequest(String message) {}
 
     @Operation(summary = "스터디 문제 풀이 통계 조회", description = "스터디의 티어별 문제 해결 수를 조회합니다.")
     @GetMapping("/{studyId}/stats")

@@ -15,4 +15,16 @@ public interface StudyRepository {
 
     boolean delete(Long id);
 
+    void saveApplication(StudyApplication application);
+
+    Optional<StudyApplication> findApplicationById(Long id);
+
+    Optional<StudyApplication> findApplicationByStudyIdAndUserId(Long studyId, Long userId);
+
+    void updateApplicationStatus(StudyApplication application);
+    
+    java.util.List<StudyApplication> findPendingApplicationsByStudyId(Long studyId);
+
+    Optional<StudyApplication> findPendingApplicationByUserId(Long userId);
+
 }

@@ -169,6 +169,21 @@
               </div>
             </div>
 
+            <!-- Management Controls -->
+            <div v-if="studyData" class="flex justify-end gap-2 mb-4">
+               <button 
+                  v-if="studyData.creatorId === user?.id" 
+                  @click="fetchApplications"
+                  class="px-3 py-1.5 bg-indigo-100 text-indigo-700 font-bold rounded-lg text-xs hover:bg-indigo-200 transition-colors flex items-center gap-1">
+                  <span class="text-lg">📬</span> 가입 신청 관리
+               </button>
+               <button 
+                  @click="leaveStudy"
+                  class="px-3 py-1.5 bg-slate-100 text-slate-500 font-bold rounded-lg text-xs hover:bg-red-50 hover:text-red-500 transition-colors flex items-center gap-1">
+                  <span class="text-lg">👋</span> 탈퇴
+               </button>
+            </div>
+
             <!-- Clean Stats Row -->
             <div class="grid grid-cols-4 gap-3">
               <!-- Stat 1: Acorns -->
@@ -348,6 +363,50 @@
 
   </div>
   <!-- End Split View Flex Container -->
+
+    <!-- Management Modal -->
+    <div v-if="showAppsModal" class="fixed inset-0 z-[60] flex items-center justify-center p-4">
+      <div class="absolute inset-0 bg-black/40 backdrop-blur-sm" @click="showAppsModal = false"></div>
+      <div class="bg-white rounded-3xl p-6 w-full max-w-lg relative z-10 shadow-2xl animate-fade-in-up md:p-8">
+         <div class="flex justify-between items-center mb-6">
+            <h3 class="text-xl font-bold text-slate-800">📬 가입 신청 목록</h3>
+            <button @click="showAppsModal = false" class="p-2 hover:bg-slate-100 rounded-full text-slate-400 hover:text-slate-600 transition-colors">
+              <X :size="20" />
+            </button>
+         </div>
+
+         <div class="space-y-4 max-h-[60vh] overflow-y-auto px-1">
+             <div v-if="applications.length === 0" class="text-center py-10 text-slate-400">
+                대기 중인 신청이 없습니다.
+             </div>
+             
+             <div v-for="app in applications" :key="app.id" class="bg-slate-50 rounded-2xl p-4 border border-slate-200">
+                <div class="flex items-start gap-4">
+                   <img :src="app.applicant?.avatarUrl || '/profile/smile.png'" class="w-10 h-10 rounded-full bg-white border border-slate-200" />
+                   <div class="flex-1">
+                      <div class="flex justify-between items-start">
+                         <h4 class="font-bold text-slate-800">{{ app.applicant?.username || 'Unknown' }}</h4>
+                         <span class="text-xs text-slate-400">{{ formatDate(app.createdAt) }}</span>
+                      </div>
+                      <p class="text-sm text-slate-600 mt-2 bg-white p-3 rounded-xl border border-slate-100">
+                         {{ app.message }}
+                      </p>
+                      
+                      <div class="flex gap-2 mt-3">
+                         <button @click="approveApp(app.id)" class="flex-1 py-2 bg-indigo-600 hover:bg-indigo-500 text-white text-sm font-bold rounded-xl transition-colors shadow-sm">
+                            승인
+                         </button>
+                         <button class="flex-1 py-2 bg-white border border-slate-200 hover:bg-red-50 hover:text-red-500 text-slate-500 text-sm font-bold rounded-xl transition-colors">
+                            거절
+                         </button>
+                      </div>
+                   </div>
+                </div>
+             </div>
+         </div>
+      </div>
+    </div>
+
 </template>
 
 <script setup>
@@ -798,6 +857,55 @@ const parsePatterns = (jsonString) => {
     if (!jsonString) return [];
     try {
         const parsed = JSON.parse(jsonString);
+        return parsed || [];
+    } catch (e) {
+        return [];
+    }
+};
+
+
+// --- Study Management Logic ---
+const showAppsModal = ref(false);
+const applications = ref([]);
+
+const fetchApplications = async () => {
+    if (!user.value?.studyId || !studyData.value) return;
+
+    try {
+        const res = await studyApi.getApplications(user.value.studyId);
+        applications.value = res.data;
+        showAppsModal.value = true;
+    } catch (e) {
+        console.error("Failed to fetch applications", e);
+        alert("권한이 없거나 신청 목록을 불러올 수 없습니다.");
+    }
+};
+
+const approveApp = async (appId) => {
+    if (!confirm('승인하시겠습니까?')) return;
+    try {
+        await studyApi.approveApplication(appId);
+        alert('승인되었습니다.');
+        // Refresh list
+        const res = await studyApi.getApplications(user.value.studyId);
+        applications.value = res.data;
+    } catch (e) {
+        alert('승인 실패');
+    }
+};
+
+const leaveStudy = async () => {
+    if (!confirm('정말 스터디를 탈퇴하시겠습니까? 이 작업은 되돌릴 수 없습니다.')) return;
+    try {
+        await studyApi.leaveStudy();
+        alert('탈퇴되었습니다.');
+        // Force refresh auth and go home
+        window.location.href = '/shome'; // or use router but ensure state clear
+    } catch (e) {
+        alert('탈퇴 실패');
+    }
+};
+
         return Array.isArray(parsed) ? parsed : [];
     } catch (e) {
         console.error("Failed to parse patterns", e);

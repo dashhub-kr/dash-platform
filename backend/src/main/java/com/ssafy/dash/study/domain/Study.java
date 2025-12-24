@@ -20,6 +20,17 @@ public class Study {
     private Double averageTier; // 평균 티어 (조회용)
     private Integer totalSolved; // 총 문제 풀이 수 (조회용)
     private String mvpUsername; // MVP 사용자명 (조회용)
+    
+    // 추가된 필드
+    private StudyVisibility visibility; // PUBLIC, PRIVATE
+    private String description; // 스터디 소개
+    
+    // 활동 지표
+    private Double averageSubmissionRate; // 기록 제출률
+    // averageTier는 기존 필드 사용
+    private Integer streak; // 연속 활동 일수
+    private String activeMissionTitle; // 진행 중인 미션
+    private Integer activeMissionProgress; // 미션 진행률
 
     public Study(Long id, String name, Long creatorId, LocalDateTime createdAt, Integer acornCount) {
         this.id = id;

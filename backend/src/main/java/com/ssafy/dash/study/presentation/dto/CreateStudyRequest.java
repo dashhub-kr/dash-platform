@@ -9,4 +9,6 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class CreateStudyRequest {
     private String name;
+    private String description;
+    private com.ssafy.dash.study.domain.StudyVisibility visibility;
 }

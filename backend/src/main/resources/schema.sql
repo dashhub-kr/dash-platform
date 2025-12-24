@@ -3,7 +3,23 @@ CREATE TABLE IF NOT EXISTS studies (
     name VARCHAR(255) NOT NULL,
     creator_id BIGINT,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    acorn_count INT DEFAULT 0
+    acorn_count INT DEFAULT 0,
+    visibility VARCHAR(20) DEFAULT 'PUBLIC',
+    description TEXT,
+    streak INT DEFAULT 0,
+    active_mission_title VARCHAR(255)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+
+CREATE TABLE IF NOT EXISTS study_applications (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    study_id BIGINT NOT NULL,
+    user_id BIGINT NOT NULL,
+    message TEXT,
+    status VARCHAR(20) DEFAULT 'PENDING',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (study_id) REFERENCES studies(id) ON DELETE CASCADE,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 
