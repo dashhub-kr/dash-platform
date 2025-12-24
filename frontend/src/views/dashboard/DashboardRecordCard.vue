@@ -19,6 +19,13 @@
           <span class="text-[9px] animate-pulse">🔥</span>
           <span class="text-[9px] font-black tracking-wider">{{ defenseStreak }} 연승!</span>
       </div>
+
+      <!-- Elapsed Time Badge (for Defense/Mock Exam) -->
+      <div v-if="record.elapsedTimeSeconds && (record.tag === 'DEFENSE' || record.tag === 'MOCK_EXAM')" 
+           class="flex items-center gap-1 px-2 py-0.5 rounded-full bg-blue-100 text-blue-700 border border-blue-200">
+          <Clock :size="10" />
+          <span class="text-[9px] font-bold">{{ formatElapsedTime(record.elapsedTimeSeconds) }}</span>
+      </div>
       
       <!-- Right Side: Name/Date Only -->
       <div class="ml-auto flex items-center gap-3">
@@ -452,7 +459,7 @@
 
 <script setup>
 import { ref, watch, computed, nextTick } from 'vue';
-import { ExternalLink, ChevronDown, ChevronUp, Bot, Bug, Send, Loader2, Activity, LayoutList, Lightbulb, Tag, MessageSquare, Wand2, CheckCircle2, BookOpen, Footprints, HelpCircle, Trophy } from 'lucide-vue-next';
+import { ExternalLink, ChevronDown, ChevronUp, Bot, Bug, Send, Loader2, Activity, LayoutList, Lightbulb, Tag, MessageSquare, Wand2, CheckCircle2, BookOpen, Footprints, HelpCircle, Trophy, Clock } from 'lucide-vue-next';
 import CodeViewer from '../../components/CodeViewer.vue';
 import { boardApi, commentApi } from '../../api/board';
 import { aiApi } from '../../api/ai'; 
@@ -668,6 +675,15 @@ const sendSuggestion = (q) => {
 // Helpers
 const formatDate = (d) => d ? new Date(d).toLocaleDateString('ko-KR', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }) : '';
 const getExtension = (l) => ({'java':'java','python':'py','cpp':'cpp','c':'c','javascript':'js'}[l?.toLowerCase()] || 'txt');
+
+const formatElapsedTime = (seconds) => {
+    if (!seconds || seconds < 0) return '';
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    if (mins === 0) return `${secs}초`;
+    if (secs === 0) return `${mins}분`;
+    return `${mins}분 ${secs}초`;
+};
 
 const extractPatterns = (json) => {
     if (!json) return [];

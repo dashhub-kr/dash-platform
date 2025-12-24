@@ -77,6 +77,7 @@ CREATE TABLE IF NOT EXISTS algorithm_records (
     record_type VARCHAR(20) NOT NULL DEFAULT 'USER_SOLUTION' COMMENT 'USER_SOLUTION: 사용자 풀이, TOP100_PROBLEM: 탑100 문제',
     tag VARCHAR(20) DEFAULT 'GENERAL' COMMENT 'MISSION, MOCK_EXAM, DEFENSE, GENERAL',
     defense_streak INT,
+    elapsed_time_seconds BIGINT NULL COMMENT '풀이 시간 (초), DEFENSE/MOCK_EXAM 태그일 때 사용',
     FOREIGN KEY (user_id) REFERENCES users(id),
     INDEX idx_algorithm_records_record_type (record_type),
     INDEX idx_algorithm_records_tag (tag)

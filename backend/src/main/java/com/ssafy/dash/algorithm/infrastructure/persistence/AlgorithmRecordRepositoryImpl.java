@@ -72,4 +72,9 @@ public class AlgorithmRecordRepositoryImpl implements AlgorithmRecordRepository 
         return new HashSet<>(problems);
     }
 
+    @Override
+    public Optional<AlgorithmRecord> findLatestSuccessfulByUserAndProblem(Long userId, String problemNumber) {
+        return Optional.ofNullable(mapper.selectLatestSuccessfulByUserAndProblem(userId, problemNumber));
+    }
+
 }

@@ -79,14 +79,20 @@ public class MockExamService {
                 ? MockExamType.valueOf(user.getExamType())
                 : null;
 
+        // Check which problems are solved
+        List<Integer> solvedProblems = problems.stream()
+                .filter(p -> algorithmRecordRepository.existsSuccessfulSubmission(userId, String.valueOf(p)))
+                .collect(Collectors.toList());
+
         return new ExamStatusResult(
                 user.getExamType(),
                 examType != null ? examType.getDisplayName() : null,
                 examType != null ? examType.getCategory() : null,
                 problems,
+                solvedProblems,
                 user.getExamStartTime(),
                 examType != null ? examType.getTimeLimitHours() : 0,
-                user.getExamSolvedCount() != null ? user.getExamSolvedCount() : 0,
+                solvedProblems.size(),
                 examType != null ? examType.getProblemCount() : 0);
     }
 
@@ -108,6 +114,17 @@ public class MockExamService {
             if (!algorithmRecordRepository.existsSuccessfulSubmission(userId, String.valueOf(solvedProblemId))) {
                 return; // 아직 정답이 아님
             }
+
+            // 풀이 시간 계산 및 저장
+            algorithmRecordRepository.findLatestSuccessfulByUserAndProblem(userId, String.valueOf(solvedProblemId))
+                    .ifPresent(record -> {
+                        LocalDateTime startTime = user.getExamStartTime();
+                        LocalDateTime endTime = record.getCreatedAt() != null ? record.getCreatedAt()
+                                : LocalDateTime.now();
+                        long elapsedSeconds = java.time.Duration.between(startTime, endTime).getSeconds();
+                        record.setElapsedTimeSeconds(elapsedSeconds);
+                        algorithmRecordRepository.update(record);
+                    });
 
             // 푼 문제 수 증가
             int newSolvedCount = (user.getExamSolvedCount() != null ? user.getExamSolvedCount() : 0) + 1;
@@ -208,6 +225,7 @@ public class MockExamService {
             String displayName,
             String category,
             List<Integer> problems,
+            List<Integer> solvedProblems,
             LocalDateTime startTime,
             int timeLimitHours,
             int solvedCount,

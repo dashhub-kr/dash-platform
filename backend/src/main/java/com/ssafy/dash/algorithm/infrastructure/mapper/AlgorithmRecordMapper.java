@@ -32,4 +32,6 @@ public interface AlgorithmRecordMapper {
 
     List<String> selectSolvedProblemNumbersByUserId(Long userId);
 
+    AlgorithmRecord selectLatestSuccessfulByUserAndProblem(Long userId, String problemNumber);
+
 }

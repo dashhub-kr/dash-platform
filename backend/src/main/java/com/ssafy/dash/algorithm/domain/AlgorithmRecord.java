@@ -33,6 +33,7 @@ public class AlgorithmRecord {
     private String recordType; // USER_SOLUTION or TOP100_PROBLEM
     private String tag; // MISSION, MOCK_EXAM, DEFENSE, GENERAL
     private Integer defenseStreak;
+    private Long elapsedTimeSeconds; // Time taken to solve (for DEFENSE/MOCK_EXAM)
 
     // Joined fields
     private String username;

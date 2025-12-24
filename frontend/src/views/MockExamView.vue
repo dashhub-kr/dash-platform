@@ -257,9 +257,8 @@ const fetchStatus = async () => {
         const res = await axios.get('/api/mockexam/status');
         status.value = res.data;
         
-        // solvedCount 기반으로 풀린 문제 추적
-        // 간소화된 방식 - 실제로는 backend에서 개별 문제를 추적해야 함
-        solvedProblems.value = new Set();
+        // Use solvedProblems from API response
+        solvedProblems.value = new Set(res.data.solvedProblems || []);
     } catch (e) {
         console.error("시험 상태 fetch 실패", e);
     } finally {
@@ -282,6 +281,7 @@ const refreshStatus = async () => {
         }
         
         status.value = res.data;
+        solvedProblems.value = new Set(res.data.solvedProblems || []);
     } catch (e) {
         console.error("상태 refresh 실패", e);
     }
