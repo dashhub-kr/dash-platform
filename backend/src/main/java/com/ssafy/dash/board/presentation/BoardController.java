@@ -1,6 +1,7 @@
 package com.ssafy.dash.board.presentation;
 
 import java.net.URI;
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -14,6 +15,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.ssafy.dash.board.application.BoardService;
@@ -49,9 +51,26 @@ public class BoardController {
 
     @GetMapping
     public ResponseEntity<List<BoardResponse>> findAll(
+            @RequestParam(required = false) Integer problemNumber,
             @Parameter(hidden = true) @AuthenticationPrincipal OAuth2User principal) {
         Long userId = extractUserIdNullable(principal);
         List<BoardResponse> responses = boardService.findAll(userId).stream()
+                .filter(r -> problemNumber == null
+                        || (r.problemNumber() != null && r.problemNumber().equals(problemNumber)))
+                .map(BoardResponse::from)
+                .collect(Collectors.toList());
+
+        return ResponseEntity.ok(responses);
+    }
+
+    @GetMapping("/popular")
+    public ResponseEntity<List<BoardResponse>> findPopular(
+            @RequestParam(defaultValue = "5") int limit,
+            @Parameter(hidden = true) @AuthenticationPrincipal OAuth2User principal) {
+        Long userId = extractUserIdNullable(principal);
+        List<BoardResponse> responses = boardService.findAll(userId).stream()
+                .sorted(Comparator.comparing(r -> -r.likeCount()))
+                .limit(limit)
                 .map(BoardResponse::from)
                 .collect(Collectors.toList());
 

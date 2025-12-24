@@ -10,7 +10,10 @@ public record BoardResult(
         String content,
         Long userId,
         String authorName,
+        String authorProfileImageUrl,
+        String studyName,
         Long algorithmRecordId,
+        Integer problemNumber,
         String boardType,
         Integer likeCount,
         Integer commentCount,
@@ -18,14 +21,18 @@ public record BoardResult(
         LocalDateTime createdAt,
         LocalDateTime updatedAt) {
 
-    public static BoardResult from(Board board, String authorName, Boolean isLiked) {
+    public static BoardResult from(Board board, String authorName, String authorProfileImageUrl,
+            String studyName, Integer problemNumber, Boolean isLiked) {
         return new BoardResult(
                 board.getId(),
                 board.getTitle(),
                 board.getContent(),
                 board.getUserId(),
                 authorName,
+                authorProfileImageUrl,
+                studyName,
                 board.getAlgorithmRecordId(),
+                problemNumber,
                 board.getBoardType(),
                 board.getLikeCount() != null ? board.getLikeCount() : 0,
                 board.getCommentCount() != null ? board.getCommentCount() : 0,
