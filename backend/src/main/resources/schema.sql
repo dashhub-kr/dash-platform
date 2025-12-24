@@ -1,6 +1,7 @@
 CREATE TABLE IF NOT EXISTS studies (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
     name VARCHAR(255) NOT NULL,
+    creator_id BIGINT,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     acorn_count INT DEFAULT 0
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
@@ -357,6 +358,7 @@ CREATE TABLE IF NOT EXISTS study_missions (
     problem_ids TEXT NOT NULL COMMENT 'JSON array of problem IDs',
     source_type VARCHAR(20) NOT NULL COMMENT 'AI_RECOMMENDED or MANUAL',
     deadline DATE,
+    status VARCHAR(20) DEFAULT 'IN_PROGRESS',
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (study_id) REFERENCES studies(id) ON DELETE CASCADE,
     INDEX idx_study_missions_study_week (study_id, week)
@@ -370,6 +372,7 @@ CREATE TABLE IF NOT EXISTS study_mission_submissions (
     user_id BIGINT NOT NULL,
     problem_id INT NOT NULL,
     completed BOOLEAN DEFAULT FALSE,
+    is_sos BOOLEAN DEFAULT FALSE,
     completed_at TIMESTAMP NULL,
     FOREIGN KEY (mission_id) REFERENCES study_missions(id) ON DELETE CASCADE,
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
