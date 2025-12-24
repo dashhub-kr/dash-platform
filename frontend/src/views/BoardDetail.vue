@@ -22,7 +22,10 @@
           <h1 class="text-3xl font-extrabold text-slate-900 mb-4 leading-tight">{{ post.title }}</h1>
           <div class="flex flex-wrap items-center gap-4 text-sm text-slate-500">
             <div class="flex items-center gap-2">
-              <div class="w-8 h-8 rounded-full bg-indigo-50 flex items-center justify-center text-indigo-600 font-bold border border-indigo-100">
+              <img v-if="post.authorProfileImageUrl" 
+                   :src="post.authorProfileImageUrl" 
+                   class="w-8 h-8 rounded-full object-cover border border-indigo-100" />
+              <div v-else class="w-8 h-8 rounded-full bg-indigo-50 flex items-center justify-center text-indigo-600 font-bold border border-indigo-100">
                  {{ post.authorName?.charAt(0).toUpperCase() || 'U' }}
               </div>
               <span class="text-slate-700 font-medium">{{ post.authorName || '익명' }}</span>
@@ -122,7 +125,10 @@
           >
             <div class="flex items-center justify-between mb-3">
               <div class="flex items-center gap-3">
-                <div class="w-8 h-8 rounded-full bg-white shadow-sm border border-slate-100 flex items-center justify-center text-slate-500 font-bold text-sm">
+                <img v-if="comment.authorProfileImageUrl" 
+                     :src="comment.authorProfileImageUrl" 
+                     class="w-8 h-8 rounded-full object-cover shadow-sm border border-slate-100" />
+                <div v-else class="w-8 h-8 rounded-full bg-white shadow-sm border border-slate-100 flex items-center justify-center text-slate-500 font-bold text-sm">
                   {{ comment.authorName?.charAt(0).toUpperCase() || 'U' }}
                 </div>
                 <span class="font-medium text-slate-700">{{ comment.authorName }}</span>
@@ -146,6 +152,12 @@
                 class="bg-white rounded-xl p-4 border border-slate-100 shadow-sm"
               >
                 <div class="flex items-center gap-2 mb-2">
+                  <img v-if="reply.authorProfileImageUrl" 
+                       :src="reply.authorProfileImageUrl" 
+                       class="w-6 h-6 rounded-full object-cover border border-slate-100" />
+                  <div v-else class="w-6 h-6 rounded-full bg-slate-50 border border-slate-100 flex items-center justify-center text-slate-400 font-bold text-[10px]">
+                    {{ reply.authorName?.charAt(0).toUpperCase() || 'U' }}
+                  </div>
                   <span class="font-medium text-slate-700 text-sm">{{ reply.authorName }}</span>
                   <span class="text-xs text-slate-400">{{ formatDate(reply.createdAt) }}</span>
                 </div>

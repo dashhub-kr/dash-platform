@@ -53,8 +53,9 @@ public class CommentService {
 
         User user = userRepository.findById(command.userId()).orElse(null);
         String authorName = (user != null) ? user.getUsername() : "Unknown";
+        String authorProfileImageUrl = (user != null) ? user.getAvatarUrl() : null;
 
-        return CommentResult.from(comment, authorName);
+        return CommentResult.from(comment, authorName, authorProfileImageUrl);
     }
 
     @Transactional(readOnly = true)
@@ -76,8 +77,9 @@ public class CommentService {
 
         User user = userRepository.findById(comment.getUserId()).orElse(null);
         String authorName = (user != null) ? user.getUsername() : "Unknown";
+        String authorProfileImageUrl = (user != null) ? user.getAvatarUrl() : null;
 
-        return CommentResult.from(comment, authorName);
+        return CommentResult.from(comment, authorName, authorProfileImageUrl);
     }
 
     @Transactional
@@ -92,8 +94,9 @@ public class CommentService {
 
         User user = userRepository.findById(comment.getUserId()).orElse(null);
         String authorName = (user != null) ? user.getUsername() : "Unknown";
+        String authorProfileImageUrl = (user != null) ? user.getAvatarUrl() : null;
 
-        return CommentResult.from(comment, authorName);
+        return CommentResult.from(comment, authorName, authorProfileImageUrl);
     }
 
     @Transactional
@@ -124,14 +127,16 @@ public class CommentService {
         return topLevel.stream()
                 .map(comment -> {
                     String authorName = comment.getAuthorName() != null ? comment.getAuthorName() : "Unknown";
+                    String authorProfileImageUrl = comment.getAuthorProfileImageUrl();
                     List<Comment> replies = repliesMap.getOrDefault(comment.getId(), List.of());
                     List<CommentResult> replyResults = replies.stream()
                             .map(reply -> {
                                 String replyAuthor = reply.getAuthorName() != null ? reply.getAuthorName() : "Unknown";
-                                return CommentResult.from(reply, replyAuthor);
+                                String replyProfileImageUrl = reply.getAuthorProfileImageUrl();
+                                return CommentResult.from(reply, replyAuthor, replyProfileImageUrl);
                             })
                             .collect(Collectors.toList());
-                    return CommentResult.from(comment, authorName, replyResults);
+                    return CommentResult.from(comment, authorName, authorProfileImageUrl, replyResults);
                 })
                 .collect(Collectors.toList());
     }

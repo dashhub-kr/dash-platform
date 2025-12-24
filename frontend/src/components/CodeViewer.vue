@@ -10,7 +10,7 @@
           <option v-for="author in uniqueAuthors" :key="author" :value="author">{{ author }}</option>
         </select>
         <!-- Expand/Collapse All -->
-        <button v-if="hasAnyComments" @click="allCommentsExpanded = !allCommentsExpanded" class="flex items-center gap-1 text-[10px] font-bold text-indigo-600 hover:text-indigo-800 transition-colors">
+        <button v-if="hasAnyComments" @click="toggleAllComments" class="flex items-center gap-1 text-[10px] font-bold text-indigo-600 hover:text-indigo-800 transition-colors">
           <span>{{ allCommentsExpanded ? '모두 접기' : '모두 펼치기' }}</span>
         </button>
         <span class="px-2 py-0.5 rounded bg-slate-200 text-slate-600 uppercase font-bold tracking-wider text-[10px]">{{ language }}</span>
@@ -62,11 +62,17 @@
                      class="flex items-center justify-center cursor-pointer" 
                      @click="toggleLine(index + 1)">
                   <div class="flex -space-x-2">
-                    <div v-for="(comment, cidx) in filteredCommentsByLine[index + 1].slice(0, 2)" :key="cidx"
-                         class="w-5 h-5 rounded-full bg-indigo-100 border-2 border-white flex items-center justify-center text-[8px] font-bold text-indigo-600 shadow-sm"
-                         :title="comment.authorName">
-                      {{ comment.authorName?.charAt(0).toUpperCase() || 'U' }}
-                    </div>
+                    <template v-for="(comment, cidx) in filteredCommentsByLine[index + 1].slice(0, 2)" :key="cidx">
+                      <img v-if="comment.authorProfileImageUrl" 
+                           :src="comment.authorProfileImageUrl" 
+                           :title="comment.authorName"
+                           class="w-5 h-5 rounded-full border-2 border-white shadow-sm object-cover" />
+                      <div v-else
+                           class="w-5 h-5 rounded-full bg-indigo-100 border-2 border-white flex items-center justify-center text-[8px] font-bold text-indigo-600 shadow-sm"
+                           :title="comment.authorName">
+                        {{ comment.authorName?.charAt(0).toUpperCase() || 'U' }}
+                      </div>
+                    </template>
                     <div v-if="filteredCommentsByLine[index + 1].length > 2" 
                          class="w-5 h-5 rounded-full bg-slate-200 border-2 border-white flex items-center justify-center text-[8px] font-bold text-slate-600 shadow-sm">
                       +{{ filteredCommentsByLine[index + 1].length - 2 }}
@@ -105,7 +111,10 @@
                     :key="comment.id"
                     class="flex gap-2 items-start animate-fade-in"
                   >
-                    <div class="w-5 h-5 rounded-full bg-indigo-100 flex-shrink-0 flex items-center justify-center text-indigo-600 text-[9px] font-bold border border-indigo-200">
+                    <img v-if="comment.authorProfileImageUrl" 
+                         :src="comment.authorProfileImageUrl" 
+                         class="w-5 h-5 rounded-full flex-shrink-0 border border-indigo-200 object-cover" />
+                    <div v-else class="w-5 h-5 rounded-full bg-indigo-100 flex-shrink-0 flex items-center justify-center text-indigo-600 text-[9px] font-bold border border-indigo-200">
                        {{ comment.authorName?.charAt(0).toUpperCase() || 'U' }}
                     </div>
                     <div class="flex-1 min-w-0">
@@ -310,6 +319,18 @@ const highlightLine = (line) => {
   } catch (e) {
     return line;
   }
+};
+
+const toggleAllComments = () => {
+    if (allCommentsExpanded.value) {
+        // Collapse all: clear both allCommentsExpanded AND individual expandedLine
+        allCommentsExpanded.value = false;
+        expandedLine.value = null;
+        selectedLine.value = null;
+    } else {
+        // Expand all
+        allCommentsExpanded.value = true;
+    }
 };
 
 const toggleLine = (lineNumber) => {

@@ -25,6 +25,7 @@ public class Comment {
 
     // 조인 필드
     private String authorName;
+    private String authorProfileImageUrl;
     private List<Comment> replies; // 대댓글 목록
 
     private Comment(Long boardId, Long userId, Long parentId, Integer lineNumber,

@@ -11,7 +11,8 @@
     SELECT 
       c.id, c.board_id, c.user_id, c.parent_id, c.line_number, c.content, c.like_count, 
       c.created_at, c.updated_at,
-      u.username as author_name
+      u.username as author_name,
+      u.avatar_url as author_profile_image_url
     FROM comments c
     LEFT JOIN users u ON c.user_id = u.id
     WHERE c.id = #{id}
@@ -21,7 +22,8 @@
     SELECT 
       c.id, c.board_id, c.user_id, c.parent_id, c.line_number, c.content, c.like_count, 
       c.created_at, c.updated_at,
-      u.username as author_name
+      u.username as author_name,
+      u.avatar_url as author_profile_image_url
     FROM comments c
     LEFT JOIN users u ON c.user_id = u.id
     WHERE c.board_id = #{boardId}
@@ -32,7 +34,8 @@
     SELECT 
       c.id, c.board_id, c.user_id, c.parent_id, c.line_number, c.content, c.like_count, 
       c.created_at, c.updated_at,
-      u.username as author_name
+      u.username as author_name,
+      u.avatar_url as author_profile_image_url
     FROM comments c
     LEFT JOIN users u ON c.user_id = u.id
     WHERE c.board_id = #{boardId} AND c.line_number = #{lineNumber}

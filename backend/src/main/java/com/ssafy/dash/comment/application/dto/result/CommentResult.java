@@ -11,6 +11,7 @@ public record CommentResult(
         Long boardId,
         Long userId,
         String authorName,
+        String authorProfileImageUrl,
         Long parentId,
         Integer lineNumber,
         String content,
@@ -19,12 +20,13 @@ public record CommentResult(
         LocalDateTime createdAt,
         LocalDateTime updatedAt) {
 
-    public static CommentResult from(Comment comment, String authorName) {
+    public static CommentResult from(Comment comment, String authorName, String authorProfileImageUrl) {
         return new CommentResult(
                 comment.getId(),
                 comment.getBoardId(),
                 comment.getUserId(),
                 authorName,
+                authorProfileImageUrl,
                 comment.getParentId(),
                 comment.getLineNumber(),
                 comment.getContent(),
@@ -34,12 +36,14 @@ public record CommentResult(
                 comment.getUpdatedAt());
     }
 
-    public static CommentResult from(Comment comment, String authorName, List<CommentResult> replies) {
+    public static CommentResult from(Comment comment, String authorName, String authorProfileImageUrl,
+            List<CommentResult> replies) {
         return new CommentResult(
                 comment.getId(),
                 comment.getBoardId(),
                 comment.getUserId(),
                 authorName,
+                authorProfileImageUrl,
                 comment.getParentId(),
                 comment.getLineNumber(),
                 comment.getContent(),
