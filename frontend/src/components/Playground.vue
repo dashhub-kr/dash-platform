@@ -15,7 +15,7 @@
       <transition name="float-panel">
         <div v-if="acornLogs.length > 0" class="recent-activity-panel">
           <h3 class="panel-title flex items-center gap-2">
-            <Activity :size="16" class="text-indigo-500" />
+            <Activity :size="16" class="text-brand-500" />
             <span class="text-slate-500 font-bold text-xs uppercase tracking-wider">Recent Activity</span>
           </h3>
           <div class="activity-list custom-scrollbar">

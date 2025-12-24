@@ -28,19 +28,19 @@
         >
           <button
             @click.prevent="$emit('scroll', 'hero')"
-            class="text-sm font-bold text-slate-500 hover:text-indigo-600 transition-colors"
+            class="text-sm font-bold text-slate-500 hover:text-brand-600 transition-colors"
           >
             홈
           </button>
           <button
             @click.prevent="$emit('scroll', 'features')"
-            class="text-sm font-bold text-slate-500 hover:text-indigo-600 transition-colors"
+            class="text-sm font-bold text-slate-500 hover:text-brand-600 transition-colors"
           >
             주요 기능
           </button>
           <button
             @click.prevent="$emit('scroll', 'core')"
-            class="text-sm font-bold text-slate-500 hover:text-indigo-600 transition-colors"
+            class="text-sm font-bold text-slate-500 hover:text-brand-600 transition-colors"
           >
             핵심 기능
           </button>
@@ -54,8 +54,8 @@
           <!-- Dashboard -->
           <router-link
             to="/dashboard"
-            class="flex items-center gap-2 px-3 py-2 rounded-xl text-sm font-bold text-slate-500 hover:bg-slate-100 hover:text-indigo-600 transition-all whitespace-nowrap"
-            active-class="bg-indigo-50 text-indigo-600"
+            class="flex items-center gap-2 px-3 py-2 rounded-xl text-sm font-bold text-slate-500 hover:bg-slate-100 hover:text-brand-600 transition-all whitespace-nowrap"
+            active-class="bg-brand-50 text-brand-600"
           >
             <LayoutGrid :size="18" />
             <span>대시보드</span>
@@ -91,8 +91,8 @@
           <div class="flex items-center gap-1">
             <router-link
               to="/training"
-              class="flex items-center gap-2 px-3 py-2 rounded-xl text-sm font-bold text-slate-500 hover:bg-slate-100 hover:text-indigo-600 transition-all whitespace-nowrap"
-              active-class="bg-indigo-50 text-indigo-600"
+              class="flex items-center gap-2 px-3 py-2 rounded-xl text-sm font-bold text-slate-500 hover:bg-slate-100 hover:text-brand-600 transition-all whitespace-nowrap"
+              active-class="bg-brand-50 text-brand-600"
             >
               <School :size="18" />
               <span>트레이닝</span>
@@ -130,8 +130,8 @@
             </router-link>
             <router-link
               to="/boards"
-              class="flex items-center gap-2 px-3 py-2 rounded-xl text-sm font-bold text-slate-500 hover:bg-slate-100 hover:text-indigo-600 transition-all whitespace-nowrap"
-              active-class="bg-indigo-50 text-indigo-600"
+              class="flex items-center gap-2 px-3 py-2 rounded-xl text-sm font-bold text-slate-500 hover:bg-slate-100 hover:text-brand-600 transition-all whitespace-nowrap"
+              active-class="bg-brand-50 text-brand-600"
             >
               <MessageSquare :size="18" />
               <span>게시판</span>
@@ -151,7 +151,7 @@
               <!-- 프로필 아바타 -->
               <img 
                 :src="userProfileImage" 
-                class="w-9 h-9 rounded-full object-cover bg-indigo-100 cursor-pointer hover:ring-2 hover:ring-indigo-100 transition-all"
+                class="w-9 h-9 rounded-full object-cover bg-brand-100 cursor-pointer hover:ring-2 hover:ring-brand-100 transition-all"
                 @click.stop="toggleProfileMenu"
                 :alt="user.username || user.email"
               />
@@ -163,7 +163,7 @@
                 >
                   <button
                     @click="goToProfile"
-                    class="w-full text-left px-4 py-2.5 text-sm font-medium text-slate-600 hover:bg-slate-50 hover:text-indigo-600 transition-colors"
+                    class="w-full text-left px-4 py-2.5 text-sm font-medium text-slate-600 hover:bg-slate-50 hover:text-brand-600 transition-colors"
                   >
                     마이페이지
                   </button>
