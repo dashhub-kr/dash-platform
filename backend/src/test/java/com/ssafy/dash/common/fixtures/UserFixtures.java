@@ -58,8 +58,7 @@ public final class UserFixtures {
             String email,
             String provider,
             String providerId,
-            String avatarUrl
-    ) {
+            String avatarUrl) {
 
         public User toDomain(LocalDateTime createdAt) {
             User user = User.create(username, email, createdAt, provider, providerId, avatarUrl);
@@ -68,7 +67,8 @@ public final class UserFixtures {
         }
 
         public UserResult toResult(LocalDateTime createdAt) {
-            return new UserResult(id, username, email, createdAt, provider, providerId, avatarUrl, null, null, null, null, null);
+            return new UserResult(id, username, email, createdAt, provider, providerId, avatarUrl, null, null, null,
+                    null, null, null);
         }
 
         public UserCreateCommand toCreateCommand() {
@@ -80,5 +80,5 @@ public final class UserFixtures {
         }
 
     }
-    
+
 }

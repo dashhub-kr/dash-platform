@@ -37,8 +37,8 @@ class AcornServiceTest {
         Long userId = 1L;
         Integer amount = 10;
         String reason = "Problem solved";
-        Study study = Study.create("Test Study");
-        
+        Study study = Study.create("Test Study", userId);
+
         given(studyRepository.findById(studyId)).willReturn(Optional.of(study));
 
         // when
