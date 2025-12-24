@@ -906,12 +906,7 @@ const leaveStudy = async () => {
     }
 };
 
-        return Array.isArray(parsed) ? parsed : [];
-    } catch (e) {
-        console.error("Failed to parse patterns", e);
-        return [];
-    }
-};
+
 
 const highlightCode = (code, language) => {
     try {

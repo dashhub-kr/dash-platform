@@ -121,8 +121,11 @@
       </div>
 
       <!-- 빈 상태 -->
-      <div v-else-if="!loading" class="text-center py-20 text-slate-400 text-xl">
-        등록된 스터디가 없습니다
+      <div v-else-if="!loading" class="text-center py-20 text-slate-400 text-xl flex flex-col items-center gap-4">
+        <p>등록된 스터디가 없습니다</p>
+        <button @click="$router.back()" class="px-6 py-2.5 bg-slate-200 hover:bg-slate-300 text-slate-600 font-bold rounded-xl transition-colors text-sm">
+          뒤로가기
+        </button>
       </div>
 
     </div>
