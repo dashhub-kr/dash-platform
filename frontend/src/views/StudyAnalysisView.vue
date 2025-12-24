@@ -16,13 +16,8 @@
       </div>
 
       <!-- 로딩 상태 - 팀 분석 -->
-      <div v-if="loadingAnalysis" class="flex flex-col items-center justify-center py-20">
-        <div class="relative w-80 h-80 rounded-3xl overflow-hidden shadow-2xl mb-6">
-          <video autoplay loop muted playsinline class="w-full h-full object-cover">
-            <source src="/rec/team.mp4" type="video/mp4" />
-          </video>
-          <div class="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent"></div>
-        </div>
+      <div v-if="loadingAnalysis" class="flex flex-col items-center justify-center py-20 animate-fade-in">
+        <div class="w-16 h-16 border-4 border-indigo-200 border-t-indigo-600 rounded-full animate-spin mb-6"></div>
         <p class="text-slate-600 text-xl font-medium animate-pulse">팀 역량을 분석하고 있습니다...</p>
       </div>
 
@@ -111,12 +106,8 @@
           </div>
 
           <!-- 커리큘럼 로딩 -->
-          <div v-if="loadingCurriculum" class="flex flex-col items-center py-16">
-            <div class="relative w-64 h-64 rounded-2xl overflow-hidden shadow-xl mb-4">
-              <video autoplay loop muted playsinline class="w-full h-full object-cover">
-                <source src="/rec/problem-search.mp4" type="video/mp4" />
-              </video>
-            </div>
+          <div v-if="loadingCurriculum" class="flex flex-col items-center py-16 animate-fade-in">
+            <div class="w-12 h-12 border-4 border-indigo-200 border-t-indigo-600 rounded-full animate-spin mb-4"></div>
             <p class="text-slate-600 font-medium animate-pulse">팀에 맞는 문제를 찾고 있습니다...</p>
           </div>
 
