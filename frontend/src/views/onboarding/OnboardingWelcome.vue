@@ -61,14 +61,14 @@
                     </span>
                   </div>
                   <div class="text-sm text-slate-500 mt-1 flex items-center gap-3">
-                    <span class="flex items-center gap-1"><Puzzle :size="14"/> {{ verifiedUser.solvedCount || 0 }}문제 해결</span>
-                    <span v-if="verifiedUser.classLevel" class="flex items-center gap-1"><BookOpen :size="14"/> Class {{ verifiedUser.classLevel }}</span>
+                    <span class="flex items-center gap-1"><Puzzle :size="14" fill="currentColor"/> {{ verifiedUser.solvedCount || 0 }}문제 해결</span>
+                    <span v-if="verifiedUser.classLevel" class="flex items-center gap-1"><BookOpen :size="14" fill="currentColor"/> Class {{ verifiedUser.classLevel }}</span>
                   </div>
                 </div>
 
                 <!-- Confirmed Badge -->
                 <div v-if="confirmed" class="text-emerald-500">
-                  <CheckCircle2 :size="28" />
+                  <CheckCircle2 :size="28" fill="currentColor" />
                 </div>
               </div>
 

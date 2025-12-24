@@ -20,7 +20,6 @@ export default {
         beetle: '#2DD4BF',  // Neutral Positive Teal
         bee: '#FFC800',     // Warning Yellow
         fox: '#FF9600',     // High Alert Orange
-        rose: '#FF4B4B',    // Error Red
       },
       fontFamily: {
         sans: ['Pretendard', 'sans-serif'],

@@ -84,14 +84,18 @@
         <!-- 모의고사 Section -->
         <div class="mb-12">
             <h2 class="text-2xl font-bold text-slate-800 mb-6 flex items-center gap-2">
-                <span class="w-8 h-8 bg-violet-100 rounded-lg flex items-center justify-center text-violet-600">📝</span>
+                <span class="w-8 h-8 bg-violet-100 rounded-lg flex items-center justify-center text-violet-600">
+                    <FileText class="w-5 h-5" fill="currentColor" />
+                </span>
                 모의고사
             </h2>
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6 overflow-hidden p-1">
                 <!-- IM -->
                 <div @click="startExam('IM')" class="group cursor-pointer flex flex-col items-center p-4 rounded-3xl hover:bg-slate-50 transition-all active:scale-95">
                     <div class="relative mb-4 transition-transform duration-300 group-hover:scale-110">
-                        <div class="w-24 h-24 bg-slate-100 rounded-full flex items-center justify-center text-5xl shadow-sm border-b-4 border-slate-200 group-hover:border-b-[6px] transition-all">🌱</div>
+                        <div class="w-24 h-24 bg-emerald-50 rounded-full flex items-center justify-center text-emerald-500 shadow-sm border-b-4 border-emerald-100 group-hover:border-b-[6px] transition-all">
+                            <Sprout :size="48" stroke-width="1.5" fill="currentColor" />
+                        </div>
                         <div class="absolute -top-1 -right-1 bg-rose-500 text-white text-xs font-bold px-2 py-0.5 rounded-full shadow-sm">기초</div>
                     </div>
                     <h3 class="text-xl font-black text-slate-800 mb-1">IM 모의고사</h3>
@@ -102,7 +106,9 @@
                 <!-- A -->
                 <div @click="startExam('A')" class="group cursor-pointer flex flex-col items-center p-4 rounded-3xl hover:bg-slate-50 transition-all active:scale-95">
                     <div class="relative mb-4 transition-transform duration-300 group-hover:scale-110">
-                        <div class="w-24 h-24 bg-blue-100 rounded-full flex items-center justify-center text-5xl shadow-sm border-b-4 border-blue-200 group-hover:border-b-[6px] transition-all">🔷</div>
+                        <div class="w-24 h-24 bg-blue-50 rounded-full flex items-center justify-center text-blue-500 shadow-sm border-b-4 border-blue-100 group-hover:border-b-[6px] transition-all">
+                            <Diamond :size="48" stroke-width="1.5" fill="currentColor" />
+                        </div>
                         <div class="absolute -top-1 -right-1 bg-blue-500 text-white text-xs font-bold px-2 py-0.5 rounded-full shadow-sm">중급</div>
                     </div>
                     <h3 class="text-xl font-black text-slate-800 mb-1">A형 모의고사</h3>
@@ -113,7 +119,9 @@
                 <!-- B -->
                 <div @click="startExam('B')" class="group cursor-pointer flex flex-col items-center p-4 rounded-3xl hover:bg-slate-50 transition-all active:scale-95">
                     <div class="relative mb-4 transition-transform duration-300 group-hover:scale-110">
-                        <div class="w-24 h-24 bg-purple-100 rounded-full flex items-center justify-center text-5xl shadow-sm border-b-4 border-purple-200 group-hover:border-b-[6px] transition-all">💎</div>
+                        <div class="w-24 h-24 bg-purple-50 rounded-full flex items-center justify-center text-purple-500 shadow-sm border-b-4 border-purple-100 group-hover:border-b-[6px] transition-all">
+                            <Crown :size="48" stroke-width="1.5" fill="currentColor" />
+                        </div>
                         <div class="absolute -top-1 -right-1 bg-purple-500 text-white text-xs font-bold px-2 py-0.5 rounded-full shadow-sm">고급</div>
                     </div>
                     <h3 class="text-xl font-black text-slate-800 mb-1">B형 모의고사</h3>
@@ -126,14 +134,18 @@
         <!-- 코딩테스트 Section -->
         <div class="mb-8">
             <h2 class="text-2xl font-bold text-slate-800 mb-6 flex items-center gap-2">
-                <span class="w-8 h-8 bg-amber-100 rounded-lg flex items-center justify-center text-amber-600">💻</span>
+                <span class="w-8 h-8 bg-amber-100 rounded-lg flex items-center justify-center text-amber-600">
+                    <Code class="w-5 h-5" fill="currentColor" />
+                </span>
                 코딩테스트
             </h2>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6 overflow-hidden p-1">
                 <!-- Samsung -->
                 <div @click="startExam('SAMSUNG')" class="group cursor-pointer flex flex-col items-center p-4 rounded-3xl hover:bg-slate-50 transition-all active:scale-95">
                     <div class="relative mb-4 transition-transform duration-300 group-hover:scale-110">
-                        <div class="w-24 h-24 bg-sky-100 rounded-full flex items-center justify-center text-5xl shadow-sm border-b-4 border-sky-200 group-hover:border-b-[6px] transition-all">🏢</div>
+                        <div class="w-24 h-24 bg-sky-50 rounded-full flex items-center justify-center text-sky-500 shadow-sm border-b-4 border-sky-100 group-hover:border-b-[6px] transition-all">
+                            <Building :size="48" stroke-width="1.5" fill="currentColor" />
+                        </div>
                     </div>
                     <h3 class="text-xl font-black text-slate-800 mb-1">삼성 코딩테스트</h3>
                     <p class="text-slate-400 font-bold text-sm mb-1">삼성 SW 역량테스트 기출</p>
@@ -143,7 +155,9 @@
                 <!-- Kakao -->
                 <div @click="startExam('KAKAO')" class="group cursor-pointer flex flex-col items-center p-4 rounded-3xl hover:bg-slate-50 transition-all active:scale-95">
                     <div class="relative mb-4 transition-transform duration-300 group-hover:scale-110">
-                        <div class="w-24 h-24 bg-amber-100 rounded-full flex items-center justify-center text-5xl shadow-sm border-b-4 border-amber-200 group-hover:border-b-[6px] transition-all">🟡</div>
+                        <div class="w-24 h-24 bg-amber-50 rounded-full flex items-center justify-center text-amber-500 shadow-sm border-b-4 border-amber-100 group-hover:border-b-[6px] transition-all">
+                            <MessageCircle :size="48" stroke-width="1.5" fill="currentColor" />
+                        </div>
                     </div>
                     <h3 class="text-xl font-black text-slate-800 mb-1">카카오 코딩테스트</h3>
                     <p class="text-slate-400 font-bold text-sm mb-1">카카오 코딩테스트 대비</p>
@@ -179,6 +193,7 @@
 import { ref, onMounted, onUnmounted, computed } from 'vue';
 import { useRouter } from 'vue-router';
 import axios from 'axios';
+import { FileText, Code, Sprout, Diamond, Crown, Building, MessageCircle } from 'lucide-vue-next';
 
 const router = useRouter();
 const loading = ref(true);

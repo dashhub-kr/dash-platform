@@ -176,28 +176,28 @@
                 class="flex flex-col items-center justify-center p-4 rounded-2xl hover:bg-slate-50 transition-colors cursor-pointer group"
                 @click="goToPlayground"
               >
-                <IconAcorn class="text-fox w-10 h-10 mb-2" stroke-width="2.5" />
+                <IconAcorn class="text-fox w-10 h-10 mb-2" stroke-width="2.5" fill="currentColor" />
                 <div class="text-2xl font-black text-slate-800">{{ studyData?.acornCount || 0 }}</div>
                 <span class="text-xs font-bold text-slate-400 uppercase tracking-wide">Acorns</span>
               </div>
 
               <!-- Stat 2: Solutions -->
               <div class="flex flex-col items-center justify-center p-4 rounded-2xl hover:bg-slate-50 transition-colors cursor-pointer group">
-                <BarChart2 class="text-brand-500 w-10 h-10 mb-2" stroke-width="2.5" />
+                <BarChart2 class="text-brand-500 w-10 h-10 mb-2" stroke-width="2.5" fill="currentColor" />
                 <div class="text-2xl font-black text-slate-800">{{ records.length }}</div>
                 <span class="text-xs font-bold text-slate-400 uppercase tracking-wide">Solutions</span>
               </div>
 
               <!-- Stat 3: Streak -->
               <div class="flex flex-col items-center justify-center p-4 rounded-2xl hover:bg-slate-50 transition-colors cursor-pointer group">
-                <Flame class="text-rose w-10 h-10 mb-2" stroke-width="2.5" />
+                <Flame class="text-rose-500 w-10 h-10 mb-2" stroke-width="2.5" fill="currentColor" />
                 <div class="text-2xl font-black text-slate-800">{{ currentStreak }}<span class="text-sm font-bold text-slate-400 ml-1">일</span></div>
                 <span class="text-xs font-bold text-slate-400 uppercase tracking-wide">Streak</span>
               </div>
 
               <!-- Stat 4: Members -->
               <div class="flex flex-col items-center justify-center p-4 rounded-2xl hover:bg-slate-50 transition-colors cursor-pointer group">
-                <Users class="text-leaf w-10 h-10 mb-2" stroke-width="2.5" />
+                <Users class="text-leaf w-10 h-10 mb-2" stroke-width="2.5" fill="currentColor" />
                 <div class="text-2xl font-black text-slate-800">{{ studyData?.memberCount || 1 }}<span class="text-sm font-bold text-slate-400 ml-1">명</span></div>
                 <span class="text-xs font-bold text-slate-400 uppercase tracking-wide">Members</span>
               </div>

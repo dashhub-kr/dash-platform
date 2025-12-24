@@ -57,12 +57,27 @@
                        class="flex items-center gap-3">
                     <div class="w-4 h-4 rounded-full" :style="{ backgroundColor: memberColors[idx % memberColors.length] }"></div>
                     <span class="text-slate-700">{{ member.username }}</span>
-                    <span class="text-xs text-slate-400 ml-auto">Tier {{ member.tier || 'N/A' }}</span>
+                    <div class="ml-auto flex items-center gap-2 w-24 flex-shrink-0">
+                      <div class="w-5 flex justify-center">
+                        <img :src="getTierIconUrl(member.tier)" class="h-4 object-contain" />
+                      </div>
+                      <span class="text-xs font-bold text-left flex-1" :class="getTierColorClass(member.tier)">
+                        {{ getFormattedTierName(member.tier) }}
+                      </span>
+                    </div>
                   </div>
                   <!-- 팀 평균 범례 -->
                   <div class="flex items-center gap-3 mt-3 pt-3 border-t border-slate-100">
                     <div class="w-4 h-4 rounded-full bg-brand-500"></div>
                     <span class="text-slate-700 font-medium">팀 평균</span>
+                    <div class="ml-auto flex items-center gap-2 w-24 flex-shrink-0" v-if="analysis.averageTier">
+                      <div class="w-5 flex justify-center">
+                        <img :src="getTierIconUrl(analysis.averageTier)" class="h-4 object-contain" />
+                      </div>
+                      <span class="text-xs font-bold text-left flex-1" :class="getTierColorClass(analysis.averageTier)">
+                        {{ getFormattedTierName(analysis.averageTier) }}
+                      </span>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -95,9 +110,9 @@
               <a :href="`https://www.acmicpc.net/problem/${problem.problemId}`"
                  target="_blank"
                  class="block">
-                <div class="flex items-center gap-3 mb-2">
-                  <span class="text-2xl font-bold text-brand-600 group-hover:text-brand-500">#{{ problem.problemId }}</span>
-                  <span v-if="problem.tags?.length" class="px-2 py-1 bg-brand-100 text-brand-700 text-xs font-medium rounded-md">{{ problem.tags[0] }}</span>
+                <div class="flex items-center gap-2 mb-2 min-w-0">
+                  <span class="text-2xl font-bold text-brand-600 group-hover:text-brand-500 flex-shrink-0">#{{ problem.problemId }}</span>
+                  <span v-if="problem.tags?.length" class="px-2 py-1 bg-brand-100 text-brand-700 text-xs font-medium rounded-md truncate max-w-[120px] sm:max-w-[150px]">{{ problem.tags[0] }}</span>
                 </div>
                 <p class="text-slate-800 font-medium truncate">{{ problem.title }}</p>
                 <p class="text-slate-500 text-sm">Lv.{{ problem.level }}</p>
@@ -317,16 +332,34 @@ onMounted(async () => {
 
 const getTagDisplayName = (tag) => familyDisplayNames[tag?.toUpperCase()] || tag;
 
-const getTierName = (tier) => {
+const getTierIconUrl = (tier) => {
+  const t = Math.round(tier || 0);
+  return `https://static.solved.ac/tier_small/${t}.svg`;
+};
+
+const getFormattedTierName = (tier) => {
   if (!tier) return 'Unranked';
   const t = Math.round(tier);
-  if (t >= 26) return 'Ruby';
-  if (t >= 21) return 'Diamond';
-  if (t >= 16) return 'Platinum';
-  if (t >= 11) return 'Gold';
-  if (t >= 6) return 'Silver';
-  if (t >= 1) return 'Bronze';
-  return 'Unranked';
+  if (t === 0) return 'Unranked';
+  
+  const levels = ['Bronze', 'Silver', 'Gold', 'Platinum', 'Diamond', 'Ruby', 'Master'];
+  const index = Math.ceil(t / 5) - 1;
+  const levelName = levels[index] || 'Unknown';
+  
+  const subLevel = 5 - ((t - 1) % 5);
+  return `${levelName} ${subLevel}`; // e.g., Gold III
+};
+
+const getTierColorClass = (tier) => {
+  const t = Math.round(tier || 0);
+  if (t === 0) return 'text-slate-400';
+  if (t <= 5) return 'text-orange-700'; // Bronze
+  if (t <= 10) return 'text-slate-500'; // Silver
+  if (t <= 15) return 'text-yellow-600'; // Gold
+  if (t <= 20) return 'text-emerald-500'; // Platinum
+  if (t <= 25) return 'text-sky-500'; // Diamond
+  if (t <= 30) return 'text-rose-500'; // Ruby
+  return 'text-purple-500'; // Master
 };
 
 const loadCurriculum = async () => {

@@ -68,16 +68,16 @@
           <div class="flex items-center gap-1">
             <router-link
               to="/study/missions"
-              class="flex items-center gap-2 px-3 py-2 rounded-xl text-sm font-bold text-slate-500 hover:bg-slate-100 hover:text-emerald-600 transition-all whitespace-nowrap"
-              active-class="bg-emerald-50 text-emerald-600"
+              class="flex items-center gap-2 px-3 py-2 rounded-xl text-sm font-bold text-slate-500 hover:bg-slate-100 hover:text-brand-600 transition-all whitespace-nowrap"
+              active-class="bg-brand-50 text-brand-600"
             >
               <Target :size="18" />
               <span>미션</span>
             </router-link>
             <router-link
               to="/study/analysis"
-              class="flex items-center gap-2 px-3 py-2 rounded-xl text-sm font-bold text-slate-500 hover:bg-slate-100 hover:text-teal-600 transition-all whitespace-nowrap"
-              active-class="bg-teal-50 text-teal-600"
+              class="flex items-center gap-2 px-3 py-2 rounded-xl text-sm font-bold text-slate-500 hover:bg-slate-100 hover:text-brand-600 transition-all whitespace-nowrap"
+              active-class="bg-brand-50 text-brand-600"
             >
               <PieChart :size="18" />
               <span>분석</span>
@@ -99,16 +99,16 @@
             </router-link>
             <router-link
               to="/mockexam"
-              class="flex items-center gap-2 px-3 py-2 rounded-xl text-sm font-bold text-slate-500 hover:bg-slate-100 hover:text-amber-600 transition-all whitespace-nowrap"
-              active-class="bg-amber-50 text-amber-600"
+              class="flex items-center gap-2 px-3 py-2 rounded-xl text-sm font-bold text-slate-500 hover:bg-slate-100 hover:text-brand-600 transition-all whitespace-nowrap"
+              active-class="bg-brand-50 text-brand-600"
             >
               <FileText :size="18" />
               <span>모의고사</span>
             </router-link>
             <router-link
               to="/defense"
-              class="flex items-center gap-2 px-3 py-2 rounded-xl text-sm font-bold text-slate-500 hover:bg-slate-100 hover:text-rose-600 transition-all whitespace-nowrap"
-              active-class="bg-rose-50 text-rose-600"
+              class="flex items-center gap-2 px-3 py-2 rounded-xl text-sm font-bold text-slate-500 hover:bg-slate-100 hover:text-brand-600 transition-all whitespace-nowrap"
+              active-class="bg-brand-50 text-brand-600"
             >
               <Shield :size="18" />
               <span>디펜스</span>
@@ -122,8 +122,8 @@
           <div class="flex items-center gap-1">
             <router-link
               to="/study/ranking"
-              class="flex items-center gap-2 px-3 py-2 rounded-xl text-sm font-bold text-slate-500 hover:bg-slate-100 hover:text-amber-500 transition-all whitespace-nowrap"
-              active-class="bg-amber-50 text-amber-500"
+              class="flex items-center gap-2 px-3 py-2 rounded-xl text-sm font-bold text-slate-500 hover:bg-slate-100 hover:text-brand-600 transition-all whitespace-nowrap"
+              active-class="bg-brand-50 text-brand-600"
             >
               <Trophy :size="18" />
               <span>랭킹</span>

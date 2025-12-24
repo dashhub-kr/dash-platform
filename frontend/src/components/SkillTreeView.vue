@@ -139,7 +139,7 @@
                     </div>
 
                     <!-- Master/Recommended Badge -->
-                    <div v-if="isRecommendedTag(tag)" class="absolute -top-2 left-1/2 -translate-x-1/2 bg-rose-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full shadow-sm animate-bounce whitespace-nowrap z-10">
+                    <div v-if="isRecommendedTag(tag)" class="absolute -top-2 left-1/2 -translate-x-1/2 bg-rose-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full shadow-sm animate-bounce whitespace-nowrap z-50">
                         추천
                     </div>
                     <div v-if="getFilledStars(tag.masteryLevel) >= 4" class="absolute -bottom-1 -right-1 bg-amber-500 rounded-full p-1.5 border-2 border-white shadow-sm">

@@ -11,9 +11,7 @@
         <!-- Extension Detected Badge -->
         <div v-if="extensionDetected" class="bg-emerald-50 border border-emerald-200 rounded-2xl p-4 flex items-center gap-3">
           <div class="w-10 h-10 bg-emerald-100 rounded-full flex items-center justify-center">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-emerald-600" viewBox="0 0 20 20" fill="currentColor">
-              <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
-            </svg>
+            <Puzzle :size="20" class="text-emerald-600" fill="currentColor" />
           </div>
           <div>
             <div class="font-bold text-emerald-800 text-sm">BaekjoonHub Dash 익스텐션 감지됨</div>
@@ -48,10 +46,7 @@
                 :disabled="saving || success"
                 @input="onSearchInput"
               />
-              <svg v-if="searching" class="absolute right-4 top-1/2 -translate-y-1/2 animate-spin h-5 w-5 text-slate-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-              </svg>
+              <Loader2 v-if="searching" class="absolute right-4 top-1/2 -translate-y-1/2 animate-spin h-5 w-5 text-slate-400" />
             </div>
           </label>
 
@@ -65,9 +60,7 @@
               <div class="flex items-center justify-between gap-3">
                 <div class="flex items-center gap-3 flex-1 min-w-0">
                   <div class="w-10 h-10 bg-slate-100 group-hover:bg-white rounded-xl flex items-center justify-center transition-colors border border-slate-200 group-hover:border-brand-200 flex-shrink-0">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-slate-400 group-hover:text-brand-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z" />
-                    </svg>
+                    <Folder :size="20" class="text-slate-400 group-hover:text-brand-600" fill="currentColor" />
                   </div>
                   <div class="min-w-0 flex-1">
                     <div class="font-bold text-slate-800 group-hover:text-brand-700 transition-colors truncate text-sm md:text-base leading-tight">{{ repo.fullName }}</div>
@@ -75,9 +68,7 @@
                   </div>
                 </div>
                 <span v-if="repo.isPrivate" class="flex-shrink-0 text-[10px] bg-amber-50 text-amber-600 border border-amber-200 px-2 py-1 rounded-lg font-bold flex items-center gap-1">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" viewBox="0 0 20 20" fill="currentColor">
-                        <path fill-rule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clip-rule="evenodd" />
-                    </svg>
+                    <Lock :size="12" fill="currentColor" />
                     Private
                 </span>
               </div>
@@ -94,24 +85,18 @@
             <div class="bg-gradient-to-br from-emerald-50 to-white border border-emerald-300 rounded-2xl p-5 shadow-lg shadow-emerald-100 ring-2 ring-emerald-50">
               <div class="flex items-start gap-3">
                 <div class="w-10 h-10 bg-emerald-100 rounded-xl flex items-center justify-center flex-shrink-0 mt-0.5">
-                  <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z" />
-                  </svg>
+                  <Folder :size="20" class="text-emerald-600" fill="currentColor" />
                 </div>
                 <div class="flex-1 min-w-0">
                   <div class="flex items-center justify-between gap-2">
                     <div class="flex items-center gap-2 min-w-0">
                          <div class="font-bold text-slate-800 truncate text-sm md:text-base">{{ selectedRepo.fullName }}</div>
                          <span v-if="selectedRepo.isPrivate" class="flex-shrink-0 text-[10px] bg-amber-50 text-amber-600 border border-amber-200 px-1.5 py-0.5 rounded font-bold flex items-center gap-0.5">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" viewBox="0 0 20 20" fill="currentColor">
-                                <path fill-rule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clip-rule="evenodd" />
-                            </svg>
+                            <Lock :size="12" fill="currentColor" />
                          </span>
                     </div>
                     <div class="text-emerald-500 flex-shrink-0">
-                      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M20 6 9 17l-5-5"/>
-                      </svg>
+                      <Check :size="24" stroke-width="3" />
                     </div>
                   </div>
                   <div class="text-sm text-slate-500 mt-1 truncate">{{ selectedRepo.description || '설명 없음' }}</div>
@@ -145,9 +130,7 @@
 
         <div v-if="success" class="flex items-center gap-3 p-4 bg-emerald-50 border border-emerald-100 rounded-2xl animate-in zoom-in-95 duration-300">
            <div class="p-2 bg-emerald-100 rounded-full">
-             <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7" />
-             </svg>
+              <CheckCircle2 :size="24" class="text-emerald-600" fill="currentColor" />
            </div>
            <span class="text-sm font-bold text-emerald-700">설정이 완료되었습니다!<br>잠시 후 대시보드로 이동합니다.</span>
         </div>
@@ -160,6 +143,7 @@
 import { ref, onMounted } from "vue";
 import { useRouter } from "vue-router";
 import { onboardingApi } from "../../api/onboarding";
+import { Puzzle, Loader2, Folder, Lock, Check, CheckCircle2 } from 'lucide-vue-next';
 
 const router = useRouter();
 const searchQuery = ref("");

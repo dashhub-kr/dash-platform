@@ -30,7 +30,7 @@
           <div class="bg-white rounded-3xl p-6 shadow-sm">
             <div class="flex items-center gap-4 mb-4">
               <div class="w-14 h-14 bg-brand-50 text-brand-600 rounded-2xl flex items-center justify-center shrink-0">
-                <RefreshCw :size="28" />
+                <RefreshCw :size="28" fill="currentColor" />
               </div>
               <div>
                 <span class="text-xs font-black text-brand-600 uppercase tracking-wide">Today's Review</span>
@@ -53,7 +53,7 @@
           <div class="bg-white rounded-3xl p-6 shadow-sm">
             <div class="flex items-center gap-4 mb-4">
               <div class="w-14 h-14 bg-rose-50 text-rose-500 rounded-2xl flex items-center justify-center shrink-0">
-                <Trophy :size="28" />
+                <Trophy :size="28" fill="currentColor" />
               </div>
               <div>
                 <span class="text-xs font-black text-rose-500 uppercase tracking-wide">Daily Challenge</span>
@@ -65,7 +65,7 @@
               @click="startChallenge"
               class="w-full py-3.5 bg-rose-50 hover:bg-rose-100 text-rose-600 hover:text-rose-700 rounded-2xl font-bold transition-all flex items-center justify-center gap-2"
             >
-              <Swords :size="18" />
+              <Swords :size="18" fill="currentColor" />
               도전하기
             </button>
           </div>

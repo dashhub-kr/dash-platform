@@ -22,20 +22,11 @@ DASH의 디자인 시스템은 학습에 대한 동기를 부여하는 **생동�
 
 | Name | Hex | Usage | Preview |
 |---|---|---|---|
-| **Leaf (Green)** | `#58CC02` | Success, Correct Answer, Solved | ![#58CC02](https://via.placeholder.com/20/58cc02/58cc02.png) |
+| **Leaf (Green)** | `#58CC02` | Success, Correct Answer, Solved, **Emerald-500 equivalent** | ![#58CC02](https://via.placeholder.com/20/58cc02/58cc02.png) |
 | **Beetle (Teal)** | `#2DD4BF` | Info, Neutral Positive | ![#2DD4BF](https://via.placeholder.com/20/2dd4bf/2dd4bf.png) |
-| **Bee (Yellow)** | `#FFC800` | Warning, EXP, Streak | ![#FFC800](https://via.placeholder.com/20/ffc800/ffc800.png) |
-| **Fox (Orange)** | `#FF9600` | High Alert, Burning Streak | ![#FF9600](https://via.placeholder.com/20/ff9600/ff9600.png) |
+| **Bee (Yellow)** | `#FFC800` | Warning, EXP, Streak, **Amber-500 equivalent** | ![#FFC800](https://via.placeholder.com/20/ffc800/ffc800.png) |
+| **Fox (Orange)** | `#FF9600` | High Alert, Burning Streak, **Orange-500 equivalent** | ![#FF9600](https://via.placeholder.com/20/ff9600/ff9600.png) |
 | **Rose (Red)** | `#FF4B4B` | Error, Danger Zones, Failed | ![#FF4B4B](https://via.placeholder.com/20/ff4b4b/ff4b4b.png) |
-
-### Grayscale (Slate)
-텍스트와 경계선에 사용되는 중립적인 색상입니다.
-
-*   **Slate 800** (`#1E293B`): Main Headings
-*   **Slate 700** (`#334155`): Body Text
-*   **Slate 400** (`#94A3B8`): Subtitles, Placeholders, Icons
-*   **Slate 200** (`#E2E8F0`): **Main Borders (2px)**
-*   **Slate 50** (`#F8FAFC`): Backgrounds
 
 ---
 
@@ -43,14 +34,14 @@ DASH의 디자인 시스템은 학습에 대한 동기를 부여하는 **생동�
 우리의 UI는 **둥글고(Round)**, **두꺼운(Bold)** 느낌을 줍니다.
 
 ### Corner Radius
-*   **XL (12px)**: Small Inputs, Badges
-*   **2XL (16px)**: **Default Buttons**, Cards, Modal Containers
-*   **3XL (24px)**: Large Profile Cards, Featured Sections
+*   **XL (12px)**: Small Inputs, Tag Badges
+*   **2XL (16px)**: **Default Buttons**, Small Cards, Inner Containers
+*   **3XL (24px)**: **Main Cards**, Modals, Featured Sections
 
 ### Borders
-*   **Simplicity (Flat)**: 그림자(Box-shadow)를 최소화하고, 대신 **두꺼운 테두리(Border)**를 사용하여 구획을 나눕니다.
-*   **Thickness**: 기본 **2px** (`border-2`)
-*   **Color**: `border-slate-200` (기본), Active 시 `border-brand` 또는 `border-slate-800`
+*   **Simplicity (Flat)**: 그림자(Box-shadow)를 최소화하고, 대신 **부드러운 테두리**를 사용하여 구획을 나눕니다.
+*   **Style**: `border border-slate-200` (기본)
+*   **Shadow**: `shadow-sm` (기본), `shadow-md` or `shadow-xl` (Hover/Modal)
 
 ---
 
@@ -59,7 +50,7 @@ DASH의 디자인 시스템은 학습에 대한 동기를 부여하는 **생동�
 
 *   **Font Family**: `Pretendard`, sans-serif
 *   **Weights**:
-    *   **Black (900)**: Big Numbers, Main Stats
+    *   **Black (900)**: Big Stats (Numbers)
     *   **Bold (700)**: Headings, Buttons, Labels
     *   **Medium (500)**: Body Text
 
@@ -67,23 +58,42 @@ DASH의 디자인 시스템은 학습에 대한 동기를 부여하는 **생동�
 
 ## 4. Components Guide
 
-### Buttons
-버튼은 **플랫(Flat)**하지만 시각적으로 명확해야 합니다.
-(기존의 3D 입체 효과는 제거되었습니다)
+### Badges (Tags)
+작은 정보를 표시하는 라벨입니다.
+*   **Structure**: `px-2 py-1` or `px-2.5 py-1`, `rounded-lg`
+*   **Typography**: `text-xs font-bold`
+*   **Variants**:
+    *   **Brand**: `bg-brand-50 text-brand-700` (Hashtags)
+    *   **Success**: `bg-emerald-100 text-emerald-700` (Passed, Solved)
+    *   **Warning**: `bg-amber-100 text-amber-700` (Weeks)
+    *   **Danger**: `bg-rose-100 text-rose-700` (Urgent, Failed)
+    *   **Neutral**: `bg-slate-100 text-slate-500` (Info, Language)
 
-*   **Style**: `w-full` (or fixed), `py-3`, `rounded-xl` or `rounded-2xl`
-*   **Primary**: `bg-brand` text-white `hover:bg-blue-500`
-*   **Secondary**: `bg-slate-100` text-slate-600 `hover:bg-slate-200`
-*   **Outline**: `border-2 border-slate-200` bg-transparent text-slate-400
+### Avatars
+사용자 프로필 이미지입니다.
+*   **Size**: `w-8 h-8` (32px) or `w-9 h-9` (36px)
+*   **Shape**: `rounded-full`
+*   **Border**: `border-2 border-white` (겹쳐질 때 구분감 제공)
+*   **Interaction**: `relative z-10 hover:z-20 hover:scale-110 transition-transform`
+
+### Icons
+**Lucide Vue Next** 라이브러리를 사용합니다.
+*   **Style**: `stroke-width="2"` or `1.5` (Clean Look)
+*   **Solid Style (Filled)**: 속이 꽉 찬 아이콘이 필요한 경우(헤더, 주요 배지 등)에는 `fill="currentColor"` 속성을 추가하여 구현합니다. 이때 `stroke-width="2.5"`로 설정하여 볼륨감을 줍니다.
+*   **Usage**: 텍스트와 함께 사용 시 `gap-1` or `gap-2`로 간격 조정
 
 ### Cards
 정보를 담는 컨테이너입니다. 
+*   **Main Container**: `bg-white`, `rounded-3xl`, `p-6` or `p-8`, `shadow-sm`, `border border-slate-200`
+*   **Interaction**: Hover 시 `translate-y` 효과나 `shadow-md` 증가
 
-*   **Style**: `bg-white`, `border-2 border-slate-200`, `rounded-3xl`
-*   **Interaction**: Hover 시 `border-slate-300` 또는 배경색 변경 (`hover:bg-slate-50`)
+### Buttons
+*   **Primary**: `bg-brand-600 hover:bg-brand-500 text-white font-bold rounded-xl shadow-md py-3`
+*   **Secondary**: `bg-slate-100 hover:bg-slate-200 text-slate-600 font-bold rounded-xl py-3`
+*   **Ghost/Link**: `text-slate-400 hover:text-slate-600`
 
-### Inputs
-사용자 입력을 받는 필드입니다.
+---
 
-*   **Style**: `bg-slate-50`, `border-2 border-slate-200`, `rounded-xl`
-*   **Focus**: `focus:bg-white`, `focus:border-brand` (Outline None)
+## 5. Layout Guide
+*   **Page Background**: `bg-slate-50` (전체 페이지 배경)
+*   **Max Width**: `max-w-7xl mx-auto px-6` (메인 컨텐츠 영역)
