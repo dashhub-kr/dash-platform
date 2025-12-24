@@ -21,14 +21,16 @@ public class StudyMissionSubmission {
     private Long userId;
     private Integer problemId;
     private Boolean completed;
+    private Boolean isSos;
     private LocalDateTime completedAt;
 
     public static StudyMissionSubmission create(Long missionId, Long userId, Integer problemId) {
-        return new StudyMissionSubmission(null, missionId, userId, problemId, false, null);
+        return new StudyMissionSubmission(null, missionId, userId, problemId, false, false, null);
     }
 
     public void markCompleted() {
         this.completed = true;
+        this.isSos = false; // 문제를 풀면 SOS는 자동 해제
         this.completedAt = LocalDateTime.now();
     }
 }

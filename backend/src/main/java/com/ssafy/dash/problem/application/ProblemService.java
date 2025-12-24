@@ -76,12 +76,22 @@ public class ProblemService {
 
     public java.util.List<com.ssafy.dash.problem.domain.ProblemRecommendationResponse> getRecommendedProblems(
             String tag, int userTier, Long userId) {
+        return getRecommendedProblems(tag, userTier, userId, null);
+    }
+
+    public java.util.List<com.ssafy.dash.problem.domain.ProblemRecommendationResponse> getRecommendedProblems(
+            String tag, int userTier, Long userId, java.util.List<String> additionalExcludedIds) {
         // 난이도 범위: 내 티어 ~ 내 티어 + 2
         int minLevel = Math.max(1, userTier);
         int maxLevel = Math.min(30, userTier + 2);
 
         // 이미 푼 문제 목록 조회
         java.util.List<String> solvedProblemNumbers = algorithmRecordMapper.selectSolvedProblemNumbersByUserId(userId);
+
+        // 추가 제외 문제 병합
+        if (additionalExcludedIds != null && !additionalExcludedIds.isEmpty()) {
+            solvedProblemNumbers.addAll(additionalExcludedIds);
+        }
 
         java.util.List<Problem> problems = problemMapper.findProblemsByTagAndLevelRange(
                 tag, minLevel, maxLevel, solvedProblemNumbers);

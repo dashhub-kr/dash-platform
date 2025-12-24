@@ -154,6 +154,7 @@ const userData = ref({
     id: null,
     username: '',
     email: '',
+    avatarUrl: '', // GitHub Avatar URL
     solvedacHandle: '',
     solvedacTier: 0,
     repositoryName: '',
@@ -171,6 +172,11 @@ const profileImages = [
 ];
 
 const userProfileImage = computed(() => {
+    // GitHub Avatar 우선
+    if (userData.value.avatarUrl) {
+        return userData.value.avatarUrl;
+    }
+
     if (!userData.value.id) return profileImages[0]; // fallback
     const index = userData.value.id % profileImages.length;
     return profileImages[index];

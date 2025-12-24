@@ -48,7 +48,7 @@
             </foreach>
         </if>
         ORDER BY p.essential DESC, RAND()
-        LIMIT 3
+        LIMIT 20
     </select>
 
 </mapper>

@@ -79,9 +79,9 @@
           <div class="mb-8 animate-fade-in-down">
             <!-- Weekly Mission Section -->
             <div class="mb-6">
-              <div v-if="currentMission" 
+              <div v-if="targetMission" 
                    class="rounded-2xl p-5 shadow-lg text-white relative overflow-hidden transition-all duration-500"
-                   :class="missionThemeClass">
+                   :class="getMissionThemeClass(targetMission)">
                 
                 <div class="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full blur-3xl -mr-16 -mt-16 pointer-events-none"></div>
                 
@@ -89,19 +89,19 @@
                   <div>
                     <div class="flex items-center gap-2 mb-2">
                        <span class="px-2 py-0.5 bg-white/20 rounded-lg text-xs font-bold uppercase tracking-wider backdrop-blur-sm">
-                         Week {{ currentMission.week }}
+                         #{{ targetMission.week }}
                        </span>
                        <span class="flex items-center gap-1 text-xs font-medium text-white/90">
                          <Calendar :size="12" />
-                         ~ {{ formatDate(currentMission.deadline) }}
+                         ~ {{ formatMissionDate(targetMission.deadline) }}
                        </span>
-                       <span v-if="isUrgent && !isMissionCompleted" class="px-2 py-0.5 bg-red-500/20 text-red-100 rounded text-xs font-bold animate-pulse">
+                       <span v-if="isMissionUrgent(targetMission) && !isMissionCompleted(targetMission)" class="px-2 py-0.5 bg-red-500/20 text-red-100 rounded text-xs font-bold animate-pulse">
                          마감 임박
                        </span>
                     </div>
                     <div class="flex items-center gap-2">
-                        <h2 class="text-xl font-black mb-1">{{ currentMission.title }}</h2>
-                        <span v-if="isMissionCompleted" class="bg-white/20 px-2 py-0.5 rounded text-xs font-bold flex items-center gap-1">
+                        <h2 class="text-xl font-black mb-1">{{ targetMission.title }}</h2>
+                        <span v-if="isMissionCompleted(targetMission)" class="bg-white/20 px-2 py-0.5 rounded text-xs font-bold flex items-center gap-1">
                             <Check :size="12" /> 해결 완료!
                         </span>
                     </div>
@@ -109,7 +109,7 @@
                   
                   <div class="flex flex-wrap gap-2">
                     <a 
-                      v-for="problemId in currentMission.problemIds" 
+                      v-for="problemId in targetMission.problemIds" 
                       :key="problemId"
                       :href="getProblemLink(problemId)" 
                       target="_blank"
@@ -126,8 +126,44 @@
                     </a>
                   </div>
                 </div>
+
+                <!-- Member Progress Section -->
+                <div v-if="targetMission.memberProgressList?.length > 0" class="mt-4 pt-3 border-t border-white/10 flex flex-wrap items-center gap-4">
+                  <div v-for="member in sortMembers(targetMission.memberProgressList)" :key="member.userId" 
+                       class="flex flex-col items-center gap-1 group relative cursor-help">
+                    
+                    <!-- Tooltip for Name -->
+                    <div class="absolute bottom-full mb-2 px-2 py-1 bg-black/80 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none z-20">
+                      {{ member.username }} {{ isMe(member.userId) ? '(나)' : '' }}
+                      <div class="absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-1 w-2 h-2 bg-black/80 rotate-45"></div>
+                    </div>
+
+                    <!-- Avatar -->
+                    <!-- Avatar -->
+                    <img :src="getMemberProfileImage(member)" :alt="member.username"
+                         class="w-9 h-9 rounded-full object-cover border-2 transition-all relative z-10 bg-white"
+                         :class="[
+                           isMe(member.userId) 
+                             ? 'border-emerald-400 ring-2 ring-emerald-400/30' + (member.allCompleted ? ' shadow-[0_0_12px_rgba(52,211,153,0.6)]' : '')
+                             : member.allCompleted 
+                               ? 'border-orange-400 shadow-[0_0_12px_rgba(251,146,60,0.5)]' 
+                               : 'border-white/20 opacity-80 grayscale-[0.0]'
+                         ]" />
+                    
+                    <!-- Status -->
+                    <div class="flex items-center gap-0.5 mt-0.5">
+                       <Flame :size="13" 
+                              class="transition-all"
+                              :class="member.allCompleted ? 'fill-orange-400 text-orange-400 animate-pulse' : 'text-slate-300/40'" />
+                       <span v-if="!member.allCompleted" class="text-[11px] font-bold text-white/50">
+                         {{ member.completedCount }}
+                       </span>
+                    </div>
+                  </div>
+                </div>
               </div>
-              <div v-else class="bg-white rounded-2xl p-6 border border-slate-100 shadow-sm flex items-center justify-center gap-3 text-slate-400">
+              
+              <div v-if="!targetMission" class="bg-white rounded-2xl p-6 border border-slate-100 shadow-sm flex items-center justify-center gap-3 text-slate-400">
                  <Map :size="20" />
                  <span class="font-medium">진행 중인 미션이 없어요!</span>
               </div>
@@ -348,11 +384,26 @@ import {
   Calendar,
   Map as MapIcon,
   TrendingUp,
-  School
+  School,
+  Flame
 } from 'lucide-vue-next';
 import hljs from 'highlight.js';
 import 'highlight.js/styles/github.css';
 import { marked } from 'marked';
+
+const profileImages = [
+    '/profile/bag.png',
+    '/profile/proud.png',
+    '/profile/smart.png',
+    '/profile/smile.png'
+];
+
+const getMemberProfileImage = (member) => {
+    if (member.avatarUrl) return member.avatarUrl;
+    const id = member.userId || 0;
+    const index = id % profileImages.length;
+    return profileImages[index];
+};
 
 // ... (other imports)
 
@@ -386,47 +437,91 @@ const handleToggleExpand = (recordId) => {
 const acornLogs = ref([]);
 const missions = ref([]);
 
-const currentMission = computed(() => {
-    if (!missions.value || missions.value.length === 0) return null;
-    const sorted = [...missions.value].sort((a, b) => b.week - a.week);
-    return sorted[0];
+// 마감되지 않은 + 모든 팀원이 완료하지 않은 미션만 표시
+const activeMissions = computed(() => {
+    if (!missions.value || missions.value.length === 0) return [];
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    
+    return missions.value
+        .filter(m => {
+            const deadline = new Date(m.deadline);
+            deadline.setHours(23, 59, 59, 999);
+            const notExpired = deadline >= today;
+            
+            // 모든 팀원이 완료했는지 확인 (memberProgressList가 있는 경우)
+            const allMembersCompleted = m.memberProgressList?.length > 0 && 
+                m.memberProgressList.every(member => member.allCompleted);
+            
+            return notExpired && !allMembersCompleted;
+        })
+        .sort((a, b) => a.week - b.week);  // 낮은 주차부터 표시
+});
+
+// 화면에 표시할 단일 미션 (가장 우선순위 높은 것)
+const targetMission = computed(() => {
+    return activeMissions.value.length > 0 ? activeMissions.value[0] : null;
 });
 
 const tagStats = ref([]);
 const topTagName = computed(() => tagStats.value.length > 0 ? tagStats.value[0].tagKey : '');
 const totalSolvedCount = computed(() => tagStats.value.reduce((acc, curr) => acc + (curr.solved || 0), 0));
 
-// Check if a specific problem is solved
-const isProblemSolved = (problemId) => {
-    return records.value.some(r => r.problemNumber == problemId && (r.result === 'SUCCESS' || r.result === 'PASSED' || (r.runtimeMs && r.runtimeMs > 0)));
+// Check if a specific problem is solved BY ME (raw version for computed)
+const isProblemSolvedRaw = (problemId) => {
+    return records.value.some(r => 
+        r.problemNumber == problemId && 
+        r.userId === user.value?.id &&
+        (r.result === 'SUCCESS' || r.result === 'PASSED' || (r.runtimeMs && r.runtimeMs > 0))
+    );
 };
 
-// Check if all mission problems are solved
-const isMissionCompleted = computed(() => {
-    if (!currentMission.value) return false;
-    return currentMission.value.problemIds.every(pid => isProblemSolved(pid));
-});
+// Check if a specific problem is solved BY ME (not by other team members)
+const isProblemSolved = (problemId) => {
+    return isProblemSolvedRaw(problemId);
+};
 
-// Check if deadline is urgent (within 3 days)
-const isUrgent = computed(() => {
-    if (!currentMission.value || isMissionCompleted.value) return false;
+// 특정 미션이 완료되었는지 확인
+const isMissionCompleted = (mission) => {
+    if (!mission) return false;
+    return mission.problemIds.every(pid => isProblemSolved(pid));
+};
+
+// 특정 미션이 마감 임박인지 확인 (3일 이내)
+const isMissionUrgent = (mission) => {
+    if (!mission || isMissionCompleted(mission)) return false;
     const now = new Date();
-    const deadline = new Date(currentMission.value.deadline);
+    const deadline = new Date(mission.deadline);
     const diffTime = deadline - now;
     const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)); 
     return diffDays <= 3 && diffDays >= 0;
-});
+};
 
-// Dynamic theme class for mission banner
-const missionThemeClass = computed(() => {
-    if (isMissionCompleted.value) {
+// 미션별 테마 클래스
+const getMissionThemeClass = (mission) => {
+    if (isMissionCompleted(mission)) {
         return 'bg-gradient-to-r from-emerald-500 to-teal-600'; // Success Theme
     }
-    if (isUrgent.value) {
+    if (isMissionUrgent(mission)) {
         return 'bg-gradient-to-r from-rose-500 to-orange-600'; // Urgent Theme
     }
     return 'bg-gradient-to-r from-indigo-500 to-indigo-600'; // Default Theme
-});
+};
+
+// 멤버 리스트 정렬: 본인 우선, 그 외 이름순
+const sortMembers = (members) => {
+    if (!members) return [];
+    return [...members].sort((a, b) => {
+        if (a.userId === user.value?.id) return -1;
+        if (b.userId === user.value?.id) return 1;
+        return a.username.localeCompare(b.username);
+    });
+};
+
+// 본인인지 확인
+const isMe = (userId) => {
+    return user.value?.id === userId;
+};
 
 const processHeatmap = (data) => {
     console.log('processHeatmap called with:', data?.length); // Debug
@@ -651,6 +746,15 @@ const formatDate = (dateString) => {
         hour: '2-digit',
         minute: '2-digit'
     });
+};
+
+const formatMissionDate = (dateString) => {
+    if (!dateString) return '';
+    const date = new Date(dateString);
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${year}. ${month}. ${day}.`;
 };
 
 // Markdown Renderer

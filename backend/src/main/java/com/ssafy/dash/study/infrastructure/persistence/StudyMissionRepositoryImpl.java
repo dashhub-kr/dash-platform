@@ -41,4 +41,9 @@ public class StudyMissionRepositoryImpl implements StudyMissionRepository {
     public void delete(Long id) {
         mapper.delete(id);
     }
+
+    @Override
+    public void update(StudyMission mission) {
+        mapper.update(mission);
+    }
 }

@@ -1,5 +1,7 @@
 package com.ssafy.dash.user.application;
 
+import com.ssafy.dash.study.domain.Study;
+import com.ssafy.dash.study.domain.StudyRepository;
 import com.ssafy.dash.user.application.dto.command.UserCreateCommand;
 import com.ssafy.dash.user.application.dto.command.UserUpdateCommand;
 import com.ssafy.dash.user.application.dto.result.UserResult;
@@ -18,10 +20,14 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final com.ssafy.dash.onboarding.domain.OnboardingRepository onboardingRepository;
+    private final StudyRepository studyRepository;
 
-    public UserService(UserRepository userRepository, com.ssafy.dash.onboarding.domain.OnboardingRepository onboardingRepository) {
+    public UserService(UserRepository userRepository,
+            com.ssafy.dash.onboarding.domain.OnboardingRepository onboardingRepository,
+            StudyRepository studyRepository) {
         this.userRepository = userRepository;
         this.onboardingRepository = onboardingRepository;
+        this.studyRepository = studyRepository;
     }
 
     @Transactional
@@ -36,10 +42,16 @@ public class UserService {
     public UserResult findById(Long id) {
         User u = userRepository.findById(id)
                 .orElseThrow(() -> new UserNotFoundException(id));
-        
+
         var onboarding = onboardingRepository.findByUserId(id).orElse(null);
 
-        return UserResult.from(u, onboarding);
+        // 스터디 팀장 여부 확인
+        Study study = null;
+        if (u.getStudyId() != null) {
+            study = studyRepository.findById(u.getStudyId()).orElse(null);
+        }
+
+        return UserResult.from(u, onboarding, study);
     }
 
     @Transactional(readOnly = true)
@@ -63,7 +75,8 @@ public class UserService {
     @Transactional
     public void delete(Long id) {
         boolean deleted = userRepository.delete(id);
-        if (!deleted) throw new UserNotFoundException(id);
+        if (!deleted)
+            throw new UserNotFoundException(id);
     }
 
 }

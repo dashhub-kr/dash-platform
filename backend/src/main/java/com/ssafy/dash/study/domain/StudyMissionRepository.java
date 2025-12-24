@@ -17,4 +17,6 @@ public interface StudyMissionRepository {
     List<StudyMission> findByStudyIdOrderByWeekDesc(Long studyId);
 
     void delete(Long id);
+
+    void update(StudyMission mission);
 }
