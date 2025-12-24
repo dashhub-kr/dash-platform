@@ -92,6 +92,20 @@ public class StudyController {
         return ResponseEntity.ok(studyAnalysisService.analyzeStudy(studyId));
     }
 
+    @Operation(summary = "팀 패밀리 통계", description = "레이더차트용 팀 패밀리별 통계를 조회합니다.")
+    @GetMapping("/{studyId}/family-stats")
+    public ResponseEntity<List<StudyAnalysisService.TeamFamilyStat>> getTeamFamilyStats(
+            @PathVariable Long studyId) {
+        return ResponseEntity.ok(studyAnalysisService.getTeamFamilyStats(studyId));
+    }
+
+    @Operation(summary = "커리큘럼 문제 추천", description = "팀 약점 기반 문제를 추천합니다.")
+    @GetMapping("/{studyId}/curriculum")
+    public ResponseEntity<List<com.ssafy.dash.problem.domain.ProblemRecommendationResponse>> getCurriculum(
+            @PathVariable Long studyId) {
+        return ResponseEntity.ok(studyAnalysisService.getCurriculumProblems(studyId));
+    }
+
     // === 주차별 미션 API ===
 
     @Operation(summary = "미션 목록 조회", description = "스터디의 주차별 미션 목록을 조회합니다.")
