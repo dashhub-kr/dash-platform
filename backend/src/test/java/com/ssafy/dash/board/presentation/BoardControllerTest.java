@@ -132,7 +132,8 @@ class BoardControllerTest {
                 BoardUpdateRequest req = TestFixtures.createBoardUpdateRequest();
                 BoardResult updatedResult = new BoardResult(TestFixtures.TEST_BOARD_ID, req.getTitle(),
                                 req.getContent(),
-                                user.getId(), user.getUsername(), null, "GENERAL", 0, 0, false, FixtureTime.now(),
+                                user.getId(), user.getUsername(), null, null, null, null, "GENERAL", 0, 0, false,
+                                FixtureTime.now(),
                                 FixtureTime.now());
 
                 given(boardService.update(eq(TestFixtures.TEST_BOARD_ID), any(BoardUpdateCommand.class), anyLong()))

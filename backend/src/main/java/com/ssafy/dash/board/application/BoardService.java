@@ -1,5 +1,7 @@
 package com.ssafy.dash.board.application;
 
+import com.ssafy.dash.algorithm.domain.AlgorithmRecord;
+import com.ssafy.dash.algorithm.domain.AlgorithmRecordRepository;
 import com.ssafy.dash.board.application.dto.command.BoardCreateCommand;
 import com.ssafy.dash.board.application.dto.command.BoardUpdateCommand;
 import com.ssafy.dash.board.application.dto.result.BoardResult;
@@ -8,6 +10,8 @@ import com.ssafy.dash.board.domain.BoardRepository;
 import com.ssafy.dash.board.domain.exception.BoardNotFoundException;
 import com.ssafy.dash.common.exception.UnauthorizedAccessException;
 import com.ssafy.dash.like.application.LikeService;
+import com.ssafy.dash.study.domain.Study;
+import com.ssafy.dash.study.domain.StudyRepository;
 import com.ssafy.dash.user.domain.User;
 import com.ssafy.dash.user.domain.UserRepository;
 import com.ssafy.dash.user.domain.exception.UserNotFoundException;
@@ -23,14 +27,19 @@ public class BoardService {
 
     private final BoardRepository boardRepository;
     private final UserRepository userRepository;
+    private final StudyRepository studyRepository;
+    private final AlgorithmRecordRepository algorithmRecordRepository;
     private final com.ssafy.dash.comment.application.CommentService commentService;
     private final LikeService likeService;
 
     public BoardService(BoardRepository boardRepository, UserRepository userRepository,
+            StudyRepository studyRepository, AlgorithmRecordRepository algorithmRecordRepository,
             com.ssafy.dash.comment.application.CommentService commentService,
             LikeService likeService) {
         this.boardRepository = boardRepository;
         this.userRepository = userRepository;
+        this.studyRepository = studyRepository;
+        this.algorithmRecordRepository = algorithmRecordRepository;
         this.commentService = commentService;
         this.likeService = likeService;
     }
@@ -151,8 +160,31 @@ public class BoardService {
 
     private BoardResult toResult(Board board, User user, boolean isLiked) {
         String authorName = (user != null) ? user.getUsername() : "Unknown";
+        String authorProfileImageUrl = (user != null) ? user.getAvatarUrl() : null;
 
-        return BoardResult.from(board, authorName, isLiked);
+        // Get study name
+        String studyName = null;
+        if (user != null && user.getStudyId() != null) {
+            Study study = studyRepository.findById(user.getStudyId()).orElse(null);
+            if (study != null) {
+                studyName = study.getName();
+            }
+        }
+
+        // Get problem number from AlgorithmRecord
+        Integer problemNumber = null;
+        if (board.getAlgorithmRecordId() != null) {
+            AlgorithmRecord record = algorithmRecordRepository.findById(board.getAlgorithmRecordId()).orElse(null);
+            if (record != null && record.getProblemNumber() != null) {
+                try {
+                    problemNumber = Integer.parseInt(record.getProblemNumber());
+                } catch (NumberFormatException e) {
+                    // Non-numeric problem number, leave as null
+                }
+            }
+        }
+
+        return BoardResult.from(board, authorName, authorProfileImageUrl, studyName, problemNumber, isLiked);
     }
 
 }

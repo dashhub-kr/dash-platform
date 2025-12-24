@@ -48,6 +48,12 @@ export const boardApi = {
     unlike(id) {
         return http.delete(`/boards/${id}/like`);
     },
+
+    // Get popular posts (sorted by likes)
+    // GET /api/boards/popular?limit=N
+    findPopular(limit = 5) {
+        return http.get('/boards/popular', { params: { limit } });
+    },
 };
 
 // Comment API
