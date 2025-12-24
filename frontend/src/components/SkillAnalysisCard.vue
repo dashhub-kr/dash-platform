@@ -1,17 +1,7 @@
 <template>
-  <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
-    <!-- 헤더 -->
-    <div class="px-6 py-4 border-b border-slate-100 bg-slate-50">
-      <h2 class="text-lg font-bold text-slate-800 flex items-center gap-2">
-        <svg class="w-5 h-5 text-brand-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 002 2h2a2 2 0 002-2z"></path>
-        </svg>
-        현재 실력 분석
-      </h2>
-    </div>
-    
+  <div>
     <!-- 콘텐츠 (5:7 비율) -->
-    <div class="p-6">
+    <div class="">
       <div class="grid grid-cols-1 lg:grid-cols-12 gap-5">
         
         <!-- Left Column: Tier + Radar + Strength/Weakness (5 cols) -->

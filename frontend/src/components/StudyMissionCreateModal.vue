@@ -3,10 +3,10 @@
     <div class="bg-white rounded-3xl w-full max-w-2xl shadow-2xl overflow-hidden animate-in fade-in zoom-in duration-200">
       
       <!-- 헤더 -->
-      <div class="bg-gradient-to-r from-emerald-600 to-teal-600 p-8 text-white relative overflow-hidden">
+      <div class="bg-gradient-to-r from-brand-600 to-brand-500 p-8 text-white relative overflow-hidden">
         <div class="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full blur-2xl translate-x-10 -translate-y-10"></div>
         <h2 class="text-2xl font-bold mb-2 relative z-10">미션 등록</h2>
-        <p class="text-emerald-100 text-sm mt-1 relative z-10">스터디원들을 위한 주차별 과제를 등록하세요</p>
+        <p class="text-brand-100 text-sm mt-1 relative z-10">스터디원들을 위한 주차별 과제를 등록하세요</p>
       </div>
       
       <!-- 안내 메시지 및 모드 표시 (탭 제거) -->
@@ -16,8 +16,8 @@
             <span v-if="initialProblemIds" class="px-2 py-0.5 bg-brand-200 text-brand-800 text-xs rounded-full">자동 선택됨</span>
          </span>
       </div>
-      <div v-else class="bg-emerald-50 px-8 py-3 border-b border-emerald-100 flex items-center justify-between">
-         <span class="text-emerald-800 font-bold text-sm">✨ 새로운 주차 미션을 생성합니다</span>
+      <div v-else class="bg-brand-50 px-8 py-3 border-b border-brand-100 flex items-center justify-between">
+         <span class="text-brand-800 font-bold text-sm">✨ 새로운 주차 미션을 생성합니다</span>
       </div>
       
       <div class="p-6 space-y-5">
@@ -28,13 +28,13 @@
               <div>
                 <label class="block text-xs font-bold text-slate-500 mb-2 uppercase tracking-wider">주차</label>
                 <input v-model.number="newMission.week" type="number" min="1"
-                       class="w-full px-4 py-3 bg-slate-50 border-2 border-slate-200 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 text-center font-bold text-lg transition-all"
+                       class="w-full px-4 py-3 bg-slate-50 border-2 border-slate-200 rounded-xl focus:ring-2 focus:ring-brand-500 focus:border-brand-500 text-center font-bold text-lg transition-all"
                        placeholder="1" />
               </div>
               <div class="col-span-3">
                 <label class="block text-xs font-bold text-slate-500 mb-2 uppercase tracking-wider">미션 제목</label>
                 <input v-model="newMission.title" type="text"
-                       class="w-full px-4 py-3 bg-slate-50 border-2 border-slate-200 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-all"
+                       class="w-full px-4 py-3 bg-slate-50 border-2 border-slate-200 rounded-xl focus:ring-2 focus:ring-brand-500 focus:border-brand-500 transition-all"
                        placeholder="예: DP 기초 다지기" />
               </div>
             </div>
@@ -69,8 +69,7 @@
                    </div>
                    <input v-model="input.value" type="text"
                           :readonly="!!initialProblemIds"
-                          class="w-full pl-8 pr-4 py-3 bg-slate-50 border-2 border-slate-200 rounded-xl focus:ring-2 transition-all read-only:bg-slate-100 read-only:text-slate-500"
-                          :class="creationMode === 'NEW' ? 'focus:ring-emerald-500 focus:border-emerald-500' : 'focus:ring-brand-500 focus:border-brand-500'"
+                          class="w-full pl-8 pr-4 py-3 bg-slate-50 border-2 border-slate-200 rounded-xl focus:ring-2 focus:ring-brand-500 focus:border-brand-500 transition-all read-only:bg-slate-100 read-only:text-slate-500"
                           placeholder="문제 번호 입력 (예: 1000)"
                           @keydown.enter.prevent="addProblemInput" />
                 </div>
@@ -100,7 +99,7 @@
         <div v-if="creationMode === 'NEW'">
           <label class="block text-xs font-bold text-slate-500 mb-2 uppercase tracking-wider">⏰ 마감일</label>
           <input v-model="newMission.deadline" type="date"
-                 class="w-full px-4 py-3 bg-slate-50 border-2 border-slate-200 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-all" />
+                 class="w-full px-4 py-3 bg-slate-50 border-2 border-slate-200 rounded-xl focus:ring-2 focus:ring-brand-500 focus:border-brand-500 transition-all" />
         </div>
       </div>
       
@@ -111,9 +110,8 @@
           취소
         </button>
         <button @click="handleCreateOrUpdate"
-                class="flex-1 py-3 text-white rounded-xl font-bold shadow-lg transition-all"
-                :disabled="isSubmitting"
-                :class="creationMode === 'NEW' ? 'bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 shadow-emerald-500/25' : 'bg-gradient-to-r from-brand-500 to-violet-500 hover:from-brand-600 hover:to-violet-600 shadow-brand-500/25'">
+                class="flex-1 py-3 text-white rounded-xl font-bold shadow-lg transition-all bg-gradient-to-r from-brand-500 to-brand-600 hover:from-brand-600 hover:to-brand-700 shadow-brand-500/25"
+                :disabled="isSubmitting">
           {{ isSubmitting ? '처리 중...' : (creationMode === 'NEW' ? '✨ 미션 생성' : '➕ 문제 추가하기') }}
         </button>
       </div>

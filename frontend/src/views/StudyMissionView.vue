@@ -10,7 +10,7 @@
         </h1>
         
         <button v-if="isLeader" @click="showCreateModal = true"
-                class="px-5 py-2.5 bg-brand hover:bg-brand-600 text-white rounded-xl font-bold text-sm transition-all flex items-center gap-2 shadow-sm hover:translate-y-0.5 active:translate-y-1">
+                class="px-5 py-2.5 bg-brand-500 hover:bg-brand-600 text-white rounded-xl font-bold text-sm transition-all flex items-center gap-2 shadow-sm hover:translate-y-0.5 active:translate-y-1">
           <plus-icon class="w-4 h-4" stroke-width="3" />
           <span>새 미션</span>
         </button>
@@ -30,7 +30,7 @@
             <h3 class="text-xl font-bold text-slate-700 mb-2">등록된 미션이 없어요</h3>
             <p class="text-slate-400 max-w-sm mx-auto mb-8">스터디원들과 함께 풀고 싶은 문제가 있다면 첫 번째 미션을 만들어보세요!</p>
             <button v-if="isLeader" @click="showCreateModal = true"
-                class="px-8 py-4 bg-brand hover:bg-brand-600 text-white rounded-2xl font-bold text-lg shadow-xl shadow-brand-200 transition-all hover:-translate-y-1">
+                class="px-8 py-4 bg-brand-500 hover:bg-brand-600 text-white rounded-2xl font-bold text-lg shadow-xl shadow-brand-200 transition-all hover:-translate-y-1">
             첫 미션 시작하기
             </button>
       </div>
