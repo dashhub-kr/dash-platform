@@ -390,15 +390,9 @@
                                             <div v-if="msg.concepts && msg.concepts.length > 0" class="mt-2 flex flex-wrap gap-1">
                                                 <span v-for="c in msg.concepts" :key="c" class="px-1.5 py-0.5 bg-slate-100 text-slate-500 rounded text-[10px]">#{{c}}</span>
                                             </div>
-
-                                            <!-- Suggested Questions -->
-                                            <div v-if="msg.suggestions && msg.suggestions.length > 0" class="mt-3 space-y-1">
-                                                <div class="text-[10px] font-bold text-slate-400 mb-1">💡 추천 질문</div>
-                                                <button v-for="q in msg.suggestions" :key="q" @click="sendSuggestion(q)" 
-                                                    class="block w-full text-left p-2 rounded bg-slate-50 hover:bg-indigo-50 text-slate-600 hover:text-indigo-600 transition-colors border border-transparent hover:border-indigo-100 text-[11px] group">
-                                                    <span class="group-hover:mr-1 transition-all">💬</span> {{ q }}
-                                                </button>
-                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
                                         </div>
                                     </div>
                                 </div>
@@ -407,10 +401,19 @@
                                     <div class="bg-white border border-slate-200 px-4 py-2.5 rounded-2xl rounded-tl-none"><Loader2 :size="14" class="animate-spin text-slate-400"/></div>
                                 </div>
                             </div>
+
+                            <!-- Suggestions above input -->
+                            <div v-if="latestSuggestions.length > 0" class="px-3 pt-2 pb-0 bg-white border-t border-slate-100 flex gap-2 overflow-x-auto custom-scrollbar">
+                                <button v-for="q in latestSuggestions" :key="q" @click="sendSuggestion(q)" 
+                                    class="whitespace-nowrap px-3 py-1.5 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 rounded-full text-[10px] font-medium border border-indigo-100 transition-colors flex items-center gap-1">
+                                    <span>💬</span> {{ q }}
+                                </button>
+                            </div>
+
                             <div class="p-3 bg-white border-t border-slate-200 sticky bottom-0">
                                 <div class="flex gap-2">
                                     <input v-model="tutorInput" @keypress.enter="sendTutorMessage" :disabled="loadingTutorResponse"
-                                        placeholder="질문을 입력하세요..." class="flex-1 bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-xs focus:ring-1 focus:ring-indigo-500 focus:outline-none"/>
+                                        placeholder="질문을 입력하세요..." class="flex-1 bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-xs focus:ring-1 focus:ring-indigo-700 focus:outline-none"/>
                                     <button @click="sendTutorMessage" :disabled="!tutorInput.trim() || loadingTutorResponse"
                                             class="w-8 h-8 bg-indigo-600 text-white rounded-lg flex items-center justify-center hover:bg-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed">
                                         <Send :size="14" />
@@ -643,6 +646,13 @@ const parsedSummary = computed(() => {
         return full.summary || null;
     } catch { return null; }
 });
+
+const latestSuggestions = computed(() => {
+    const lastMsg = tutorMessages.value.slice().reverse().find(m => m.role === 'assistant');
+    return lastMsg && lastMsg.suggestions ? lastMsg.suggestions : [];
+});
+
+const parsedTraceExample = computed(() => {
 
 const parsedTraceExample = computed(() => {
     if (!props.record.fullResponse) return null;
