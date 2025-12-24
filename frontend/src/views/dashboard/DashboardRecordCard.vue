@@ -12,14 +12,14 @@
       <span v-if="record.tag === 'DEFENSE'">{{ isPassed ? '방어성공' : '방어실패' }}</span>
       <span v-else>{{ isPassed ? 'PASSED' : 'FAILED' }}</span>
 
-      <!-- Defense Streak Badge (Moved here) -->
+      <span v-if="taskTypeLabel" class="ml-1 opacity-70 font-medium text-[10px]">[{{ taskTypeLabel }}]</span>
+
+      <!-- Defense Streak Badge -->
       <div v-if="record.tag === 'DEFENSE' && defenseStreak > 0" 
            class="flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-gradient-to-r from-orange-500 via-amber-500 to-yellow-500 text-white shadow-sm shadow-orange-200 border border-orange-400/50 mx-1">
           <span class="text-[9px] animate-pulse">🔥</span>
-          <span class="text-[9px] font-black italic tracking-wider">{{ defenseStreak }} 연승!</span>
+          <span class="text-[9px] font-black tracking-wider">{{ defenseStreak }} 연승!</span>
       </div>
-
-      <span v-if="taskTypeLabel" class="ml-1 opacity-70 font-medium text-[10px]">[{{ taskTypeLabel }}]</span>
       
       <!-- Right Side: Name/Date Only -->
       <div class="ml-auto flex items-center gap-3">
@@ -53,11 +53,14 @@
                     <!-- Pattern Tags (Korean only) -->
                     <span v-for="pattern in extractPatterns(record.patterns)" :key="pattern"
                           class="px-2 py-0.5 bg-indigo-50 text-indigo-600 text-[10px] font-bold rounded border border-indigo-100">
-                        {{ extractKorean(pattern) }}
+                        {{ pattern }}
                     </span>
                   </div>
                   <!-- Title -->
-                  <h3 class="text-lg md:text-xl font-bold text-slate-800 leading-tight group-hover:text-indigo-600 transition-colors">
+                  <h3 class="text-lg md:text-xl font-bold text-slate-800 leading-tight group-hover:text-indigo-600 transition-colors flex items-center gap-2">
+                      <span v-if="platformBadge" class="text-slate-400 text-sm font-normal">
+                          [{{ platformBadge }}]
+                      </span>
                       {{ record.title }}
                   </h3>
               </div>
@@ -162,7 +165,7 @@
                                 <div class="flex flex-wrap gap-2">
                                     <span v-for="pattern in extractPatterns(record.patterns)" :key="pattern"
                                           class="px-2.5 py-1 bg-indigo-50 text-indigo-700 text-xs font-medium rounded-lg border border-indigo-100">
-                                        {{ extractKorean(pattern) }}
+                                        {{ pattern }}
                                     </span>
                                 </div>
                             </div>
@@ -496,19 +499,16 @@ const sendSuggestion = (q) => {
 // Helpers
 const formatDate = (d) => d ? new Date(d).toLocaleDateString('ko-KR', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }) : '';
 const getExtension = (l) => ({'java':'java','python':'py','cpp':'cpp','c':'c','javascript':'js'}[l?.toLowerCase()] || 'txt');
-const extractKorean = (text) => { 
-    if (!text) return text;
-    const match = text.match(/[가-힣\s]+/); 
-    // If match found and it's not just whitespace, return it. Otherwise return original.
-    if (match && match[0].trim().length > 0) {
-        return match[0].trim();
-    }
-    return text;
-};
+
 const extractPatterns = (json) => {
     if (!json) return [];
-    try { return Array.isArray(JSON.parse(json)) ? JSON.parse(json) : []; } catch { return []; }
+    try { 
+        const parsed = Array.isArray(JSON.parse(json)) ? JSON.parse(json) : [];
+        // Flatten: If a pattern string contains commas, split it.
+        return parsed.flatMap(p => p.split(',').map(s => s.trim()).filter(s => s.length > 0)); 
+    } catch { return []; }
 };
+
 const renderMarkdown = (text) => text ? marked.parse(text) : '';
 
 // Computed
@@ -528,8 +528,18 @@ const isPassed = computed(() => props.record.result === 'SUCCESS' || props.recor
 const taskTypeLabel = computed(() => ({'MISSION':'과제','MOCK_EXAM':'모의고사','DEFENSE':'디펜스','GENERAL':'일반'}[props.record.tag]));
 const defenseStreak = computed(() => props.record.defenseStreak || 0);
 
+const platformBadge = computed(() => {
+    const p = props.record.platform?.toUpperCase();
+    if (p === 'BAEKJOON') return 'BOJ';
+    if (p === 'SWEA') return 'SWEA';
+    if (p === 'PROGRAMMERS') return 'PGS';
+    return null;
+});
+
 const statusHeaderClass = computed(() => {
+    // Defense: Indigo theme (Premium, Shield-like)
     if (props.record.tag === 'DEFENSE') return isPassed.value ? 'bg-indigo-50 text-indigo-700 border-b border-indigo-100' : 'bg-red-50 text-red-700 border-b border-red-100';
+    // General: Emerald/Red theme
     return isPassed.value ? 'bg-emerald-50 text-emerald-700 border-b border-emerald-100' : 'bg-red-50 text-red-700 border-b border-red-100';
 });
 
