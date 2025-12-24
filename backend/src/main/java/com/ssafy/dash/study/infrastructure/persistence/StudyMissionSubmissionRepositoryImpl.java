@@ -40,4 +40,24 @@ public class StudyMissionSubmissionRepositoryImpl implements StudyMissionSubmiss
     public int countCompletedByMissionIdAndUserId(Long missionId, Long userId) {
         return mapper.countCompletedByMissionIdAndUserId(missionId, userId);
     }
+
+    @Override
+    public void deleteByMissionIdAndProblemId(Long missionId, Integer problemId) {
+        mapper.deleteByMissionIdAndProblemId(missionId, problemId);
+    }
+
+    @Override
+    public List<Integer> findCompletedProblemIds(Long missionId, Long userId) {
+        return mapper.selectCompletedProblemIds(missionId, userId);
+    }
+
+    @Override
+    public void updateSosStatus(Long missionId, Long userId, Integer problemId, boolean isSos) {
+        mapper.updateSosStatus(missionId, userId, problemId, isSos);
+    }
+
+    @Override
+    public List<Integer> findSosProblemIds(Long missionId, Long userId) {
+        return mapper.selectSosProblemIds(missionId, userId);
+    }
 }

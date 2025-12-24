@@ -3,8 +3,8 @@
 <mapper namespace="com.ssafy.dash.study.infrastructure.mapper.StudyMissionSubmissionMapper">
 
   <insert id="insert" parameterType="StudyMissionSubmission" useGeneratedKeys="true" keyProperty="id">
-    INSERT INTO study_mission_submissions (mission_id, user_id, problem_id, completed, completed_at)
-    VALUES (#{missionId}, #{userId}, #{problemId}, #{completed}, #{completedAt})
+    INSERT INTO study_mission_submissions (mission_id, user_id, problem_id, completed, is_sos, completed_at)
+    VALUES (#{missionId}, #{userId}, #{problemId}, #{completed}, #{isSos}, #{completedAt})
   </insert>
 
   <select id="selectByMissionId" resultType="StudyMissionSubmission" parameterType="long">
@@ -18,13 +18,34 @@
 
   <update id="markCompleted">
     UPDATE study_mission_submissions 
-    SET completed = true, completed_at = CURRENT_TIMESTAMP
+    SET completed = true, is_sos = false, completed_at = CURRENT_TIMESTAMP
+    WHERE mission_id = #{missionId} AND user_id = #{userId} AND problem_id = #{problemId}
+  </update>
+
+  <update id="updateSosStatus">
+    UPDATE study_mission_submissions
+    SET is_sos = #{isSos}
     WHERE mission_id = #{missionId} AND user_id = #{userId} AND problem_id = #{problemId}
   </update>
 
   <select id="countCompletedByMissionIdAndUserId" resultType="int">
     SELECT COUNT(*) FROM study_mission_submissions 
     WHERE mission_id = #{missionId} AND user_id = #{userId} AND completed = true
+  </select>
+
+  <delete id="deleteByMissionIdAndProblemId">
+    DELETE FROM study_mission_submissions
+    WHERE mission_id = #{missionId} AND problem_id = #{problemId}
+  </delete>
+
+  <select id="selectCompletedProblemIds" resultType="int">
+    SELECT problem_id FROM study_mission_submissions
+    WHERE mission_id = #{missionId} AND user_id = #{userId} AND completed = true
+  </select>
+
+  <select id="selectSosProblemIds" resultType="int">
+    SELECT problem_id FROM study_mission_submissions
+    WHERE mission_id = #{missionId} AND user_id = #{userId} AND is_sos = true
   </select>
 
 </mapper>
