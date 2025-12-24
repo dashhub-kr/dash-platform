@@ -92,7 +92,7 @@
                         :language="record.language || 'java'"
                         :filename="`${record.title}.${getExtension(record.language)}`"
                         :comments="comments"
-                        :keyBlocks="parsedKeyBlocks"
+                        :keyBlocks="combinedHighlights"
                         @submit-comment="submitLineComment"
                         :readOnly="false" 
                       />
@@ -105,23 +105,52 @@
                     <div class="p-3 bg-white border-b border-slate-200 font-bold text-xs text-slate-600 flex items-center gap-2 h-[48px] shrink-0 bg-slate-50">
                         <LayoutList :size="14" /> 구조 및 핵심
                     </div>
-                    <div class="flex-1 overflow-y-auto p-3 custom-scrollbar space-y-4">
-                        <!-- Key Blocks -->
-                        <div v-if="parsedKeyBlocks.length > 0" class="space-y-3">
-                            <div v-for="(block, idx) in parsedKeyBlocks" :key="idx" 
-                                class="bg-white border border-slate-200 rounded-lg p-3 shadow-sm hover:border-indigo-300 transition-colors cursor-pointer group"
-                                @click="scrollToLine(block.startLine)"
-                            >
-                                <div class="flex items-center justify-between mb-2">
-                                    <span class="text-[10px] font-bold text-indigo-600 opacity-0 group-hover:opacity-100 transition-opacity">이동</span>
+                    <div class="flex-1 overflow-y-auto p-3 custom-scrollbar space-y-6">
+                        
+                        <!-- Structure Section -->
+                        <div v-if="parsedStructure.length > 0">
+                            <h4 class="text-sm font-bold text-slate-700 mb-3 flex items-center gap-2">
+                                    <span>🏗️</span> 주요 자료구조 & 변수
+                            </h4>
+                            <div class="space-y-3">
+                                <div v-for="(item, idx) in parsedStructure" :key="idx" 
+                                        class="p-3 bg-slate-50 rounded-lg border border-slate-200 hover:border-indigo-300 transition-colors group">
+                                    <div class="font-mono text-xs font-bold text-indigo-700 mb-1 bg-indigo-50 inline-block px-1.5 py-0.5 rounded group-hover:bg-indigo-100">
+                                        {{ item.name }}
+                                    </div>
+                                    <p class="text-xs text-slate-600 leading-relaxed">{{ item.role }}</p>
                                 </div>
-                                <h5 class="text-xs font-bold text-slate-800 mb-1">{{ block.role || `Lines ${block.startLine} ~ ${block.endLine}` }}</h5>
-                                <p class="text-[11px] text-slate-500 leading-relaxed">{{ block.explanation }}</p>
                             </div>
                         </div>
-                        <div v-else class="text-center py-10 text-slate-400">
+
+                        <!-- Key Blocks -->
+                        <div v-if="parsedKeyBlocks.length > 0">
+                            <h4 class="text-sm font-bold text-slate-700 mb-3 flex items-center gap-2">
+                                    <span>🔑</span> 핵심 로직
+                            </h4>
+                            <div class="space-y-3">
+                                <div v-for="(block, idx) in parsedKeyBlocks" :key="idx" 
+                                    class="bg-white border border-slate-200 rounded-lg p-3 shadow-sm hover:border-indigo-300 transition-colors cursor-pointer group"
+                                    @click="scrollToLine(block.startLine)"
+                                >
+                                    <div class="flex items-center justify-between mb-2">
+                                        <span class="text-[10px] font-bold text-indigo-600 opacity-0 group-hover:opacity-100 transition-opacity">이동</span>
+                                    </div>
+                                    <h5 class="text-xs font-bold text-slate-800 mb-1">{{ block.role || (block.startLine ? `Lines ${block.startLine} ~ ${block.endLine}` : 'Code Block') }}</h5>
+                                    
+                                    <!-- Code Preview in Panel -->
+                                    <div class="mb-2 bg-slate-50 border border-slate-200 rounded p-1.5" v-if="block.code">
+                                        <code class="font-mono text-[10px] text-slate-600 block truncate">{{ block.code }}</code>
+                                    </div>
+
+                                    <p class="text-[11px] text-slate-500 leading-relaxed">{{ block.explanation }}</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div v-if="parsedStructure.length === 0 && parsedKeyBlocks.length === 0" class="text-center py-10 text-slate-400">
                             <Loader2 class="w-6 h-6 mx-auto mb-2 opacity-50 animate-spin" v-if="loadingBoard"/>
-                            <span class="text-xs">{{ loadingBoard ? '분석 중...' : '핵심 블록 정보 없음' }}</span>
+                            <span class="text-xs">{{ loadingBoard ? '분석 중...' : '분석 정보 없음' }}</span>
                         </div>
                     </div>
                 </div>
@@ -514,7 +543,27 @@ const renderMarkdown = (text) => text ? marked.parse(text) : '';
 // Computed
 const parsedKeyBlocks = computed(() => {
     if (!props.record.keyBlocks) return [];
-    try { return JSON.parse(props.record.keyBlocks); } catch (e) { return [];}
+    try { return Array.isArray(JSON.parse(props.record.keyBlocks)) ? JSON.parse(props.record.keyBlocks) : []; } catch { return []; }
+});
+
+const parsedStructure = computed(() => {
+    if (!props.record.fullResponse) return [];
+    try {
+        const full = JSON.parse(props.record.fullResponse);
+        return Array.isArray(full.structure) ? full.structure : [];
+    } catch { return []; }
+});
+
+const combinedHighlights = computed(() => {
+    const structure = parsedStructure.value.map(item => ({
+        code: item.name,
+        explanation: `[구조] ${item.role}`
+    }));
+    const keyBlocks = parsedKeyBlocks.value.map(block => ({
+        code: block.code,
+        explanation: `[로직] ${block.explanation}`
+    }));
+    return [...structure, ...keyBlocks];
 });
 
 const parsedPitfalls = computed(() => {

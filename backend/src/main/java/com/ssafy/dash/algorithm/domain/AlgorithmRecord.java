@@ -48,6 +48,7 @@ public class AlgorithmRecord {
     private Boolean refactorProvided;
     private String refactorCode;
     private String refactorExplanation;
+    private String fullResponse;
 
     private AlgorithmRecord(Long userId, Long studyId, String problemNumber, String title, String language, String code,
             LocalDateTime createdAt, LocalDateTime updatedAt) {

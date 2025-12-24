@@ -22,7 +22,7 @@
     SELECT r.*, r.tag, u.username,
            car.score, car.time_complexity, car.space_complexity, car.complexity_explanation, 
            car.patterns, car.algorithm_intuition, car.pitfalls, car.key_blocks, 
-           car.refactor_provided, car.refactor_code, car.refactor_explanation
+           car.refactor_provided, car.refactor_code, car.refactor_explanation, car.full_response, car.full_response, car.full_response, car.full_response
     FROM algorithm_records r
     LEFT JOIN users u ON r.user_id = u.id
     LEFT JOIN code_analysis_results car ON r.id = car.algorithm_record_id
@@ -33,7 +33,7 @@
     SELECT r.*, u.username,
            car.score, car.time_complexity, car.space_complexity, car.complexity_explanation, 
            car.patterns, car.algorithm_intuition, car.pitfalls, car.key_blocks, 
-           car.refactor_provided, car.refactor_code, car.refactor_explanation
+           car.refactor_provided, car.refactor_code, car.refactor_explanation, car.full_response, car.full_response, car.full_response, car.full_response
     FROM algorithm_records r
     LEFT JOIN users u ON r.user_id = u.id
     LEFT JOIN code_analysis_results car ON r.id = car.algorithm_record_id
@@ -45,7 +45,7 @@
     SELECT r.*, u.username,
            car.score, car.time_complexity, car.space_complexity, car.complexity_explanation, 
            car.patterns, car.algorithm_intuition, car.pitfalls, car.key_blocks, 
-           car.refactor_provided, car.refactor_code, car.refactor_explanation
+           car.refactor_provided, car.refactor_code, car.refactor_explanation, car.full_response, car.full_response, car.full_response, car.full_response
     FROM algorithm_records r
     LEFT JOIN users u ON r.user_id = u.id
     LEFT JOIN code_analysis_results car ON r.id = car.algorithm_record_id
