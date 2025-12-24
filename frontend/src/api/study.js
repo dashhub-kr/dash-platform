@@ -10,8 +10,8 @@ export const studyApi = {
         return http.post('/studies', { name });
     },
     // Join an existing study
-    joinStudy(studyId) {
-        return http.post(`/studies/${studyId}/join`);
+    joinStudy(studyId, message = '') {
+        return http.post(`/studies/${studyId}/apply`, { message });
     },
     // Get study statistics
     getStats(studyId) {
@@ -35,6 +35,9 @@ export const studyApi = {
     },
     approveApplication(applicationId) {
         return http.post(`/studies/applications/${applicationId}/approve`);
+    },
+    rejectApplication(applicationId) {
+        return http.post(`/studies/applications/${applicationId}/reject`);
     },
     leaveStudy() {
         return http.post(`/studies/leave`);
