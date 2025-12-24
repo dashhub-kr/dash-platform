@@ -13,6 +13,7 @@ public class Study {
 
     private Long id;
     private String name;
+    private Long creatorId;
     private LocalDateTime createdAt;
     private Integer memberCount; // 회원수 (조회용)
     private Integer acornCount;
@@ -20,15 +21,16 @@ public class Study {
     private Integer totalSolved; // 총 문제 풀이 수 (조회용)
     private String mvpUsername; // MVP 사용자명 (조회용)
 
-    public Study(Long id, String name, LocalDateTime createdAt, Integer acornCount) {
+    public Study(Long id, String name, Long creatorId, LocalDateTime createdAt, Integer acornCount) {
         this.id = id;
         this.name = name;
+        this.creatorId = creatorId;
         this.createdAt = createdAt;
         this.acornCount = acornCount == null ? 0 : acornCount;
     }
 
-    public static Study create(String name) {
-        return new Study(null, name, LocalDateTime.now(), 0);
+    public static Study create(String name, Long creatorId) {
+        return new Study(null, name, creatorId, LocalDateTime.now(), 0);
     }
 
     public void addAcorns(int amount) {

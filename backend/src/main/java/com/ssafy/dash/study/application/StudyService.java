@@ -28,7 +28,7 @@ public class StudyService {
 
     @Transactional
     public Study createStudy(Long userId, String name) {
-        Study study = Study.create(name);
+        Study study = Study.create(name, userId);
         studyRepository.save(study);
         // MyBatis가 insert 후 객체에 ID를 설정한다고 가정
 
