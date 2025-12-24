@@ -12,4 +12,6 @@ public class CodeReviewRequest {
     private String code;
     private String language;
     private String problemNumber;
+    private String platform;
+    private String problemTitle;
 }

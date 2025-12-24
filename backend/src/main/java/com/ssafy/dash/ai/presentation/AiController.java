@@ -34,7 +34,9 @@ public class AiController {
                                 request.algorithmRecordId(),
                                 request.code(),
                                 request.language(),
-                                request.problemNumber());
+                                request.problemNumber(),
+                                request.platform(),
+                                request.problemTitle());
                 return ResponseEntity.ok(result);
         }
 
@@ -114,9 +116,12 @@ public class AiController {
         public ResponseEntity<AiCounterExampleResponse> generateCounterExample(
                         @RequestBody AiCounterExampleRequest request) {
                 AiCounterExampleResponse response = debugService.generateCounterExample(
+                                request.recordId(),
                                 request.problemNumber(),
                                 request.code(),
-                                request.language());
+                                request.language(),
+                                request.platform(),
+                                request.problemTitle());
                 return ResponseEntity.ok(response);
         }
 
@@ -132,7 +137,9 @@ public class AiController {
                         Long algorithmRecordId,
                         String code,
                         String language,
-                        String problemNumber) {
+                        String problemNumber,
+                        String platform,
+                        String problemTitle) {
         }
 
         public record HintRequest(

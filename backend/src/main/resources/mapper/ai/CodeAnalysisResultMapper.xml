@@ -7,13 +7,24 @@
             algorithm_record_id, summary, time_complexity, space_complexity,
             complexity_explanation, patterns, algorithm_intuition,
             pitfalls, improvements, key_blocks, refactor_provided, refactor_code,
-            refactor_explanation, score, full_response, analyzed_at
+            refactor_explanation, score, full_response, analyzed_at,
+            counter_example_input, counter_example_expected, counter_example_predicted, counter_example_reason
         ) VALUES (
             #{algorithmRecordId},      #{summary}, #{timeComplexity}, #{spaceComplexity}, #{complexityExplanation},
       #{patterns}, #{algorithmIntuition}, #{pitfalls}, #{improvements}, #{keyBlocks},
-      #{refactorProvided}, #{refactorCode}, #{refactorExplanation}, #{score}, #{fullResponse}, #{analyzedAt}
+      #{refactorProvided}, #{refactorCode}, #{refactorExplanation}, #{score}, #{fullResponse}, #{analyzedAt},
+      #{counterExampleInput}, #{counterExampleExpected}, #{counterExamplePredicted}, #{counterExampleReason}
         )
     </insert>
+
+    <update id="updateCounterExample" parameterType="CodeAnalysisResult">
+        UPDATE code_analysis_results SET
+            counter_example_input = #{counterExampleInput},
+            counter_example_expected = #{counterExampleExpected},
+            counter_example_predicted = #{counterExamplePredicted},
+            counter_example_reason = #{counterExampleReason}
+        WHERE algorithm_record_id = #{algorithmRecordId}
+    </update>
 
     <select id="findByAlgorithmRecordId" resultType="CodeAnalysisResult">
         SELECT * FROM code_analysis_results 
