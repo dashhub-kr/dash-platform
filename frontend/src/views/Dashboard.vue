@@ -127,38 +127,59 @@
                   </div>
                 </div>
 
-                <!-- Member Progress Section -->
-                <div v-if="targetMission.memberProgressList?.length > 0" class="mt-4 pt-3 border-t border-white/10 flex flex-wrap items-center gap-4">
-                  <div v-for="member in sortMembers(targetMission.memberProgressList)" :key="member.userId" 
-                       class="flex flex-col items-center gap-1 group relative cursor-help">
-                    
-                    <!-- Tooltip for Name -->
-                    <div class="absolute bottom-full mb-2 px-2 py-1 bg-black/80 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none z-20">
-                      {{ member.username }} {{ isMe(member.userId) ? '(나)' : '' }}
-                      <div class="absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-1 w-2 h-2 bg-black/80 rotate-45"></div>
-                    </div>
+                <!-- Member Progress Section (Shared Gauge) -->
+                <div v-if="targetMission.memberProgressList?.length > 0" class="mt-8 pt-4 border-t border-white/10">
+                  <div class="relative h-14 w-full mt-4 mb-2">
+                      <!-- Progress Track -->
+                      <div class="absolute top-[28px] left-0 right-0 h-3 bg-white/20 rounded-full overflow-hidden backdrop-blur-sm shadow-inner">
+                          <!-- Optional: Tick marks or segments -->
+                          <div class="w-full h-full opacity-30 bg-[linear-gradient(90deg,transparent_99%,rgba(255,255,255,0.5)_100%)] bg-[length:20%_100%]"></div>
+                      </div>
+                      
+                      <!-- Goal Flag (Right End) -->
+                      <div class="absolute top-[18px] -right-2 z-10 bg-white/20 p-1.5 rounded-full border border-white/30 shadow-sm backdrop-blur-md">
+                          <Trophy class="w-4 h-4 text-yellow-300" />
+                      </div>
 
-                    <!-- Avatar -->
-                    <!-- Avatar -->
-                    <img :src="getMemberProfileImage(member)" :alt="member.username"
-                         class="w-9 h-9 rounded-full object-cover border-2 transition-all relative z-10 bg-white"
-                         :class="[
-                           isMe(member.userId) 
-                             ? 'border-emerald-400 ring-2 ring-emerald-400/30' + (member.allCompleted ? ' shadow-[0_0_12px_rgba(52,211,153,0.6)]' : '')
-                             : member.allCompleted 
-                               ? 'border-orange-400 shadow-[0_0_12px_rgba(251,146,60,0.5)]' 
-                               : 'border-white/20 opacity-80 grayscale-[0.0]'
-                         ]" />
-                    
-                    <!-- Status -->
-                    <div class="flex items-center gap-0.5 mt-0.5">
-                       <Flame :size="13" 
-                              class="transition-all"
-                              :class="member.allCompleted ? 'fill-orange-400 text-orange-400 animate-pulse' : 'text-slate-300/40'" />
-                       <span v-if="!member.allCompleted" class="text-[11px] font-bold text-white/50">
-                         {{ member.completedCount }}
-                       </span>
-                    </div>
+                      <!-- Member Markers -->
+                      <div v-for="member in sortMembers(targetMission.memberProgressList)" :key="member.userId" 
+                           class="absolute top-0 transform -translate-x-1/2 transition-all duration-700 ease-out z-20 group"
+                           :style="{ left: getMemberProgressPercent(member, targetMission) + '%' }"
+                           :class="{'z-30': isMe(member.userId)}">
+                           
+                           <div class="flex flex-col items-center cursor-help">
+                              <!-- Avatar -->
+                              <div class="relative">
+                                  <img :src="getMemberProfileImage(member)" :alt="member.username"
+                                       class="w-8 h-8 rounded-full object-cover border-2 shadow-lg transition-transform hover:scale-110 bg-white"
+                                       :class="[
+                                         isMe(member.userId) 
+                                           ? 'border-emerald-400 ring-2 ring-emerald-400/50' 
+                                           : member.allCompleted 
+                                             ? 'border-orange-400' 
+                                             : 'border-white/80 grayscale-[0.3]'
+                                       ]" />
+                                   
+                                   <!-- Completed Badge -->
+                                   <div v-if="member.allCompleted" class="absolute -top-1 -right-1 w-3.5 h-3.5 bg-orange-500 rounded-full flex items-center justify-center border border-white shadow-sm animate-bounce">
+                                       <Check class="w-2 h-2 text-white" stroke-width="4" />
+                                   </div>
+                              </div>
+
+                              <!-- Arrow -->
+                              <div class="w-0 h-0 border-l-[5px] border-l-transparent border-r-[5px] border-r-transparent border-t-[6px] transition-colors mt-0.5 drop-shadow-sm"
+                                   :class="isMe(member.userId) ? 'border-t-emerald-400' : 'border-t-white/80'"></div>
+
+                              <!-- Tooltip -->
+                              <div class="absolute bottom-full mb-1 px-2 py-1 bg-slate-900/90 text-white text-[10px] rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none shadow-xl flex flex-col items-center gap-0.5 backdrop-blur-sm">
+                                  <span class="font-bold text-indigo-200">{{ member.username }} {{ isMe(member.userId) ? '(나)' : '' }}</span>
+                                  <span class="font-mono">{{ member.completedCount }} / {{ targetMission.problemIds.length }}</span>
+                                  
+                                  <!-- Tooltip Arrow -->
+                                  <div class="absolute -bottom-1 left-1/2 -translate-x-1/2 w-2 h-2 bg-slate-900/90 rotate-45"></div>
+                              </div>
+                           </div>
+                      </div>
                   </div>
                 </div>
               </div>
@@ -580,6 +601,20 @@ const sortMembers = (members) => {
 // 본인인지 확인
 const isMe = (userId) => {
     return user.value?.id === userId;
+};
+
+// 미션 진행률 계산 (0~100)
+const getMemberProgressPercent = (member, mission) => {
+    if (!mission || !mission.problemIds || mission.problemIds.length === 0) return 0;
+    const total = mission.problemIds.length;
+    const completed = member.completedCount || 0;
+    
+    // 만약 모두 완료했다면 정확히 100% (우측 끝 Goal Flag 위치)
+    if (member.allCompleted) return 100;
+    
+    // 그 외에는 비율대로 계산하되, 시작점(0%)과 끝점(100%) 사이에서 적절히 배치
+    // 예를 들어, 0개면 0%, 100%면 100%
+    return Math.min(100, Math.max(0, (completed / total) * 100));
 };
 
 const processHeatmap = (data) => {
