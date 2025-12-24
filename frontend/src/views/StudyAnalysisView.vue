@@ -51,53 +51,16 @@
           <!-- Radar Chart 영역 -->
           <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
             <!-- 차트 -->
-            <div class="bg-slate-50 rounded-2xl p-4 flex items-center justify-center min-h-[320px]">
-              <svg viewBox="0 0 300 300" class="w-full max-w-[280px]">
-                <!-- 육각형 배경 그리드 -->
-                <g v-for="level in [1, 0.75, 0.5, 0.25]" :key="level">
-                  <polygon 
-                    :points="getHexagonPoints(150, 150, 100 * level)" 
-                    fill="none" 
-                    stroke="#e2e8f0" 
-                    stroke-width="1"
-                  />
-                </g>
-                
-                <g v-for="(tag, i) in chartTags" :key="'axis-' + i">
-                  <line 
-                    :x1="150" :y1="150"
-                    :x2="150 + 100 * Math.cos((i * 60 - 90) * Math.PI / 180)"
-                    :y2="150 + 100 * Math.sin((i * 60 - 90) * Math.PI / 180)"
-                    stroke="#cbd5e1"
-                    stroke-width="1"
-                  />
-                  <text 
-                    :x="150 + 115 * Math.cos((i * 60 - 90) * Math.PI / 180)"
-                    :y="150 + 115 * Math.sin((i * 60 - 90) * Math.PI / 180)"
-                    text-anchor="middle"
-                    dominant-baseline="middle"
-                    class="text-[10px] fill-slate-600 font-bold"
-                  >{{ getTagDisplayName(tag) }}</text>
-                </g>
-                
-                <!-- 팀 평균 polygon -->
-                <polygon 
-                  :points="getTeamAveragePoints()"
-                  fill="rgba(99, 102, 241, 0.3)"
-                  stroke="#6366f1"
-                  stroke-width="2"
-                />
-                
-                <!-- 멤버별 polygons (레이어) -->
-                <polygon 
-                  v-for="(member, idx) in analysis.memberStats.slice(0, 5)"
-                  :key="'member-' + idx"
-                  :points="getMemberPoints(member)"
-                  :fill="getMemberColor(idx, 0.15)"
-                  :stroke="getMemberColor(idx, 1)"
-                  stroke-width="1.5"
-                />
-              </svg>
+            <div class="bg-slate-50 rounded-2xl p-6 flex flex-col items-center justify-center min-h-[350px]">
+              <div class="w-full max-w-[300px] aspect-square">
+                <Radar v-if="radarChartData" :data="radarChartData" :options="radarChartOptions" />
+                <div v-else class="flex items-center justify-center h-full text-slate-400">
+                  데이터가 부족합니다
+                </div>
+              </div>
+              <p class="text-center text-xs text-slate-400 mt-3">
+                팀원별 정규화 후 평균 (본인 최대=100%)
+              </p>
             </div>
 
             <!-- 약점 및 범례 -->
@@ -111,21 +74,22 @@
                   <div v-for="weakness in analysis.topWeaknesses" :key="weakness.tagKey" 
                        class="flex items-center justify-between bg-white rounded-xl px-4 py-3">
                     <span class="font-medium text-slate-700">{{ getTagDisplayName(weakness.tagKey) }}</span>
-                    <span class="text-amber-600 font-bold">{{ Math.round(weakness.averageRate) }}%</span>
+                    <span class="text-amber-600 font-bold">{{ Math.round(weakness.averageRate) }}문제</span>
                   </div>
                 </div>
               </div>
 
               <!-- 멤버 범례 -->
               <div class="bg-white rounded-2xl p-6 border border-slate-200">
-                <h3 class="text-lg font-bold text-slate-800 mb-4">멤버별 범례</h3>
+                <h3 class="text-lg font-bold text-slate-800 mb-4">멤버별 정보</h3>
                 <div class="space-y-2">
                   <div v-for="(member, idx) in analysis.memberStats.slice(0, 5)" :key="'legend-' + idx"
                        class="flex items-center gap-3">
-                    <div class="w-4 h-4 rounded-full" :style="{ backgroundColor: getMemberColor(idx, 1) }"></div>
+                    <div class="w-4 h-4 rounded-full" :style="{ backgroundColor: memberColors[idx % memberColors.length] }"></div>
                     <span class="text-slate-700">{{ member.username }}</span>
                     <span class="text-xs text-slate-400 ml-auto">Tier {{ member.tier || 'N/A' }}</span>
                   </div>
+                  <!-- 팀 평균 범례 -->
                   <div class="flex items-center gap-3 mt-3 pt-3 border-t border-slate-100">
                     <div class="w-4 h-4 rounded-full bg-indigo-500"></div>
                     <span class="text-slate-700 font-medium">팀 평균</span>
@@ -159,15 +123,16 @@
 
           <!-- 커리큘럼 결과 -->
           <div v-else-if="curriculum.length > 0" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            <a v-for="problem in curriculum" :key="problem.id"
-               :href="`https://www.acmicpc.net/problem/${problem.id}`"
+            <a v-for="problem in curriculum" :key="problem.problemId"
+               :href="`https://www.acmicpc.net/problem/${problem.problemId}`"
                target="_blank"
                class="bg-slate-50 hover:bg-slate-100 border border-slate-200 rounded-xl p-5 transition-all hover:-translate-y-1 hover:shadow-lg group">
               <div class="flex items-center gap-3 mb-2">
-                <span class="text-2xl font-bold text-indigo-600 group-hover:text-indigo-500">#{{ problem.id }}</span>
-                <span class="px-2 py-1 bg-indigo-100 text-indigo-700 text-xs font-medium rounded-md">{{ problem.tag }}</span>
+                <span class="text-2xl font-bold text-indigo-600 group-hover:text-indigo-500">#{{ problem.problemId }}</span>
+                <span v-if="problem.tags?.length" class="px-2 py-1 bg-indigo-100 text-indigo-700 text-xs font-medium rounded-md">{{ problem.tags[0] }}</span>
               </div>
-              <p class="text-slate-600 text-sm">팀 약점 보완</p>
+              <p class="text-slate-800 font-medium truncate">{{ problem.title }}</p>
+              <p class="text-slate-500 text-sm">Lv.{{ problem.level }}</p>
             </a>
           </div>
 
@@ -193,22 +158,28 @@
 <script setup>
 import { ref, onMounted, computed } from 'vue';
 import axios from 'axios';
+import { Radar } from 'vue-chartjs';
+import { Chart as ChartJS, RadialLinearScale, PointElement, LineElement, Filler, Tooltip, Legend } from 'chart.js';
+
+ChartJS.register(RadialLinearScale, PointElement, LineElement, Filler, Tooltip, Legend);
 
 const loadingAnalysis = ref(true);
 const loadingCurriculum = ref(false);
 const analysis = ref(null);
+const familyStats = ref([]);
 const curriculum = ref([]);
 const studyId = ref(null);
 
-const chartTags = ['dp', 'graphs', 'implementation', 'math', 'data_structures', 'greedy'];
-
-const tagDisplayNames = {
-  dp: 'DP',
-  graphs: '그래프',
-  implementation: '구현',
-  math: '수학',
-  data_structures: '자료구조',
-  greedy: '그리디'
+// 패밀리 표시 이름 맵핑
+const familyDisplayNames = {
+  'IMPLEMENTATION': '구현',
+  'DP': 'DP',
+  'GRAPH': '그래프',
+  'MATH': '수학',
+  'GREEDY': '그리디',
+  'STRING': '문자열',
+  'DATA_STRUCTURE': '자료구조',
+  'ADVANCED': '고급'
 };
 
 const memberColors = [
@@ -219,15 +190,121 @@ const memberColors = [
   '#06b6d4', // cyan
 ];
 
+// 레이더차트용 레이블 (패밀리 기준)
+const chartLabels = computed(() => {
+  if (familyStats.value.length === 0) return [];
+  return familyStats.value.map(stat => 
+    familyDisplayNames[stat.familyKey] || stat.familyName || stat.familyKey
+  );
+});
+
+// 레이더차트 데이터 - 멤버별 오버레이 + 팀 평균
+const radarChartData = computed(() => {
+  if (familyStats.value.length === 0 || !analysis.value?.memberStats) return null;
+  
+  const labels = chartLabels.value;
+  const familyKeys = familyStats.value.map(s => s.familyKey?.toLowerCase());
+  
+  // 멤버별 정규화 데이터 계산
+  const normalizedMembers = [];
+  const datasets = [];
+  
+  analysis.value.memberStats.slice(0, 5).forEach((member, idx) => {
+    const rawData = familyKeys.map(key => member.tagSolved?.[key] || 0);
+    const maxValue = Math.max(...rawData, 1);
+    const normalizedData = rawData.map(v => Math.round(v / maxValue * 100));
+    normalizedMembers.push(normalizedData);
+    
+    const color = memberColors[idx % memberColors.length];
+    datasets.push({
+      label: member.username,
+      data: normalizedData,
+      backgroundColor: `${color}08`,  // 매우 연한 배경
+      borderColor: `${color}50`,      // 연한 테두리
+      borderWidth: 1.5,
+      pointBackgroundColor: color,
+      pointBorderColor: '#fff',
+      pointBorderWidth: 1,
+      pointRadius: 2,
+      pointHoverRadius: 4
+    });
+  });
+  
+  // 팀 평균 (정규화된 값들의 평균)
+  const teamAvg = familyKeys.map((_, i) => {
+    const sum = normalizedMembers.reduce((acc, m) => acc + m[i], 0);
+    return Math.round(sum / normalizedMembers.length);
+  });
+  
+  datasets.push({
+    label: '팀 평균',
+    data: teamAvg,
+    backgroundColor: 'rgba(99, 102, 241, 0.15)',
+    borderColor: 'rgba(99, 102, 241, 0.9)',
+    borderWidth: 2.5,
+    pointBackgroundColor: '#6366f1',
+    pointBorderColor: '#fff',
+    pointBorderWidth: 2,
+    pointRadius: 4,
+    pointHoverRadius: 6
+  });
+  
+  return { labels, datasets };
+});
+
+// 레이더차트 옵션
+const radarChartOptions = computed(() => ({
+  responsive: true,
+  maintainAspectRatio: true,
+  plugins: {
+    legend: { display: false },
+    tooltip: {
+      callbacks: {
+        label: (ctx) => `${ctx.dataset.label}: ${ctx.raw}%`
+      },
+      backgroundColor: 'rgba(15, 23, 42, 0.9)',
+      padding: 10,
+      cornerRadius: 8
+    }
+  },
+  scales: {
+    r: {
+      beginAtZero: true,
+      ticks: {
+        stepSize: 20,
+        display: false
+      },
+      grid: {
+        color: 'rgba(148, 163, 184, 0.15)',
+        circular: true
+      },
+      angleLines: {
+        color: 'rgba(148, 163, 184, 0.15)'
+      },
+      pointLabels: {
+        color: 'rgba(51, 65, 85, 0.8)',
+        font: { 
+          family: "'Pretendard', sans-serif",
+          size: 11, 
+          weight: '600' 
+        }
+      }
+    }
+  }
+}));
+
 onMounted(async () => {
   try {
-    // 현재 사용자의 스터디 ID 가져오기
     const userRes = await axios.get('/api/users/me');
     studyId.value = userRes.data.studyId;
     
     if (studyId.value) {
-      const res = await axios.get(`/api/studies/${studyId.value}/analysis`);
-      analysis.value = res.data;
+      const [analysisRes, familyRes] = await Promise.all([
+        axios.get(`/api/studies/${studyId.value}/analysis`),
+        axios.get(`/api/studies/${studyId.value}/family-stats`)
+      ]);
+      analysis.value = analysisRes.data;
+      familyStats.value = familyRes.data || [];
     }
   } catch (e) {
     console.error('팀 분석 로드 실패', e);
@@ -236,7 +313,7 @@ onMounted(async () => {
   }
 });
 
-const getTagDisplayName = (tag) => tagDisplayNames[tag] || tag;
+const getTagDisplayName = (tag) => familyDisplayNames[tag?.toUpperCase()] || tag;
 
 const getTierName = (tier) => {
   if (!tier) return 'Unranked';
@@ -250,61 +327,19 @@ const getTierName = (tier) => {
   return 'Unranked';
 };
 
-const getHexagonPoints = (cx, cy, r) => {
-  return chartTags.map((_, i) => {
-    const angle = (i * 60 - 90) * Math.PI / 180;
-    return `${cx + r * Math.cos(angle)},${cy + r * Math.sin(angle)}`;
-  }).join(' ');
-};
-
-const getTeamAveragePoints = () => {
-  if (!analysis.value?.teamAverages) return '';
-  return chartTags.map((tag, i) => {
-    const rate = analysis.value.teamAverages[tag] || 0;
-    // 제곱근 스케일링으로 작은 값도 잘 보이게
-    const scaledRate = Math.sqrt(rate / 100) * 100;
-    const r = (scaledRate / 100) * 100;
-    const angle = (i * 60 - 90) * Math.PI / 180;
-    return `${150 + r * Math.cos(angle)},${150 + r * Math.sin(angle)}`;
-  }).join(' ');
-};
-
-const getMemberPoints = (member) => {
-  if (!member?.tagRates) return '';
-  return chartTags.map((tag, i) => {
-    const rate = member.tagRates[tag] || 0;
-    // 제곱근 스케일링으로 작은 값도 잘 보이게  
-    const scaledRate = Math.sqrt(rate / 100) * 100;
-    const r = (scaledRate / 100) * 100;
-    const angle = (i * 60 - 90) * Math.PI / 180;
-    return `${150 + r * Math.cos(angle)},${150 + r * Math.sin(angle)}`;
-  }).join(' ');
-};
-
-const getMemberColor = (idx, alpha) => {
-  const color = memberColors[idx % memberColors.length];
-  if (alpha === 1) return color;
-  // Convert hex to rgba
-  const r = parseInt(color.slice(1, 3), 16);
-  const g = parseInt(color.slice(3, 5), 16);
-  const b = parseInt(color.slice(5, 7), 16);
-  return `rgba(${r}, ${g}, ${b}, ${alpha})`;
-};
-
 const loadCurriculum = async () => {
-  if (!studyId.value || !analysis.value?.topWeaknesses) return;
+  if (!studyId.value) return;
   
   loadingCurriculum.value = true;
   
-  // 약점 태그 기반 더미 커리큘럼 (실제로는 AI 추천 연동)
-  await new Promise(resolve => setTimeout(resolve, 2000));
-  
-  curriculum.value = analysis.value.topWeaknesses.map((w, i) => ({
-    id: 1000 + i * 100 + Math.floor(Math.random() * 100),
-    tag: getTagDisplayName(w.tagKey)
-  }));
-  
-  loadingCurriculum.value = false;
+  try {
+    const res = await axios.get(`/api/studies/${studyId.value}/curriculum`);
+    curriculum.value = res.data || [];
+  } catch (e) {
+    console.error('커리큘럼 로드 실패', e);
+  } finally {
+    loadingCurriculum.value = false;
+  }
 };
 </script>
 
