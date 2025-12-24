@@ -25,7 +25,7 @@
             <!-- 로딩 -->
             <div v-if="loading" class="flex items-center justify-center py-12">
               <div class="text-center">
-                <div class="w-8 h-8 border-4 border-indigo-500 border-t-transparent rounded-full animate-spin mx-auto mb-3"></div>
+                <div class="w-8 h-8 border-4 border-brand-500 border-t-transparent rounded-full animate-spin mx-auto mb-3"></div>
                 <p class="text-slate-500 text-sm">강의 검색 중...</p>
               </div>
             </div>
@@ -34,20 +34,20 @@
               <!-- 추천 문제 -->
               <section v-if="problems.length > 0">
                 <h4 class="font-bold text-slate-700 flex items-center gap-2 mb-3">
-                  <Code :size="16" class="text-indigo-500" />
+                  <Code :size="16" class="text-brand-500" />
                   이 태그와 함께 풀면 좋은 문제
                 </h4>
                 <div class="grid grid-cols-4 gap-3">
                   <div 
                     v-for="prob in problems.slice(0, 3)" 
                     :key="prob.problemId"
-                    class="bg-slate-50 rounded-xl p-4 hover:bg-indigo-50 transition-colors cursor-pointer border border-slate-100 hover:border-indigo-200"
+                    class="bg-slate-50 rounded-xl p-4 hover:bg-brand-50 transition-colors cursor-pointer border border-slate-100 hover:border-brand-200"
                     @click="goToProblem(prob.problemId)"
                   >
                     <div class="flex items-center gap-2 mb-2">
                       <img :src="`https://static.solved.ac/tier_small/${prob.level}.svg`" class="w-5 h-5" />
                       <span class="text-xs font-bold text-slate-500">#{{ prob.problemId }}</span>
-                      <span v-if="prob.essential" class="ml-auto text-[10px] font-bold text-indigo-600 bg-indigo-100 px-1.5 py-0.5 rounded">필수</span>
+                      <span v-if="prob.essential" class="ml-auto text-[10px] font-bold text-brand-600 bg-brand-100 px-1.5 py-0.5 rounded">필수</span>
                     </div>
                     <h5 class="font-medium text-slate-800 text-sm truncate">{{ prob.title }}</h5>
                   </div>
@@ -55,14 +55,14 @@
                   <!-- 더 보기 카드 -->
                   <div 
                     @click="goToMoreProblems"
-                    class="bg-indigo-50 rounded-xl p-4 hover:bg-indigo-100 transition-colors cursor-pointer border-2 border-dashed border-indigo-200 hover:border-indigo-400 flex flex-col items-center justify-center gap-2"
+                    class="bg-brand-50 rounded-xl p-4 hover:bg-brand-100 transition-colors cursor-pointer border-2 border-dashed border-brand-200 hover:border-brand-400 flex flex-col items-center justify-center gap-2"
                   >
-                    <div class="w-10 h-10 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-600">
+                    <div class="w-10 h-10 rounded-full bg-brand-100 flex items-center justify-center text-brand-600">
                       <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
                       </svg>
                     </div>
-                    <span class="text-sm font-bold text-indigo-600">더 보기</span>
+                    <span class="text-sm font-bold text-brand-600">더 보기</span>
                   </div>
                 </div>
               </section>

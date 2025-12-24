@@ -24,7 +24,7 @@
       <template #node-skill="{ data }">
           <!-- 태그 이름 (심플 & 가독성 강화) -->
           <div 
-            class="skill-node px-6 py-4 rounded-2xl border-2 text-center cursor-pointer transition-all flex items-center justify-center min-w-[120px]"
+            class="skill-node px-6 py-4 rounded-2xl border text-center cursor-pointer transition-all flex items-center justify-center min-w-[120px]"
             :class="getNodeClass(data)"
             @click.stop="onNodeClick(data)"
           >
@@ -272,7 +272,7 @@ const getNodeClass = (data) => {
   
   // 선택된 노드
   if (isSelected(id)) {
-    return 'bg-indigo-100 border-indigo-500 shadow-lg ring-2 ring-indigo-400';
+    return 'bg-brand-100 border-brand-500 shadow-lg ring-2 ring-brand-400';
   }
   
   // 선수 태그
