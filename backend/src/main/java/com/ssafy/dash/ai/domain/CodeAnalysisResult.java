@@ -49,5 +49,11 @@ public class CodeAnalysisResult {
     // Full JSON Response (for UI rendering)
     private String fullResponse;
 
+    // 반례 캐싱
+    private String counterExampleInput;
+    private String counterExampleExpected;
+    private String counterExamplePredicted;
+    private String counterExampleReason;
+
     private LocalDateTime analyzedAt;
 }

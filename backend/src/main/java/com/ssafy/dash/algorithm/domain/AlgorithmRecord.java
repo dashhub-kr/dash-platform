@@ -50,6 +50,10 @@ public class AlgorithmRecord {
     private String refactorCode;
     private String refactorExplanation;
     private String fullResponse;
+    private String counterExampleInput;
+    private String counterExampleExpected;
+    private String counterExamplePredicted;
+    private String counterExampleReason;
 
     private AlgorithmRecord(Long userId, Long studyId, String problemNumber, String title, String language, String code,
             LocalDateTime createdAt, LocalDateTime updatedAt) {

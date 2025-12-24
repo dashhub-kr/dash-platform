@@ -1,16 +1,16 @@
 <template>
-  <div class="min-h-screen bg-[#f0f9ff] text-slate-800 selection:bg-indigo-500/30 font-[Pretendard]">
+  <div class="min-h-screen bg-white text-slate-800 selection:bg-brand-500/30 font-[Pretendard]">
 
     <main class="container mx-auto px-6 py-10 max-w-4xl">
-      <div class="mb-8 animate-fade-in-up">
+      <div class="flex items-center justify-between mb-6 animate-fade-in-up">
         <button 
           @click="$router.back()" 
-          class="flex items-center gap-2 text-slate-500 hover:text-indigo-600 mb-4 transition-colors"
+          class="flex items-center gap-2 text-slate-500 hover:text-brand-600 transition-colors font-medium"
         >
           <ArrowLeft :size="20" />
           돌아가기
         </button>
-        <h1 class="text-3xl font-extrabold text-slate-900">{{ isEdit ? '글 수정하기' : '새 글 작성하기' }}</h1>
+        <h1 class="text-xl font-bold text-slate-800">{{ isEdit ? '글 수정' : '새 글 작성' }}</h1>
       </div>
 
       <!-- Main Layout -->
@@ -21,14 +21,14 @@
            <div class="sticky top-24 space-y-4">
               <!-- Helper Text -->
               <div class="bg-white/50 backdrop-blur border border-slate-200 p-4 rounded-xl flex items-start gap-3 shadow-sm">
-                 <div class="p-2 bg-indigo-50 text-indigo-600 rounded-lg">
+                 <div class="p-2 bg-brand-50 text-brand-600 rounded-lg">
                     <Code2 :size="20" />
                  </div>
                  <div>
                     <h3 class="font-bold text-slate-800 text-sm">코드 리뷰 모드</h3>
                     <p class="text-xs text-slate-500 mt-1 leading-relaxed">
                        좌측의 코드를 보며 리뷰를 작성하세요. <br/>
-                       코드 라인을 클릭하면 <span class="text-indigo-600 font-bold">인라인 댓글</span>을 남길 수 있습니다.
+                       코드 라인을 클릭하면 <span class="text-brand-600 font-bold">인라인 댓글</span>을 남길 수 있습니다.
                     </p>
                  </div>
               </div>
@@ -58,7 +58,7 @@
         ]">
           
           <!-- Board Type & Record Select (Always visible, but styled differently) -->
-          <div class="bg-white/80 backdrop-blur-md border border-white/60 shadow-xl shadow-indigo-500/5 rounded-2xl p-6">
+          <div class="bg-white/80 backdrop-blur-md border border-white/60 shadow-xl shadow-brand-500/5 rounded-2xl p-6">
              <div class="mb-6">
                 <label class="block text-sm font-bold text-slate-700 mb-2">게시글 유형</label>
                 <div class="flex gap-4 p-1 bg-slate-100/50 rounded-xl border border-slate-200/50">
@@ -82,7 +82,7 @@
              <div v-if="form.boardType === 'CODE_REVIEW'">
                 <label class="block text-sm font-bold text-slate-700 mb-2">풀이 선택</label>
                 <div v-if="loadingRecords" class="py-3 text-sm text-slate-500 flex items-center gap-2">
-                   <div class="w-4 h-4 border-2 border-indigo-500 border-t-transparent rounded-full animate-spin"></div>
+                   <div class="w-4 h-4 border-2 border-brand-500 border-t-transparent rounded-full animate-spin"></div>
                    불러오는 중...
                 </div>
                 <div v-else-if="studyRecords.length === 0" class="text-sm text-slate-400 py-2">
@@ -103,7 +103,7 @@
           </div>
 
           <!-- The Actual Writing Form -->
-          <form @submit.prevent="handleSubmit" class="bg-white/80 backdrop-blur-md border border-white/60 shadow-xl shadow-indigo-500/5 rounded-2xl p-6 space-y-6">
+          <form @submit.prevent="handleSubmit" class="bg-white/80 backdrop-blur-md border border-white/60 shadow-xl shadow-brand-500/5 rounded-2xl p-6 space-y-6">
             <!-- Title -->
             <div>
               <label class="block text-sm font-bold text-slate-700 mb-2">제목</label>
@@ -111,7 +111,7 @@
                 v-model="form.title"
                 type="text"
                 placeholder="제목을 입력하세요"
-                class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
+                class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-transparent transition-all"
               />
             </div>
 
@@ -121,7 +121,7 @@
               <textarea
                 v-model="form.content"
                 placeholder="코드에 대한 전반적인 리뷰나 질문을 작성해주세요."
-                class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all resize-none leading-relaxed"
+                class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-transparent transition-all resize-none leading-relaxed"
                 :rows="isCodeReviewMode ? 15 : 12"
               ></textarea>
             </div>
@@ -137,7 +137,7 @@
               <button 
                 type="submit"
                 :disabled="submitting || !isValid"
-                class="px-8 py-2.5 bg-indigo-600 hover:bg-indigo-500 disabled:bg-slate-300 disabled:text-slate-500 text-white rounded-xl font-bold transition-all shadow-lg shadow-indigo-500/30 transform active:scale-95 flex items-center gap-2"
+                class="px-8 py-2.5 bg-brand-600 hover:bg-brand-500 disabled:bg-slate-300 disabled:text-slate-500 text-white rounded-xl font-bold transition-all shadow-lg shadow-brand-500/30 transform active:scale-95 flex items-center gap-2"
               >
                 <div v-if="submitting" class="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
                 <span>{{ isEdit ? '수정 완료' : '작성 완료' }}</span>

@@ -1,24 +1,19 @@
 <template>
-  <div class="min-h-screen bg-slate-50 relative pb-20">
-    <!-- 배경 효과 -->
-    <div class="fixed inset-0 pointer-events-none overflow-hidden">
-      <div class="absolute top-0 left-1/4 w-96 h-96 bg-indigo-200/20 rounded-full blur-3xl"></div>
-      <div class="absolute bottom-0 right-1/4 w-96 h-96 bg-rose-200/20 rounded-full blur-3xl"></div>
-    </div>
+  <div class="min-h-screen bg-white text-slate-800 pb-20">
 
     <!-- 헤더 영역 -->
 
 
-    <div class="container mx-auto px-6 py-8 relative z-10">
+    <div class="max-w-4xl mx-auto px-6 py-8 relative z-10">
       <!-- 탭 네비게이션 -->
       <div class="flex justify-center mb-8">
-        <div class="flex gap-1 bg-white/50 backdrop-blur-sm p-1.5 rounded-2xl border border-white/60 shadow-sm">
+        <div class="flex gap-1 bg-white/50 backdrop-blur-sm p-1.5 rounded-3xl border border-white/60 shadow-sm">
           <button
             v-for="tab in tabs"
             :key="tab.id"
             @click="currentTab = tab.id"
-            class="px-6 py-2.5 rounded-xl text-sm font-bold transition-all duration-200"
-            :class="currentTab === tab.id ? 'bg-white text-indigo-600 shadow-sm ring-1 ring-black/5' : 'text-slate-500 hover:text-slate-700'"
+            class="px-6 py-2.5 rounded-2xl text-sm font-bold transition-all duration-200"
+            :class="currentTab === tab.id ? 'bg-white text-brand-600 shadow-sm ring-1 ring-black/5' : 'text-slate-500 hover:text-slate-700'"
           >
             {{ tab.label }}
           </button>
@@ -31,41 +26,46 @@
         <!-- 히어로 카드 2개 -->
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
           <!-- 오늘의 복습 -->
-          <div class="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm hover:shadow-md transition-shadow">
-            <div class="flex items-center gap-3 mb-4">
-              <div class="w-12 h-12 bg-indigo-100 rounded-xl flex items-center justify-center">
-                <RefreshCw :size="24" class="text-indigo-600" />
+          <!-- 오늘의 복습 -->
+          <div class="bg-white rounded-3xl p-6 shadow-sm">
+            <div class="flex items-center gap-4 mb-4">
+              <div class="w-14 h-14 bg-brand-50 text-brand-600 rounded-2xl flex items-center justify-center shrink-0">
+                <RefreshCw :size="28" />
               </div>
               <div>
-                <span class="text-xs font-bold text-indigo-600 uppercase">Today's Review</span>
-                <h3 class="text-lg font-bold text-slate-800">{{ dailyReview?.title || '복습할 문제가 없습니다' }}</h3>
+                <span class="text-xs font-black text-brand-600 uppercase tracking-wide">Today's Review</span>
+                <h3 class="text-xl font-black text-slate-800 tracking-tight">{{ dailyReview?.title || '복습할 문제가 없습니다' }}</h3>
               </div>
             </div>
-            <p class="text-sm text-slate-500 mb-4 line-clamp-2">{{ dailyReview?.reason || '꾸준한 학습으로 실력을 키워보세요!' }}</p>
+            <p class="text-sm font-medium text-slate-500 mb-6 line-clamp-2 pl-1">{{ dailyReview?.reason || '꾸준한 학습으로 실력을 키워보세요!' }}</p>
             <button 
               v-if="dailyReview"
               @click="openDailyReviewModal"
-              class="w-full py-3 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl font-bold transition-colors flex items-center justify-center gap-2"
+              class="w-full py-3.5 bg-brand-600 hover:bg-brand-700 text-white rounded-2xl font-bold transition-all shadow-sm active:scale-[0.98] flex items-center justify-center gap-2"
             >
-              <Play :size="16" />
+              <Play :size="18" fill="currentColor" />
               다시 풀기
             </button>
           </div>
 
           <!-- 오늘의 도전 -->
-          <div class="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm hover:shadow-md transition-shadow">
-            <div class="flex items-center gap-3 mb-4">
-              <div class="w-12 h-12 bg-rose-100 rounded-xl flex items-center justify-center">
-                <Trophy :size="24" class="text-rose-500" />
+          <!-- 오늘의 도전 -->
+          <div class="bg-white rounded-3xl p-6 shadow-sm">
+            <div class="flex items-center gap-4 mb-4">
+              <div class="w-14 h-14 bg-rose-50 text-rose-500 rounded-2xl flex items-center justify-center shrink-0">
+                <Trophy :size="28" />
               </div>
               <div>
-                <span class="text-xs font-bold text-rose-500 uppercase">Daily Challenge</span>
-                <h3 class="text-lg font-bold text-slate-800">{{ learningPath?.goalLevel || '목표 설정 중...' }}</h3>
+                <span class="text-xs font-black text-rose-500 uppercase tracking-wide">Daily Challenge</span>
+                <h3 class="text-xl font-black text-slate-800 tracking-tight">{{ learningPath?.dailyChallenge?.title || learningPath?.goalLevel || '목표 설정 중...' }}</h3>
               </div>
             </div>
-            <p class="text-sm text-slate-500 mb-4">다음 단계로 나아가기 위한 도전입니다.</p>
-            <button class="w-full py-3 border-2 border-slate-200 hover:border-rose-400 text-slate-700 hover:text-rose-500 rounded-xl font-bold transition-colors flex items-center justify-center gap-2">
-              <Swords :size="16" />
+            <p class="text-sm font-medium text-slate-500 mb-6 pl-1">{{ learningPath?.dailyChallenge?.description || '다음 단계로 나아가기 위한 도전입니다.' }}</p>
+            <button 
+              @click="startChallenge"
+              class="w-full py-3.5 bg-rose-50 hover:bg-rose-100 text-rose-600 hover:text-rose-700 rounded-2xl font-bold transition-all flex items-center justify-center gap-2"
+            >
+              <Swords :size="18" />
               도전하기
             </button>
           </div>
@@ -85,71 +85,11 @@
 
         <!-- AI 종합 분석 리포트 -->
         <section class="mb-8">
-          <h2 class="text-xl font-bold text-slate-800 mb-5 flex items-center gap-2 pl-2 border-l-4 border-indigo-500">
+          <h2 class="text-xl font-bold text-slate-800 mb-5 flex items-center gap-2 pl-2 border-l-4 border-brand-500">
             AI 종합 분석 리포트
           </h2>
           
-          <div class="space-y-4">
-            <!-- Analysis Summary Banner -->
-            <div class="relative overflow-hidden rounded-2xl bg-indigo-900 shadow-lg text-white p-6">
-               <div class="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20"></div>
-               <div class="absolute top-0 right-0 w-64 h-64 bg-indigo-500 rounded-full blur-3xl opacity-20 -translate-y-1/2 translate-x-1/2"></div>
-               
-               <div class="relative z-10 flex gap-4 items-start">
-                 <div class="hidden md:flex p-2.5 bg-indigo-500/30 rounded-xl backdrop-blur-md border border-indigo-400/30 flex-shrink-0">
-                    <FileText :size="20" class="text-indigo-200" />
-                 </div>
-                 <div class="flex-1">
-                   <h3 class="text-xs font-bold text-indigo-300 uppercase tracking-widest mb-2">Analysis Summary</h3>
-                   <p class="text-base text-indigo-50 leading-relaxed font-medium">
-                     {{ learningPath?.aiAnalysis?.analysisSummary || 'AI가 학습 데이터를 분석하고 있습니다...' }}
-                   </p>
-                 </div>
-               </div>
-            </div>
-
-            <!-- 3-Column Insights -->
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-               <!-- Growth Prediction -->
-               <div class="bg-white/80 border border-slate-200 rounded-xl p-4 min-h-[120px]">
-                 <div class="flex items-center gap-2 mb-2">
-                   <div class="w-8 h-8 rounded-full bg-violet-100 flex items-center justify-center text-violet-600">
-                     <TrendingUp :size="16" />
-                   </div>
-                   <h4 class="font-bold text-slate-700 text-sm">성장 예측</h4>
-                 </div>
-                 <p class="text-slate-600 text-xs leading-relaxed">
-                   {{ learningPath?.aiAnalysis?.growthPrediction || '데이터 분석 중...' }}
-                 </p>
-               </div>
-
-               <!-- Strategic Advice -->
-               <div class="bg-indigo-50/80 border border-indigo-200 rounded-xl p-4 min-h-[120px]">
-                 <div class="flex items-center gap-2 mb-2">
-                   <div class="w-8 h-8 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-600">
-                     <Target :size="16" />
-                   </div>
-                   <h4 class="font-bold text-indigo-900 text-sm">전략적 조언</h4>
-                 </div>
-                 <p class="text-indigo-800 text-xs leading-relaxed">
-                   {{ learningPath?.aiAnalysis?.strategicAdvice || '전략 수립 중...' }}
-                 </p>
-               </div>
-
-               <!-- Efficiency Analysis -->
-               <div class="bg-white/80 border border-slate-200 rounded-xl p-4 min-h-[120px]">
-                 <div class="flex items-center gap-2 mb-2">
-                   <div class="w-8 h-8 rounded-full bg-emerald-100 flex items-center justify-center text-emerald-600">
-                     <Activity :size="16" />
-                   </div>
-                   <h4 class="font-bold text-slate-700 text-sm">효율성 분석</h4>
-                 </div>
-                 <p class="text-slate-600 text-xs leading-relaxed">
-                   {{ learningPath?.aiAnalysis?.efficiencyAnalysis || '효율성 분석 중...' }}
-                 </p>
-               </div>
-            </div>
-          </div>
+          <AiAnalysisReport :ai-analysis="learningPath?.aiAnalysis" />
         </section>
         
       </div>
@@ -166,7 +106,7 @@
   <Teleport to="body">
     <Transition name="fade">
       <div v-if="selectedVideoId" class="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm" @click="closeVideoModal">
-        <div class="relative w-full max-w-5xl aspect-video" @click.stop>
+        <div class="relative w-full max-w-4xl aspect-video" @click.stop>
           <!-- 닫기 버튼 -->
           <button 
             @click="closeVideoModal"
@@ -216,6 +156,7 @@ import LearningRoadmap from '../components/LearningRoadmap.vue';
 import SkillTreeView from '../components/SkillTreeView.vue';
 import SkillAnalysisCard from '../components/SkillAnalysisCard.vue';
 import LectureModal from '../components/LectureModal.vue';
+import AiAnalysisReport from '../components/AiAnalysisReport.vue';
 import { useAuth } from '../composables/useAuth';
 import { aiApi } from '../api/ai';
 import { marked } from 'marked';
@@ -233,8 +174,8 @@ const lectureTagKey = ref('');
 const lectureBojTagId = ref('');
 
 const tabs = [
-    { id: 'roadmap', label: '⛳️ 로드맵' },
-    { id: 'skilltree', label: '🌳 스킬 트리' }
+    { id: 'roadmap', label: '로드맵' },
+    { id: 'skilltree', label: '스킬 트리' }
 ];
 
 // 1. Roadmap Data
@@ -342,6 +283,12 @@ const goToMoreProblems = () => {
         // 2. 없으면 Solved.ac 검색 (fallback)
         const query = `*tag:${currentTagKey.value} tier:${tierStart}..${tierEnd} -s@${user.value.username}`;
         window.open(`https://solved.ac/search?query=${encodeURIComponent(query)}`, '_blank');
+    }
+};
+
+const startChallenge = () => {
+    if (learningPath.value?.dailyChallenge?.link) {
+        window.open(learningPath.value.dailyChallenge.link, '_blank');
     }
 };
 

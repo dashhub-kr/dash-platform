@@ -1,16 +1,16 @@
 <template>
-  <div class="code-viewer bg-white border border-slate-200">
+  <div class="code-viewer bg-white border border-slate-200 rounded-xl overflow-hidden">
     <!-- Header -->
     <div class="px-4 py-2 bg-slate-50 text-slate-500 text-xs font-mono border-b border-slate-200 flex justify-between items-center select-none">
       <span class="font-bold text-slate-600">{{ filename }}</span>
       <div class="flex items-center gap-3">
         <!-- Author Filter -->
-        <select v-if="uniqueAuthors.length > 0" v-model="selectedAuthorFilter" class="text-[10px] bg-white border border-slate-200 rounded px-2 py-1 focus:outline-none focus:ring-1 focus:ring-indigo-400">
+        <select v-if="uniqueAuthors.length > 0" v-model="selectedAuthorFilter" class="text-[10px] bg-white border border-slate-200 rounded px-2 py-1 focus:outline-none focus:ring-1 focus:ring-brand-400">
           <option value="">모든 댓글</option>
           <option v-for="author in uniqueAuthors" :key="author" :value="author">{{ author }}</option>
         </select>
         <!-- Expand/Collapse All -->
-        <button v-if="hasAnyComments" @click="toggleAllComments" class="flex items-center gap-1 text-[10px] font-bold text-indigo-600 hover:text-indigo-800 transition-colors">
+        <button v-if="hasAnyComments" @click="toggleAllComments" class="flex items-center gap-1 text-[10px] font-bold text-brand-600 hover:text-brand-800 transition-colors">
           <span>{{ allCommentsExpanded ? '모두 접기' : '모두 펼치기' }}</span>
         </button>
         <span class="px-2 py-0.5 rounded bg-slate-200 text-slate-600 uppercase font-bold tracking-wider text-[10px]">{{ language }}</span>
@@ -31,27 +31,26 @@
               class="group transition-colors duration-200"
               :class="{ 
                 'hover:bg-slate-50': !effectiveHighlightedLines.has(index + 1),
-                'bg-yellow-100 text-slate-900': selectedHighlightLines.has(index + 1),
-                'bg-indigo-50/50': !selectedHighlightLines.has(index + 1) && hoverHighlightLines.has(index + 1) 
+                'bg-brand-100 text-slate-900': selectedHighlightLines.has(index + 1),
+                'bg-brand-50/50': !selectedHighlightLines.has(index + 1) && hoverHighlightLines.has(index + 1) 
               }"
               :data-line-number="index + 1"
             >
-              <!-- Line Number -->
+              <!-- Line Number (Sticky) -->
               <td 
-                class="w-12 text-right pr-4 py-0.5 text-slate-400 select-none font-mono text-sm border-r border-slate-100 bg-slate-50/50"
-                :class="{'text-slate-600 font-bold': selectedLine === index + 1, 'bg-indigo-100/50 text-indigo-600 font-bold': effectiveHighlightedLines.has(index + 1)}"
+                class="w-10 text-right pr-2 py-0.5 text-slate-400 select-none font-mono text-sm border-r border-slate-100 bg-slate-50 sticky left-0 z-10"
+                :class="{'text-slate-600 font-bold': selectedLine === index + 1, 'bg-brand-100 text-brand-600 font-bold': effectiveHighlightedLines.has(index + 1)}"
               >
                 {{ index + 1 }}
               </td>
               
               <!-- Code -->
               <td 
-                class="pl-4 pr-4 py-0.5 font-mono text-sm whitespace-pre text-slate-700 relative cursor-pointer"
+                class="pl-2 pr-4 py-0.5 font-mono text-sm whitespace-pre text-slate-700 relative cursor-pointer"
                 @click="toggleLine(index + 1)"
                 @mouseenter="handleLineHover(index + 1, $event)"
                 @mouseleave="handleLineLeave"
               >
-                <div class="absolute left-0 top-0 bottom-0 w-1 bg-indigo-500 opacity-0 group-hover:opacity-100 transition-opacity"></div>
                 <code v-html="highlightLine(line)"></code>
               </td>
               
@@ -68,7 +67,7 @@
                            :title="comment.authorName"
                            class="w-5 h-5 rounded-full border-2 border-white shadow-sm object-cover" />
                       <div v-else
-                           class="w-5 h-5 rounded-full bg-indigo-100 border-2 border-white flex items-center justify-center text-[8px] font-bold text-indigo-600 shadow-sm"
+                           class="w-5 h-5 rounded-full bg-brand-100 border-2 border-white flex items-center justify-center text-[8px] font-bold text-brand-600 shadow-sm"
                            :title="comment.authorName">
                         {{ comment.authorName?.charAt(0).toUpperCase() || 'U' }}
                       </div>
@@ -83,7 +82,7 @@
                 <button 
                   v-else-if="filteredCommentsByLine[index + 1]?.length > 0"
                   @click="toggleLine(index + 1)"
-                  class="text-indigo-500 hover:text-indigo-600 transition-colors"
+                  class="text-brand-500 hover:text-brand-600 transition-colors"
                   title="댓글 접기"
                 >
                   <MessageSquare :size="14" />
@@ -113,8 +112,8 @@
                   >
                     <img v-if="comment.authorProfileImageUrl" 
                          :src="comment.authorProfileImageUrl" 
-                         class="w-5 h-5 rounded-full flex-shrink-0 border border-indigo-200 object-cover" />
-                    <div v-else class="w-5 h-5 rounded-full bg-indigo-100 flex-shrink-0 flex items-center justify-center text-indigo-600 text-[9px] font-bold border border-indigo-200">
+                         class="w-5 h-5 rounded-full flex-shrink-0 border border-brand-200 object-cover" />
+                    <div v-else class="w-5 h-5 rounded-full bg-brand-100 flex-shrink-0 flex items-center justify-center text-brand-600 text-[9px] font-bold border border-brand-200">
                        {{ comment.authorName?.charAt(0).toUpperCase() || 'U' }}
                     </div>
                     <div class="flex-1 min-w-0">
@@ -135,8 +134,8 @@
                     <input
                       v-model="newCommentContent"
                       placeholder="이 라인에 대한 리뷰..."
-                      class="flex-1 bg-white border border-slate-200 rounded-lg px-3 py-1.5 text-slate-700 placeholder-slate-400 text-xs focus:outline-none focus:border-indigo-400 focus:ring-1 focus:ring-indigo-400/50 transition-all"
-                      @keyup.enter="submitLineComment(index + 1)"
+                      class="flex-1 bg-white border border-slate-200 rounded-lg px-3 py-1.5 text-slate-700 placeholder-slate-400 text-xs focus:outline-none focus:border-brand-400 focus:ring-1 focus:ring-brand-400/50 transition-all"
+                      @keyup.enter.stop="submitLineComment(index + 1)"
                     />
                     <button 
                       @click="expandedLine = null"
@@ -147,7 +146,7 @@
                     <button 
                       @click="submitLineComment(index + 1)"
                       :disabled="!newCommentContent.trim()"
-                      class="px-2 py-1 rounded text-[10px] font-bold text-white bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                      class="px-2 py-1 rounded text-[10px] font-bold text-white bg-brand-600 hover:bg-brand-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                     >
                       등록
                     </button>
@@ -162,22 +161,22 @@
     <!-- AI Annotation Tooltip -->
     <Teleport to="body">
       <div v-if="hoveredLine && keyBlocksByLine[hoveredLine]?.length > 0"
-           class="fixed z-[9999] bg-slate-900 text-white rounded-lg shadow-2xl p-4 max-w-md pointer-events-none border border-amber-500/30"
+           class="fixed z-[9999] bg-white text-slate-800 rounded-2xl shadow-2xl p-5 max-w-md pointer-events-none border border-brand-200"
            :style="{ left: tooltipPosition.x + 'px', top: tooltipPosition.y + 'px', transform: 'translate(-50%, -100%) translateY(-10px)' }">
-        <div class="flex items-center gap-2 mb-2 text-amber-400 font-bold text-sm">
+        <div class="flex items-center gap-2 mb-3 text-brand-600 font-bold text-sm">
           <span>💡</span>
           <span>AI 코드 설명</span>
         </div>
-        <div v-for="(block, idx) in keyBlocksByLine[hoveredLine]" :key="idx" class="space-y-2">
-          <div v-if="block.code" class="bg-slate-800 rounded p-2 text-xs font-mono text-slate-300 border border-slate-700">
+        <div v-for="(block, idx) in keyBlocksByLine[hoveredLine]" :key="idx" class="space-y-3">
+          <div v-if="block.code" class="bg-slate-100 rounded-lg p-3 text-xs font-mono text-slate-700 border border-slate-200">
             {{ block.code }}
           </div>
-          <p class="text-sm text-slate-300 leading-relaxed">{{ block.explanation }}</p>
+          <p class="text-sm text-slate-600 leading-relaxed">{{ block.explanation }}</p>
         </div>
         <!-- Arrow -->
         <div class="absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-full">
-          <div class="w-0 h-0 border-l-[8px] border-r-[8px] border-t-[8px] border-transparent border-t-amber-500/30"></div>
-          <div class="w-0 h-0 border-l-[6px] border-r-[6px] border-t-[6px] border-transparent border-t-slate-900 absolute top-0 left-1/2 -translate-x-1/2"></div>
+          <div class="w-0 h-0 border-l-[8px] border-r-[8px] border-t-[8px] border-transparent border-t-brand-200"></div>
+          <div class="w-0 h-0 border-l-[6px] border-r-[6px] border-t-[6px] border-transparent border-t-white absolute top-0 left-1/2 -translate-x-1/2"></div>
         </div>
       </div>
     </Teleport>
@@ -421,7 +420,7 @@ const scrollToLine = (lineNumber, endLine = null) => {
     const end = endLine ? Number(endLine) : null;
 
     selectedLine.value = start;
-    expandedLine.value = start; // Optional: if you want to open the comment box
+    // expandedLine은 설정하지 않음 - 댓글창 자동 열기 방지
     
     const linesToHighlight = new Set();
     if (end && end >= start) {

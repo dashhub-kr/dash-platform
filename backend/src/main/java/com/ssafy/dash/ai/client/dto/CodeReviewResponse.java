@@ -60,6 +60,7 @@ public class CodeReviewResponse {
     public static class StructureItem {
         private String name;
         private String role;
+        private String type; // "variable", "function", "class", "constant"
     }
 
     @Data
@@ -70,6 +71,8 @@ public class CodeReviewResponse {
     public static class KeyBlock {
         private String code;
         private String explanation;
+        private Integer startLine;
+        private Integer endLine;
     }
 
     @Data

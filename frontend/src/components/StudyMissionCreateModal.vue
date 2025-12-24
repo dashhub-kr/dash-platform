@@ -10,10 +10,10 @@
       </div>
       
       <!-- 안내 메시지 및 모드 표시 (탭 제거) -->
-      <div v-if="creationMode === 'ADD'" class="bg-indigo-50 px-8 py-3 border-b border-indigo-100 flex items-center justify-between">
-         <span class="text-indigo-800 font-bold text-sm flex items-center gap-2">
+      <div v-if="creationMode === 'ADD'" class="bg-brand-50 px-8 py-3 border-b border-brand-100 flex items-center justify-between">
+         <span class="text-brand-800 font-bold text-sm flex items-center gap-2">
             💡 진행 중인 미션에 문제를 추가합니다
-            <span v-if="initialProblemIds" class="px-2 py-0.5 bg-indigo-200 text-indigo-800 text-xs rounded-full">자동 선택됨</span>
+            <span v-if="initialProblemIds" class="px-2 py-0.5 bg-brand-200 text-brand-800 text-xs rounded-full">자동 선택됨</span>
          </span>
       </div>
       <div v-else class="bg-emerald-50 px-8 py-3 border-b border-emerald-100 flex items-center justify-between">
@@ -45,7 +45,7 @@
                 <label class="block text-xs font-bold text-slate-500 mb-2 uppercase tracking-wider">추가할 미션 선택</label>
                 <select v-model="selectedMissionId" 
                         :disabled="!!initialProblemIds"
-                        class="w-full px-4 py-3 bg-slate-50 border-2 border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 font-bold text-slate-700 transition-all appearance-none cursor-pointer disabled:bg-slate-100 disabled:text-slate-400 disabled:cursor-not-allowed">
+                        class="w-full px-4 py-3 bg-slate-50 border-2 border-slate-200 rounded-xl focus:ring-2 focus:ring-brand-500 focus:border-brand-500 font-bold text-slate-700 transition-all appearance-none cursor-pointer disabled:bg-slate-100 disabled:text-slate-400 disabled:cursor-not-allowed">
                     <option :value="null" disabled>미션을 선택하세요</option>
                     <option v-for="mission in activeMissions" :key="mission.id" :value="mission.id">
                         [#{{ mission.week }}] {{ mission.title }} (마감: {{ formatDate(mission.deadline) }})
@@ -70,7 +70,7 @@
                    <input v-model="input.value" type="text"
                           :readonly="!!initialProblemIds"
                           class="w-full pl-8 pr-4 py-3 bg-slate-50 border-2 border-slate-200 rounded-xl focus:ring-2 transition-all read-only:bg-slate-100 read-only:text-slate-500"
-                          :class="creationMode === 'NEW' ? 'focus:ring-emerald-500 focus:border-emerald-500' : 'focus:ring-indigo-500 focus:border-indigo-500'"
+                          :class="creationMode === 'NEW' ? 'focus:ring-emerald-500 focus:border-emerald-500' : 'focus:ring-brand-500 focus:border-brand-500'"
                           placeholder="문제 번호 입력 (예: 1000)"
                           @keydown.enter.prevent="addProblemInput" />
                 </div>
@@ -88,7 +88,7 @@
 
           <button v-if="!initialProblemIds" 
                   @click="addProblemInput"
-                  class="mt-3 w-full py-3 border-2 border-dashed border-slate-200 rounded-xl text-slate-500 font-bold hover:border-indigo-300 hover:text-indigo-500 hover:bg-indigo-50/50 transition-all flex items-center justify-center gap-2">
+                  class="mt-3 w-full py-3 border-2 border-dashed border-slate-200 rounded-xl text-slate-500 font-bold hover:border-brand-300 hover:text-brand-500 hover:bg-brand-50/50 transition-all flex items-center justify-center gap-2">
              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
              </svg>
@@ -113,7 +113,7 @@
         <button @click="handleCreateOrUpdate"
                 class="flex-1 py-3 text-white rounded-xl font-bold shadow-lg transition-all"
                 :disabled="isSubmitting"
-                :class="creationMode === 'NEW' ? 'bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 shadow-emerald-500/25' : 'bg-gradient-to-r from-indigo-500 to-violet-500 hover:from-indigo-600 hover:to-violet-600 shadow-indigo-500/25'">
+                :class="creationMode === 'NEW' ? 'bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 shadow-emerald-500/25' : 'bg-gradient-to-r from-brand-500 to-violet-500 hover:from-brand-600 hover:to-violet-600 shadow-brand-500/25'">
           {{ isSubmitting ? '처리 중...' : (creationMode === 'NEW' ? '✨ 미션 생성' : '➕ 문제 추가하기') }}
         </button>
       </div>

@@ -295,7 +295,11 @@ CREATE TABLE IF NOT EXISTS code_analysis_results (
     refactor_explanation TEXT,
     score INT,
     full_response LONGTEXT,
-    analyzed_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    analyzed_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    counter_example_input TEXT,
+    counter_example_expected TEXT,
+    counter_example_predicted TEXT,
+    counter_example_reason TEXT
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 

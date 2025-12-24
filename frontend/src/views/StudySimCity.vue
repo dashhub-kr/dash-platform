@@ -4,8 +4,8 @@
     
     <!-- Header Overlay -->
     <div class="absolute top-6 left-6 z-10 animate-fade-in-down">
-      <div class="bg-white/80 backdrop-blur-md border border-white/50 rounded-2xl p-4 shadow-lg shadow-indigo-500/10 flex items-center gap-4">
-        <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-indigo-400 to-cyan-400 flex items-center justify-center text-2xl shadow-md transform -rotate-6">
+      <div class="bg-white/80 backdrop-blur-md border border-white/50 rounded-2xl p-4 shadow-lg shadow-brand-500/10 flex items-center gap-4">
+        <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-brand-400 to-cyan-400 flex items-center justify-center text-2xl shadow-md transform -rotate-6">
           🏙️
         </div>
         <div>
@@ -20,10 +20,10 @@
 
     <!-- Controls Overlay -->
     <div class="absolute bottom-10 left-1/2 transform -translate-x-1/2 z-10 animate-fade-in-up">
-      <div class="bg-white/90 backdrop-blur-xl border border-white/50 rounded-3xl p-2 shadow-2xl shadow-indigo-500/20 flex items-center gap-2">
+      <div class="bg-white/90 backdrop-blur-xl border border-white/50 rounded-3xl p-2 shadow-2xl shadow-brand-500/20 flex items-center gap-2">
         <button 
           @click="setMode('build')" 
-          :class="['flex items-center gap-2 px-6 py-3 rounded-2xl font-bold transition-all duration-300', mode === 'build' ? 'bg-indigo-600 text-white shadow-lg scale-105' : 'bg-transparent text-slate-500 hover:bg-slate-100']"
+          :class="['flex items-center gap-2 px-6 py-3 rounded-2xl font-bold transition-all duration-300', mode === 'build' ? 'bg-brand-600 text-white shadow-lg scale-105' : 'bg-transparent text-slate-500 hover:bg-slate-100']"
         >
           <span>🏗️</span>
           <span>건설 모드</span>
@@ -53,7 +53,7 @@
     <!-- Map Return Button -->
     <button 
       @click="$router.push('/map')"
-      class="absolute top-6 right-6 z-10 bg-white/80 backdrop-blur-md p-3 rounded-full text-slate-500 hover:text-indigo-600 hover:bg-white border border-white/50 shadow-md transition-all hover:scale-110 active:scale-95"
+      class="absolute top-6 right-6 z-10 bg-white/80 backdrop-blur-md p-3 rounded-full text-slate-500 hover:text-brand-600 hover:bg-white border border-white/50 shadow-md transition-all hover:scale-110 active:scale-95"
       title="지도로 돌아가기"
     >
       <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>

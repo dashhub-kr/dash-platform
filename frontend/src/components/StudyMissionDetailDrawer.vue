@@ -51,7 +51,7 @@
         <!-- Deadline Section -->
         <div class="bg-slate-50 rounded-xl p-4 border border-slate-100 flex items-center justify-between">
            <div class="flex items-center gap-3">
-              <div class="w-10 h-10 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-600">
+              <div class="w-10 h-10 rounded-full bg-brand-100 flex items-center justify-center text-brand-600">
                  <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                  </svg>
@@ -91,45 +91,52 @@
                        <th class="px-4 py-3 text-center w-20">진행률</th>
                     </tr>
                  </thead>
-                 <tbody class="divide-y divide-slate-100">
-                    <tr v-for="member in localMission.memberProgressList" :key="member.userId" class="hover:bg-slate-50/50">
-                       <td class="px-4 py-3 font-medium text-slate-800 flex items-center gap-2 sticky left-0 bg-white z-10">
-                          <img :src="member.avatarUrl" class="w-6 h-6 rounded-full" />
+                  <tbody class="divide-y divide-slate-100">
+                     <tr v-for="member in sortedMemberProgressList" :key="member.userId" 
+                         class="hover:bg-slate-50/50"
+                         :class="{ 'bg-emerald-50/70': isCurrentUser(member.userId) }">
+                       <td class="px-4 py-3 font-medium flex items-center gap-2 sticky left-0 z-10"
+                           :class="isCurrentUser(member.userId) ? 'bg-emerald-50/70 text-emerald-800' : 'bg-white text-slate-800'">
+                          <img :src="member.avatarUrl" 
+                               class="w-6 h-6 rounded-full" 
+                               :class="isCurrentUser(member.userId) ? 'ring-2 ring-emerald-400' : ''" />
                           <span class="truncate max-w-[100px]">{{ member.username }}</span>
                        </td>
                        
                        <!-- Problem Cells -->
-                       <td v-for="pid in localMission.problemIds" :key="pid" class="px-4 py-3 text-center">
-                          <div v-if="isSolved(member, pid)" class="flex justify-center">
-                             <span class="w-6 h-6 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
-                                   <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
-                                </svg>
-                             </span>
-                          </div>
-                          <div v-else class="flex justify-center group relative w-full h-full items-center">
-                             <!-- 1. SOS State (Flag) -->
-                             <span v-if="isSos(member, pid)" class="cursor-help" title="SOS 요청 중!">
-                                <span class="text-xl animate-pulse">🚩</span>
-                             </span>
-                             
-                             <!-- 2. Empty Dot -->
-                             <span v-else class="w-2 h-2 rounded-full bg-slate-200"></span>
-
-                             <!-- 3. SOS Button (Only for current user if not solved and mission is active) -->
-                             <button v-if="isCurrentUser(member.userId) && !isSolved(member, pid) && localMission.status !== 'COMPLETED'" 
-                                     @click="toggleSos(pid)"
-                                     class="absolute -top-3 -right-3 hidden group-hover:flex w-7 h-7 rounded-full items-center justify-center shadow-md transition-all z-20"
-                                     :class="isSos(member, pid) ? 'bg-slate-500 text-white hover:bg-slate-600' : 'bg-white text-rose-500 border border-rose-100 hover:bg-rose-50'"
-                                     :title="isSos(member, pid) ? 'SOS 취소' : 'SOS: 도움이 필요해요!'">
-                                {{ isSos(member, pid) ? '✕' : '🏳️' }}
-                             </button>
-                          </div>
-                       </td>
+                        <td v-for="pid in localMission.problemIds" :key="pid" 
+                            class="px-4 py-3 text-center group relative">
+                           <div v-if="isSolved(member, pid)" class="flex justify-center">
+                              <span class="w-6 h-6 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center">
+                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                                    <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
+                                 </svg>
+                              </span>
+                           </div>
+                           <div v-else class="flex justify-center items-center min-h-[24px]">
+                              <!-- 1. SOS State (Flag) -->
+                              <span v-if="isSos(member, pid)" class="cursor-help" title="SOS 요청 중!">
+                                 <span class="text-xl animate-pulse">🚩</span>
+                              </span>
+                              
+                              <!-- 2. Empty Dot -->
+                              <span v-else class="w-2 h-2 rounded-full bg-slate-200"></span>
+                           </div>
+                           
+                           <!-- 3. SOS Button (호버 시 셀 중앙에 표시) -->
+                           <button v-if="isCurrentUser(member.userId) && !isSolved(member, pid) && localMission.status !== 'COMPLETED'" 
+                                   @click.stop="toggleSos(pid)"
+                                   class="absolute inset-0 m-auto w-7 h-7 rounded-full items-center justify-center shadow-md transition-all z-20 hidden group-hover:flex"
+                                   :class="isSos(member, pid) ? 'bg-slate-500 text-white hover:bg-slate-600' : 'bg-white text-rose-500 border border-rose-100 hover:bg-rose-50'"
+                                   :title="isSos(member, pid) ? 'SOS 취소' : 'SOS: 도움이 필요해요!'">
+                              {{ isSos(member, pid) ? '✕' : '🏳️' }}
+                           </button>
+                        </td>
                        
-                       <td class="px-4 py-3 text-center font-bold text-slate-600">
-                          {{ Math.round((member.completedCount / localMission.totalProblems) * 100) }}%
-                       </td>
+                       <td class="px-4 py-3 text-center font-bold"
+                            :class="isCurrentUser(member.userId) ? 'text-emerald-700' : 'text-slate-600'">
+                           {{ Math.round((member.completedCount / localMission.totalProblems) * 100) }}%
+                        </td>
                     </tr>
                  </tbody>
               </table>
@@ -147,7 +154,7 @@
                    class="flex items-center justify-between p-4 bg-white border border-slate-200 rounded-xl hover:border-slate-300 transition-colors">
                  <div class="flex items-center gap-4">
                     <span class="text-lg font-bold text-slate-700">#{{ pid }}</span>
-                    <a :href="`https://www.acmicpc.net/problem/${pid}`" target="_blank" class="text-xs text-indigo-500 hover:underline flex items-center gap-1">
+                    <a :href="`https://www.acmicpc.net/problem/${pid}`" target="_blank" class="text-xs text-brand-500 hover:underline flex items-center gap-1">
                        문제 보기
                        <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
@@ -161,7 +168,7 @@
                  </button>
               </div>
               
-              <button v-if="localMission.status !== 'COMPLETED'" @click="openAddProblemModal" class="w-full py-3 border-2 border-dashed border-slate-200 rounded-xl text-slate-400 font-bold hover:border-indigo-300 hover:text-indigo-500 hover:bg-indigo-50/50 transition-all flex items-center justify-center gap-2">
+              <button v-if="localMission.status !== 'COMPLETED'" @click="openAddProblemModal" class="w-full py-3 border-2 border-dashed border-slate-200 rounded-xl text-slate-400 font-bold hover:border-brand-300 hover:text-brand-500 hover:bg-brand-50/50 transition-all flex items-center justify-center gap-2">
                  <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
                  </svg>
@@ -215,6 +222,16 @@ watch(() => props.mission, (newVal) => {
       localMission.value = JSON.parse(JSON.stringify(newVal)); // Deep copy
    }
 }, { immediate: true, deep: true });
+
+// Computed: 본인을 맨 위에 정렬
+const sortedMemberProgressList = computed(() => {
+   if (!localMission.value.memberProgressList) return [];
+   return [...localMission.value.memberProgressList].sort((a, b) => {
+      if (a.userId === props.currentUserId) return -1;
+      if (b.userId === props.currentUserId) return 1;
+      return 0;
+   });
+});
 
 // Methods
 const closeDrawer = () => {

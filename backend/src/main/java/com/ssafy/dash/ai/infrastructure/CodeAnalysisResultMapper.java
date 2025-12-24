@@ -18,5 +18,7 @@ public interface CodeAnalysisResultMapper {
 
     void update(CodeAnalysisResult result);
 
+    void updateCounterExample(CodeAnalysisResult result);
+
     void deleteByAlgorithmRecordId(@Param("algorithmRecordId") Long algorithmRecordId);
 }

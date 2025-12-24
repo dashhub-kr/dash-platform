@@ -5,6 +5,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ssafy.dash.ai.client.AiServerClient;
 import com.ssafy.dash.ai.client.dto.CodeReviewRequest;
 import com.ssafy.dash.ai.client.dto.CodeReviewResponse;
+import com.ssafy.dash.ai.client.dto.CodeReviewResponse;
+import com.ssafy.dash.ai.client.dto.AiCounterExampleResponse;
 import com.ssafy.dash.ai.domain.CodeAnalysisResult;
 import com.ssafy.dash.ai.infrastructure.CodeAnalysisResultMapper;
 import lombok.RequiredArgsConstructor;
@@ -33,7 +35,7 @@ public class CodeReviewService {
      */
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     public CodeAnalysisResult analyzeAndSave(Long algorithmRecordId, String code, String language,
-            String problemNumber) {
+            String problemNumber, String platform, String problemTitle) {
         log.info("Analyzing code for record: {}", algorithmRecordId);
 
         // 1. AI 서버에 분석 요청
@@ -41,6 +43,8 @@ public class CodeReviewService {
                 .code(code)
                 .language(language)
                 .problemNumber(problemNumber)
+                .platform(platform)
+                .problemTitle(problemTitle)
                 .build();
 
         CodeReviewResponse response = aiClient.analyzeCode(request);
@@ -54,6 +58,38 @@ public class CodeReviewService {
 
         log.info("Code analysis saved for record: {}, score: {}", algorithmRecordId, result.getScore());
         return result;
+    }
+
+    /**
+     * 반례 결과 저장
+     */
+    @Transactional
+    public void saveCounterExample(Long algorithmRecordId, AiCounterExampleResponse response) {
+        // 이미 결과가 있으면 업데이트, 없으면 신규 생성
+        Optional<CodeAnalysisResult> existing = resultMapper.findByAlgorithmRecordId(algorithmRecordId);
+
+        CodeAnalysisResult result;
+        if (existing.isPresent()) {
+            result = existing.get();
+        } else {
+            result = CodeAnalysisResult.builder()
+                    .algorithmRecordId(algorithmRecordId)
+                    .analyzedAt(LocalDateTime.now())
+                    .build();
+        }
+
+        result.setCounterExampleInput(response.inputExample());
+        result.setCounterExampleExpected(response.expectedOutput());
+        result.setCounterExamplePredicted(response.predictedOutput());
+        result.setCounterExampleReason(response.explanation());
+
+        if (existing.isPresent()) {
+            resultMapper.updateCounterExample(result);
+        } else {
+            resultMapper.insert(result);
+        }
+
+        log.info("Counter example saved for record: {}", algorithmRecordId);
     }
 
     /**

@@ -53,7 +53,7 @@ class CodeReviewServiceTest {
 
         // when
         CodeAnalysisResult result = codeReviewService.analyzeAndSave(
-                algorithmRecordId, code, language, problemNumber);
+                algorithmRecordId, code, language, problemNumber, "baekjoon", "A+B");
 
         // then
         assertThat(result).isNotNull();

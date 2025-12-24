@@ -25,7 +25,7 @@
                 
                 <!-- LOADING STATE -->
                 <div v-if="loading" class="flex flex-col items-center justify-center h-full py-20">
-                    <div class="w-16 h-16 border-4 border-indigo-100 border-t-indigo-500 rounded-full animate-spin mb-6"></div>
+                    <div class="w-16 h-16 border-4 border-brand-100 border-t-brand-500 rounded-full animate-spin mb-6"></div>
                     <h4 class="text-lg font-bold text-slate-800">AI가 분석 중입니다</h4>
                     <p class="text-slate-500">잠시만 기다려주세요...</p>
                 </div>
@@ -44,7 +44,7 @@
                             <label class="text-xs font-bold text-slate-500 uppercase tracking-wider">Counterexample Input</label>
                             <button 
                                 @click="copyInput" 
-                                class="flex items-center gap-1.5 text-xs font-bold text-indigo-500 hover:text-indigo-700 transition-colors px-2 py-1 rounded bg-indigo-50 hover:bg-indigo-100"
+                                class="flex items-center gap-1.5 text-xs font-bold text-brand-500 hover:text-brand-700 transition-colors px-2 py-1 rounded bg-brand-50 hover:bg-brand-100"
                             >
                                 <component :is="copied ? Check : Copy" class="w-3.5 h-3.5" />
                                 {{ copied ? 'Copied!' : 'Copy Input' }}
@@ -83,11 +83,11 @@
                     </div>
 
                     <!-- 3. AI Tutor Explanation -->
-                    <div class="bg-white rounded-2xl border border-indigo-100 shadow-lg p-6 relative overflow-hidden">
-                        <div class="absolute top-0 left-0 w-1.5 h-full bg-gradient-to-b from-indigo-500 to-purple-500"></div>
+                    <div class="bg-white rounded-2xl border border-brand-100 shadow-lg p-6 relative overflow-hidden">
+                        <div class="absolute top-0 left-0 w-1.5 h-full bg-gradient-to-b from-brand-500 to-purple-500"></div>
                         <div class="flex items-start gap-4">
-                            <div class="w-10 h-10 rounded-full bg-indigo-50 flex items-center justify-center shrink-0">
-                                <Bot class="w-6 h-6 text-indigo-600" />
+                            <div class="w-10 h-10 rounded-full bg-brand-50 flex items-center justify-center shrink-0">
+                                <Bot class="w-6 h-6 text-brand-600" />
                             </div>
                             <div class="space-y-2">
                                 <h4 class="font-bold text-slate-800">AI Tutor's Insight</h4>
@@ -103,7 +103,7 @@
                     
                     <!-- Header -->
                     <div class="flex items-center gap-3 mb-4">
-                        <div class="w-12 h-12 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center shadow-lg">
+                        <div class="w-12 h-12 rounded-full bg-gradient-to-br from-brand-500 to-purple-600 flex items-center justify-center shadow-lg">
                             <MessageSquare class="w-6 h-6 text-white" />
                         </div>
                         <div>
@@ -118,7 +118,7 @@
                              class="flex" :class="msg.role === 'user' ? 'justify-end' : 'justify-start'">
                             <div class="max-w-[85%] px-4 py-3 rounded-2xl text-sm"
                                  :class="msg.role === 'user' 
-                                     ? 'bg-indigo-500 text-white rounded-br-sm' 
+                                     ? 'bg-brand-500 text-white rounded-br-sm' 
                                      : 'bg-white border border-slate-200 text-slate-700 rounded-bl-sm shadow-sm'">
                                 <div v-html="renderMarkdown(msg.content)"></div>
                             </div>
@@ -127,9 +127,9 @@
                         <div v-if="chatLoading" class="flex justify-start">
                             <div class="bg-white border border-slate-200 px-4 py-3 rounded-2xl rounded-bl-sm shadow-sm">
                                 <div class="flex gap-1.5">
-                                    <div class="w-2 h-2 bg-indigo-400 rounded-full animate-bounce"></div>
-                                    <div class="w-2 h-2 bg-indigo-400 rounded-full animate-bounce" style="animation-delay: 0.1s"></div>
-                                    <div class="w-2 h-2 bg-indigo-400 rounded-full animate-bounce" style="animation-delay: 0.2s"></div>
+                                    <div class="w-2 h-2 bg-brand-400 rounded-full animate-bounce"></div>
+                                    <div class="w-2 h-2 bg-brand-400 rounded-full animate-bounce" style="animation-delay: 0.1s"></div>
+                                    <div class="w-2 h-2 bg-brand-400 rounded-full animate-bounce" style="animation-delay: 0.2s"></div>
                                 </div>
                             </div>
                         </div>
@@ -139,7 +139,7 @@
                     <div v-if="quickReplies.length > 0 && !chatLoading" class="flex flex-wrap gap-2 mb-4">
                         <button v-for="(reply, idx) in quickReplies" :key="idx"
                                 @click="sendChatMessage(reply)"
-                                class="px-3 py-1.5 bg-indigo-50 border border-indigo-200 text-indigo-700 rounded-full text-xs font-medium hover:bg-indigo-100 transition-colors"
+                                class="px-3 py-1.5 bg-brand-50 border border-brand-200 text-brand-700 rounded-full text-xs font-medium hover:bg-brand-100 transition-colors"
                                 v-html="renderMarkdown(reply)">
                         </button>
                     </div>
@@ -151,13 +151,13 @@
                             @keyup.enter="sendChatMessage(chatInput)"
                             :disabled="chatLoading"
                             type="text" 
-                            placeholder="질문 시 도토리 3개가 차감됩니다..."
-                            class="flex-1 px-4 py-3 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                            placeholder="힌트가 필요한 부분을 질문해보세요..."
+                            class="flex-1 px-4 py-3 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-transparent"
                         />
                         <button 
                             @click="sendChatMessage(chatInput)"
                             :disabled="!chatInput.trim() || chatLoading"
-                            class="px-5 py-3 bg-gradient-to-r from-indigo-500 to-purple-600 text-white rounded-xl font-bold text-sm hover:from-indigo-600 hover:to-purple-700 transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-md">
+                            class="px-5 py-3 bg-gradient-to-r from-brand-500 to-purple-600 text-white rounded-xl font-bold text-sm hover:from-brand-600 hover:to-purple-700 transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-md">
                             전송
                         </button>
                     </div>
@@ -171,17 +171,17 @@
                     <div v-if="data" class="flex items-center border-b border-slate-200 bg-white -mx-4 sm:-mx-6 px-4 sm:px-6">
                         <button @click="activeTab = 'insight'" 
                             class="px-4 py-4 text-sm font-bold border-b-2 transition-colors flex items-center gap-2"
-                            :class="activeTab === 'insight' ? 'border-indigo-600 text-indigo-600' : 'border-transparent text-slate-500 hover:text-slate-800'">
+                            :class="activeTab === 'insight' ? 'border-brand-600 text-brand-600' : 'border-transparent text-slate-500 hover:text-slate-800'">
                             <LayoutGrid class="w-4 h-4" /> Insight
                         </button>
                         <button @click="activeTab = 'structure'" 
                             class="px-4 py-4 text-sm font-bold border-b-2 transition-colors flex items-center gap-2"
-                            :class="activeTab === 'structure' ? 'border-indigo-600 text-indigo-600' : 'border-transparent text-slate-500 hover:text-slate-800'">
+                            :class="activeTab === 'structure' ? 'border-brand-600 text-brand-600' : 'border-transparent text-slate-500 hover:text-slate-800'">
                             <Network class="w-4 h-4" /> Structure
                         </button>
                         <button @click="activeTab = 'feedback'" 
                             class="px-4 py-4 text-sm font-bold border-b-2 transition-colors flex items-center gap-2"
-                            :class="activeTab === 'feedback' ? 'border-indigo-600 text-indigo-600' : 'border-transparent text-slate-500 hover:text-slate-800'">
+                            :class="activeTab === 'feedback' ? 'border-brand-600 text-brand-600' : 'border-transparent text-slate-500 hover:text-slate-800'">
                             <MessageSquare class="w-4 h-4" /> Feedback
                         </button>
                     </div>
@@ -191,8 +191,8 @@
                         <!-- TAB 1: INSIGHT -->
                         <div v-if="activeTab === 'insight'" class="space-y-6 animate-fade-in">
                             <!-- Summary -->
-                            <div class="bg-gradient-to-br from-indigo-50 to-white p-6 rounded-2xl border border-indigo-100 shadow-sm">
-                                <h4 class="text-xs font-bold text-indigo-400 uppercase tracking-widest mb-3">Analysis Summary</h4>
+                            <div class="bg-gradient-to-br from-brand-50 to-white p-6 rounded-2xl border border-brand-100 shadow-sm">
+                                <h4 class="text-xs font-bold text-brand-400 uppercase tracking-widest mb-3">Analysis Summary</h4>
                                 <div class="prose prose-sm max-w-none text-slate-800 text-lg font-medium leading-relaxed" v-html="renderMarkdown(data.summary)"></div>
                             </div>
                             
@@ -228,7 +228,7 @@
                                 <h4 class="text-sm font-bold text-slate-800 mb-4 flex items-center gap-2">🏗️ 코드 구조도</h4>
                                 <div class="space-y-2">
                                     <div v-for="(item, idx) in data.structure" :key="idx" class="flex items-center gap-4 p-3 rounded-xl bg-slate-50 border border-slate-100">
-                                        <div class="w-8 h-8 rounded-lg bg-indigo-100 flex items-center justify-center text-indigo-600 font-bold text-xs shrink-0">
+                                        <div class="w-8 h-8 rounded-lg bg-brand-100 flex items-center justify-center text-brand-600 font-bold text-xs shrink-0">
                                             {{ idx + 1 }}
                                         </div>
                                         <div class="flex-1">
@@ -293,7 +293,7 @@
                             <!-- Refactor -->
                             <div v-if="data.refactor?.code" class="bg-white p-5 rounded-xl border border-slate-100">
                                 <h4 class="text-sm font-semibold text-slate-800 mb-3 flex items-center gap-2">
-                                    <span class="w-6 h-6 rounded-lg bg-indigo-50 flex items-center justify-center text-sm">✨</span>
+                                    <span class="w-6 h-6 rounded-lg bg-brand-50 flex items-center justify-center text-sm">✨</span>
                                     리팩토링 제안
                                 </h4>
                                 <div class="prose prose-sm prose-slate max-w-none text-slate-600 mb-4 leading-relaxed" v-html="renderMarkdown(data.refactor.explanation)"></div>
@@ -443,7 +443,7 @@ const getHeaderIcon = (type) => {
 
 const getHeaderIconClass = (type) => {
     switch(type) {
-        case 'review': return 'bg-indigo-100 text-indigo-600';
+        case 'review': return 'bg-brand-100 text-brand-600';
         case 'counter_example': return 'bg-rose-100 text-rose-600';
         case 'tutor': return 'bg-amber-100 text-amber-600';
         default: return 'bg-slate-100 text-slate-600';
@@ -524,14 +524,14 @@ const copyCode = async (code) => {
 }
 
 /* Inline code in user messages (indigo/blue bg) */
-.bg-indigo-500 :deep(code:not(pre code)) {
+.bg-brand-500 :deep(code:not(pre code)) {
   background-color: rgba(255, 255, 255, 0.25);
   color: #fff;
 }
 
 /* Inline code in indigo quick replies */
-.bg-indigo-50 :deep(code:not(pre code)),
-.border-indigo-200 :deep(code:not(pre code)) {
+.bg-brand-50 :deep(code:not(pre code)),
+.border-brand-200 :deep(code:not(pre code)) {
   background-color: rgba(99, 102, 241, 0.15);
   color: #4338ca;
 }

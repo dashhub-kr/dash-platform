@@ -1,9 +1,5 @@
 <template>
-  <div class="min-h-screen flex items-center justify-center bg-slate-50 text-slate-800 p-6 relative overflow-hidden font-[Pretendard]">
-    
-    <!-- Background Decor -->
-    <div class="absolute top-[-10%] right-[10%] w-[40vw] h-[40vw] bg-yellow-200/40 rounded-full blur-[100px] animate-blob mix-blend-multiply"></div>
-    <div class="absolute bottom-[-10%] left-[10%] w-[40vw] h-[40vw] bg-emerald-200/40 rounded-full blur-[100px] animate-blob animation-delay-2000 mix-blend-multiply"></div>
+  <div class="min-h-screen flex items-center justify-center bg-slate-50 text-slate-800 p-6">
 
     <div class="max-w-md w-full space-y-8 animate-fade-in-up relative z-10">
       <div class="text-center space-y-2">
@@ -11,7 +7,7 @@
         <p class="text-slate-500 font-medium">마지막 단계입니다! 백준 풀이를 저장할 깃허브 저장소를 연결하세요.</p>
       </div>
 
-      <div class="bg-white/80 border border-white/60 rounded-3xl p-8 shadow-xl shadow-indigo-500/10 backdrop-blur-md space-y-6">
+      <div class="bg-white/80 border border-white/60 rounded-3xl p-8 shadow-xl shadow-brand-500/10 backdrop-blur-md space-y-6">
         <!-- Extension Detected Badge -->
         <div v-if="extensionDetected" class="bg-emerald-50 border border-emerald-200 rounded-2xl p-4 flex items-center gap-3">
           <div class="w-10 h-10 bg-emerald-100 rounded-full flex items-center justify-center">
@@ -25,14 +21,14 @@
           </div>
         </div>
 
-        <div class="bg-indigo-50 border border-indigo-100 rounded-2xl p-5 space-y-3">
-          <h3 class="text-sm font-bold text-indigo-900 uppercase tracking-wider flex items-center gap-2">
-            <span class="w-2 h-2 rounded-full bg-indigo-500"></span>
+        <div class="bg-brand-50 border border-brand-100 rounded-2xl p-5 space-y-3">
+          <h3 class="text-sm font-bold text-brand-900 uppercase tracking-wider flex items-center gap-2">
+            <span class="w-2 h-2 rounded-full bg-brand-500"></span>
             체크리스트
           </h3>
-          <ol class="list-decimal list-inside text-sm text-slate-600 space-y-2 marker:font-bold marker:text-indigo-500 font-medium">
+          <ol class="list-decimal list-inside text-sm text-slate-600 space-y-2 marker:font-bold marker:text-brand-500 font-medium">
             <li :class="extensionDetected ? 'line-through text-slate-400' : ''">
-                 <a href="https://chromewebstore.google.com/detail/kimjgflahdmnlhilmojcoaechlgkokhc?utm_source=item-share-cb" target="_blank" class="font-bold text-indigo-600 hover:text-indigo-500 hover:underline transition-colors" :class="extensionDetected ? 'text-slate-400' : ''">BaekjoonHub Dash</a> 익스텐션을 설치합니다.
+                 <a href="https://chromewebstore.google.com/detail/kimjgflahdmnlhilmojcoaechlgkokhc?utm_source=item-share-cb" target="_blank" class="font-bold text-brand-600 hover:text-brand-500 hover:underline transition-colors" :class="extensionDetected ? 'text-slate-400' : ''">BaekjoonHub Dash</a> 익스텐션을 설치합니다.
                  <span v-if="extensionDetected" class="text-emerald-500 ml-1">✓</span>
             </li>
             <li>연결할 저장소 이름을 검색합니다.</li>
@@ -48,7 +44,7 @@
                 v-model="searchQuery"
                 type="text"
                 placeholder="저장소 이름을 입력하세요"
-                class="w-full bg-white border border-slate-200 rounded-2xl px-5 py-4 text-slate-800 placeholder:text-slate-400 focus:outline-none focus:ring-4 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all font-medium"
+                class="w-full bg-white border border-slate-200 rounded-2xl px-5 py-4 text-slate-800 placeholder:text-slate-400 focus:outline-none focus:ring-4 focus:ring-brand-500/20 focus:border-brand-500 transition-all font-medium"
                 :disabled="saving || success"
                 @input="onSearchInput"
               />
@@ -64,17 +60,17 @@
               v-for="repo in repositories" 
               :key="repo.fullName"
               @click="selectRepository(repo)"
-              class="bg-white hover:bg-indigo-50 border border-slate-200 hover:border-indigo-300 rounded-2xl p-4 cursor-pointer transition-all group shadow-sm hover:shadow-md"
+              class="bg-white hover:bg-brand-50 border border-slate-200 hover:border-brand-300 rounded-2xl p-4 cursor-pointer transition-all group shadow-sm hover:shadow-md"
             >
               <div class="flex items-center justify-between gap-3">
                 <div class="flex items-center gap-3 flex-1 min-w-0">
-                  <div class="w-10 h-10 bg-slate-100 group-hover:bg-white rounded-xl flex items-center justify-center transition-colors border border-slate-200 group-hover:border-indigo-200 flex-shrink-0">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-slate-400 group-hover:text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <div class="w-10 h-10 bg-slate-100 group-hover:bg-white rounded-xl flex items-center justify-center transition-colors border border-slate-200 group-hover:border-brand-200 flex-shrink-0">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-slate-400 group-hover:text-brand-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z" />
                     </svg>
                   </div>
                   <div class="min-w-0 flex-1">
-                    <div class="font-bold text-slate-800 group-hover:text-indigo-700 transition-colors truncate text-sm md:text-base leading-tight">{{ repo.fullName }}</div>
+                    <div class="font-bold text-slate-800 group-hover:text-brand-700 transition-colors truncate text-sm md:text-base leading-tight">{{ repo.fullName }}</div>
                     <div class="text-xs text-slate-500 truncate mt-0.5">{{ repo.description || '설명 없음' }}</div>
                   </div>
                 </div>
@@ -95,7 +91,7 @@
 
           <!-- Selected Repository Card -->
           <div v-if="selectedRepo" class="relative">
-            <div class="bg-gradient-to-br from-emerald-50 to-white border-2 border-emerald-400 rounded-2xl p-5 shadow-lg shadow-emerald-100">
+            <div class="bg-gradient-to-br from-emerald-50 to-white border border-emerald-300 rounded-2xl p-5 shadow-lg shadow-emerald-100 ring-2 ring-emerald-50">
               <div class="flex items-start gap-3">
                 <div class="w-10 h-10 bg-emerald-100 rounded-xl flex items-center justify-center flex-shrink-0 mt-0.5">
                   <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -138,7 +134,7 @@
           <div class="flex flex-col gap-3">
             <button
               type="submit"
-              class="w-full px-4 py-4 rounded-2xl bg-gradient-to-r from-indigo-600 to-indigo-500 hover:from-indigo-500 hover:to-indigo-400 transition-all text-white font-bold shadow-lg shadow-indigo-500/30 hover:shadow-indigo-500/40 hover:-translate-y-0.5 disabled:opacity-60 disabled:cursor-not-allowed disabled:transform-none"
+              class="w-full px-4 py-4 rounded-2xl bg-gradient-to-r from-brand-600 to-brand-500 hover:from-brand-500 hover:to-brand-400 transition-all text-white font-bold shadow-lg shadow-brand-500/30 hover:shadow-brand-500/40 hover:-translate-y-0.5 disabled:opacity-60 disabled:cursor-not-allowed disabled:transform-none"
               :disabled="saving || success || !selectedRepo"
             >
               {{ saving ? "연결 중..." : (selectedRepo ? "저장소 연결하고 시작하기" : "위에서 저장소를 선택해주세요") }}

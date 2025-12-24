@@ -1,145 +1,175 @@
 <template>
-  <div class="study-mission-container relative w-full min-h-screen bg-slate-50 font-[Pretendard]">
-    <!-- 배경 효과 -->
-    <div class="absolute inset-0 bg-gradient-to-br from-emerald-50 via-white to-indigo-50"></div>
-    <div class="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none">
-      <div class="absolute top-1/4 right-1/4 w-96 h-96 bg-emerald-200/30 rounded-full blur-3xl animate-pulse mix-blend-multiply"></div>
-      <div class="absolute bottom-1/4 left-1/4 w-80 h-80 bg-indigo-200/30 rounded-full blur-3xl animate-pulse delay-1000 mix-blend-multiply"></div>
-    </div>
-
-    <div class="relative z-10 p-6 md:p-10 max-w-6xl mx-auto">
+  <div class="min-h-screen bg-white text-slate-700 font-sans pb-20">
+    
+    <div class="max-w-4xl mx-auto px-6 py-10">
       
-      <!-- 헤더 -->
-      <div class="flex flex-wrap items-center justify-between gap-4 mb-10">
-        <div>
-          <h1 class="text-4xl font-black text-slate-900 tracking-tight mb-1">주차별 미션</h1>
-          <p class="text-slate-500">스터디 과제를 관리하고 진행 현황을 확인하세요</p>
-        </div>
+      <!-- Header Section -->
+      <div class="flex items-center justify-between mb-8">
+        <h1 class="text-2xl font-black text-slate-800 tracking-tight">
+          미션 로드맵
+        </h1>
+        
         <button v-if="isLeader" @click="showCreateModal = true"
-                class="px-6 py-3 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl font-bold shadow-lg shadow-emerald-500/25 transition-all">
-          + 미션 생성
+                class="px-5 py-2.5 bg-brand hover:bg-brand-600 text-white rounded-xl font-bold text-sm transition-all flex items-center gap-2 shadow-sm hover:translate-y-0.5 active:translate-y-1">
+          <plus-icon class="w-4 h-4" stroke-width="3" />
+          <span>새 미션</span>
         </button>
       </div>
 
-      <!-- 로딩 -->
-      <div v-if="loading" class="text-center py-20 text-slate-500 animate-pulse text-xl">
-        미션 목록을 불러오는 중...
+      <!-- Loading State -->
+      <div v-if="loading" class="flex flex-col items-center justify-center py-20 space-y-4">
+        <div class="w-12 h-12 border-4 border-slate-200 border-t-brand rounded-full animate-spin"></div>
+        <p class="text-slate-400 font-bold animate-pulse">로딩 중입니다...</p>
       </div>
 
-      <!-- 미션 목록 -->
-      <div v-else-if="missions.length > 0" class="space-y-6">
+      <!-- Empty State -->
+      <div v-else-if="missions.length === 0" class="flex flex-col items-center justify-center py-20 text-center">
+            <div class="w-24 h-24 bg-slate-100 rounded-full flex items-center justify-center mb-6 text-slate-400">
+                <Inbox :size="48" stroke-width="1.5" />
+            </div>
+            <h3 class="text-xl font-bold text-slate-700 mb-2">등록된 미션이 없어요</h3>
+            <p class="text-slate-400 max-w-sm mx-auto mb-8">스터디원들과 함께 풀고 싶은 문제가 있다면 첫 번째 미션을 만들어보세요!</p>
+            <button v-if="isLeader" @click="showCreateModal = true"
+                class="px-8 py-4 bg-brand hover:bg-brand-600 text-white rounded-2xl font-bold text-lg shadow-xl shadow-brand-200 transition-all hover:-translate-y-1">
+            첫 미션 시작하기
+            </button>
+      </div>
+
+      <!-- Missions List -->
+      <div v-else class="space-y-8">
         <div v-for="mission in missions" :key="mission.id"
              @click="openDetailDrawer(mission)"
-             class="bg-white/80 backdrop-blur-xl border border-white/50 rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all cursor-pointer group active:scale-[0.99]"
-             :class="{ 'opacity-70 grayscale bg-slate-50': mission.status === 'COMPLETED' }">
-            <div class="flex flex-wrap items-start justify-between gap-4 mb-4">
-            <div>
-              <div class="flex items-center gap-3 mb-2">
-                <span class="px-3 py-1 font-bold rounded-lg text-sm"
-                      :class="mission.status === 'COMPLETED' ? 'bg-slate-200 text-slate-500' : 'bg-emerald-100 text-emerald-700'">
-                  Week {{ mission.week }}
-                </span>
-                <span v-if="mission.status === 'COMPLETED'" class="px-3 py-1 bg-slate-100 text-slate-400 font-bold rounded-lg text-sm border border-slate-200">
-                  🚫 종료됨
-                </span>
-                <span v-else-if="mission.sourceType === 'AI_RECOMMENDED'" 
-                      class="px-3 py-1 bg-indigo-100 text-indigo-700 font-medium rounded-lg text-sm">
-                  🤖 AI 추천
-                </span>
-              </div>
-              <h3 class="text-xl font-bold text-slate-900">{{ mission.title }}</h3>
-            </div>
-            <div class="text-right">
-              <p class="text-sm text-slate-500 mb-1">마감일</p>
-              <p class="font-medium text-slate-700">{{ formatDate(mission.deadline) }}</p>
-            </div>
-          </div>
+             class="bg-white rounded-3xl p-6 md:p-8 shadow-sm cursor-pointer transition-all hover:bg-slate-50 group relative overflow-hidden"
+             :class="{ 'opacity-70 grayscale': mission.status === 'COMPLETED' }"
+        >
+             <!-- Status Badge (Absolute) -->
+             <div v-if="mission.status === 'COMPLETED'" class="absolute -right-12 top-8 bg-slate-200 text-slate-500 font-black text-xs py-1 w-40 text-center rotate-45 shadow-sm">
+                COMPLETED
+             </div>
 
-          <!-- 문제 목록 -->
-          <div class="flex flex-wrap gap-2 mb-6">
-            <a v-for="(problemId, idx) in mission.problemIds" :key="problemId"
-               :href="`https://www.acmicpc.net/problem/${problemId}`"
-               target="_blank"
-               class="px-4 py-2 rounded-lg font-medium text-sm transition-all"
-               :class="idx < mission.solvedCount 
-                 ? 'bg-emerald-100 text-emerald-700 line-through' 
-                 : 'bg-slate-100 text-slate-600 hover:bg-slate-200'">
-              #{{ problemId }}
-            </a>
-          </div>
+            <div class="flex flex-col md:flex-row gap-6">
+                <!-- Left: Info -->
+                <div class="flex-1">
+                    <div class="flex items-center gap-2 mb-3">
+                         <!-- Week Badge -->
+                        <BaseIconBadge 
+                            :icon="Calendar"
+                            :text="`Week ${mission.week}`"
+                            :color="mission.status === 'COMPLETED' ? 'slate' : 'yellow'"
+                            size="sm"
+                        />
+                         <!-- AI Badge -->
+                         <BaseIconBadge 
+                             v-if="mission.sourceType === 'AI_RECOMMENDED'"
+                             :icon="Brain"
+                             text="AI 추천"
+                             color="brand"
+                             size="sm"
+                        />
+                    </div>
 
-          <!-- 팀원별 진행 레이스 (New Shared Gauge) -->
-          <div class="mt-6 pt-6 border-t border-slate-100">
-            <h4 class="text-sm font-bold text-slate-500 mb-4 flex items-center gap-2">
-              <span>🏃 팀원 진행 현황</span>
-            </h4>
-            
-            <div class="relative h-14 w-full mt-8 mb-2">
-                <!-- Progress Track -->
-                <div class="absolute top-[28px] left-0 right-0 h-3 bg-slate-100 rounded-full overflow-hidden shadow-inner">
-                    <div class="w-full h-full opacity-30 bg-[linear-gradient(90deg,transparent_99%,rgba(0,0,0,0.05)_100%)] bg-[length:20%_100%]"></div>
-                </div>
-                
-                <!-- Goal Flag (Right End) -->
-                <div class="absolute top-[18px] -right-2 z-10 bg-white p-1.5 rounded-full border border-slate-200 shadow-sm">
-                    <Trophy class="w-4 h-4 text-yellow-500" />
-                </div>
+                    <h3 class="text-2xl font-black text-slate-700 mb-2 group-hover:text-brand transition-colors">
+                        {{ mission.title }}
+                    </h3>
+                    
+                    <div class="flex items-center gap-4 text-slate-400 text-sm font-bold mb-6">
+                        <span>{{ formatDate(mission.deadline) }} 까지</span>
+                        
+                        <!-- D-Day Badge -->
+                        <BaseIconBadge 
+                            v-if="getDaysLeft(mission.deadline) >= 0"
+                            :icon="Flame"
+                            :text="getDaysLeft(mission.deadline) === 0 ? '오늘 마감' : `D-${getDaysLeft(mission.deadline)}`"
+                            color="orange"
+                            size="sm"
+                        />
+                         <span v-else class="text-slate-300 bg-slate-100 px-2 py-0.5 rounded-lg text-xs font-bold">
+                            종료됨
+                        </span>
+                    </div>
 
-                <!-- Member Markers -->
-                <div v-for="member in sortMembers(mission.memberProgressList)" :key="member.userId" 
-                     class="absolute top-0 transform -translate-x-1/2 transition-all duration-700 ease-out z-20 group"
-                     :style="{ left: getMemberProgressPercent(member, mission) + '%' }"
-                     :class="{'z-30': isMe(member.userId)}">
-                     
-                     <div class="flex flex-col items-center cursor-help">
-                        <!-- Avatar -->
-                        <div class="relative">
-                            <img :src="getMemberProfileImage(member)" :alt="member.username"
-                                 class="w-8 h-8 rounded-full object-cover border-2 shadow-md transition-transform hover:scale-110 bg-white"
-                                 :class="[
-                                   isMe(member.userId) 
-                                     ? 'border-emerald-500 ring-2 ring-emerald-500/30' 
-                                     : member.allCompleted 
-                                       ? 'border-orange-500' 
-                                       : 'border-slate-200 grayscale-[0.3]'
-                                 ]" />
-                             
-                             <!-- Completed Badge -->
-                             <div v-if="member.allCompleted" class="absolute -top-1 -right-1 w-3.5 h-3.5 bg-orange-500 rounded-full flex items-center justify-center border border-white shadow-sm animate-bounce">
-                                 <Check class="w-2 h-2 text-white" stroke-width="4" />
-                             </div>
+                    <!-- Problem Chips -->
+                     <div class="flex flex-wrap gap-2">
+                        <div v-for="(problemId, idx) in mission.problemIds" :key="problemId"
+                            class="px-3 py-1.5 rounded-xl font-bold text-sm transition-all flex items-center gap-1.5"
+                            :class="idx < mission.solvedCount 
+                                ? 'bg-leaf/10 text-leaf' 
+                                : 'bg-slate-100 text-slate-400'"
+                        >
+                           <div class="w-2 h-2 rounded-full" :class="idx < mission.solvedCount ? 'bg-leaf' : 'bg-slate-300'"></div>
+                           <span>{{ problemId }}</span>
                         </div>
+                    </div>
+                </div>
 
-                        <!-- Arrow -->
-                        <div class="w-0 h-0 border-l-[5px] border-l-transparent border-r-[5px] border-r-transparent border-t-[6px] transition-colors mt-0.5 drop-shadow-sm"
-                             :class="isMe(member.userId) ? 'border-t-emerald-500' : 'border-t-slate-300'"></div>
+                <!-- Right: Race Track -->
+                <div class="w-full md:w-1/3 bg-slate-50 rounded-2xl p-4 self-stretch flex flex-col justify-center">
+                    <div class="flex justify-between items-center mb-4">
+                         <span class="text-xs font-black text-slate-400 uppercase tracking-widest">Team Race</span>
+                         <span class="text-xs font-bold text-slate-500 bg-white px-2 py-1 rounded-lg">
+                            {{ Math.round((mission.memberProgressList?.reduce((acc, cur) => acc + cur.completedCount, 0) / (mission.memberProgressList?.length * Math.max(mission.totalProblems, 1))) * 100) }}% 달성
+                         </span>
+                    </div>
 
-                        <!-- Tooltip -->
-                        <div class="absolute bottom-full mb-1 px-2 py-1 bg-slate-800 text-white text-[10px] rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none shadow-xl flex flex-col items-center gap-0.5 z-50">
-                            <span class="font-bold text-indigo-200">{{ member.username }} {{ isMe(member.userId) ? '(나)' : '' }}</span>
-                            <span class="font-mono">{{ member.completedCount }} / {{ mission.problemIds.length }}</span>
-                            <!-- Tooltip Arrow -->
-                            <div class="absolute -bottom-1 left-1/2 -translate-x-1/2 w-2 h-2 bg-slate-800 rotate-45"></div>
+                    <div class="relative h-4 bg-slate-200 rounded-full mb-8 mx-2">
+                        <!-- Runners -->
+                        <div v-for="(members, progress) in getGroupedMembers(mission.memberProgressList)" 
+                             :key="progress"
+                             class="absolute top-1/2 -translate-y-1/2 group/runner-group z-10 w-8 h-8"
+                             :style="{ left: `calc(${progress}% - 14px)` }">
+
+                            <div v-for="(member, idx) in getSortedMembersForGroup(members)" 
+                                :key="member.userId"
+                                class="absolute top-0 left-0 transition-all duration-300 ease-out"
+                                :style="{ 
+                                    zIndex: member.userId === currentUserId ? 50 : (40 - idx),
+                                    '--tx': `${idx * 18}px`
+                                }">
+                                
+                                <!-- Avatar Container -->
+                                <div class="relative transition-transform duration-300 transform group-hover/runner-group:translate-x-[var(--tx)] group/avatar"
+                                     :class="idx > 0 ? 'group-hover/runner-group:opacity-80' : ''">
+                                    
+                                    <img v-if="member.avatarUrl" :src="member.avatarUrl" 
+                                         class="w-8 h-8 rounded-full border-2 border-white object-cover shadow-sm bg-white"
+                                         :class="member.userId === currentUserId ? 'ring-2 ring-brand/30' : ''" />
+                                    <div v-else class="w-8 h-8 rounded-full border-2 border-white bg-slate-300 flex items-center justify-center text-[10px] font-bold text-white uppercase shadow-sm"
+                                         :style="{ backgroundColor: stringToColor(member.username) }">
+                                        {{ member.username?.substring(0, 2) }}
+                                    </div>
+
+                                    <!-- Flag for Completion -->
+                                    <div v-if="member.completedCount === member.totalProblems" class="absolute -top-2 -right-1 text-brand drop-shadow-md animate-bounce z-50">
+                                        <Flag :size="16" fill="currentColor" />
+                                    </div>
+
+                                    <!-- Tooltip -->
+                                    <div class="absolute left-1/2 -translate-x-1/2 -top-8 bg-slate-800 text-white text-[10px] font-bold px-2 py-1 rounded-lg opacity-0 group-hover/avatar:opacity-100 transition-opacity whitespace-nowrap pointer-events-none z-[60]">
+                                        {{ member.username }}
+                                    </div>
+                                </div>
+                            </div>
                         </div>
-                     </div>
+                    </div>
+                    
+                    <!-- Legend -->
+                    <div class="flex flex-wrap gap-2 mt-auto">
+                        <div v-for="member in mission.memberProgressList?.slice(0, 3)" :key="'legend-'+member.userId" 
+                             class="flex items-center gap-1.5 text-[10px] font-bold text-slate-400 bg-white px-2 py-1 rounded-lg border border-slate-100">
+                             <div class="w-1.5 h-1.5 rounded-full" :class="member.completedCount === member.totalProblems ? 'bg-leaf' : 'bg-slate-300'"></div>
+                             {{ member.username }}
+                        </div>
+                        <div v-if="mission.memberProgressList?.length > 3" class="text-[10px] font-bold text-slate-300 px-1 py-1">
+                            +{{ mission.memberProgressList.length - 3 }}
+                        </div>
+                    </div>
                 </div>
             </div>
-          </div>
         </div>
       </div>
-
-      <!-- 빈 상태 -->
-      <div v-else class="text-center py-20">
-        <p class="text-slate-400 text-xl mb-6">아직 등록된 미션이 없습니다</p>
-        <button v-if="isLeader" @click="showCreateModal = true"
-                class="px-8 py-4 bg-emerald-600 text-white rounded-xl font-bold shadow-lg">
-          첫 미션 만들기
-        </button>
-      </div>
-
     </div>
 
-    <!-- 미션 생성 Modal -->
+    <!-- Modals -->
     <StudyMissionCreateModal
       :isOpen="showCreateModal"
       :studyId="studyId"
@@ -151,7 +181,6 @@
       @refresh="loadMissions"
     />
 
-    <!-- 미션 상세 Drawer -->
     <StudyMissionDetailDrawer
       :isOpen="showDetailDrawer"
       :mission="selectedMission"
@@ -171,17 +200,18 @@ import { useRoute, useRouter } from 'vue-router';
 import axios from 'axios';
 import StudyMissionCreateModal from '@/components/StudyMissionCreateModal.vue';
 import StudyMissionDetailDrawer from '@/components/StudyMissionDetailDrawer.vue';
-import { Trophy, Check, Flame } from 'lucide-vue-next';
-
-const profileImages = [
-    '/profile/bag.png',
-    '/profile/proud.png',
-    '/profile/smart.png',
-    '/profile/smile.png'
-];
+import BaseIconBadge from '@/components/common/BaseIconBadge.vue';
+import { Plus as PlusIcon, 
+    Inbox, 
+    Calendar,
+    Brain,
+    Flame,
+    Flag,
+    Info
+} from 'lucide-vue-next';
 
 const route = useRoute();
-const router = useRouter(); // 쿼리 제거용
+const router = useRouter();
 
 const loading = ref(true);
 const missions = ref([]);
@@ -194,7 +224,6 @@ const modalProblemIds = ref('');
 const modalTitle = ref('');
 const preSelectedMissionId = ref(null);
 
-// Drawer 상태
 const showDetailDrawer = ref(false);
 const selectedMission = ref(null);
 
@@ -207,14 +236,10 @@ onMounted(async () => {
     
     if (studyId.value) {
       await loadMissions();
-      
-      // 쿼리 파라미터로 전달된 문제 정보가 있으면 모달 자동 열기
       if (route.query.problemIds && isLeader.value) {
         modalProblemIds.value = route.query.problemIds;
         modalTitle.value = route.query.title || '';
         showCreateModal.value = true;
-        
-        // 쿼리 파라미터 제거 (지저분하므로)
         router.replace({ query: null });
       }
     }
@@ -226,22 +251,31 @@ onMounted(async () => {
 });
 
 const loadMissions = async () => {
-  const res = await axios.get(`/api/studies/${studyId.value}/missions`);
-  missions.value = res.data;
+  try {
+    const res = await axios.get(`/api/studies/${studyId.value}/missions`);
+    missions.value = res.data;
+  } catch (e) {
+    console.error("Fetch missions failed", e);
+  }
 };
 
 const formatDate = (dateStr) => {
   if (!dateStr) return '-';
   const date = new Date(dateStr);
-  const year = date.getFullYear();
-  const month = String(date.getMonth() + 1).padStart(2, '0');
-  const day = String(date.getDate()).padStart(2, '0');
-  return `${year}. ${month}. ${day}.`;
+  return `${date.getMonth() + 1}/${date.getDate()}`;
+};
+
+const getDaysLeft = (deadline) => {
+    const today = new Date();
+    today.setHours(0,0,0,0);
+    const end = new Date(deadline);
+    end.setHours(0,0,0,0);
+    const diff = end - today;
+    return Math.ceil(diff / (1000 * 60 * 60 * 24));
 };
 
 const closeModal = () => {
   showCreateModal.value = false;
-  // 모달 닫을 때 데이터 초기화
   modalProblemIds.value = '';
   modalTitle.value = '';
   preSelectedMissionId.value = null;
@@ -262,32 +296,34 @@ const openAddModalForMission = (missionId) => {
   showCreateModal.value = true;
 };
 
-// --- Helper Functions for Mission Gauge ---
-const isMe = (userId) => currentUserId.value === userId;
-
-const getMemberProfileImage = (member) => {
-    if (member.avatarUrl) return member.avatarUrl;
-    const id = member.userId || 0;
-    const index = id % profileImages.length;
-    return profileImages[index];
+const getGroupedMembers = (memberList) => {
+  if (!memberList) return {};
+  const groups = {};
+  memberList.forEach(m => {
+    const total = Math.max(m.totalProblems, 1);
+    const progress = Math.min(Math.floor((m.completedCount / total) * 100), 100);
+    if (!groups[progress]) groups[progress] = [];
+    groups[progress].push(m);
+  });
+  return groups;
 };
 
-const getMemberProgressPercent = (member, mission) => {
-    if (!mission || !mission.problemIds || mission.problemIds.length === 0) return 0;
-    const total = mission.problemIds.length;
-    const completed = member.completedCount || 0;
-    
-    if (member.allCompleted) return 100;
-    return Math.min(100, Math.max(0, (completed / total) * 100));
+const getSortedMembersForGroup = (members) => {
+  return [...members].sort((a, b) => {
+    if (a.userId === currentUserId.value) return -1;
+    if (b.userId === currentUserId.value) return 1;
+    return 0;
+  });
 };
 
-const sortMembers = (members) => {
-    if (!members) return [];
-    return [...members].sort((a, b) => {
-        if (a.userId === currentUserId.value) return -1;
-        if (b.userId === currentUserId.value) return 1;
-        return a.username.localeCompare(b.username);
-    });
+const stringToColor = (str) => {
+    if (!str) return '#cbd5e1';
+    let hash = 0;
+    for (let i = 0; i < str.length; i++) {
+        hash = str.charCodeAt(i) + ((hash << 5) - hash);
+    }
+    const c = (hash & 0x00ffffff).toString(16).toUpperCase();
+    return '#' + '00000'.substring(0, 6 - c.length) + c;
 };
 </script>
 
