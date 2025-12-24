@@ -4,12 +4,31 @@
     :class="{ 'hover:shadow-md hover:-translate-y-0.5': !expanded, 'shadow-xl': expanded, ...cardBorderClass }"
   >
     <!-- STATUS HEADER BAR -->
+    <!-- STATUS HEADER BAR -->
     <div :class="statusHeaderClass" class="px-4 py-2 flex items-center gap-2 text-sm font-bold">
-      <span>{{ isPassed ? '✅' : '❌' }}</span>
-      <span>{{ isPassed ? 'PASSED' : 'FAILED' }}</span>
-      <span v-if="taskTypeLabel" class="ml-1">[{{ taskTypeLabel }}]</span>
-      <span v-if="record.tag === 'DEFENSE' && defenseStreak > 0" class="ml-auto text-xs">🔥 {{ defenseStreak}}연승</span>
-      <div v-if="!expanded" class="ml-auto text-xs opacity-50">{{ formatDate(record.committedAt) }}</div>
+      <span v-if="record.tag === 'DEFENSE'">{{ isPassed ? '🛡️' : '💥' }}</span>
+      <span v-else>{{ isPassed ? '✅' : '❌' }}</span>
+      
+      <span v-if="record.tag === 'DEFENSE'">{{ isPassed ? '방어성공' : '방어실패' }}</span>
+      <span v-else>{{ isPassed ? 'PASSED' : 'FAILED' }}</span>
+
+      <!-- Defense Streak Badge (Moved here) -->
+      <div v-if="record.tag === 'DEFENSE' && defenseStreak > 0" 
+           class="flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-gradient-to-r from-orange-500 via-amber-500 to-yellow-500 text-white shadow-sm shadow-orange-200 border border-orange-400/50 mx-1">
+          <span class="text-[9px] animate-pulse">🔥</span>
+          <span class="text-[9px] font-black italic tracking-wider">{{ defenseStreak }} 연승!</span>
+      </div>
+
+      <span v-if="taskTypeLabel" class="ml-1 opacity-70 font-medium text-[10px]">[{{ taskTypeLabel }}]</span>
+      
+      <!-- Right Side: Name/Date Only -->
+      <div class="ml-auto flex items-center gap-3">
+          <!-- Submitter Name & Date -->
+          <div class="flex items-center gap-2 text-xs opacity-50">
+              <span class="font-bold border-r border-slate-400/30 pr-2">{{ record.memberName || 'Unknown' }}</span>
+              <span v-if="!expanded">{{ formatDate(record.committedAt) }}</span>
+          </div>
+      </div>
     </div>
 
     <!-- Header / Collapsed View -->
@@ -477,7 +496,15 @@ const sendSuggestion = (q) => {
 // Helpers
 const formatDate = (d) => d ? new Date(d).toLocaleDateString('ko-KR', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }) : '';
 const getExtension = (l) => ({'java':'java','python':'py','cpp':'cpp','c':'c','javascript':'js'}[l?.toLowerCase()] || 'txt');
-const extractKorean = (text) => { const match = text?.match(/[가-힣\s]+/); return match ? match[0].trim() : text; };
+const extractKorean = (text) => { 
+    if (!text) return text;
+    const match = text.match(/[가-힣\s]+/); 
+    // If match found and it's not just whitespace, return it. Otherwise return original.
+    if (match && match[0].trim().length > 0) {
+        return match[0].trim();
+    }
+    return text;
+};
 const extractPatterns = (json) => {
     if (!json) return [];
     try { return Array.isArray(JSON.parse(json)) ? JSON.parse(json) : []; } catch { return []; }
