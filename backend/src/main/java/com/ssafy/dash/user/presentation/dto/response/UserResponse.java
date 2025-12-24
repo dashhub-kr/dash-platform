@@ -16,7 +16,8 @@ public record UserResponse(
         String solvedacHandle,
         Integer solvedacTier,
         String repositoryName,
-        Boolean webhookConfigured) {
+        Boolean webhookConfigured,
+        Boolean isStudyLeader) {
 
     public static UserResponse from(UserResult result) {
         return new UserResponse(
@@ -31,8 +32,8 @@ public record UserResponse(
                 result.solvedacHandle(),
                 result.solvedacTier(),
                 result.repositoryName(),
-                result.webhookConfigured()
-        );
+                result.webhookConfigured(),
+                result.isStudyLeader());
     }
 
 }

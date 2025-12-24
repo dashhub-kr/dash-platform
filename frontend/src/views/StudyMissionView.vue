@@ -15,7 +15,7 @@
           <h1 class="text-4xl font-black text-slate-900 tracking-tight mb-1">주차별 미션</h1>
           <p class="text-slate-500">스터디 과제를 관리하고 진행 현황을 확인하세요</p>
         </div>
-        <button @click="showCreateModal = true"
+        <button v-if="isLeader" @click="showCreateModal = true"
                 class="px-6 py-3 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl font-bold shadow-lg shadow-emerald-500/25 transition-all">
           + 미션 생성
         </button>
@@ -29,14 +29,20 @@
       <!-- 미션 목록 -->
       <div v-else-if="missions.length > 0" class="space-y-6">
         <div v-for="mission in missions" :key="mission.id"
-             class="bg-white/80 backdrop-blur-xl border border-white/50 rounded-2xl p-6 shadow-lg hover:shadow-xl transition-shadow">
-          <div class="flex flex-wrap items-start justify-between gap-4 mb-4">
+             @click="openDetailDrawer(mission)"
+             class="bg-white/80 backdrop-blur-xl border border-white/50 rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all cursor-pointer group active:scale-[0.99]"
+             :class="{ 'opacity-70 grayscale bg-slate-50': mission.status === 'COMPLETED' }">
+            <div class="flex flex-wrap items-start justify-between gap-4 mb-4">
             <div>
               <div class="flex items-center gap-3 mb-2">
-                <span class="px-3 py-1 bg-emerald-100 text-emerald-700 font-bold rounded-lg text-sm">
+                <span class="px-3 py-1 font-bold rounded-lg text-sm"
+                      :class="mission.status === 'COMPLETED' ? 'bg-slate-200 text-slate-500' : 'bg-emerald-100 text-emerald-700'">
                   Week {{ mission.week }}
                 </span>
-                <span v-if="mission.sourceType === 'AI_RECOMMENDED'" 
+                <span v-if="mission.status === 'COMPLETED'" class="px-3 py-1 bg-slate-100 text-slate-400 font-bold rounded-lg text-sm border border-slate-200">
+                  🚫 종료됨
+                </span>
+                <span v-else-if="mission.sourceType === 'AI_RECOMMENDED'" 
                       class="px-3 py-1 bg-indigo-100 text-indigo-700 font-medium rounded-lg text-sm">
                   🤖 AI 추천
                 </span>
@@ -104,7 +110,7 @@
       <!-- 빈 상태 -->
       <div v-else class="text-center py-20">
         <p class="text-slate-400 text-xl mb-6">아직 등록된 미션이 없습니다</p>
-        <button @click="showCreateModal = true"
+        <button v-if="isLeader" @click="showCreateModal = true"
                 class="px-8 py-4 bg-emerald-600 text-white rounded-xl font-bold shadow-lg">
           첫 미션 만들기
         </button>
@@ -113,89 +119,75 @@
     </div>
 
     <!-- 미션 생성 Modal -->
-    <div v-if="showCreateModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
-      <div class="bg-white rounded-3xl w-full max-w-lg shadow-2xl overflow-hidden">
-        <!-- Modal 헤더 -->
-        <div class="bg-gradient-to-r from-emerald-500 to-teal-500 p-6">
-          <h2 class="text-2xl font-bold text-white">🎯 새 미션 만들기</h2>
-          <p class="text-emerald-100 text-sm mt-1">스터디원들을 위한 주차별 과제를 등록하세요</p>
-        </div>
-        
-        <div class="p-6 space-y-5">
-          <!-- 주차 및 제목 Row -->
-          <div class="grid grid-cols-4 gap-4">
-            <div>
-              <label class="block text-xs font-bold text-slate-500 mb-2 uppercase tracking-wider">주차</label>
-              <input v-model.number="newMission.week" type="number" min="1"
-                     class="w-full px-4 py-3 bg-slate-50 border-2 border-slate-200 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 text-center font-bold text-lg transition-all"
-                     placeholder="1" />
-            </div>
-            <div class="col-span-3">
-              <label class="block text-xs font-bold text-slate-500 mb-2 uppercase tracking-wider">미션 제목</label>
-              <input v-model="newMission.title" type="text"
-                     class="w-full px-4 py-3 bg-slate-50 border-2 border-slate-200 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-all"
-                     placeholder="예: DP 기초 다지기" />
-            </div>
-          </div>
-          
-          <!-- 문제 번호 -->
-          <div>
-            <label class="block text-xs font-bold text-slate-500 mb-2 uppercase tracking-wider">📝 문제 번호</label>
-            <input v-model="problemIdsInput" type="text"
-                   class="w-full px-4 py-3 bg-slate-50 border-2 border-slate-200 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-all"
-                   placeholder="1234, 5678, 9012 (쉼표로 구분)" />
-            <p class="text-xs text-slate-400 mt-2">백준 문제 번호를 쉼표로 구분하여 입력하세요</p>
-          </div>
-          
-          <!-- 마감일 -->
-          <div>
-            <label class="block text-xs font-bold text-slate-500 mb-2 uppercase tracking-wider">⏰ 마감일</label>
-            <input v-model="newMission.deadline" type="date"
-                   class="w-full px-4 py-3 bg-slate-50 border-2 border-slate-200 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-all" />
-          </div>
-        </div>
-        
-        <!-- Modal 푸터 -->
-        <div class="flex gap-3 p-6 bg-slate-50 border-t border-slate-100">
-          <button @click="showCreateModal = false"
-                  class="flex-1 py-3 border-2 border-slate-200 text-slate-600 rounded-xl font-bold hover:bg-slate-100 transition-all">
-            취소
-          </button>
-          <button @click="createMission"
-                  class="flex-1 py-3 bg-gradient-to-r from-emerald-500 to-teal-500 text-white rounded-xl font-bold hover:from-emerald-600 hover:to-teal-600 shadow-lg shadow-emerald-500/25 transition-all">
-            ✨ 미션 생성
-          </button>
-        </div>
-      </div>
-    </div>
+    <StudyMissionCreateModal
+      :isOpen="showCreateModal"
+      :studyId="studyId"
+      :missions="missions"
+      :initialProblemIds="modalProblemIds"
+      :initialTitle="modalTitle"
+      :preSelectedMissionId="preSelectedMissionId"
+      @close="closeModal"
+      @refresh="loadMissions"
+    />
+
+    <!-- 미션 상세 Drawer -->
+    <StudyMissionDetailDrawer
+      :isOpen="showDetailDrawer"
+      :mission="selectedMission"
+      :studyId="studyId"
+      :isLeader="isLeader"
+      :currentUserId="currentUserId"
+      @close="closeDetailDrawer"
+      @refresh="loadMissions"
+      @open-add-modal="openAddModalForMission"
+    />
   </div>
 </template>
 
 <script setup>
 import { ref, onMounted } from 'vue';
+import { useRoute, useRouter } from 'vue-router';
 import axios from 'axios';
+import StudyMissionCreateModal from '@/components/StudyMissionCreateModal.vue';
+import StudyMissionDetailDrawer from '@/components/StudyMissionDetailDrawer.vue';
+
+const route = useRoute();
+const router = useRouter(); // 쿼리 제거용
 
 const loading = ref(true);
 const missions = ref([]);
 const studyId = ref(null);
 const currentUserId = ref(null);
 const showCreateModal = ref(false);
+const isLeader = ref(false);
 
-const newMission = ref({
-  week: 1,
-  title: '',
-  deadline: ''
-});
-const problemIdsInput = ref('');
+const modalProblemIds = ref('');
+const modalTitle = ref('');
+const preSelectedMissionId = ref(null);
+
+// Drawer 상태
+const showDetailDrawer = ref(false);
+const selectedMission = ref(null);
 
 onMounted(async () => {
   try {
     const userRes = await axios.get('/api/users/me');
     studyId.value = userRes.data.studyId;
     currentUserId.value = userRes.data.id;
+    isLeader.value = userRes.data.isStudyLeader || false;
     
     if (studyId.value) {
       await loadMissions();
+      
+      // 쿼리 파라미터로 전달된 문제 정보가 있으면 모달 자동 열기
+      if (route.query.problemIds && isLeader.value) {
+        modalProblemIds.value = route.query.problemIds;
+        modalTitle.value = route.query.title || '';
+        showCreateModal.value = true;
+        
+        // 쿼리 파라미터 제거 (지저분하므로)
+        router.replace({ query: null });
+      }
     }
   } catch (e) {
     console.error('미션 로드 실패', e);
@@ -211,33 +203,38 @@ const loadMissions = async () => {
 
 const formatDate = (dateStr) => {
   if (!dateStr) return '-';
-  return new Date(dateStr).toLocaleDateString('ko-KR');
+  const date = new Date(dateStr);
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+  return `${year}. ${month}. ${day}.`;
 };
 
-const createMission = async () => {
-  try {
-    const problemIds = problemIdsInput.value
-      .split(',')
-      .map(s => parseInt(s.trim()))
-      .filter(n => !isNaN(n));
-    
-    await axios.post(`/api/studies/${studyId.value}/missions`, {
-      week: newMission.value.week,
-      title: newMission.value.title,
-      problemIds,
-      deadline: newMission.value.deadline
-    });
-    
-    showCreateModal.value = false;
-    newMission.value = { week: 1, title: '', deadline: '' };
-    problemIdsInput.value = '';
-    await loadMissions();
-  } catch (e) {
-    console.error('미션 생성 실패', e);
-  }
+const closeModal = () => {
+  showCreateModal.value = false;
+  // 모달 닫을 때 데이터 초기화
+  modalProblemIds.value = '';
+  modalTitle.value = '';
+  preSelectedMissionId.value = null;
+};
+
+const openDetailDrawer = (mission) => {
+  selectedMission.value = mission;
+  showDetailDrawer.value = true;
+};
+
+const closeDetailDrawer = () => {
+  showDetailDrawer.value = false;
+  selectedMission.value = null;
+};
+
+const openAddModalForMission = (missionId) => {
+  preSelectedMissionId.value = missionId;
+  showCreateModal.value = true;
 };
 </script>
 
 <style scoped>
 @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css');
 </style>
+

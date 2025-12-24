@@ -3,8 +3,8 @@
 <mapper namespace="com.ssafy.dash.study.infrastructure.mapper.StudyMissionMapper">
 
   <insert id="insert" parameterType="StudyMission" useGeneratedKeys="true" keyProperty="id">
-    INSERT INTO study_missions (study_id, week, title, problem_ids, source_type, deadline, created_at)
-    VALUES (#{studyId}, #{week}, #{title}, #{problemIds}, #{sourceType}, #{deadline}, #{createdAt})
+    INSERT INTO study_missions (study_id, week, title, problem_ids, source_type, deadline, status, created_at)
+    VALUES (#{studyId}, #{week}, #{title}, #{problemIds}, #{sourceType}, #{deadline}, #{status}, #{createdAt})
   </insert>
 
   <select id="selectById" resultType="StudyMission" parameterType="long">
@@ -22,5 +22,14 @@
   <delete id="delete" parameterType="long">
     DELETE FROM study_missions WHERE id = #{id}
   </delete>
+
+  <update id="update" parameterType="StudyMission">
+    UPDATE study_missions
+    SET title = #{title},
+        problem_ids = #{problemIds},
+        deadline = #{deadline},
+        status = #{status}
+    WHERE id = #{id}
+  </update>
 
 </mapper>

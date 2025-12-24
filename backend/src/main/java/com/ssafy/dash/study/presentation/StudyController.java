@@ -92,6 +92,20 @@ public class StudyController {
         return ResponseEntity.ok(studyAnalysisService.analyzeStudy(studyId));
     }
 
+    @Operation(summary = "팀 패밀리 통계", description = "레이더차트용 팀 패밀리별 통계를 조회합니다.")
+    @GetMapping("/{studyId}/family-stats")
+    public ResponseEntity<List<StudyAnalysisService.TeamFamilyStat>> getTeamFamilyStats(
+            @PathVariable Long studyId) {
+        return ResponseEntity.ok(studyAnalysisService.getTeamFamilyStats(studyId));
+    }
+
+    @Operation(summary = "커리큘럼 문제 추천", description = "팀 약점 기반 문제를 추천합니다.")
+    @GetMapping("/{studyId}/curriculum")
+    public ResponseEntity<List<com.ssafy.dash.problem.domain.ProblemRecommendationResponse>> getCurriculum(
+            @PathVariable Long studyId) {
+        return ResponseEntity.ok(studyAnalysisService.getCurriculumProblems(studyId));
+    }
+
     // === 주차별 미션 API ===
 
     @Operation(summary = "미션 목록 조회", description = "스터디의 주차별 미션 목록을 조회합니다.")
@@ -123,10 +137,78 @@ public class StudyController {
         return ResponseEntity.ok(studyMissionService.getMissionProgress(missionId));
     }
 
+    @Operation(summary = "미션 문제 추가", description = "기존 미션에 문제를 추가합니다.")
+    @PutMapping("/{studyId}/missions/{missionId}/problems")
+    public ResponseEntity<Void> addMissionProblems(
+            @PathVariable Long studyId,
+            @PathVariable Long missionId,
+            @RequestBody AddMissionProblemsRequest request) {
+        studyMissionService.addProblemsToMission(missionId, request.problemIds());
+        return ResponseEntity.ok().build();
+    }
+
     public record CreateMissionRequest(
             Integer week,
             String title,
             List<Integer> problemIds,
             java.time.LocalDate deadline) {
+    }
+
+    public record AddMissionProblemsRequest(
+            List<Integer> problemIds) {
+    }
+
+    @Operation(summary = "미션 정보 수정", description = "미션의 제목이나 마감일을 수정합니다.")
+    @PatchMapping("/{studyId}/missions/{missionId}")
+    public ResponseEntity<Void> updateMission(
+            @PathVariable Long studyId,
+            @PathVariable Long missionId,
+            @RequestBody UpdateMissionRequest request) {
+        studyMissionService.updateMission(missionId, request.title(), request.deadline());
+        return ResponseEntity.ok().build();
+    }
+
+    @Operation(summary = "미션 문제 삭제", description = "미션에서 특정 문제를 삭제합니다.")
+    @DeleteMapping("/{studyId}/missions/{missionId}/problems/{problemId}")
+    public ResponseEntity<Void> deleteMissionProblem(
+            @PathVariable Long studyId,
+            @PathVariable Long missionId,
+            @PathVariable Integer problemId) {
+        studyMissionService.removeProblemFromMission(missionId, problemId);
+        return ResponseEntity.ok().build();
+    }
+
+    @Operation(summary = "SOS 요청 토글", description = "특정 문제에 대한 SOS 상태를 토글합니다.")
+    @PostMapping("/{studyId}/missions/{missionId}/problems/{problemId}/sos")
+    public ResponseEntity<Void> toggleSos(
+            @PathVariable Long studyId,
+            @PathVariable Long missionId,
+            @PathVariable Integer problemId,
+            @Parameter(hidden = true) @AuthenticationPrincipal OAuth2User principal) {
+        if (principal instanceof CustomOAuth2User customUser) {
+            studyMissionService.toggleSos(missionId, problemId, customUser.getUserId());
+            return ResponseEntity.ok().build();
+        }
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+    }
+
+    public record UpdateMissionRequest(
+            String title,
+            java.time.LocalDate deadline) {
+    }
+
+    @Operation(summary = "미션 상태 강제 변경 (완료 처리)", description = "스터디장이 미션을 강제로 완료(종료) 처리합니다.")
+    @PatchMapping("/{studyId}/missions/{missionId}/status")
+    public ResponseEntity<Void> updateMissionStatus(
+            @PathVariable Long studyId,
+            @PathVariable Long missionId,
+            @RequestBody UpdateMissionStatusRequest request) {
+        if ("COMPLETED".equals(request.status())) {
+            studyMissionService.completeMission(missionId);
+        }
+        return ResponseEntity.ok().build();
+    }
+
+    public record UpdateMissionStatusRequest(String status) {
     }
 }

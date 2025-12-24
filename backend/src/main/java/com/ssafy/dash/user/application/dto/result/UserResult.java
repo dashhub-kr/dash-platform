@@ -1,5 +1,6 @@
 package com.ssafy.dash.user.application.dto.result;
 
+import com.ssafy.dash.study.domain.Study;
 import com.ssafy.dash.user.domain.User;
 
 import java.time.LocalDateTime;
@@ -17,16 +18,21 @@ public record UserResult(
         String solvedacHandle,
         Integer solvedacTier,
         String repositoryName,
-        Boolean webhookConfigured
-) {
+        Boolean webhookConfigured,
+        Boolean isStudyLeader) {
 
     public static UserResult from(User user) {
-        return from(user, null);
+        return from(user, null, null);
     }
 
     public static UserResult from(User user, com.ssafy.dash.onboarding.domain.Onboarding onboarding) {
+        return from(user, onboarding, null);
+    }
+
+    public static UserResult from(User user, com.ssafy.dash.onboarding.domain.Onboarding onboarding, Study study) {
         String repoName = onboarding != null ? onboarding.getRepositoryName() : null;
         Boolean webhook = onboarding != null ? onboarding.isWebhookConfigured() : null;
+        Boolean isLeader = study != null && study.getCreatorId() != null && study.getCreatorId().equals(user.getId());
 
         return new UserResult(
                 user.getId(),
@@ -40,8 +46,8 @@ public record UserResult(
                 user.getSolvedacHandle(),
                 user.getSolvedacTier(),
                 repoName,
-                webhook
-        );
+                webhook,
+                isLeader);
     }
 
 }

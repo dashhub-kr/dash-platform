@@ -130,8 +130,11 @@
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
 import { onboardingApi } from '../../api/onboarding';
+import { useAuth } from '../../composables/useAuth';
 
 const router = useRouter();
+const { user } = useAuth();
+
 const handle = ref('');
 const loading = ref(false);
 const verifying = ref(false);
@@ -200,15 +203,21 @@ const submitHandle = async () => {
   
   loading.value = true;
   try {
-    const profileImages = [
-      '/profile/bag.png',
-      '/profile/proud.png',
-      '/profile/smart.png',
-      '/profile/smile.png'
-    ];
-    const randomImage = profileImages[Math.floor(Math.random() * profileImages.length)];
+    let profileImage = null;
+
+    // GitHub 아바타가 없고, 기존 프로필 이미지도 없는 경우에만 랜덤 이미지 사용
+    if (!user.value?.avatarUrl) {
+         const profileImages = [
+          '/profile/bag.png',
+          '/profile/proud.png',
+          '/profile/smart.png',
+          '/profile/smile.png'
+        ];
+        profileImage = profileImages[Math.floor(Math.random() * profileImages.length)];
+    }
     
-    await onboardingApi.registerSolvedac(handle.value, randomImage);
+    // profileImage가 null이면 백엔드에서 기존(GitHub) 아바타를 유지함
+    await onboardingApi.registerSolvedac(handle.value, profileImage);
     router.push('/onboarding/analysis');
   } catch (error) {
     console.error(error);
