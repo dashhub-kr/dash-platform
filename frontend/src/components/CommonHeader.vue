@@ -222,6 +222,11 @@ const profileImages = [
 
 const userProfileImage = computed(() => {
   if (!user.value) return '';
+  // GitHub Avatar 우선
+  if (user.value.avatarUrl) {
+    return user.value.avatarUrl;
+  }
+  
   const id = user.value.id || 0;
   // Deterministic selection based on ID
   const index = id % profileImages.length;
