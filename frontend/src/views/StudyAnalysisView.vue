@@ -104,11 +104,10 @@
         <div class="bg-white/80 backdrop-blur-xl border border-white/50 rounded-3xl p-8 shadow-xl">
           <div class="flex items-center justify-between mb-6">
             <h2 class="text-2xl font-bold text-slate-900">📚 추천 커리큘럼</h2>
-            <button @click="loadCurriculum" 
-                    class="px-6 py-3 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl font-medium transition-all shadow-lg shadow-indigo-500/25"
-                    :disabled="loadingCurriculum">
-              {{ loadingCurriculum ? '생성 중...' : '커리큘럼 생성' }}
-            </button>
+            <div v-if="loadingCurriculum" class="flex items-center gap-2 text-indigo-600">
+               <span class="animate-spin text-xl">⏳</span>
+               <span class="text-sm font-bold">맞춤 커리큘럼 생성 중...</span>
+            </div>
           </div>
 
           <!-- 커리큘럼 로딩 -->
@@ -123,22 +122,30 @@
 
           <!-- 커리큘럼 결과 -->
           <div v-else-if="curriculum.length > 0" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            <a v-for="problem in curriculum" :key="problem.problemId"
-               :href="`https://www.acmicpc.net/problem/${problem.problemId}`"
-               target="_blank"
-               class="bg-slate-50 hover:bg-slate-100 border border-slate-200 rounded-xl p-5 transition-all hover:-translate-y-1 hover:shadow-lg group">
-              <div class="flex items-center gap-3 mb-2">
-                <span class="text-2xl font-bold text-indigo-600 group-hover:text-indigo-500">#{{ problem.problemId }}</span>
-                <span v-if="problem.tags?.length" class="px-2 py-1 bg-indigo-100 text-indigo-700 text-xs font-medium rounded-md">{{ problem.tags[0] }}</span>
-              </div>
-              <p class="text-slate-800 font-medium truncate">{{ problem.title }}</p>
-              <p class="text-slate-500 text-sm">Lv.{{ problem.level }}</p>
-            </a>
+            <div v-for="problem in curriculum" :key="problem.problemId"
+                 class="bg-slate-50 hover:bg-slate-100 border border-slate-200 rounded-xl p-5 transition-all hover:-translate-y-1 hover:shadow-lg group relative">
+              <a :href="`https://www.acmicpc.net/problem/${problem.problemId}`"
+                 target="_blank"
+                 class="block">
+                <div class="flex items-center gap-3 mb-2">
+                  <span class="text-2xl font-bold text-indigo-600 group-hover:text-indigo-500">#{{ problem.problemId }}</span>
+                  <span v-if="problem.tags?.length" class="px-2 py-1 bg-indigo-100 text-indigo-700 text-xs font-medium rounded-md">{{ problem.tags[0] }}</span>
+                </div>
+                <p class="text-slate-800 font-medium truncate">{{ problem.title }}</p>
+                <p class="text-slate-500 text-sm">Lv.{{ problem.level }}</p>
+              </a>
+              <!-- 팀장 전용: 미션 등록 버튼 -->
+              <button v-if="isLeader"
+                      @click.stop="registerAsMission(problem)"
+                      class="absolute top-3 right-3 px-3 py-1.5 bg-emerald-500 hover:bg-emerald-600 text-white text-xs font-bold rounded-lg shadow-md transition-all opacity-0 group-hover:opacity-100">
+                📌 미션 등록
+              </button>
+            </div>
           </div>
 
           <!-- 빈 상태 -->
           <div v-else class="text-center py-12 text-slate-400">
-            <p>커리큘럼을 생성하려면 위 버튼을 클릭하세요</p>
+            <p>데이터가 부족하여 커리큘럼을 생성할 수 없습니다.</p>
           </div>
         </div>
       </div>
@@ -152,16 +159,30 @@
       </div>
 
     </div>
+    <!-- 미션 생성 모달 -->
+    <StudyMissionCreateModal
+        :isOpen="showCreateModal"
+        :studyId="studyId"
+        :missions="missions"
+        :initialProblemIds="modalProblemIds"
+        :initialTitle="modalTitle"
+        @close="closeModal"
+        @refresh="loadMissions"
+    />
   </div>
 </template>
 
 <script setup>
 import { ref, onMounted, computed } from 'vue';
+import { useRouter } from 'vue-router';
 import axios from 'axios';
 import { Radar } from 'vue-chartjs';
 import { Chart as ChartJS, RadialLinearScale, PointElement, LineElement, Filler, Tooltip, Legend } from 'chart.js';
+import StudyMissionCreateModal from '@/components/StudyMissionCreateModal.vue';
 
 ChartJS.register(RadialLinearScale, PointElement, LineElement, Filler, Tooltip, Legend);
+
+const router = useRouter();
 
 const loadingAnalysis = ref(true);
 const loadingCurriculum = ref(false);
@@ -169,6 +190,13 @@ const analysis = ref(null);
 const familyStats = ref([]);
 const curriculum = ref([]);
 const studyId = ref(null);
+const isLeader = ref(false);
+
+// 모달 관련 상태
+const showCreateModal = ref(false);
+const modalProblemIds = ref('');
+const modalTitle = ref('');
+const missions = ref([]); // 미션 목록 (모달용)
 
 // 패밀리 표시 이름 맵핑
 const familyDisplayNames = {
@@ -297,6 +325,7 @@ onMounted(async () => {
   try {
     const userRes = await axios.get('/api/users/me');
     studyId.value = userRes.data.studyId;
+    isLeader.value = userRes.data.isStudyLeader || false;
     
     if (studyId.value) {
       const [analysisRes, familyRes] = await Promise.all([
@@ -305,6 +334,10 @@ onMounted(async () => {
       ]);
       analysis.value = analysisRes.data;
       familyStats.value = familyRes.data || [];
+      
+      // 커리큘럼 및 미션 목록 로드
+      loadCurriculum();
+      loadMissions();
     }
   } catch (e) {
     console.error('팀 분석 로드 실패', e);
@@ -340,6 +373,29 @@ const loadCurriculum = async () => {
   } finally {
     loadingCurriculum.value = false;
   }
+};
+
+const loadMissions = async () => {
+  if (!studyId.value) return;
+  try {
+    const res = await axios.get(`/api/studies/${studyId.value}/missions`);
+    missions.value = res.data;
+  } catch (e) {
+    console.error('미션 목록 로드 실패', e);
+  }
+};
+
+// 미션 등록 모달 열기
+const registerAsMission = (problem) => {
+  modalProblemIds.value = problem.problemId;
+  modalTitle.value = problem.tags?.[0] ? `${problem.tags[0]} 연습` : `문제 #${problem.problemId}`;
+  showCreateModal.value = true;
+};
+
+const closeModal = () => {
+    showCreateModal.value = false;
+    modalProblemIds.value = '';
+    modalTitle.value = '';
 };
 </script>
 
