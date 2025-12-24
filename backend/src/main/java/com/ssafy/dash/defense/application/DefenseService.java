@@ -99,7 +99,17 @@ public class DefenseService {
 
             Integer currentStreak = 0;
 
-            // 성공!
+            // 성공! 풀이 시간 계산 및 저장
+            algorithmRecordRepository.findLatestSuccessfulByUserAndProblem(userId, String.valueOf(solvedProblemId))
+                    .ifPresent(record -> {
+                        LocalDateTime startTime = user.getDefenseStartTime();
+                        LocalDateTime endTime = record.getCreatedAt() != null ? record.getCreatedAt()
+                                : LocalDateTime.now();
+                        long elapsedSeconds = java.time.Duration.between(startTime, endTime).getSeconds();
+                        record.setElapsedTimeSeconds(elapsedSeconds);
+                        algorithmRecordRepository.update(record);
+                    });
+
             if ("GOLD".equals(user.getDefenseType())) {
                 user.setGoldStreak(user.getGoldStreak() + 1);
                 currentStreak = user.getGoldStreak();

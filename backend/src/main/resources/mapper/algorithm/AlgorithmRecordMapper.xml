@@ -6,11 +6,11 @@
     INSERT INTO algorithm_records (
       user_id, study_id, problem_number, title, code, language, platform, difficulty,
       runtime_ms, memory_kb, repository_name, file_path, commit_sha, commit_message,
-      committed_at, created_at, updated_at, record_type, tag, defense_streak
+      committed_at, created_at, updated_at, record_type, tag, defense_streak, elapsed_time_seconds
     ) VALUES (
       #{userId}, #{studyId}, #{problemNumber}, #{title}, #{code}, #{language}, #{platform}, #{difficulty},
       #{runtimeMs}, #{memoryKb}, #{repositoryName}, #{filePath}, #{commitSha}, #{commitMessage},
-      #{committedAt}, #{createdAt}, #{updatedAt}, #{recordType}, #{tag}, #{defenseStreak}
+      #{committedAt}, #{createdAt}, #{updatedAt}, #{recordType}, #{tag}, #{defenseStreak}, #{elapsedTimeSeconds}
     )
   </insert>
 
@@ -59,7 +59,7 @@
         platform = #{platform}, difficulty = #{difficulty}, runtime_ms = #{runtimeMs}, memory_kb = #{memoryKb},
         repository_name = #{repositoryName}, file_path = #{filePath}, commit_sha = #{commitSha},
         commit_message = #{commitMessage}, committed_at = #{committedAt}, updated_at = #{updatedAt},
-        defense_streak = #{defenseStreak}, tag = #{tag}
+        defense_streak = #{defenseStreak}, tag = #{tag}, elapsed_time_seconds = #{elapsedTimeSeconds}
     WHERE id = #{id}
   </update>
 
@@ -93,6 +93,17 @@
     WHERE user_id = #{userId}
       AND runtime_ms IS NOT NULL
       AND memory_kb IS NOT NULL
+  </select>
+
+  <select id="selectLatestSuccessfulByUserAndProblem" resultType="AlgorithmRecord">
+    SELECT *
+    FROM algorithm_records
+    WHERE user_id = #{userId}
+      AND problem_number = #{problemNumber}
+      AND runtime_ms IS NOT NULL
+      AND memory_kb IS NOT NULL
+    ORDER BY created_at DESC
+    LIMIT 1
   </select>
 
 

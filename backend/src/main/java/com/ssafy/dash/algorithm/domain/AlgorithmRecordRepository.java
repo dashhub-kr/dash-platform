@@ -26,4 +26,6 @@ public interface AlgorithmRecordRepository {
 
     Set<String> findSolvedProblemNumbers(Long userId);
 
+    Optional<AlgorithmRecord> findLatestSuccessfulByUserAndProblem(Long userId, String problemNumber);
+
 }

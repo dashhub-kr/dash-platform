@@ -75,6 +75,7 @@ public final class AlgorithmRecordFixtures {
                     null,
                     null, // tag
                     0, // defenseStreak
+                    null, // elapsedTimeSeconds
                     createdAt,
                     updatedAt,
                     null,

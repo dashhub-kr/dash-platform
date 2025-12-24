@@ -23,6 +23,7 @@ public record AlgorithmRecordResult(
         LocalDateTime committedAt,
         String tag,
         Integer defenseStreak,
+        Long elapsedTimeSeconds,
         LocalDateTime createdAt,
         LocalDateTime updatedAt,
         // Analysis Fields
@@ -62,6 +63,7 @@ public record AlgorithmRecordResult(
                 record.getCommittedAt(),
                 record.getTag(),
                 record.getDefenseStreak(),
+                record.getElapsedTimeSeconds(),
                 record.getCreatedAt(),
                 record.getUpdatedAt(),
                 record.getScore(),
