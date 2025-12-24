@@ -24,11 +24,18 @@ public class StudyMission {
     private String problemIds; // JSON 배열 "[1234, 5678]"
     private String sourceType; // "AI_RECOMMENDED" 또는 "MANUAL"
     private LocalDate deadline;
+    private MissionStatus status;
     private LocalDateTime createdAt;
 
     public static StudyMission create(Long studyId, Integer week, String title,
             String problemIds, String sourceType, LocalDate deadline) {
         return new StudyMission(
-                null, studyId, week, title, problemIds, sourceType, deadline, LocalDateTime.now());
+                null, studyId, week, title, problemIds, sourceType, deadline, MissionStatus.IN_PROGRESS,
+                LocalDateTime.now());
+    }
+
+    public enum MissionStatus {
+        IN_PROGRESS,
+        COMPLETED
     }
 }

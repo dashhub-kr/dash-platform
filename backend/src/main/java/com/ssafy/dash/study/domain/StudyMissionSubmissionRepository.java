@@ -16,4 +16,12 @@ public interface StudyMissionSubmissionRepository {
     void markCompleted(Long missionId, Long userId, Integer problemId);
 
     int countCompletedByMissionIdAndUserId(Long missionId, Long userId);
+
+    List<Integer> findCompletedProblemIds(Long missionId, Long userId);
+
+    void deleteByMissionIdAndProblemId(Long missionId, Integer problemId);
+
+    void updateSosStatus(Long missionId, Long userId, Integer problemId, boolean isSos);
+
+    List<Integer> findSosProblemIds(Long missionId, Long userId);
 }

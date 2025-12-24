@@ -21,4 +21,6 @@ public interface StudyMissionMapper {
     List<StudyMission> selectByStudyIdOrderByWeekDesc(Long studyId);
 
     int delete(Long id);
+
+    void update(StudyMission mission);
 }
