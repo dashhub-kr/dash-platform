@@ -267,14 +267,29 @@
                         <!-- 2. ANALYSIS TAB -->
                         <div v-if="activeTab === 'analysis'" class="p-5 space-y-6">
                             <!-- Complexity Cards -->
-                            <div class="grid grid-cols-2 gap-3">
-                                <div class="bg-white p-3 rounded-xl border border-slate-200 shadow-sm text-center">
-                                    <div class="text-[10px] text-slate-400 font-bold uppercase mb-1">시간 복잡도</div>
-                                    <div class="text-sm font-black text-slate-800 font-mono">{{ record.timeComplexity || '-' }}</div>
+                            <div class="space-y-3">
+                                <div class="grid grid-cols-2 gap-3">
+                                    <div class="bg-white p-3 rounded-xl border border-slate-200 shadow-sm text-center">
+                                        <div class="text-[10px] text-slate-400 font-bold uppercase mb-1">시간 복잡도</div>
+                                        <div class="text-sm font-black text-slate-800 font-mono">{{ record.timeComplexity || '-' }}</div>
+                                    </div>
+                                    <div class="bg-white p-3 rounded-xl border border-slate-200 shadow-sm text-center">
+                                        <div class="text-[10px] text-slate-400 font-bold uppercase mb-1">공간 복잡도</div>
+                                        <div class="text-sm font-black text-slate-800 font-mono">{{ record.spaceComplexity || '-' }}</div>
+                                    </div>
                                 </div>
-                                <div class="bg-white p-3 rounded-xl border border-slate-200 shadow-sm text-center">
-                                    <div class="text-[10px] text-slate-400 font-bold uppercase mb-1">공간 복잡도</div>
-                                    <div class="text-sm font-black text-slate-800 font-mono">{{ record.spaceComplexity || '-' }}</div>
+                                
+                                <!-- Complexity Explanation Toggle -->
+                                <div v-if="record.complexityExplanation">
+                                    <button 
+                                        @click="showComplexityExplanation = !showComplexityExplanation"
+                                        class="text-xs text-indigo-500 hover:text-indigo-600 font-bold flex items-center gap-1 mx-auto transition-colors"
+                                    >
+                                        <HelpCircle :size="12" /> 왜 이런 복잡도를 가지나요? <ChevronDown :size="12" class="transition-transform duration-300" :class="{ 'rotate-180': showComplexityExplanation }"/>
+                                    </button>
+                                    <div v-if="showComplexityExplanation" class="mt-3 bg-slate-50 p-3 rounded-lg border border-slate-200 animate-slide-down">
+                                        <div class="text-xs text-slate-600 leading-relaxed whitespace-pre-line" v-html="renderMarkdown(record.complexityExplanation)"></div>
+                                    </div>
                                 </div>
                             </div>
 
@@ -414,7 +429,7 @@
 
 <script setup>
 import { ref, watch, computed, nextTick } from 'vue';
-import { ExternalLink, ChevronDown, ChevronUp, Bot, Bug, Send, Loader2, Activity, LayoutList, Lightbulb, Tag, MessageSquare, Wand2, CheckCircle2, BookOpen, Footprints } from 'lucide-vue-next';
+import { ExternalLink, ChevronDown, ChevronUp, Bot, Bug, Send, Loader2, Activity, LayoutList, Lightbulb, Tag, MessageSquare, Wand2, CheckCircle2, BookOpen, Footprints, HelpCircle } from 'lucide-vue-next';
 import CodeViewer from '../../components/CodeViewer.vue';
 import { boardApi, commentApi } from '../../api/board';
 import { aiApi } from '../../api/ai'; 
@@ -455,6 +470,8 @@ const codeViewerRef = ref(null);
 // Overview Tab State
 const showTrace = ref(false);
 const overviewCommentInput = ref('');
+// Analysis Tab State
+const showComplexityExplanation = ref(false);
 
 const toggleTrace = () => {
     showTrace.value = !showTrace.value;
