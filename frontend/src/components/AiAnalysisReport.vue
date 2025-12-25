@@ -1,74 +1,71 @@
 <template>
   <div class="space-y-4">
-    <!-- Analysis Summary Banner -->
-    <div class="relative overflow-hidden rounded-2xl bg-brand-900 shadow-lg text-white p-6">
-      <div class="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20"></div>
-      <div class="absolute top-0 right-0 w-64 h-64 bg-brand-500 rounded-full blur-3xl opacity-20 -translate-y-1/2 translate-x-1/2"></div>
-      
-      <div class="relative z-10">
-        <p class="text-base text-brand-50 leading-relaxed font-medium">
+    <!-- Analysis Summary Card -->
+    <div class="bg-white rounded-2xl p-5 border border-slate-200 shadow-sm">
+      <div class="flex items-start gap-4">
+        <div class="w-10 h-10 bg-brand-50 rounded-xl flex items-center justify-center shrink-0">
+          <Sparkles class="w-5 h-5 text-brand-500" stroke-width="2.5" fill="currentColor" />
+        </div>
+        <p class="text-sm text-slate-600 leading-relaxed font-medium flex-1">
           {{ aiAnalysis?.analysisSummary || '분석 데이터를 불러오는 중...' }}
         </p>
       </div>
     </div>
 
-    <!-- Weekly Goal & Quick Stats -->
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+    <!-- 2-Column Stats -->
+    <div class="grid grid-cols-2 gap-4">
       <!-- Weekly Goal -->
-      <div class="md:col-span-2 bg-gradient-to-r from-brand-500 to-purple-500 rounded-xl p-5 text-white shadow-md">
-        <div class="text-xs font-bold text-white/70 uppercase tracking-wider mb-2">이번 주 목표</div>
-        <p class="text-lg font-bold leading-snug">
+      <div class="bg-brand-50 rounded-2xl p-5 border border-brand-100">
+        <div class="text-[10px] font-black text-brand-600 uppercase tracking-wider mb-2">이번 주 목표</div>
+        <p class="text-sm font-bold text-slate-800 leading-snug">
           {{ aiAnalysis?.weeklyGoal || '목표 생성 중...' }}
         </p>
-        <p v-if="aiAnalysis?.difficultySuggestion" class="text-white/70 text-sm mt-2">
-          권장 난이도: {{ aiAnalysis.difficultySuggestion }}
+        <p v-if="aiAnalysis?.difficultySuggestion" class="text-xs text-brand-500 mt-2 font-medium">
+          권장: {{ aiAnalysis.difficultySuggestion }}
         </p>
       </div>
       
       <!-- Estimated Days -->
-      <div class="bg-white border border-slate-200 rounded-xl p-4 flex flex-col justify-center items-center shadow-sm">
-        <div class="text-4xl font-black text-brand-600">
+      <div class="bg-white rounded-2xl p-5 border border-slate-200 shadow-sm flex flex-col justify-center items-center">
+        <div class="text-3xl font-black text-brand-600">
           {{ aiAnalysis?.estimatedDaysToGoal || '-' }}
         </div>
-        <div class="text-xs font-semibold text-slate-500 uppercase">Days to Goal</div>
+        <div class="text-[10px] font-black text-slate-400 uppercase tracking-wider">Days to Goal</div>
       </div>
     </div>
 
     <!-- Recommended Tags -->
-    <div v-if="aiAnalysis?.recommendedTags?.length" class="bg-slate-50 border border-slate-200 rounded-xl p-4">
-      <div class="text-xs font-bold text-slate-500 uppercase mb-3">집중 추천 태그</div>
+    <div v-if="aiAnalysis?.recommendedTags?.length" class="bg-white rounded-2xl p-5 border border-slate-200 shadow-sm">
+      <div class="text-[10px] font-black text-slate-500 uppercase tracking-wider mb-3">집중 추천 태그</div>
       <div class="flex flex-wrap gap-2">
         <span 
           v-for="(tag, idx) in aiAnalysis.recommendedTags" 
           :key="idx"
-          class="px-3 py-1.5 bg-brand-100 text-brand-700 text-sm font-semibold rounded-full"
+          class="px-2.5 py-1 bg-brand-50 text-brand-700 text-xs font-bold rounded-lg"
         >
           {{ tag }}
         </span>
       </div>
     </div>
 
-    <!-- 2-Column Insights (헤더 최소화) -->
+    <!-- Growth + Strategic Insight -->
     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-      <!-- Growth + Strategic combined feel -->
-      <div class="bg-white border border-slate-200 rounded-xl p-5 space-y-3">
-        <div class="flex items-center gap-2 text-violet-600">
-          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path>
-          </svg>
-          <span class="font-bold text-sm">성장 예측</span>
+      <div class="bg-white rounded-2xl p-5 border border-slate-200 shadow-sm">
+        <div class="flex items-center gap-2 text-violet-600 mb-3">
+          <TrendingUp class="w-4 h-4" stroke-width="2.5" />
+          <span class="font-bold text-xs uppercase">성장 예측</span>
         </div>
-        <p class="text-slate-600 text-sm leading-relaxed">
+        <p class="text-sm text-slate-600 leading-relaxed">
           {{ aiAnalysis?.growthPrediction || '데이터 분석 중...' }}
         </p>
-        <p v-if="aiAnalysis?.strategicAdvice" class="text-brand-600 text-sm leading-relaxed border-t border-slate-100 pt-3">
+        <p v-if="aiAnalysis?.strategicAdvice" class="text-xs text-brand-600 mt-3 pt-3 border-t border-slate-100 font-medium">
           💡 {{ aiAnalysis.strategicAdvice }}
         </p>
       </div>
 
-      <!-- Motivation (헤더 없이 자연스럽게) -->
-      <div class="bg-gradient-to-br from-emerald-50 to-teal-50 border border-emerald-200 rounded-xl p-5 flex items-center">
-        <p class="text-emerald-700 text-sm leading-relaxed font-medium">
+      <!-- Motivation -->
+      <div class="bg-emerald-50 rounded-2xl p-5 border border-emerald-100 flex items-center">
+        <p class="text-sm text-emerald-700 leading-relaxed font-medium">
           {{ aiAnalysis?.motivationMessage || aiAnalysis?.efficiencyAnalysis || '꾸준히 노력하면 목표에 도달할 수 있어요!' }}
         </p>
       </div>
@@ -77,6 +74,8 @@
 </template>
 
 <script setup>
+import { Sparkles, TrendingUp } from 'lucide-vue-next';
+
 defineProps({
   aiAnalysis: {
     type: Object,

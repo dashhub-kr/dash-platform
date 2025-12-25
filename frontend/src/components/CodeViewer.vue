@@ -1,7 +1,7 @@
 <template>
-  <div class="code-viewer bg-white border border-slate-200 rounded-xl overflow-hidden">
+  <div ref="rootRef" class="code-viewer bg-white border border-slate-200 rounded-xl relative">
     <!-- Header -->
-    <div class="px-4 py-2 bg-slate-50 text-slate-500 text-xs font-mono border-b border-slate-200 flex justify-between items-center select-none">
+    <div class="px-4 py-2 bg-slate-50 text-slate-500 text-xs font-mono border-b border-slate-200 flex justify-between items-center select-none rounded-t-xl">
       <span class="font-bold text-slate-600">{{ filename }}</span>
       <div class="flex items-center gap-3">
         <!-- Author Filter -->
@@ -22,7 +22,7 @@
     </div>
     
     <!-- Code Content -->
-    <div class="overflow-x-auto custom-scrollbar bg-white">
+    <div class="overflow-x-auto custom-scrollbar bg-white rounded-b-xl">
       <table class="w-full border-collapse">
         <tbody>
           <template v-for="(line, index) in codeLines" :key="index">
@@ -158,28 +158,26 @@
       </table>
     </div>
 
-    <!-- AI Annotation Tooltip -->
-    <Teleport to="body">
-      <div v-if="hoveredLine && keyBlocksByLine[hoveredLine]?.length > 0"
-           class="fixed z-[9999] bg-white text-slate-800 rounded-2xl shadow-2xl p-5 max-w-md pointer-events-none border border-brand-200"
-           :style="{ left: tooltipPosition.x + 'px', top: tooltipPosition.y + 'px', transform: 'translate(-50%, -100%) translateY(-10px)' }">
-        <div class="flex items-center gap-2 mb-3 text-brand-600 font-bold text-sm">
-          <span>💡</span>
-          <span>AI 코드 설명</span>
-        </div>
-        <div v-for="(block, idx) in keyBlocksByLine[hoveredLine]" :key="idx" class="space-y-3">
-          <div v-if="block.code" class="bg-slate-100 rounded-lg p-3 text-xs font-mono text-slate-700 border border-slate-200">
-            {{ block.code }}
-          </div>
-          <p class="text-sm text-slate-600 leading-relaxed">{{ block.explanation }}</p>
-        </div>
-        <!-- Arrow -->
-        <div class="absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-full">
-          <div class="w-0 h-0 border-l-[8px] border-r-[8px] border-t-[8px] border-transparent border-t-brand-200"></div>
-          <div class="w-0 h-0 border-l-[6px] border-r-[6px] border-t-[6px] border-transparent border-t-white absolute top-0 left-1/2 -translate-x-1/2"></div>
-        </div>
+    <!-- AI Annotation Tooltip (Absolute, non-teleported) -->
+    <div v-if="hoveredLine && keyBlocksByLine[hoveredLine]?.length > 0"
+         class="absolute z-[40] bg-white text-slate-800 rounded-2xl shadow-2xl p-5 max-w-md pointer-events-none border border-brand-200"
+         :style="{ left: tooltipPosition.x + 'px', top: tooltipPosition.y + 'px', transform: 'translateY(-100%) translateY(-12px)' }">
+      <div class="flex items-center gap-2 mb-3 text-brand-600 font-bold text-sm">
+        <span>💡</span>
+        <span>AI 코드 설명</span>
       </div>
-    </Teleport>
+      <div v-for="(block, idx) in keyBlocksByLine[hoveredLine]" :key="idx" class="space-y-3">
+        <div v-if="block.code" class="bg-slate-100 rounded-lg p-3 text-xs font-mono text-slate-700 border border-slate-200">
+          {{ block.code }}
+        </div>
+        <p class="text-sm text-slate-600 leading-relaxed">{{ block.explanation }}</p>
+      </div>
+      <!-- Down Arrow (Bottom) -->
+      <div class="absolute bottom-0 left-6 translate-y-[95%] text-brand-200 drop-shadow-sm">
+           <div class="w-0 h-0 border-l-[8px] border-r-[8px] border-t-[8px] border-l-transparent border-r-transparent border-t-brand-200"></div>
+           <div class="w-0 h-0 border-l-[6px] border-r-[6px] border-t-[6px] border-l-transparent border-r-transparent border-t-white absolute bottom-[2px] left-[-6px]"></div>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -189,206 +187,184 @@ import { Copy, MessageSquare } from 'lucide-vue-next';
 import hljs from 'highlight.js';
 import 'highlight.js/styles/github.css';
 
+// ... (keep props and other vars)
 const props = defineProps({
-  code: {
-    type: String,
-    required: true
-  },
-  language: {
-    type: String,
-    default: 'java'
-  },
-  filename: {
-    type: String,
-    default: 'Source Code'
-  },
-  comments: { // Changed from lineComments count object to full array
-    type: Array,
-    default: () => []
-  },
-  keyBlocks: { // AI-generated code block annotations
-    type: Array,
-    default: () => []
-  }
+  code: { type: String, default: '' },
+  language: { type: String, default: 'java' },
+  filename: { type: String, default: '' },
+  comments: { type: Array, default: () => [] },
+  keyBlocks: { type: Array, default: () => [] },
+  readOnly: { type: Boolean, default: false }
 });
 
 const emit = defineEmits(['submit-comment']);
 
-const expandedLine = ref(null); // Changed from Set to single line number
-const newCommentContent = ref('');
-const selectedLine = ref(null);
-const allCommentsExpanded = ref(false);
+const rootRef = ref(null);
 const selectedAuthorFilter = ref('');
+const allCommentsExpanded = ref(false);
+const expandedLine = ref(null);
+const selectedLine = ref(null);
+const selectedHighlightLines = ref(new Set());
+const hoverHighlightLines = ref(new Set());
+const hoveredLine = ref(null);
+const rafId = ref(null);
+const tooltipPosition = ref({ x: 0, y: 0 });
+const newCommentContent = ref('');
 
 const codeLines = computed(() => {
-  return props.code ? props.code.split('\n') : [];
+    return props.code ? props.code.split('\n') : [];
 });
 
-const commentsByLine = computed(() => {
+const keyBlocksByLine = computed(() => {
     const map = {};
-    props.comments.forEach(c => {
-        if (!c.lineNumber) return;
-        if (!map[c.lineNumber]) map[c.lineNumber] = [];
-        map[c.lineNumber].push(c);
+    if (!props.keyBlocks) return map;
+    
+    props.keyBlocks.forEach(block => {
+        // Find start line if code matches
+        if (block.code) {
+           const lines = codeLines.value;
+           const targetCode = block.code.trim();
+           for(let i=0; i<lines.length; i++) {
+               if(lines[i].includes(targetCode)) {
+                   if (!map[i+1]) map[i+1] = [];
+                   map[i+1].push({...block, startLine: i+1});
+               }
+           }
+        }
     });
     return map;
 });
 
-const filteredCommentsByLine = computed(() => {
-    if (!selectedAuthorFilter.value) return commentsByLine.value;
-    const map = {};
-    Object.keys(commentsByLine.value).forEach(lineNum => {
-        const filtered = commentsByLine.value[lineNum].filter(c => c.authorName === selectedAuthorFilter.value);
-        if (filtered.length > 0) map[lineNum] = filtered;
-    });
-    return map;
+const effectiveHighlightedLines = computed(() => {
+    const set = new Set(selectedHighlightLines.value);
+    keyBlocksByLine.value && Object.keys(keyBlocksByLine.value).forEach(line => set.add(Number(line)));
+    return set;
 });
 
 const uniqueAuthors = computed(() => {
-    const authors = new Set();
-    props.comments.forEach(c => { if (c.authorName) authors.add(c.authorName); });
+    if (!props.comments) return [];
+    const authors = new Set(props.comments.map(c => c.authorName).filter(Boolean));
     return Array.from(authors);
 });
 
-const hasAnyComments = computed(() => props.comments.length > 0);
-
-const isLineExpanded = (lineNum) => {
-    return expandedLine.value === lineNum;
-};
-
-// Map keyBlocks to code lines
-const keyBlocksByLine = computed(() => {
+const filteredCommentsByLine = computed(() => {
     const map = {};
-    props.keyBlocks.forEach(block => {
-        // Priority 1: Use explicit line numbers (startLine ~ endLine)
-        if (block.startLine && block.endLine) {
-            for (let i = block.startLine; i <= block.endLine; i++) {
-                if (!map[i]) map[i] = [];
-                map[i].push(block);
-            }
-            return; // processed
-        }
-
-        // Priority 2: Fallback to code string matching
-        if (block.code) {
-            const codeSnippet = block.code.trim();
-            if (codeSnippet.length < 3) return; // Skip very short blocks
-
-            codeLines.value.forEach((line, idx) => {
-                const trimmedLine = line.trim();
-                if (trimmedLine.length < 3) return; // Skip short lines (prevents matching '}', '{', etc.)
-                if (/^[}\])];]+$/.test(trimmedLine)) return; // Skip structural lines
-
-                if (line.includes(codeSnippet) || codeSnippet.includes(trimmedLine)) {
-                    const lineNum = idx + 1;
-                    if (!map[lineNum]) map[lineNum] = [];
-                    map[lineNum].push(block);
-                }
-            });
+    if (!props.comments) return map;
+    
+    props.comments.forEach(comment => {
+        if (selectedAuthorFilter.value && comment.authorName !== selectedAuthorFilter.value) return;
+        
+        const line = comment.lineNumber;
+        if (line) {
+            if (!map[line]) map[line] = [];
+            map[line].push(comment);
         }
     });
     return map;
 });
 
-const hoveredLine = ref(null);
-const tooltipPosition = ref({ x: 0, y: 0 });
-const hoverHighlightLines = ref(new Set());
-const selectedHighlightLines = ref(new Set());
-
-const effectiveHighlightedLines = computed(() => {
-    try {
-        const selected = selectedHighlightLines.value || new Set();
-        const hover = hoverHighlightLines.value || new Set();
-        const combined = new Set(selected);
-        hover.forEach(line => combined.add(line));
-        return combined;
-    } catch (e) {
-        console.error("Error in effectiveHighlightedLines", e);
-        return new Set();
-    }
+const hasAnyComments = computed(() => {
+    return props.comments && props.comments.length > 0;
 });
 
-const highlightLine = (line) => {
-  if (!line && line !== '') return '';
-  // Empty line handling
-  if (line.trim() === '') return '&nbsp;';
-  
-  try {
-    return hljs.highlightAuto(line).value;
-  } catch (e) {
-    return line;
-  }
-};
 
-const toggleAllComments = () => {
-    if (allCommentsExpanded.value) {
-        // Collapse all: clear both allCommentsExpanded AND individual expandedLine
-        allCommentsExpanded.value = false;
-        expandedLine.value = null;
-        selectedLine.value = null;
-    } else {
-        // Expand all
-        allCommentsExpanded.value = true;
+const highlightLine = (line) => {
+    try {
+        return hljs.highlight(line || ' ', { language: props.language }).value;
+    } catch (e) {
+        return line;
     }
 };
 
 const toggleLine = (lineNumber) => {
     if (expandedLine.value === lineNumber) {
-        // Close if clicking the same line
         expandedLine.value = null;
-        selectedLine.value = null;
     } else {
-        // Open this line, close others
         expandedLine.value = lineNumber;
-        selectedLine.value = lineNumber;
-        newCommentContent.value = '';
     }
+};
+
+const toggleAllComments = () => {
+    allCommentsExpanded.value = !allCommentsExpanded.value;
+};
+
+const isLineExpanded = (lineNumber) => {
+    return expandedLine.value === lineNumber;
+};
+const updateTooltipPosition = () => {
+    if (!hoveredLine.value || !rootRef.value) return;
+    
+    // Check if we need to use a specific start line from the block
+    const blocks = keyBlocksByLine.value[hoveredLine.value];
+    let targetLineNumber = hoveredLine.value;
+    
+    if (blocks && blocks.length > 0 && blocks[0].startLine) {
+        targetLineNumber = blocks[0].startLine;
+    }
+
+    let targetRect = null;
+    const rootRect = rootRef.value.getBoundingClientRect();
+    
+    const tr = rootRef.value.querySelector(`tr[data-line-number="${targetLineNumber}"]`);
+    if (tr) {
+        const codeTd = tr.querySelector('td:nth-child(2)');
+        if (codeTd) {
+            targetRect = codeTd.getBoundingClientRect();
+        } else {
+            targetRect = tr.getBoundingClientRect();
+        }
+    }
+
+    if (targetRect) {
+        // Calculate position RELATIVE to the root container
+        tooltipPosition.value = {
+            x: targetRect.left - rootRect.left,
+            y: targetRect.top - rootRect.top
+        };
+    }
+    
+    rafId.value = requestAnimationFrame(updateTooltipPosition);
 };
 
 const handleLineHover = (lineNumber, event) => {
     const lineContent = codeLines.value[lineNumber - 1];
     if (!lineContent) return;
     
-    // Ignore empty lines
     const trimmed = lineContent.trim();
     if (trimmed === '') return;
-
-    // Ignore lines that are just closing braces/brackets (likely just structure)
-    // Matches: }, };, ], ];, ), );
     if (/^[}\])];]+$/.test(trimmed)) return;
 
     const blocks = keyBlocksByLine.value[lineNumber];
     if (blocks && blocks.length > 0) {
         hoveredLine.value = lineNumber;
         
-        // Find all lines that share ANY of these blocks
         const relatedLines = new Set();
         relatedLines.add(lineNumber);
-        
-        // For each block on this line
         blocks.forEach(block => {
-             // Search all lines to find where this block appears
              for (const [lineNumStr, lineBlocks] of Object.entries(keyBlocksByLine.value)) {
                  if (lineBlocks.includes(block)) {
                      relatedLines.add(Number(lineNumStr));
                  }
              }
         });
-        
         hoverHighlightLines.value = relatedLines;
 
-        const rect = event.target.getBoundingClientRect();
-        tooltipPosition.value = {
-            x: rect.left + rect.width / 2,
-            y: rect.top
-        };
+        // Start tracking position
+        if (rafId.value) cancelAnimationFrame(rafId.value);
+        updateTooltipPosition();
     }
 };
 
 const handleLineLeave = () => {
     hoveredLine.value = null;
     hoverHighlightLines.value = new Set();
+    if (rafId.value) {
+        cancelAnimationFrame(rafId.value);
+        rafId.value = null;
+    }
 };
+
+
 
 const copyCode = () => {
   navigator.clipboard.writeText(props.code);
