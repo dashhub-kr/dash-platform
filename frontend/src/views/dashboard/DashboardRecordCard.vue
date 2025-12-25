@@ -461,6 +461,8 @@ const cardBorderClass = computed(() => {
     // Borderless mode: no ring effects
     return {};
 });
+
+defineExpose({ scrollToLine });
 </script>
 
 <style scoped>

@@ -160,7 +160,7 @@
 
     <!-- AI Annotation Tooltip (Absolute, non-teleported) -->
     <div v-if="hoveredLine && keyBlocksByLine[hoveredLine]?.length > 0"
-         class="absolute z-[40] bg-white text-slate-800 rounded-2xl shadow-2xl p-5 max-w-md pointer-events-none border border-brand-200"
+         class="absolute z-[100] bg-white text-slate-800 rounded-2xl shadow-2xl p-5 max-w-md pointer-events-none border border-brand-200"
          :style="{ left: tooltipPosition.x + 'px', top: tooltipPosition.y + 'px', transform: 'translateY(-100%) translateY(-12px)' }">
       <div class="flex items-center gap-2 mb-3 text-brand-600 font-bold text-sm">
         <span>💡</span>
@@ -220,8 +220,20 @@ const keyBlocksByLine = computed(() => {
     if (!props.keyBlocks) return map;
     
     props.keyBlocks.forEach(block => {
-        // Find start line if code matches
-        if (block.code) {
+        // Method 1: Use startLine/endLine if provided
+        if (block.startLine) {
+            const start = Number(block.startLine);
+            const end = block.endLine ? Number(block.endLine) : start;
+            for (let i = start; i <= end; i++) {
+                if (!map[i]) map[i] = [];
+                // Avoid duplicates
+                if (!map[i].some(b => b.startLine === start && b.endLine === end)) {
+                    map[i].push({...block, startLine: start, endLine: end});
+                }
+            }
+        }
+        // Method 2: Find by code matching (for structure items without line numbers)
+        else if (block.code) {
            const lines = codeLines.value;
            const targetCode = block.code.trim();
            for(let i=0; i<lines.length; i++) {
@@ -294,12 +306,14 @@ const isLineExpanded = (lineNumber) => {
 const updateTooltipPosition = () => {
     if (!hoveredLine.value || !rootRef.value) return;
     
-    // Check if we need to use a specific start line from the block
+    // Find the earliest startLine from all blocks for this hovered line
     const blocks = keyBlocksByLine.value[hoveredLine.value];
     let targetLineNumber = hoveredLine.value;
     
-    if (blocks && blocks.length > 0 && blocks[0].startLine) {
-        targetLineNumber = blocks[0].startLine;
+    if (blocks && blocks.length > 0) {
+        // Use the minimum startLine among all matched blocks
+        const minStartLine = Math.min(...blocks.map(b => b.startLine || hoveredLine.value));
+        targetLineNumber = minStartLine;
     }
 
     let targetRect = null;
@@ -339,13 +353,13 @@ const handleLineHover = (lineNumber, event) => {
         hoveredLine.value = lineNumber;
         
         const relatedLines = new Set();
-        relatedLines.add(lineNumber);
         blocks.forEach(block => {
-             for (const [lineNumStr, lineBlocks] of Object.entries(keyBlocksByLine.value)) {
-                 if (lineBlocks.includes(block)) {
-                     relatedLines.add(Number(lineNumStr));
-                 }
-             }
+            // Use startLine and endLine to highlight the entire range
+            const start = block.startLine || lineNumber;
+            const end = block.endLine || start;
+            for (let i = start; i <= end; i++) {
+                relatedLines.add(i);
+            }
         });
         hoverHighlightLines.value = relatedLines;
 

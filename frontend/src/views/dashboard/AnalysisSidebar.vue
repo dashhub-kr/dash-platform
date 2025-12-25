@@ -32,7 +32,7 @@
                     <!-- Structure: Variables & Functions -->
                     <div v-if="parsedVariables.length > 0 || parsedFunctions.length > 0" class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
                         <h4 class="text-xs font-bold text-slate-800 mb-3 flex items-center gap-2">
-                            <LayoutList :size="14" class="text-blue-500"/> 구조 및 핵심
+                            <LayoutList :size="14" class="text-blue-500"/> 변수 및 함수
                         </h4>
                         
                         <!-- Variables -->
@@ -436,7 +436,12 @@ const emitScrollToLine = (start, end) => {
 const viewCodeLine = (name) => {
     if (!name || !props.record?.code) return;
     const lines = props.record.code.split('\n');
-    const index = lines.findIndex(line => line.includes(name));
+    
+    // Handle comma-separated names like "N, K" - search for each part
+    const searchTerms = name.split(',').map(s => s.trim()).filter(s => s.length > 0);
+    const primaryTerm = searchTerms[0]; // Use first term for search
+    
+    const index = lines.findIndex(line => line.includes(primaryTerm));
     if (index !== -1) emitScrollToLine(index + 1);
 };
 
