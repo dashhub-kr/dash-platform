@@ -205,6 +205,7 @@
                     <div v-else class="space-y-4 pb-20">
                         <template v-for="record in filteredRecords" :key="record.id">
                             <DashboardRecordCard 
+                                :ref="el => { if (expandedRecordId === record.id) activeCardRef = el }"
                                 :record="record"
                                 :is-expanded="expandedRecordId === record.id"
                                 @toggle-expand="handleToggleExpand"
@@ -265,7 +266,7 @@
 
                 <!-- 3. Analysis Sidebar (Context) -->
                 <div class="flex-1 min-h-0 overflow-hidden rounded-2xl border border-slate-200 shadow-sm bg-white">
-                     <AnalysisSidebar :record="activeAnalysisRecord" />
+                     <AnalysisSidebar :record="activeAnalysisRecord" @scroll-to-line="handleScrollToLine" />
                 </div>
 
                 <div class="text-center text-[10px] text-slate-300 font-bold space-x-3 pb-2 uppercase tracking-wider">
@@ -392,6 +393,7 @@ watch(selectedFilter, () => {
 
 const expandedRecordId = ref(null);
 const activeAnalysisRecord = ref(null);
+const activeCardRef = ref(null);
 
 const handleToggleExpand = (recordId) => {
     console.log('Dashboard: toggle-expand received for', recordId);
@@ -399,12 +401,20 @@ const handleToggleExpand = (recordId) => {
         console.log('Dashboard: Collapsing record');
         expandedRecordId.value = null;
         activeAnalysisRecord.value = null;
+        activeCardRef.value = null;
     } else {
         console.log('Dashboard: Expanding record');
         expandedRecordId.value = recordId;
         const found = records.value.find(r => r.id == recordId);
         console.log('Dashboard: Found record?', found);
         activeAnalysisRecord.value = found;
+    }
+};
+
+const handleScrollToLine = ({ start, end }) => {
+    console.log('Dashboard: handleScrollToLine', start, end, 'activeCardRef:', !!activeCardRef.value);
+    if (activeCardRef.value && activeCardRef.value.scrollToLine) {
+        activeCardRef.value.scrollToLine(start, end);
     }
 };
 
