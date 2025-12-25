@@ -1,11 +1,22 @@
-SET SQL_SAFE_UPDATES = 0; -- Disable safe update mode to allow updates by username
+SET FOREIGN_KEY_CHECKS = 0; -- Disable foreign key checks to allow truncation
 
 -- =====================================================
--- DASH Mock Data Seed Script
--- 발표용 데모 데이터 (Circular Dependency Fixed + Safe Update Fix)
+-- DASH Mock Data Seed Script (Idempotent / Re-runnable)
+-- 발표용 데모 데이터 (Circular Dependency Fixed + Clean Start)
 -- 생성일: 2025-12-25
 -- Updated: 2025-12-26
 -- =====================================================
+
+-- =====================================================
+-- 0. 기존 데이터 초기화 (TRUNCATE)
+-- =====================================================
+TRUNCATE TABLE study_mission_submissions;
+TRUNCATE TABLE study_applications;
+TRUNCATE TABLE comments;
+TRUNCATE TABLE boards;
+TRUNCATE TABLE study_missions;
+TRUNCATE TABLE users;
+TRUNCATE TABLE studies;
 
 -- =====================================================
 -- 1. 유저 데이터 (총 15명) - study_id는 NULL로 먼저 생성
@@ -103,10 +114,7 @@ VALUES
 (1, 3, 11724, 1, 0, NOW()),
 (1, 4, 1260, 0, 1, NULL), -- SOS
 
--- 미션3 (삼성 기출) 제출 (스터디 2, mission_id 3 assuming insert order 1,2,3... wait. Auto inc?
--- Manual ID mapping is risky if IDs are auto-increment.
--- Assuming sequential IDs 1..12 based on insertion order.
--- Mission 3 -> Study 2, Mission 1
+-- 미션3 (삼성 기출) 제출 (스터디 2), Mission 3 corresponds to auto-increment ID
 (3, 3, 14500, 1, 0, DATE_SUB(NOW(), INTERVAL 3 DAY)),
 (3, 3, 14501, 1, 0, DATE_SUB(NOW(), INTERVAL 2 DAY)),
 (3, 4, 14500, 1, 0, DATE_SUB(NOW(), INTERVAL 4 DAY)),
@@ -217,6 +225,6 @@ VALUES
 -- =====================================================
 -- 완료 메시지
 -- =====================================================
-SELECT 'Mock Data Expansion Completed!' AS result;
+SELECT 'Mock Data Seed Completed with Truncate!' AS result;
 
-SET SQL_SAFE_UPDATES = 1; -- Re-enable safe update mode (Optional but recommended)
+SET FOREIGN_KEY_CHECKS = 1; -- Re-enable foreign key checks
