@@ -1,8 +1,6 @@
 # 4. ER Diagram (ER 다이어그램)
 
 ## 4.1 다이어그램
-![ER Diagram](./ERD.png)
-
 ```mermaid
 erDiagram
     users ||--o{ user_oauth_tokens : "has"
