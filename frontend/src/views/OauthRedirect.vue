@@ -70,7 +70,7 @@ onMounted(async () => {
 
     setTimeout(() => {
         if (data.flowType === "SIGN_UP") {
-            router.push("/onboarding/welcome");
+            router.push("/onboarding");
         } else {
             window.location.href = "/";
         }
