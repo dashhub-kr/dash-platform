@@ -11,34 +11,8 @@
     <!-- 스킬 트리 -->
     <div v-else class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
       
-      <!-- 헤더 (그래프 모드일 때는 숨김) -->
-      <div v-if="viewMode === 'card'" class="px-6 py-4 border-b border-slate-100 flex items-center justify-between bg-slate-50">
-        <div class="flex items-center gap-3">
-          <Sword class="text-brand-500" :size="24" />
-          <h3 class="text-lg font-bold text-slate-800">알고리즘 스킬트리</h3>
-        </div>
-        <div class="flex gap-4 text-xs">
-          <span class="flex items-center gap-1.5">
-            <span class="w-2.5 h-2.5 rounded-full bg-amber-500"></span>
-            <span class="text-slate-600">전문가+ {{ expertPlusTags }}</span>
-          </span>
-          <span class="flex items-center gap-1.5">
-            <span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span>
-            <span class="text-slate-600">숙련 {{ advancedTags }}</span>
-          </span>
-          <span class="flex items-center gap-1.5">
-            <span class="w-2.5 h-2.5 rounded-full bg-sky-500"></span>
-            <span class="text-slate-600">학습중 {{ learningTags }}</span>
-          </span>
-          <span class="flex items-center gap-1.5">
-            <span class="w-2.5 h-2.5 rounded-full bg-slate-300"></span>
-            <span class="text-slate-500">미진행 {{ lockedTags }}</span>
-          </span>
-        </div>
-      </div>
-      
       <!-- 그래프 뷰 (전체화면 오버레이) -->
-      <div v-if="viewMode === 'graph'" class="fixed inset-0 top-[64px] z-50 bg-slate-50 flex flex-col">
+      <div v-if="viewMode === 'graph'" class="fixed inset-0 z-50 bg-slate-50 flex flex-col">
         <div class="flex-1 w-full h-full relative">
             <SkillTreeGraphView />
 
@@ -53,7 +27,7 @@
       </div>
       
       <!-- 카드 뷰 (기존 스킬 그리드) -->
-      <div v-else class="p-6 relative min-h-[600px]">
+      <div v-else class="p-6 relative">
         <!-- 그래프 모드 진입 버튼 (Floating) -->
         <button 
             @click="viewMode = 'graph'"
@@ -70,37 +44,41 @@
             @click="selectFamily(family)"
           >
             <div 
-              class="relative p-4 rounded-xl transition-all hover:bg-slate-50"
-              :class="[
-                selectedFamily?.key === family.key 
-                  ? 'bg-brand-50 shadow-sm ring-1 ring-brand-100' 
-                  : 'bg-white hover:bg-slate-50',
-                getCompletionClass(family.progressPercent)
-              ]"
+              class="relative p-4 rounded-3xl flex flex-col items-center transition-all hover:bg-slate-50 active:scale-95"
+              :class="selectedFamily?.key === family.key ? 'bg-brand-50 ring-2 ring-brand-200' : 'bg-white'"
             >
-              <!-- 아이콘 + 별 표시 -->
-              <div class="flex items-center justify-between mb-3">
-                <component :is="getFamilyIcon(family.key)" :size="28" class="text-slate-700" :class="selectedFamily?.key === family.key ? 'text-brand-600' : ''" />
-                <div class="flex gap-0.5">
-                  <span v-for="i in 5" :key="i" class="text-base" :class="i <= getFilledStars(family.masteryLevel) ? 'text-amber-400' : 'text-slate-300'">★</span>
+              <!-- 원형 아이콘 뱃지 (하위 태그 스타일) -->
+              <div class="relative w-20 h-20 mb-3 transition-transform duration-300 group-hover:scale-105">
+                <div 
+                  class="w-full h-full rounded-full flex items-center justify-center shadow-sm border-b-4 transition-all"
+                  :class="getFamilyBadgeClass(family)"
+                >
+                  <component :is="getFamilyIcon(family.key)" :size="32" class="drop-shadow-sm" />
+                </div>
+                
+                <!-- 마스터 뱃지 -->
+                <div v-if="getFilledStars(family.masteryLevel) >= 4" class="absolute -bottom-1 -right-1 bg-amber-500 rounded-full p-1.5 border-2 border-white shadow-sm">
+                  <Trophy :size="14" class="text-white" />
                 </div>
               </div>
               
               <!-- 이름 -->
-              <div class="text-sm font-bold text-slate-800 mb-2">{{ family.name }}</div>
+              <div class="text-sm font-bold text-slate-800 text-center mb-2">{{ family.name }}</div>
               
-              <!-- 마스터리 레벨 텍스트 -->
-              <div class="text-xs text-slate-500 mb-2">
-                {{ getFamilyMasteryLabel(family.masteryLevel) }}
+              <!-- 별 표시 -->
+              <div class="flex gap-0.5 mb-2">
+                <span 
+                  v-for="i in 5" 
+                  :key="i" 
+                  class="text-sm"
+                  :class="i <= getFilledStars(family.masteryLevel) ? 'text-amber-400' : 'text-slate-200'"
+                >★</span>
               </div>
               
               <!-- 하위 태그 수 -->
-              <div class="text-xs text-slate-400">
+              <div class="text-[11px] text-slate-400">
                 {{ family.children?.length || 0 }}개 스킬 · {{ family.solved || 0 }}문제
               </div>
-              
-              <!-- 마스터 뱃지 -->
-              <div v-if="getFilledStars(family.masteryLevel) >= 4" class="absolute -top-2 -right-2 text-lg">🏆</div>
             </div>
           </div>
         </div>
@@ -418,6 +396,30 @@ const getFamilyMasteryLabel = (masteryLevel) => {
     'MASTER': '마스터'
   };
   return labels[masteryLevel] || '시작 전';
+};
+
+// 패밀리 뱃지 배경색 (마스터리 레벨 기반)
+const getFamilyBadgeClass = (family) => {
+  const filled = getFilledStars(family.masteryLevel);
+  
+  // 마스터 (Gold)
+  if (filled >= 4) {
+    return 'bg-amber-400 border-amber-600 text-white';
+  }
+  // 학습 중 (Green)
+  if (filled >= 1) {
+    return 'bg-leaf border-green-700 text-white';
+  }
+  // 시작 전 (Gray)
+  return 'bg-slate-100 border-slate-300 text-slate-400';
+};
+
+// 마스터리 레벨 라벨 색상
+const getMasteryLabelClass = (masteryLevel) => {
+  const filled = getFilledStars(masteryLevel);
+  if (filled >= 4) return 'text-amber-600';
+  if (filled >= 1) return 'text-emerald-600';
+  return 'text-slate-400';
 };
 
 const selectFamily = (family) => {

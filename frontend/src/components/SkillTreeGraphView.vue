@@ -22,15 +22,13 @@
       
       <!-- 커스텀 노드 -->
       <template #node-skill="{ data }">
-          <!-- 태그 이름 (심플 & 가독성 강화) -->
+          <!-- 태그 이름 (솔리드 컬러 + 흰 글씨) -->
           <div 
-            class="skill-node px-6 py-4 rounded-2xl border text-center cursor-pointer transition-all flex items-center justify-center min-w-[120px]"
+            class="skill-node px-5 py-3 rounded-xl text-center cursor-pointer transition-all flex items-center justify-center min-w-[100px] shadow-sm hover:shadow-md hover:scale-105"
             :class="getNodeClass(data)"
             @click.stop="onNodeClick(data)"
           >
-            <!-- 관계 표시 뱃지 제거 (심플 유지) -->
-            
-            <div class="text-base font-bold whitespace-pre-wrap break-words line-clamp-2 leading-tight max-w-[140px]" :class="selectedNodeId && !isRelated(data.id) ? 'text-slate-400' : 'text-slate-800'">
+            <div class="text-sm font-bold whitespace-pre-wrap break-words line-clamp-2 leading-tight max-w-[120px]" :class="getNodeTextClass(data)">
               {{ data.label }}
             </div>
           </div>
@@ -248,21 +246,39 @@ const getFilledStars = (masteryLevel) => {
   return levels[masteryLevel] || 0;
 };
 
-// 패밀리별 색상 (지하철 노선도 스타일)
+// 패밀리별 색상 (DESIGN_SYSTEM.md 참조 - 솔리드 배경 + 흰 글씨)
 const familyColors = {
-  1: { bg: 'bg-white', border: 'border-rose-400', ring: 'ring-rose-300', line: '#f43f5e' },       // 구현
-  2: { bg: 'bg-white', border: 'border-violet-400', ring: 'ring-violet-300', line: '#8b5cf6' }, // DP
-  3: { bg: 'bg-white', border: 'border-sky-400', ring: 'ring-sky-300', line: '#0ea5e9' },          // 그래프
-  4: { bg: 'bg-white', border: 'border-emerald-400', ring: 'ring-emerald-300', line: '#10b981' }, // 탐색
-  5: { bg: 'bg-white', border: 'border-amber-400', ring: 'ring-amber-300', line: '#f59e0b' },    // 자료구조
-  6: { bg: 'bg-white', border: 'border-pink-400', ring: 'ring-pink-300', line: '#ec4899' },       // 수학
-  7: { bg: 'bg-white', border: 'border-cyan-400', ring: 'ring-cyan-300', line: '#06b6d4' },       // 문자열
-  8: { bg: 'bg-white', border: 'border-orange-400', ring: 'ring-orange-300', line: '#f97316' }, // 기하
-  default: { bg: 'bg-white', border: 'border-slate-400', ring: 'ring-slate-300', line: '#64748b' }
+  1: { bg: 'bg-rose-500', text: 'text-white', ring: 'ring-rose-400', line: '#f43f5e' },           // 구현
+  2: { bg: 'bg-violet-500', text: 'text-white', ring: 'ring-violet-400', line: '#8b5cf6' },       // DP
+  3: { bg: 'bg-sky-500', text: 'text-white', ring: 'ring-sky-400', line: '#0ea5e9' },             // 그래프
+  4: { bg: 'bg-[#58CC02]', text: 'text-white', ring: 'ring-emerald-400', line: '#58CC02' },       // 탐색 (Leaf)
+  5: { bg: 'bg-amber-500', text: 'text-white', ring: 'ring-amber-400', line: '#f59e0b' },         // 자료구조
+  6: { bg: 'bg-pink-500', text: 'text-white', ring: 'ring-pink-400', line: '#ec4899' },           // 수학
+  7: { bg: 'bg-[#2DD4BF]', text: 'text-white', ring: 'ring-teal-400', line: '#2DD4BF' },          // 문자열 (Beetle)
+  8: { bg: 'bg-[#FF9600]', text: 'text-white', ring: 'ring-orange-400', line: '#FF9600' },        // 기하 (Fox)
+  default: { bg: 'bg-slate-400', text: 'text-white', ring: 'ring-slate-300', line: '#64748b' }
 };
 
 const getFamilyColor = (familyId) => {
   return familyColors[familyId] || familyColors.default;
+};
+
+// 노드 텍스트 색상
+const getNodeTextClass = (data) => {
+  const id = data.id;
+  
+  // 관련 없는 노드 (선택 상태일 때)
+  if (selectedNodeId.value && !isRelated(id)) {
+    return 'text-slate-300';
+  }
+  
+  // 선택된 노드
+  if (isSelected(id)) {
+    return 'text-brand-700';
+  }
+  
+  const familyColor = getFamilyColor(data.familyId);
+  return familyColor.text;
 };
 
 const getNodeClass = (data) => {
@@ -272,29 +288,31 @@ const getNodeClass = (data) => {
   
   // 선택된 노드
   if (isSelected(id)) {
-    return 'bg-brand-100 border-brand-500 shadow-lg ring-2 ring-brand-400';
+    return 'bg-white ring-2 ring-brand-500 shadow-lg';
   }
   
   // 선수 태그
   if (selectedNodeId.value && isPrerequisite(id)) {
-    return `${familyColor.bg} ${familyColor.border} shadow-md ring-2 ${familyColor.ring}`;
+    return `${familyColor.bg} shadow-md ring-2 ${familyColor.ring}`;
   }
   
   // 의존 태그
   if (selectedNodeId.value && isDependent(id)) {
-    return `${familyColor.bg} ${familyColor.border} shadow-md ring-2 ${familyColor.ring} opacity-40`; // 투명도 조절
+    return `${familyColor.bg} shadow-md ring-2 ${familyColor.ring} opacity-50`;
   }
   
   // 관련 없는 노드 (선택 상태일 때)
   if (selectedNodeId.value && !isRelated(id)) {
-    return 'bg-slate-100 border-slate-200 opacity-10';
+    return 'bg-slate-100 opacity-20';
   }
   
-  // 기본 상태 - 패밀리 색상
+  // 마스터 노드 (★4~5) - 금테 추가
   if (filled >= 4) {
-    return `bg-gradient-to-br from-amber-50 to-yellow-100 ${familyColor.border} shadow-lg hover:shadow-xl ring-2 ring-amber-300`;
+    return `${familyColor.bg} shadow-lg ring-2 ring-amber-400`;
   }
-  return `${familyColor.bg} ${familyColor.border} hover:shadow-lg`;
+  
+  // 기본 상태
+  return `${familyColor.bg}`;
 };
 
 const originalPositions = ref({}); // 원래 위치 저장

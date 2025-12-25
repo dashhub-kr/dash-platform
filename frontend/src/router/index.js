@@ -1,5 +1,5 @@
 import { createRouter, createWebHistory } from "vue-router";
-import Landing from "../components/Landing.vue";
+import LandingView from "../views/LandingView.vue";
 
 const OauthRedirect = () => import("../views/OauthRedirect.vue");
 const Playground = () => import("../components/Playground.vue");
@@ -13,7 +13,7 @@ const YouTubeSearch = () => import("../views/YouTubeSearch.vue");
 const StudySimCity = () => import("../views/StudySimCity.vue");
 
 const routes = [
-  { path: "/", name: "Landing", component: Landing },
+  { path: "/", name: "Landing", component: LandingView },
   { path: "/playground", name: "Playground", component: Playground },
   { path: "/oauth2/redirect", name: "OauthRedirect", component: OauthRedirect },
   { path: "/onboarding/welcome", name: "OnboardingWelcome", component: () => import("../views/onboarding/OnboardingWelcome.vue") },
@@ -28,7 +28,9 @@ const routes = [
   { path: "/profile", name: "Profile", component: Profile },
   { path: "/youtube", name: "YouTubeSearch", component: YouTubeSearch },
   // { path: "/simcity", name: "StudySimCity", component: StudySimCity }, // 임시 비활성화
-  { path: "/training", name: "TrainingView", component: () => import("../views/TrainingView.vue") },
+  { path: "/training", redirect: "/training/roadmap" },
+  { path: "/training/roadmap", name: "TrainingRoadmapView", component: () => import("../views/training/TrainingRoadmapView.vue") },
+  { path: "/training/skilltree", name: "TrainingSkillTreeView", component: () => import("../views/training/TrainingSkillTreeView.vue") },
   { path: "/defense", name: "DefenseView", component: () => import("../views/DefenseView.vue") },
   { path: "/mockexam", name: "MockExamView", component: () => import("../views/MockExamView.vue") },
   { path: "/study/analysis", name: "StudyAnalysisView", component: () => import("../views/StudyAnalysisView.vue") },
