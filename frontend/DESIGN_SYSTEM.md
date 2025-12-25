@@ -95,5 +95,56 @@ DASH의 디자인 시스템은 학습에 대한 동기를 부여하는 **생동�
 ---
 
 ## 5. Layout Guide
-*   **Page Background**: `bg-slate-50` (전체 페이지 배경)
-*   **Max Width**: `max-w-7xl mx-auto px-6` (메인 컨텐츠 영역)
+### Standard Page Layout (Unified)
+모든 페이지는 일관된 사용자 경험을 위해 아래의 표준 레이아웃 구조를 따릅니다.
+
+*   **Structure**: 2-Column Layout (Main Content + Right Sidebar)
+*   **Container**: `flex justify-center p-4 md:p-8`
+*   **Wrapper**: `flex gap-8 max-w-screen-xl w-full`
+*   **Columns**:
+    1.  **Main Content (Left)**: `flex-1 min-w-0 space-y-6`
+        *   유동적으로 늘어나며, 화면 중앙을 차지합니다.
+    2.  **Right Sidebar (Right)**: `w-[380px] hidden xl:flex flex-col gap-6 sticky top-8 h-[calc(100vh-4rem)]`
+        *   고정된 너비(380px)를 가지며, 스크롤 시 상단에 고정됩니다.
+        *   `xl` (1280px) 미만 해상도에서는 숨겨집니다.
+
+### Code Snippet (Copy & Paste)
+```html
+<template>
+  <div class="min-h-screen bg-white text-slate-800 pb-20">
+    <!-- Main Layout Container -->
+    <div class="flex justify-center p-4 md:p-8">
+      <div class="flex gap-8 max-w-screen-xl w-full items-start">
+        
+        <!-- LEFT COLUMN: Main Content -->
+        <main class="flex-1 min-w-0 space-y-6">          
+          <!-- Page Header -->
+          <div class="mb-8">
+            <h1 class="text-2xl font-black text-slate-800 flex items-center gap-3">
+              <!-- Icon -->
+              Title
+            </h1>
+          </div>
+          
+          <!-- Content Sections -->
+          <section>...</section>
+        </main>
+
+        <!-- RIGHT COLUMN: Sidebar -->
+        <aside class="hidden xl:flex w-[380px] shrink-0 flex-col gap-6 sticky top-8 h-[calc(100vh-4rem)]">
+          <!-- Sidebar Cards -->
+          <div class="bg-white rounded-3xl border border-slate-200 shadow-sm p-6">
+            ...
+          </div>
+        </aside>
+
+      </div>
+    </div>
+  </div>
+</template>
+```
+
+### Responsive Behavior
+*   **Mobile / Tablet (< xl)**: Right Sidebar가 숨겨지고 Main Content가 화면 전체 너비를 사용합니다.
+*   **Desktop (>= xl)**: Main Content와 Right Sidebar가 380px 고정 너비 사이드바와 함께 나란히 배치됩니다.
+
