@@ -16,19 +16,23 @@
             <span v-if="initialProblemIds" class="px-2 py-0.5 bg-brand-200 text-brand-800 text-xs rounded-full">자동 선택됨</span>
          </span>
       </div>
+      <div v-else-if="creationMode === 'EDIT'" class="bg-brand-50 px-8 py-3 border-b border-brand-100 flex items-center justify-between">
+         <span class="text-brand-800 font-bold text-sm">✏️ 미션 정보를 수정합니다</span>
+      </div>
       <div v-else class="bg-brand-50 px-8 py-3 border-b border-brand-100 flex items-center justify-between">
          <span class="text-brand-800 font-bold text-sm">✨ 새로운 주차 미션을 생성합니다</span>
       </div>
       
       <div class="p-6 space-y-5">
         <!-- 모드별 UI -->
-        <template v-if="creationMode === 'NEW'">
+        <template v-if="creationMode === 'NEW' || creationMode === 'EDIT'">
             <!-- 주차 및 제목 Row -->
             <div class="grid grid-cols-4 gap-4">
               <div>
                 <label class="block text-xs font-bold text-slate-500 mb-2 uppercase tracking-wider">주차</label>
                 <input v-model.number="newMission.week" type="number" min="1"
-                       class="w-full px-4 py-3 bg-slate-50 border-2 border-slate-200 rounded-xl focus:ring-2 focus:ring-brand-500 focus:border-brand-500 text-center font-bold text-lg transition-all"
+                       :disabled="creationMode === 'EDIT'"
+                       class="w-full px-4 py-3 bg-slate-50 border-2 border-slate-200 rounded-xl focus:ring-2 focus:ring-brand-500 focus:border-brand-500 text-center font-bold text-lg transition-all disabled:text-slate-400 disabled:cursor-not-allowed"
                        placeholder="1" />
               </div>
               <div class="col-span-3">
@@ -58,7 +62,7 @@
         </template>
         
         <!-- 문제 번호 (동적 추가 방식) -->
-        <div>
+        <div v-if="creationMode !== 'EDIT'">
           <label class="block text-xs font-bold text-slate-500 mb-2 uppercase tracking-wider">📝 추가할 문제 번호</label>
           
           <div class="space-y-3">
@@ -95,8 +99,8 @@
           </button>
         </div>
         
-        <!-- 마감일 (NEW 모드일 때만) -->
-        <div v-if="creationMode === 'NEW'">
+        <!-- 마감일 (NEW 또는 EDIT 모드) -->
+        <div v-if="creationMode === 'NEW' || creationMode === 'EDIT'">
           <label class="block text-xs font-bold text-slate-500 mb-2 uppercase tracking-wider">⏰ 마감일</label>
           <input v-model="newMission.deadline" type="date"
                  class="w-full px-4 py-3 bg-slate-50 border-2 border-slate-200 rounded-xl focus:ring-2 focus:ring-brand-500 focus:border-brand-500 transition-all" />
@@ -112,7 +116,7 @@
         <button @click="handleCreateOrUpdate"
                 class="flex-1 py-3 text-white rounded-xl font-bold shadow-lg transition-all bg-gradient-to-r from-brand-500 to-brand-600 hover:from-brand-600 hover:to-brand-700 shadow-brand-500/25"
                 :disabled="isSubmitting">
-          {{ isSubmitting ? '처리 중...' : (creationMode === 'NEW' ? '✨ 미션 생성' : '➕ 문제 추가하기') }}
+          {{ isSubmitting ? '처리 중...' : (creationMode === 'NEW' ? '✨ 미션 생성' : (creationMode === 'EDIT' ? '💾 수정 완료' : '➕ 문제 추가하기')) }}
         </button>
       </div>
     </div>
@@ -128,7 +132,13 @@ const props = defineProps({
   studyId: Number,
   initialProblemIds: String,
   initialTitle: String,
+  initialTitle: String,
   preSelectedMissionId: Number,
+  forceNew: Boolean,
+  isEditMode: Boolean,
+  missionId: Number,
+  initialDeadline: String,
+  initialWeek: Number,
   missions: {
     type: Array,
     default: () => []
@@ -210,8 +220,21 @@ const initializeForm = () => {
   newMission.value.deadline = localISOTime;
   
   // 3. 모드 자동 설정
+  if (props.isEditMode) {
+      creationMode.value = 'EDIT';
+      if (props.initialDeadline) {
+          newMission.value.deadline = props.initialDeadline;
+      }
+      if (props.initialWeek) {
+          newMission.value.week = props.initialWeek;
+      }
+  }
+  // forceNew가 true이면 무조건 NEW 모드
+  else if (props.forceNew) {
+    creationMode.value = 'NEW';
+  }
   // 진행 중인 미션이 있다면 기본적으로 '기존 미션에 추가' 모드로 설정
-  if (activeMissions.value.length > 0) {
+  else if (activeMissions.value.length > 0) {
     if (props.preSelectedMissionId) {
        selectedMissionId.value = props.preSelectedMissionId;
     } else {
@@ -240,6 +263,7 @@ const handleCreateOrUpdate = async () => {
         return;
     }
     
+    
     if (creationMode.value === 'NEW') {
         await axios.post(`/api/studies/${props.studyId}/missions`, {
           week: newMission.value.week,
@@ -247,6 +271,11 @@ const handleCreateOrUpdate = async () => {
           problemIds,
           deadline: newMission.value.deadline
         });
+    } else if (creationMode.value === 'EDIT') {
+         await axios.patch(`/api/studies/${props.studyId}/missions/${props.missionId}`, {
+            title: newMission.value.title,
+            deadline: newMission.value.deadline
+         });
     } else {
         if (!selectedMissionId.value) {
             alert('추가할 미션을 선택해주세요.');
@@ -260,7 +289,6 @@ const handleCreateOrUpdate = async () => {
     // 성공 시 초기화 및 닫기
     newMission.value = { week: 1, title: '', deadline: '' };
     problemInputs.value = [{ value: '' }];
-    creationMode.value = 'NEW';
     
     emit('refresh');
     closeModal();

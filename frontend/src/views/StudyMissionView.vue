@@ -1,172 +1,269 @@
 <template>
-  <div class="min-h-screen bg-white text-slate-700 font-sans pb-20">
+  <div class="min-h-screen bg-slate-50 font-sans pb-20">
     
-    <div class="max-w-4xl mx-auto px-6 py-10">
-      
-      <!-- Header Section -->
-      <div class="flex items-center justify-between mb-8">
-        <h1 class="text-2xl font-black text-slate-800 tracking-tight">
-          미션 로드맵
-        </h1>
-        
-        <button v-if="isLeader" @click="showCreateModal = true"
-                class="px-5 py-2.5 bg-brand-500 hover:bg-brand-600 text-white rounded-xl font-bold text-sm transition-all flex items-center gap-2 shadow-sm hover:translate-y-0.5 active:translate-y-1">
-          <plus-icon class="w-4 h-4" stroke-width="3" />
-          <span>새 미션</span>
-        </button>
-      </div>
-
-      <!-- Loading State -->
-      <div v-if="loading" class="flex flex-col items-center justify-center py-20 space-y-4">
-        <div class="w-12 h-12 border-4 border-slate-200 border-t-brand rounded-full animate-spin"></div>
-        <p class="text-slate-400 font-bold animate-pulse">로딩 중입니다...</p>
-      </div>
-
-      <!-- Empty State -->
-      <div v-else-if="missions.length === 0" class="flex flex-col items-center justify-center py-20 text-center">
-            <div class="w-24 h-24 bg-slate-100 rounded-full flex items-center justify-center mb-6 text-slate-400">
-                <Inbox :size="48" stroke-width="1.5" />
-            </div>
-            <h3 class="text-xl font-bold text-slate-700 mb-2">등록된 미션이 없어요</h3>
-            <p class="text-slate-400 max-w-sm mx-auto mb-8">스터디원들과 함께 풀고 싶은 문제가 있다면 첫 번째 미션을 만들어보세요!</p>
-            <button v-if="isLeader" @click="showCreateModal = true"
-                class="px-8 py-4 bg-brand-500 hover:bg-brand-600 text-white rounded-2xl font-bold text-lg shadow-xl shadow-brand-200 transition-all hover:-translate-y-1">
-            첫 미션 시작하기
-            </button>
-      </div>
-
-      <!-- Missions List -->
-      <div v-else class="space-y-8">
-        <div v-for="mission in missions" :key="mission.id"
-             @click="openDetailDrawer(mission)"
-             class="bg-white rounded-3xl p-6 md:p-8 shadow-sm cursor-pointer transition-all hover:bg-slate-50 group relative overflow-hidden"
-             :class="{ 'opacity-70 grayscale': mission.status === 'COMPLETED' }"
-        >
-             <!-- Status Badge (Absolute) -->
-             <div v-if="mission.status === 'COMPLETED'" class="absolute -right-12 top-8 bg-slate-200 text-slate-500 font-black text-xs py-1 w-40 text-center rotate-45 shadow-sm">
-                COMPLETED
-             </div>
-
-            <div class="flex flex-col md:flex-row gap-6">
-                <!-- Left: Info -->
-                <div class="flex-1">
-                    <div class="flex items-center gap-2 mb-3">
-                         <!-- Week Badge -->
-                        <BaseIconBadge 
-                            :icon="Calendar"
-                            :text="`Week ${mission.week}`"
-                            :color="mission.status === 'COMPLETED' ? 'slate' : 'yellow'"
-                            size="sm"
-                        />
-                         <!-- AI Badge -->
-                         <BaseIconBadge 
-                             v-if="mission.sourceType === 'AI_RECOMMENDED'"
-                             :icon="Brain"
-                             text="AI 추천"
-                             color="brand"
-                             size="sm"
-                        />
-                    </div>
-
-                    <h3 class="text-2xl font-black text-slate-700 mb-2 group-hover:text-brand transition-colors">
-                        {{ mission.title }}
-                    </h3>
+    <!-- Centered Container for 2-Column Layout -->
+    <div class="flex justify-center p-4 md:p-8">
+        <div class="flex gap-8 max-w-screen-xl w-full">
+            
+            <!-- LEFT COLUMN: Main Content (Missions) -->
+            <main class="flex-1 min-w-0">
+                <!-- Header Section -->
+                <div class="flex items-center justify-between mb-8">
+                    <h1 class="text-2xl font-black text-slate-800 tracking-tight flex items-center gap-2">
+                        <MapIcon :size="28" class="text-brand-500 fill-brand-500" />
+                        미션
+                    </h1>
                     
-                    <div class="flex items-center gap-4 text-slate-400 text-sm font-bold mb-6">
-                        <span>{{ formatDate(mission.deadline) }} 까지</span>
-                        
-                        <!-- D-Day Badge -->
-                        <BaseIconBadge 
-                            v-if="getDaysLeft(mission.deadline) >= 0"
-                            :icon="Flame"
-                            :text="getDaysLeft(mission.deadline) === 0 ? '오늘 마감' : `D-${getDaysLeft(mission.deadline)}`"
-                            color="orange"
-                            size="sm"
-                        />
-                         <span v-else class="text-slate-300 bg-slate-100 px-2 py-0.5 rounded-lg text-xs font-bold">
-                            종료됨
-                        </span>
-                    </div>
-
-                    <!-- Problem Chips -->
-                     <div class="flex flex-wrap gap-2">
-                        <div v-for="(problemId, idx) in mission.problemIds" :key="problemId"
-                            class="px-3 py-1.5 rounded-xl font-bold text-sm transition-all flex items-center gap-1.5"
-                            :class="idx < mission.solvedCount 
-                                ? 'bg-leaf/10 text-leaf' 
-                                : 'bg-slate-100 text-slate-400'"
-                        >
-                           <div class="w-2 h-2 rounded-full" :class="idx < mission.solvedCount ? 'bg-leaf' : 'bg-slate-300'"></div>
-                           <span>{{ problemId }}</span>
-                        </div>
-                    </div>
+                    <button v-if="isLeader" @click="openCreateModal"
+                            class="px-5 py-2.5 bg-brand-500 hover:bg-brand-600 text-white rounded-xl font-bold text-sm transition-all flex items-center gap-2 shadow-sm hover:translate-y-0.5 active:translate-y-1">
+                    <Plus :size="18" stroke-width="3" />
+                    <span>새 미션</span>
+                    </button>
                 </div>
 
-                <!-- Right: Race Track -->
-                <div class="w-full md:w-1/3 bg-slate-50 rounded-2xl p-4 self-stretch flex flex-col justify-center">
-                    <div class="flex justify-between items-center mb-4">
-                         <span class="text-xs font-black text-slate-400 uppercase tracking-widest">Team Race</span>
-                         <span class="text-xs font-bold text-slate-500 bg-white px-2 py-1 rounded-lg">
-                            {{ Math.round((mission.memberProgressList?.reduce((acc, cur) => acc + cur.completedCount, 0) / (mission.memberProgressList?.length * Math.max(mission.totalProblems, 1))) * 100) }}% 달성
-                         </span>
-                    </div>
+                <!-- Loading State -->
+                <div v-if="loading" class="flex flex-col items-center justify-center py-20 space-y-4">
+                    <div class="w-12 h-12 border-4 border-slate-200 border-t-brand rounded-full animate-spin"></div>
+                    <p class="text-slate-400 font-bold animate-pulse">로딩 중입니다...</p>
+                </div>
 
-                    <div class="relative h-4 bg-slate-200 rounded-full mb-8 mx-2">
-                        <!-- Runners -->
-                        <div v-for="(members, progress) in getGroupedMembers(mission.memberProgressList)" 
-                             :key="progress"
-                             class="absolute top-1/2 -translate-y-1/2 group/runner-group z-10 w-8 h-8"
-                             :style="{ left: `calc(${progress}% - 14px)` }">
+                <!-- Empty State -->
+                <div v-else-if="missions.length === 0" class="flex flex-col items-center justify-center py-20 text-center bg-white rounded-3xl border border-dashed border-slate-200">
+                        <div class="w-24 h-24 bg-slate-50 rounded-full flex items-center justify-center mb-6 text-slate-300">
+                            <Inbox :size="48" stroke-width="1.5" />
+                        </div>
+                        <h3 class="text-xl font-bold text-slate-700 mb-2">등록된 미션이 없어요</h3>
+                        <p class="text-slate-400 max-w-sm mx-auto mb-8 font-medium">스터디원들과 함께 풀고 싶은 문제가 있다면<br/>첫 번째 미션을 만들어보세요!</p>
+                        <button v-if="isLeader" @click="showCreateModal = true"
+                            class="px-8 py-4 bg-brand-500 hover:bg-brand-600 text-white rounded-2xl font-bold text-lg shadow-xl shadow-brand-200 transition-all hover:-translate-y-1">
+                        첫 미션 시작하기
+                        </button>
+                </div>
 
-                            <div v-for="(member, idx) in getSortedMembersForGroup(members)" 
-                                :key="member.userId"
-                                class="absolute top-0 left-0 transition-all duration-300 ease-out"
-                                :style="{ 
-                                    zIndex: member.userId === currentUserId ? 50 : (40 - idx),
-                                    '--tx': `${idx * 18}px`
-                                }">
+                <!-- Missions List -->
+                <div v-else class="space-y-6">
+                    <div v-for="mission in missions" :key="mission.id"
+                        class="bg-white rounded-3xl p-6 md:p-8 shadow-sm transition-all hover:bg-slate-50 border border-slate-200 group relative overflow-hidden"
+                        :class="{ 'opacity-70 grayscale': mission.status === 'COMPLETED' }"
+                    >
+                        <!-- Status Badge (Absolute) -->
+                        <div v-if="mission.status === 'COMPLETED'" class="absolute -right-12 top-8 bg-slate-100 text-slate-400 font-black text-xs py-1 w-40 text-center rotate-45 shadow-sm border border-slate-200">
+                            COMPLETED
+                        </div>
+
+                        <div class="flex flex-col md:flex-row gap-6">
+                            <!-- Left: Info -->
+                            <div class="flex-1">
+                                <div class="flex items-center gap-2 mb-3">
+                                    <!-- Week Badge -->
+                                    <BaseIconBadge 
+                                        :icon="Calendar"
+                                        :text="`Week ${mission.week}`"
+                                        :color="mission.status === 'COMPLETED' ? 'slate' : 'yellow'"
+                                        size="sm"
+                                    />
+                                    <!-- AI Badge -->
+                                    <BaseIconBadge 
+                                        v-if="mission.sourceType === 'AI_RECOMMENDED'"
+                                        :icon="Brain"
+                                        text="AI 추천"
+                                        color="brand"
+                                        size="sm"
+                                    />
+                                </div>
+
+                                <h3 class="text-2xl font-black text-slate-700 mb-2 group-hover:text-brand transition-colors">
+                                    {{ mission.title }}
+                                </h3>
                                 
-                                <!-- Avatar Container -->
-                                <div class="relative transition-transform duration-300 transform group-hover/runner-group:translate-x-[var(--tx)] group/avatar"
-                                     :class="idx > 0 ? 'group-hover/runner-group:opacity-80' : ''">
+                                <div class="flex items-center gap-4 text-slate-400 text-sm font-bold mb-6">
+                                    <span>{{ formatDate(mission.deadline) }} 까지</span>
                                     
-                                    <img v-if="member.avatarUrl" :src="member.avatarUrl" 
-                                         class="w-8 h-8 rounded-full border-2 border-white object-cover shadow-sm bg-white"
-                                         :class="member.userId === currentUserId ? 'ring-2 ring-brand/30' : ''" />
-                                    <div v-else class="w-8 h-8 rounded-full border-2 border-white bg-slate-300 flex items-center justify-center text-[10px] font-bold text-white uppercase shadow-sm"
-                                         :style="{ backgroundColor: stringToColor(member.username) }">
-                                        {{ member.username?.substring(0, 2) }}
+                                    <!-- D-Day Badge -->
+                                    <BaseIconBadge 
+                                        v-if="getDaysLeft(mission.deadline) >= 0"
+                                        :icon="Flame"
+                                        :text="getDaysLeft(mission.deadline) === 0 ? '오늘 마감' : `D-${getDaysLeft(mission.deadline)}`"
+                                        color="orange"
+                                        size="sm"
+                                    />
+                                    <span v-else class="text-slate-300 bg-slate-100 px-2 py-0.5 rounded-lg text-xs font-bold">
+                                        종료됨
+                                    </span>
+                                </div>
+
+                                <!-- Problem Chips -->
+                                <div class="flex flex-wrap gap-2">
+                                    <div v-if="isLeader" class="flex gap-1 mb-2 w-full">
+                                      <button 
+                                        @click.stop="openEditModal(mission)"
+                                        class="flex items-center gap-1 px-2 py-1 text-slate-400 hover:text-brand-500 hover:bg-brand-50 rounded-lg transition-all text-xs font-bold"
+                                        title="미션 수정">
+                                        <Pencil class="w-3.5 h-3.5" />
+                                        수정
+                                      </button>
+                                      
+                                      <button 
+                                        v-if="mission.status !== 'COMPLETED'"
+                                        @click.stop="confirmEndMission(mission.id)"
+                                        class="flex items-center gap-1 px-2 py-1 text-slate-400 hover:text-orange-500 hover:bg-orange-50 rounded-lg transition-all text-xs font-bold"
+                                        title="미션 종료">
+                                        <CheckCircle2 class="w-3.5 h-3.5" />
+                                        종료
+                                      </button>
+
+                                      <button 
+                                        v-if="mission.status === 'COMPLETED'"
+                                        @click.stop="confirmDeleteMission(mission.id)"
+                                        class="flex items-center gap-1 px-2 py-1 text-slate-400 hover:text-rose-500 hover:bg-rose-50 rounded-lg transition-all text-xs font-bold"
+                                        title="미션 삭제">
+                                        <Trash2 class="w-3.5 h-3.5" />
+                                        삭제
+                                      </button>
                                     </div>
 
-                                    <!-- Flag for Completion -->
-                                    <div v-if="member.completedCount === member.totalProblems" class="absolute -top-2 -right-1 text-brand drop-shadow-md animate-bounce z-50">
-                                        <Flag :size="16" fill="currentColor" />
+                                    <div v-for="(problemId, idx) in mission.problemIds" :key="problemId"
+                                        class="px-3 py-1.5 rounded-xl font-bold text-sm transition-all flex items-center gap-1.5"
+                                        :class="idx < mission.solvedCount 
+                                            ? 'bg-emerald-50 text-emerald-600 border border-emerald-100' 
+                                            : 'bg-slate-50 text-slate-400 border border-slate-100'"
+                                    >
+                                    <div class="w-2 h-2 rounded-full" :class="idx < mission.solvedCount ? 'bg-emerald-500' : 'bg-slate-300'"></div>
+                                    <span>{{ problemId }}</span>
                                     </div>
+                                </div>
+                            </div>
 
-                                    <!-- Tooltip -->
-                                    <div class="absolute left-1/2 -translate-x-1/2 -top-8 bg-slate-800 text-white text-[10px] font-bold px-2 py-1 rounded-lg opacity-0 group-hover/avatar:opacity-100 transition-opacity whitespace-nowrap pointer-events-none z-[60]">
+                            <!-- Right: Race Track -->
+                            <div class="w-full md:w-1/3 bg-slate-50 rounded-2xl p-4 self-stretch flex flex-col justify-center border border-slate-100">
+                                <div class="flex justify-between items-center mb-4">
+                                    <span class="text-xs font-black text-slate-400 uppercase tracking-widest">Team Race</span>
+                                    <span class="text-xs font-bold text-slate-500 bg-white px-2 py-1 rounded-lg shadow-sm border border-slate-100">
+                                        {{ Math.round((mission.memberProgressList?.reduce((acc, cur) => acc + cur.completedCount, 0) / (Math.max(mission.memberProgressList?.length * Math.max(mission.totalProblems, 1), 1))) * 100) }}% 달성
+                                    </span>
+                                </div>
+
+                                <div class="relative h-3 bg-slate-200 rounded-full mb-8 mx-2 overflow-visible">
+                                    <!-- Runners -->
+                                    <template v-for="(members, progress) in getGroupedMembers(mission.memberProgressList)" :key="progress">
+                                        <div 
+                                            class="absolute top-1/2 -translate-y-1/2 group/runner-group z-10 w-8 h-8"
+                                            :style="{ left: `calc(${progress}% - 14px)` }"
+                                        >
+                                            <div v-for="(member, idx) in getSortedMembersForGroup(members)" 
+                                                :key="member.userId"
+                                                class="absolute top-0 left-0 transition-all duration-300 ease-out"
+                                                :style="{ 
+                                                    zIndex: member.userId === currentUserId ? 50 : (40 - idx),
+                                                    transform: `translateX(${idx * 12}px)`
+                                                }">
+                                                
+                                                <!-- Avatar Container -->
+                                                <div class="relative transition-transform duration-300 transform group-hover/runner-group:scale-110 group/avatar"
+                                                    :class="idx > 0 ? 'group-hover/runner-group:opacity-80' : ''">
+                                                    
+                                                    <img v-if="member.avatarUrl" :src="member.avatarUrl" 
+                                                        class="w-8 h-8 rounded-full border-2 border-white object-cover shadow-sm bg-white"
+                                                        :class="member.userId === currentUserId ? 'ring-2 ring-brand/30' : ''" />
+                                                    <div v-else class="w-8 h-8 rounded-full border-2 border-white bg-slate-300 flex items-center justify-center text-[10px] font-bold text-white uppercase shadow-sm"
+                                                        :style="{ backgroundColor: stringToColor(member.username) }">
+                                                        {{ member.username?.substring(0, 2) }}
+                                                    </div>
+
+                                                    <!-- Flag for Completion -->
+                                                    <div v-if="member.completedCount === member.totalProblems" class="absolute -top-3 -right-2 text-rose-500 drop-shadow-md animate-bounce z-50">
+                                                        <Flag :size="16" fill="currentColor" />
+                                                    </div>
+
+                                                    <!-- Tooltip -->
+                                                    <div class="absolute left-1/2 -translate-x-1/2 -top-8 bg-slate-800 text-white text-[10px] font-bold px-2 py-1 rounded-lg opacity-0 group-hover/avatar:opacity-100 transition-opacity whitespace-nowrap pointer-events-none z-[60]">
+                                                        {{ member.username }}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </template>
+                                </div>
+                                
+                                <!-- Legend -->
+                                <div class="flex flex-wrap gap-2 mt-auto pt-2">
+                                    <div v-for="member in mission.memberProgressList?.slice(0, 3)" :key="'legend-'+member.userId" 
+                                        class="flex items-center gap-1.5 text-[10px] font-bold text-slate-400 bg-white px-2 py-1 rounded-lg border border-slate-100">
+                                        <div class="w-1.5 h-1.5 rounded-full" :class="member.completedCount === member.totalProblems ? 'bg-emerald-500' : 'bg-slate-300'"></div>
                                         {{ member.username }}
+                                    </div>
+                                    <div v-if="mission.memberProgressList?.length > 3" class="text-[10px] font-bold text-slate-300 px-1 py-1">
+                                        +{{ mission.memberProgressList.length - 3 }}
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
+                </div>
+            </main>
+
+            <!-- RIGHT COLUMN: Stats & Activity (Matched Dashboard) -->
+            <aside class="hidden xl:flex w-[380px] shrink-0 flex-col gap-6 sticky top-8 h-[calc(100vh-4rem)]">
+                
+                <!-- 1. Stats Row -->
+                <div class="bg-white rounded-2xl p-4 border border-slate-200 shadow-sm flex items-center justify-around">
+                     <!-- Stat 1: Acorns -->
+                     <div class="flex items-center gap-2 group cursor-pointer" title="Acorns">
+                        <IconAcorn class="text-fox w-8 h-8" stroke-width="2.5" fill="currentColor" />
+                        <span class="text-xl font-black text-slate-700">{{ studyData?.acornCount || 0 }}</span>
+                    </div>
+
+                    <div class="w-px h-8 bg-slate-100"></div>
+
+                    <!-- Stat 2: Streak -->
+                    <div class="flex items-center gap-2 group cursor-pointer" title="Streak">
+                        <Flame class="w-7 h-7" :class="currentStreak > 0 ? 'text-rose-500 fill-rose-500 animate-pulse' : 'text-slate-300'" stroke-width="2.5" />
+                        <span class="text-xl font-black text-slate-700">{{ currentStreak }}</span>
+                    </div>
                     
-                    <!-- Legend -->
-                    <div class="flex flex-wrap gap-2 mt-auto">
-                        <div v-for="member in mission.memberProgressList?.slice(0, 3)" :key="'legend-'+member.userId" 
-                             class="flex items-center gap-1.5 text-[10px] font-bold text-slate-400 bg-white px-2 py-1 rounded-lg border border-slate-100">
-                             <div class="w-1.5 h-1.5 rounded-full" :class="member.completedCount === member.totalProblems ? 'bg-leaf' : 'bg-slate-300'"></div>
-                             {{ member.username }}
-                        </div>
-                        <div v-if="mission.memberProgressList?.length > 3" class="text-[10px] font-bold text-slate-300 px-1 py-1">
-                            +{{ mission.memberProgressList.length - 3 }}
-                        </div>
+                    <div class="w-px h-8 bg-slate-100"></div>
+
+                    <!-- Stat 3: Submissions -->
+                     <div class="flex items-center gap-2 group cursor-pointer" title="Submissions">
+                        <Send class="w-6 h-6 text-sky-400 fill-sky-400" stroke-width="2.5" />
+                        <span class="text-xl font-black text-slate-700">{{ recordCount }}</span>
                     </div>
                 </div>
-            </div>
+
+                <!-- 2. Activity Log -->
+                <div v-if="!loading && heatmapWeeks.length > 0" class="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm">
+                    <h3 class="font-black text-slate-700 text-sm mb-4">스터디 활동 로그</h3>
+                    
+                    <!-- Heatmap Visualization -->
+                    <div class="">
+                       <!-- Scroll wrapper -->
+                       <div ref="heatmapScrollRef" class="overflow-x-auto pb-2 custom-scrollbar no-scrollbar" style="direction: rtl;">
+                           <div class="flex gap-[3px] justify-end min-w-max" style="direction: ltr;">
+                               <div v-for="(week, wIdx) in heatmapWeeks" :key="wIdx" class="flex flex-col gap-[3px]">
+                                   <div v-for="(day, dIdx) in week" :key="dIdx"
+                                        class="w-2.5 h-2.5 rounded-[2px] transition-all relative"
+                                        :class="day.colorClass"
+                                        :title="`${day.dateFormatted}: ${day.count} solved`">
+                                   </div>
+                               </div>
+                           </div>
+                       </div>
+                    </div>
+                </div>
+                <!-- 3. Dynamic Mission Detail (Sidebar) -->
+                <!-- Fixed to Current Active Mission -->
+                <StudyMissionSidebarDetail 
+                    v-if="selectedMission"
+                    :mission="selectedMission"
+                    :currentUserId="currentUserId"
+                    :studyId="studyId"
+                    :isLeader="isLeader"
+                    @refresh="loadMissions"
+                    @open-add-modal="openAddModalForMission"
+                />
+            </aside>
+
         </div>
-      </div>
     </div>
 
     <!-- Modals -->
@@ -177,37 +274,49 @@
       :initialProblemIds="modalProblemIds"
       :initialTitle="modalTitle"
       :preSelectedMissionId="preSelectedMissionId"
+      :forceNew="forceNewMission"
+      :isEditMode="isEditMode"
+      :missionId="editingMissionId"
+      :initialDeadline="modalDeadline"
+      :initialWeek="modalWeek"
       @close="closeModal"
       @refresh="loadMissions"
     />
 
+    <!-- Drawer (Deprecated/Hidden for now, logic moved to sidebar) -->
+    <!-- 
     <StudyMissionDetailDrawer
       :isOpen="showDetailDrawer"
       :mission="selectedMission"
-      :studyId="studyId"
-      :isLeader="isLeader"
-      :currentUserId="currentUserId"
-      @close="closeDetailDrawer"
-      @refresh="loadMissions"
-      @open-add-modal="openAddModalForMission"
-    />
+      ...
+    /> 
+    -->
   </div>
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, computed, nextTick } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import axios from 'axios';
 import StudyMissionCreateModal from '@/components/StudyMissionCreateModal.vue';
 import StudyMissionDetailDrawer from '@/components/StudyMissionDetailDrawer.vue';
+import StudyMissionSidebarDetail from '@/components/StudyMissionSidebarDetail.vue';
 import BaseIconBadge from '@/components/common/BaseIconBadge.vue';
-import { Plus as PlusIcon, 
+import IconAcorn from '@/components/icons/IconAcorn.vue';
+import { dashboardApi } from '@/api/dashboard';
+import { studyApi } from '@/api/study';
+import { 
+    Plus, 
     Inbox, 
     Calendar,
     Brain,
     Flame,
     Flag,
-    Info
+    Map as MapIcon,
+    Send,
+    Pencil,
+    Trash2,
+    CheckCircle2
 } from 'lucide-vue-next';
 
 const route = useRoute();
@@ -220,12 +329,110 @@ const currentUserId = ref(null);
 const showCreateModal = ref(false);
 const isLeader = ref(false);
 
+// Stats Data
+const studyData = ref(null);
+const recordCount = ref(0);
+const heatmapWeeks = ref([]);
+const heatmapScrollRef = ref(null);
+
 const modalProblemIds = ref('');
 const modalTitle = ref('');
 const preSelectedMissionId = ref(null);
+const forceNewMission = ref(false);
 
-const showDetailDrawer = ref(false);
+const isEditMode = ref(false);
+const editingMissionId = ref(null);
+const modalDeadline = ref('');
+const modalWeek = ref(null);
+
+// Sidebar Selection State
 const selectedMission = ref(null);
+
+// Use Dashboard.vue logic for consistency
+const processHeatmap = (data) => {
+    try {
+        const activityMap = new Map();
+        (data || []).forEach(item => {
+             if(item?.date) activityMap.set(item.date, item);
+        });
+
+        const weeks = [];
+        const today = new Date();
+        const end = new Date(today);
+        const start = new Date(end);
+        start.setDate(start.getDate() - (52 * 7) + 1);
+
+        let current = new Date(start);
+        let currentWeek = [];
+
+        for (let i = 0; i < 52 * 7; i++) {
+             const dateStr = current.toISOString().split('T')[0];
+             const activity = activityMap.get(dateStr);
+             
+             // --- Participation Logic Start ---
+             const totalMembers = studyData.value?.memberCount || 1;
+             const contributors = Array.isArray(activity?.contributors) ? activity.contributors : [];
+             const activeCount = contributors.length;
+             const totalSolvedCount = activity?.count || 0;
+             
+             let participationRate = 0;
+             if (totalMembers > 0) {
+                 participationRate = activeCount / totalMembers;
+             }
+             
+             let colorClass = 'bg-slate-100';
+             if (participationRate > 0) colorClass = 'bg-brand-200';
+             if (participationRate >= 0.25) colorClass = 'bg-brand-400';
+             if (participationRate >= 0.50) colorClass = 'bg-brand-500';
+             if (participationRate >= 0.75) colorClass = 'bg-brand-600';
+             if (participationRate >= 1.0) colorClass = 'bg-brand-800';
+             // --- Participation Logic End ---
+
+             currentWeek.push({
+                 date: dateStr,
+                 dateFormatted: current.toLocaleDateString('ko-KR', { month: 'short', day: 'numeric' }),
+                 count: totalSolvedCount,
+                 colorClass: colorClass
+             });
+
+             if (currentWeek.length === 7) {
+                 weeks.push(currentWeek);
+                 currentWeek = [];
+             }
+             current.setDate(current.getDate() + 1);
+        }
+        if (currentWeek.length > 0) weeks.push(currentWeek);
+        heatmapWeeks.value = weeks;
+    } catch(err) {
+        console.error("Heatmap Gen Error", err);
+    }
+};
+
+const currentStreak = computed(() => {
+    if (!heatmapWeeks.value.length) return 0;
+    
+    // Flatten weeks to days array and reverse to start from today
+    const allDays = heatmapWeeks.value.flat().reverse();
+    
+    let streak = 0;
+    const today = new Date().toISOString().split('T')[0];
+    
+    for (const day of allDays) {
+        // Skip future dates
+        if (day.date > today) continue;
+        
+        if (day.count > 0) {
+            streak++;
+        } else if (streak > 0 || day.date === today) {
+            // If today has no activity, streak is 0
+            // If we had activity before and now hit a zero, stop counting
+            break;
+        }
+    }
+    
+    return streak;
+});
+
 
 onMounted(async () => {
   try {
@@ -236,6 +443,29 @@ onMounted(async () => {
     
     if (studyId.value) {
       await loadMissions();
+
+      // Fetch Stats
+      const statsRes = await studyApi.get(studyId.value);
+      studyData.value = statsRes.data;
+
+      const recordsRes = await dashboardApi.getRecords();
+      recordCount.value = recordsRes.data?.length || 0;
+
+      // Process heatmap
+      try {
+        const heatmapRes = await dashboardApi.getHeatmap();
+        processHeatmap(heatmapRes.data || []);
+      } catch (e) {
+        console.error('Heatmap Load Error:', e);
+        processHeatmap([]);
+      }
+
+      nextTick(() => {
+          if (heatmapScrollRef.value) {
+            heatmapScrollRef.value.scrollLeft = heatmapScrollRef.value.scrollWidth;
+          }
+      });
+
       if (route.query.problemIds && isLeader.value) {
         modalProblemIds.value = route.query.problemIds;
         modalTitle.value = route.query.title || '';
@@ -254,6 +484,15 @@ const loadMissions = async () => {
   try {
     const res = await axios.get(`/api/studies/${studyId.value}/missions`);
     missions.value = res.data;
+    
+    // Find the latest active (status !== 'COMPLETED') mission to fix in sidebar
+    // Assuming missions are sorted by week desc (or id desc)
+    const activeMission = missions.value.find(m => m.status !== 'COMPLETED');
+    // If no active mission, maybe show the latest one (even if completed) or null?
+    // User said "current running mission", so if all completed, maybe show nothing or the last one?
+    // Let's default to the *latest* mission if all are completed, but prioritize active.
+    selectedMission.value = activeMission || missions.value[0] || null;
+
   } catch (e) {
     console.error("Fetch missions failed", e);
   }
@@ -274,21 +513,73 @@ const getDaysLeft = (deadline) => {
     return Math.ceil(diff / (1000 * 60 * 60 * 24));
 };
 
+
+const openCreateModal = () => {
+    forceNewMission.value = true;
+    isEditMode.value = false;
+    modalProblemIds.value = '';
+    modalTitle.value = '';
+    modalDeadline.value = '';
+    modalWeek.value = null;
+    preSelectedMissionId.value = null;
+    showCreateModal.value = true;
+};
+
+const openEditModal = (mission) => {
+    isEditMode.value = true;
+    // backend expects missionId for PATCH
+    editingMissionId.value = mission.id;
+    
+    // Fill initial values
+    modalTitle.value = mission.title;
+    modalDeadline.value = mission.deadline;
+    modalWeek.value = mission.week;
+    
+    showCreateModal.value = true;
+};
+
+const confirmDeleteMission = async (missionId) => {
+    if (!confirm('정말로 이 미션을 삭제하시겠습니까? 삭제된 미션은 복구할 수 없으며, 팀원들의 제출 기록도 함께 삭제됩니다.')) {
+        return;
+    }
+    
+    try {
+        await axios.delete(`/api/studies/${studyId.value}/missions/${missionId}`);
+        await loadMissions();
+        if (selectedMission.value?.id === missionId) selectedMission.value = null;
+    } catch (e) {
+        console.error('미션 삭제 실패', e);
+        alert('미션 삭제 중 오류가 발생했습니다.');
+    }
+};
+
+const confirmEndMission = async (missionId) => {
+    if (!confirm('미션을 종료하시겠습니까? 종료된 미션은 더 이상 제출할 수 없습니다.')) {
+        return;
+    }
+
+    try {
+        await axios.patch(`/api/studies/${studyId.value}/missions/${missionId}/status`, {
+            status: 'COMPLETED'
+        });
+        await loadMissions();
+    } catch (e) {
+        console.error('미션 종료 실패', e);
+        alert('미션 종료 중 오류가 발생했습니다.');
+    }
+};
+
 const closeModal = () => {
   showCreateModal.value = false;
   modalProblemIds.value = '';
   modalTitle.value = '';
   preSelectedMissionId.value = null;
+  forceNewMission.value = false;
 };
 
+// Instead of opening drawer, select mission for sidebar
 const openDetailDrawer = (mission) => {
   selectedMission.value = mission;
-  showDetailDrawer.value = true;
-};
-
-const closeDetailDrawer = () => {
-  showDetailDrawer.value = false;
-  selectedMission.value = null;
 };
 
 const openAddModalForMission = (missionId) => {
@@ -329,5 +620,11 @@ const stringToColor = (str) => {
 
 <style scoped>
 @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css');
+.no-scrollbar::-webkit-scrollbar {
+    display: none;
+}
+.no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}
 </style>
-

@@ -1,140 +1,97 @@
 <template>
   <div class="min-h-screen bg-white text-slate-800">
 
-    <div class="relative z-10 p-6 md:p-10 max-w-4xl mx-auto">
+    <!-- Main Layout Container -->
+    <div class="flex justify-center p-4 md:p-8">
       
-
-
-      <!-- 로딩 상태 - 팀 분석 -->
-      <div v-if="loadingAnalysis" class="flex flex-col items-center justify-center py-20 animate-fade-in">
+      <!-- Loading State -->
+      <div v-if="loadingAnalysis" class="flex flex-col items-center justify-center py-40 w-full">
         <div class="w-16 h-16 border-4 border-indigo-200 border-t-indigo-600 rounded-full animate-spin mb-6"></div>
         <p class="text-slate-600 text-xl font-medium animate-pulse">팀 역량을 분석하고 있습니다...</p>
       </div>
 
-      <!-- 분석 결과 -->
-      <div v-else-if="analysis" class="space-y-10">
-        
-
-
-
-          <!-- Radar Chart 영역 -->
-          <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-            <!-- 차트 -->
-            <div class="bg-white border border-slate-200 shadow-sm rounded-3xl p-6 flex flex-col items-center justify-center min-h-[350px]">
-              <div class="w-full max-w-[300px] aspect-square">
-                <Radar v-if="radarChartData" :data="radarChartData" :options="radarChartOptions" />
-                <div v-else class="flex items-center justify-center h-full text-slate-400">
-                  데이터가 부족합니다
-                </div>
-              </div>
-              <p class="text-center text-xs text-slate-400 mt-3">
-                팀원별 정규화 후 평균 (본인 최대=100%)
-              </p>
-            </div>
-
-            <!-- 약점 및 범례 -->
-            <div class="space-y-6">
-              <!-- 상위 약점 -->
-              <!-- 상위 약점 -->
-              <div class="bg-amber-50 rounded-3xl p-6">
-                <h3 class="text-lg font-bold text-amber-800 mb-4 flex items-center gap-2">
-                  <AlertTriangle class="w-5 h-5 text-amber-600" /> 팀 약점 태그
-                </h3>
-                <div class="space-y-3">
-                  <div v-for="weakness in analysis.topWeaknesses" :key="weakness.tagKey" 
-                       class="flex items-center justify-between bg-white rounded-2xl px-5 py-3 border border-amber-100">
-                    <span class="font-medium text-slate-700">{{ getTagDisplayName(weakness.tagKey) }}</span>
-                    <span class="text-amber-600 font-bold">{{ Math.round(weakness.averageRate) }}문제</span>
-                  </div>
-                </div>
-              </div>
-
-              <!-- 멤버 범례 -->
-              <div class="bg-white rounded-3xl p-6 shadow-sm">
-                <h3 class="text-lg font-bold text-slate-800 mb-4">멤버별 정보</h3>
-                <div class="space-y-2">
-                  <div v-for="(member, idx) in analysis.memberStats.slice(0, 5)" :key="'legend-' + idx"
-                       class="flex items-center gap-3">
-                    <div class="w-4 h-4 rounded-full" :style="{ backgroundColor: memberColors[idx % memberColors.length] }"></div>
-                    <span class="text-slate-700">{{ member.username }}</span>
-                    <div class="ml-auto flex items-center gap-2 w-24 flex-shrink-0">
-                      <div class="w-5 flex justify-center">
-                        <img :src="getTierIconUrl(member.tier)" class="h-4 object-contain" />
+      <!-- Content State -->
+      <div v-else-if="analysis" class="flex gap-8 max-w-screen-xl w-full items-start">
+          
+          <!-- LEFT COLUMN: Main Content -->
+          <main class="flex-1 min-w-0 space-y-6 animate-in slide-in-from-left duration-500">
+             
+             <!-- 1. Team Skill Analysis (Radar Chart) -->
+             <div class="bg-white border border-slate-200 shadow-sm rounded-3xl p-8">
+                 <h2 class="font-black text-slate-800 mb-6 flex items-center gap-2">
+                   <Activity class="w-6 h-6 text-brand-500" stroke-width="2.5" fill="currentColor" /> 팀 스킬 분석
+                 </h2>
+                 <div class="flex flex-col items-center justify-center">
+                    <div class="w-full max-w-[400px] aspect-square relative z-0">
+                      <Radar v-if="radarChartData" :data="radarChartData" :options="radarChartOptions" />
+                      <div v-else class="flex items-center justify-center h-full text-slate-400">
+                        데이터가 부족합니다
                       </div>
-                      <span class="text-xs font-bold text-left flex-1" :class="getTierColorClass(member.tier)">
-                        {{ getFormattedTierName(member.tier) }}
-                      </span>
                     </div>
+                    <p class="text-center text-xs text-slate-400 mt-6 bg-slate-50 px-3 py-1 rounded-full">
+                      팀원별 정규화 후 평균 (본인 최대=100%)
+                    </p>
+                 </div>
+             </div>
+  
+              <!-- 2. Recommended Curriculum -->
+              <div class="bg-white border border-slate-200 rounded-3xl p-8 shadow-sm">
+                <div class="flex items-center justify-between mb-6">
+                  <h2 class="font-black text-slate-900 flex items-center gap-2">
+                      <BookOpen class="w-6 h-6 text-brand-500" stroke-width="2.5" fill="currentColor" /> 추천 커리큘럼
+                  </h2>
+                  <div v-if="loadingCurriculum" class="flex items-center gap-2 text-brand-600">
+                     <span class="animate-spin text-sm">⏳</span>
+                     <span class="text-xs font-bold">맞춤 커리큘럼 생성 중...</span>
                   </div>
-                  <!-- 팀 평균 범례 -->
-                  <div class="flex items-center gap-3 mt-3 pt-3 border-t border-slate-100">
-                    <div class="w-4 h-4 rounded-full bg-brand-500"></div>
-                    <span class="text-slate-700 font-medium">팀 평균</span>
-                    <div class="ml-auto flex items-center gap-2 w-24 flex-shrink-0" v-if="analysis.averageTier">
-                      <div class="w-5 flex justify-center">
-                        <img :src="getTierIconUrl(analysis.averageTier)" class="h-4 object-contain" />
+                </div>
+  
+                <!-- 커리큘럼 로딩 -->
+                <div v-if="loadingCurriculum" class="flex flex-col items-center py-16 animate-fade-in">
+                  <div class="w-10 h-10 border-4 border-indigo-200 border-t-indigo-600 rounded-full animate-spin mb-4"></div>
+                  <p class="text-slate-600 font-bold text-sm animate-pulse">팀에 맞는 문제를 찾고 있습니다...</p>
+                </div>
+  
+                <!-- 커리큘럼 결과 -->
+                <div v-else-if="curriculum.length > 0" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                  <div v-for="problem in curriculum" :key="problem.problemId"
+                       class="bg-slate-50 hover:bg-slate-100 border border-slate-200 rounded-xl p-5 transition-all hover:-translate-y-1 hover:shadow-lg group relative">
+                    <a :href="`https://www.acmicpc.net/problem/${problem.problemId}`"
+                       target="_blank"
+                       class="block">
+                      <div class="flex items-center gap-2 mb-2 min-w-0">
+                        <span class="text-xl font-black text-brand-600 group-hover:text-brand-500 flex-shrink-0">#{{ problem.problemId }}</span>
+                        <span v-if="problem.tags?.length" class="px-2 py-0.5 bg-brand-100 text-brand-700 text-[10px] font-bold rounded-md truncate max-w-[120px]">{{ problem.tags[0] }}</span>
                       </div>
-                      <span class="text-xs font-bold text-left flex-1" :class="getTierColorClass(analysis.averageTier)">
-                        {{ getFormattedTierName(analysis.averageTier) }}
-                      </span>
-                    </div>
+                      <p class="text-slate-800 font-bold truncate text-sm mb-1">{{ problem.title }}</p>
+                      <div class="flex items-center gap-2">
+                           <span class="text-xs font-medium text-slate-500">Lv.{{ problem.level }}</span>
+                      </div>
+                    </a>
+                    <!-- 팀장 전용: 미션 등록 버튼 -->
+                    <button v-if="isLeader"
+                            @click.stop="registerAsMission(problem)"
+                            class="absolute top-3 right-3 px-2 py-1 bg-brand-500 hover:bg-brand-600 text-white text-[10px] font-bold rounded-lg shadow-md transition-all opacity-0 group-hover:opacity-100 flex items-center gap-1">
+                      <Pin class="w-3 h-3" /> 미션 등록
+                    </button>
                   </div>
+                </div>
+  
+                <!-- 빈 상태 -->
+                <div v-else class="text-center py-12 text-slate-400 text-sm">
+                  <p>데이터가 부족하여 커리큘럼을 생성할 수 없습니다.</p>
                 </div>
               </div>
-            </div>
-          </div>
-        
-
-        <!-- 커리큘럼 섹션 -->
-        <div class="bg-white rounded-3xl p-8 shadow-sm">
-          <div class="flex items-center justify-between mb-6">
-            <h2 class="text-2xl font-bold text-slate-900 flex items-center gap-2">
-                <BookOpen class="text-brand-500" /> 추천 커리큘럼
-            </h2>
-            <div v-if="loadingCurriculum" class="flex items-center gap-2 text-brand-600">
-               <span class="animate-spin text-xl">⏳</span>
-               <span class="text-sm font-bold">맞춤 커리큘럼 생성 중...</span>
-            </div>
-          </div>
-
-          <!-- 커리큘럼 로딩 -->
-          <div v-if="loadingCurriculum" class="flex flex-col items-center py-16 animate-fade-in">
-            <div class="w-12 h-12 border-4 border-indigo-200 border-t-indigo-600 rounded-full animate-spin mb-4"></div>
-            <p class="text-slate-600 font-medium animate-pulse">팀에 맞는 문제를 찾고 있습니다...</p>
-          </div>
-
-          <!-- 커리큘럼 결과 -->
-          <div v-else-if="curriculum.length > 0" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            <div v-for="problem in curriculum" :key="problem.problemId"
-                 class="bg-slate-50 hover:bg-slate-100 border border-slate-200 rounded-xl p-5 transition-all hover:-translate-y-1 hover:shadow-lg group relative">
-              <a :href="`https://www.acmicpc.net/problem/${problem.problemId}`"
-                 target="_blank"
-                 class="block">
-                <div class="flex items-center gap-2 mb-2 min-w-0">
-                  <span class="text-2xl font-bold text-brand-600 group-hover:text-brand-500 flex-shrink-0">#{{ problem.problemId }}</span>
-                  <span v-if="problem.tags?.length" class="px-2 py-1 bg-brand-100 text-brand-700 text-xs font-medium rounded-md truncate max-w-[120px] sm:max-w-[150px]">{{ problem.tags[0] }}</span>
-                </div>
-                <p class="text-slate-800 font-medium truncate">{{ problem.title }}</p>
-                <p class="text-slate-500 text-sm">Lv.{{ problem.level }}</p>
-              </a>
-              <!-- 팀장 전용: 미션 등록 버튼 -->
-              <button v-if="isLeader"
-                      @click.stop="registerAsMission(problem)"
-                      class="absolute top-3 right-3 px-3 py-1.5 bg-brand-500 hover:bg-brand-600 text-white text-xs font-bold rounded-lg shadow-md transition-all opacity-0 group-hover:opacity-100 flex items-center gap-1">
-                <Pin class="w-3 h-3" /> 미션 등록
-              </button>
-            </div>
-          </div>
-
-          <!-- 빈 상태 -->
-          <div v-else class="text-center py-12 text-slate-400">
-            <p>데이터가 부족하여 커리큘럼을 생성할 수 없습니다.</p>
-          </div>
-        </div>
+          </main>
+  
+          <!-- RIGHT COLUMN: Sidebar -->
+          <aside class="hidden xl:flex w-[380px] shrink-0 sticky top-8 h-fit">
+              <StudyAnalysisSidebar :analysis="analysis" :memberColors="memberColors" />
+          </aside>
       </div>
 
-      <!-- 스터디 없음 상태 -->
-      <div v-else class="flex flex-col items-center justify-center py-20 text-center">
+      <!-- No Study State -->
+      <div v-else class="flex flex-col items-center justify-center py-40 text-center w-full">
         <p class="text-slate-500 text-xl mb-6">스터디에 가입해야 팀 분석을 이용할 수 있습니다.</p>
         <router-link to="/onboarding" class="px-8 py-4 bg-brand-600 text-white rounded-2xl font-bold shadow-lg shadow-brand-200 hover:shadow-brand-300 transition-all hover:-translate-y-1">
           스터디 가입하기
@@ -162,6 +119,7 @@ import axios from 'axios';
 import { Radar } from 'vue-chartjs';
 import { Chart as ChartJS, RadialLinearScale, PointElement, LineElement, Filler, Tooltip, Legend } from 'chart.js';
 import StudyMissionCreateModal from '@/components/StudyMissionCreateModal.vue';
+import StudyAnalysisSidebar from '@/components/StudyAnalysisSidebar.vue';
 import { BookOpen, AlertTriangle, Pin, Users, BookMarked, Activity } from 'lucide-vue-next';
 
 ChartJS.register(RadialLinearScale, PointElement, LineElement, Filler, Tooltip, Legend);

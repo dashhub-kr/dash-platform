@@ -1,142 +1,175 @@
 <template>
   <div class="min-h-screen bg-white text-slate-800">
 
-    <main class="container mx-auto px-6 py-10 max-w-4xl">
+    <!-- Main Layout Container -->
+    <div class="flex justify-center p-4 md:p-8">
+      <div class="flex gap-8 max-w-screen-xl w-full items-start">
 
+        <!-- LEFT COLUMN: Main Content -->
+        <main class="flex-1 min-w-0 space-y-6">
 
-      <!-- Search Bar -->
-      <div class="mb-6 animate-fade-in-up">
-        <div class="flex gap-3">
-          <div class="flex-1 relative">
-            <Search :size="18" class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" />
-            <input 
-              v-model="searchProblemNumber"
-              @keyup.enter="searchPosts"
-              type="number"
-              placeholder="문제 번호로 검색 (예: 1234)"
-              class="w-full pl-12 pr-4 py-3 bg-white border border-slate-200 rounded-xl text-slate-700 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-brand-400 focus:border-transparent"
-            />
-          </div>
-          <button @click="searchPosts" class="px-6 py-3 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl font-bold transition-colors">
-            검색
-          </button>
-          <button v-if="searchProblemNumber" @click="clearSearch" class="px-4 py-3 text-slate-500 hover:text-slate-700 transition-colors">
-            초기화
-          </button>
-          <div class="w-px h-full bg-slate-200 mx-1"></div>
-          <button
-            @click="$router.push('/boards/write')"
-            class="flex items-center gap-2 px-5 py-3 bg-brand-600 hover:bg-brand-500 text-white rounded-xl font-bold transition-all shadow-md shadow-brand-200 hover:-translate-y-0.5 shrink-0"
-          >
-            <PenSquare :size="18" />
-            글쓰기
-          </button>
-        </div>
-      </div>
-
-      <!-- Popular Posts Section -->
-      <div v-if="popularPosts.length > 0 && !searchProblemNumber" class="mb-8 animate-fade-in-up">
-        <h2 class="text-lg font-bold text-slate-800 mb-4 flex items-center gap-2">
-          <span>🔥</span> 인기글
-        </h2>
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          <div 
-            v-for="post in popularPosts.slice(0, 3)" 
-            :key="'popular-' + post.id"
-            @click="$router.push(`/boards/${post.id}`)"
-            class="bg-gradient-to-br from-orange-50 to-amber-50 border border-orange-200 rounded-2xl p-5 cursor-pointer hover:shadow-lg hover:-translate-y-1 transition-all"
-          >
-            <div class="flex items-center gap-2 mb-2">
-              <span v-if="post.problemNumber" class="px-2 py-0.5 bg-orange-100 text-orange-700 text-xs font-bold rounded">P{{ post.problemNumber }}</span>
-              <span class="flex items-center gap-1 text-rose-500 text-sm font-bold">
-                <ThumbsUp :size="12" /> {{ post.likeCount }}
-              </span>
-            </div>
-            <h3 class="font-bold text-slate-800 truncate mb-2">{{ post.title }}</h3>
-            <div class="flex items-center gap-2 text-xs text-slate-500">
-              <img v-if="post.authorProfileImageUrl" :src="post.authorProfileImageUrl" class="w-5 h-5 rounded-full" />
-              <span v-if="post.studyName" class="text-brand-600">[{{ post.studyName }}]</span>
-              <span>{{ post.authorName }}</span>
+          <!-- Search Bar -->
+          <div class="animate-fade-in-up">
+            <div class="flex gap-3">
+              <div class="flex-1 relative">
+                <Search :size="18" class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" />
+                <input 
+                  v-model="searchProblemNumber"
+                  @keyup.enter="searchPosts"
+                  type="number"
+                  placeholder="문제 번호로 검색 (예: 1234)"
+                  class="w-full pl-12 pr-4 py-3 bg-white border border-slate-200 rounded-xl text-slate-700 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-brand-400 focus:border-transparent"
+                />
+              </div>
+              <button @click="searchPosts" class="px-6 py-3 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl font-bold transition-colors">
+                검색
+              </button>
+              <button v-if="searchProblemNumber" @click="clearSearch" class="px-4 py-3 text-slate-500 hover:text-slate-700 transition-colors">
+                초기화
+              </button>
+              <div class="w-px h-full bg-slate-200 mx-1"></div>
+              <button
+                @click="$router.push('/boards/write')"
+                class="flex items-center gap-2 px-5 py-3 bg-brand-600 hover:bg-brand-500 text-white rounded-xl font-bold transition-all shadow-md shadow-brand-200 hover:-translate-y-0.5 shrink-0"
+              >
+                <PenSquare :size="18" />
+                글쓰기
+              </button>
             </div>
           </div>
-        </div>
-      </div>
 
-      <!-- Board List -->
-      <div class="bg-white/80 border border-white/60 rounded-3xl overflow-hidden shadow-xl shadow-slate-200/50 backdrop-blur-md animate-fade-in-up delay-100">
-        <!-- List Header -->
-        <div class="grid grid-cols-12 px-8 py-5 bg-slate-50 border-b border-slate-100 text-sm font-bold text-slate-500 uppercase tracking-wider">
-          <div class="col-span-1 text-center">번호</div>
-          <div class="col-span-5 pl-2">제목</div>
-          <div class="col-span-2 text-center">작성자</div>
-          <div class="col-span-2 text-center">추천/댓글</div>
-          <div class="col-span-2 text-center">작성일</div>
-        </div>
+          <!-- Board List -->
+          <div class="bg-white/80 border border-white/60 rounded-3xl overflow-hidden shadow-xl shadow-slate-200/50 backdrop-blur-md animate-fade-in-up delay-100">
+            <!-- List Header -->
+            <div class="grid grid-cols-12 px-8 py-5 bg-slate-50 border-b border-slate-100 text-sm font-bold text-slate-500 uppercase tracking-wider">
+              <div class="col-span-1 text-center">번호</div>
+              <div class="col-span-5 pl-2">제목</div>
+              <div class="col-span-2 text-center">작성자</div>
+              <div class="col-span-2 text-center">추천/댓글</div>
+              <div class="col-span-2 text-center">작성일</div>
+            </div>
 
-        <!-- List Items -->
-        <template v-if="loading">
-          <div class="p-16 text-center text-slate-400 font-medium">
-            <div class="animate-pulse flex flex-col items-center">
-              <div class="h-4 bg-slate-200 rounded w-1/4 mb-4"></div>
-              <div class="h-4 bg-slate-200 rounded w-1/2"></div>
-            </div>
+            <!-- List Items -->
+            <template v-if="loading">
+              <div class="p-16 text-center text-slate-400 font-medium">
+                <div class="animate-pulse flex flex-col items-center">
+                  <div class="h-4 bg-slate-200 rounded w-1/4 mb-4"></div>
+                  <div class="h-4 bg-slate-200 rounded w-1/2"></div>
+                </div>
+              </div>
+            </template>
+            <template v-else-if="filteredPosts.length === 0">
+              <div class="p-20 text-center flex flex-col items-center justify-center">
+                <div class="w-16 h-16 bg-slate-100 rounded-full flex items-center justify-center mb-6 text-slate-300">
+                    <Inbox :size="32" />
+                </div>
+                <h3 class="text-xl font-bold text-slate-700 mb-2">{{ searchProblemNumber ? '검색 결과가 없습니다' : '작성된 글이 없습니다' }}</h3>
+                <p class="text-slate-500">{{ searchProblemNumber ? '다른 문제 번호로 검색해보세요.' : '첫 번째 글을 작성해보세요!' }}</p>
+              </div>
+            </template>
+            <template v-else>
+              <div
+                v-for="post in filteredPosts"
+                :key="post.id"
+                @click="$router.push(`/boards/${post.id}`)"
+                class="grid grid-cols-12 px-8 py-5 border-b border-slate-100 hover:bg-brand-50/30 cursor-pointer transition-colors group items-center"
+              >
+                <div class="col-span-1 text-center text-slate-400 font-mono text-sm group-hover:text-brand-500 transition-colors">{{ post.id }}</div>
+                <div class="col-span-5 pl-2 pr-4 flex items-center gap-2">
+                  <span v-if="post.boardType === 'CODE_REVIEW'" class="px-2 py-0.5 text-xs font-bold rounded-full bg-emerald-100 text-emerald-700">코드리뷰</span>
+                  <span v-if="post.problemNumber" class="px-2 py-0.5 text-xs font-bold rounded-full bg-blue-100 text-blue-700">P{{ post.problemNumber }}</span>
+                  <h3 class="text-slate-800 font-bold text-lg group-hover:text-brand-600 transition-colors truncate">
+                    {{ post.title }}
+                  </h3>
+                </div>
+                <div class="col-span-2 text-center text-sm font-medium text-slate-600 flex items-center justify-center gap-2">
+                  <img v-if="post.authorProfileImageUrl" :src="post.authorProfileImageUrl" class="w-6 h-6 rounded-full border border-slate-200" />
+                  <div class="flex flex-col items-start">
+                    <span v-if="post.studyName" class="text-[10px] text-brand-500 font-bold">[{{ post.studyName }}]</span>
+                    <span>{{ post.authorName || '익명' }}</span>
+                  </div>
+                </div>
+                <div class="col-span-2 text-center text-sm text-slate-500 flex items-center justify-center gap-3">
+                  <span class="flex items-center gap-1.5" title="추천">
+                    <div class="w-6 h-6 bg-rose-500 rounded-full flex items-center justify-center text-white shadow-sm shadow-rose-200">
+                        <ThumbsUp :size="12" stroke-width="3" />
+                    </div>
+                    <span class="font-bold text-rose-500">{{ post.likeCount || 0 }}</span>
+                  </span>
+                  <span class="flex items-center gap-1.5" title="댓글">
+                    <div class="w-6 h-6 bg-brand-500 rounded-full flex items-center justify-center text-white shadow-sm shadow-brand-200">
+                        <MessageCircle :size="12" stroke-width="3" />
+                    </div>
+                    <span class="font-bold text-brand-500">{{ post.commentCount || 0 }}</span>
+                  </span>
+                </div>
+                <div class="col-span-2 text-center text-xs text-slate-400 font-medium">
+                  {{ formatDate(post.createdAt) }}
+                </div>
+              </div>
+            </template>
           </div>
-        </template>
-        <template v-else-if="filteredPosts.length === 0">
-          <div class="p-20 text-center flex flex-col items-center justify-center">
-            <div class="w-16 h-16 bg-slate-100 rounded-full flex items-center justify-center mb-6 text-slate-300">
-                <Inbox :size="32" />
-            </div>
-            <h3 class="text-xl font-bold text-slate-700 mb-2">{{ searchProblemNumber ? '검색 결과가 없습니다' : '작성된 글이 없습니다' }}</h3>
-            <p class="text-slate-500">{{ searchProblemNumber ? '다른 문제 번호로 검색해보세요.' : '첫 번째 글을 작성해보세요!' }}</p>
-          </div>
-        </template>
-        <template v-else>
-          <div
-            v-for="post in filteredPosts"
-            :key="post.id"
-            @click="$router.push(`/boards/${post.id}`)"
-            class="grid grid-cols-12 px-8 py-5 border-b border-slate-100 hover:bg-brand-50/30 cursor-pointer transition-colors group items-center"
-          >
-            <div class="col-span-1 text-center text-slate-400 font-mono text-sm group-hover:text-brand-500 transition-colors">{{ post.id }}</div>
-            <div class="col-span-5 pl-2 pr-4 flex items-center gap-2">
-              <span v-if="post.boardType === 'CODE_REVIEW'" class="px-2 py-0.5 text-xs font-bold rounded-full bg-emerald-100 text-emerald-700">코드리뷰</span>
-              <span v-if="post.problemNumber" class="px-2 py-0.5 text-xs font-bold rounded-full bg-blue-100 text-blue-700">P{{ post.problemNumber }}</span>
-              <h3 class="text-slate-800 font-bold text-lg group-hover:text-brand-600 transition-colors truncate">
-                {{ post.title }}
-              </h3>
-            </div>
-            <div class="col-span-2 text-center text-sm font-medium text-slate-600 flex items-center justify-center gap-2">
-              <img v-if="post.authorProfileImageUrl" :src="post.authorProfileImageUrl" class="w-6 h-6 rounded-full border border-slate-200" />
-              <div class="flex flex-col items-start">
-                <span v-if="post.studyName" class="text-[10px] text-brand-500 font-bold">[{{ post.studyName }}]</span>
-                <span>{{ post.authorName || '익명' }}</span>
+        </main>
+
+        <!-- RIGHT COLUMN: Sidebar (Popular Posts) -->
+        <aside class="hidden xl:flex w-[380px] shrink-0 flex-col gap-6 sticky top-8 h-[calc(100vh-4rem)]">
+          <!-- Popular Posts Section -->
+          <div v-if="popularPosts.length > 0 && !searchProblemNumber" class="bg-white rounded-3xl p-6 shadow-sm border border-slate-200 animate-fade-in-up">
+            <h2 class="text-lg font-bold text-slate-800 mb-6 flex items-center gap-2">
+              <div class="w-8 h-8 bg-orange-500 rounded-lg flex items-center justify-center text-white shadow-sm shadow-orange-200">
+                <Flame :size="18" fill="currentColor" class="text-white" />
+              </div>
+              인기글
+            </h2>
+            <div class="flex flex-col gap-4">
+              <div 
+                v-for="post in popularPosts.slice(0, 3)" 
+                :key="'popular-' + post.id"
+                @click="$router.push(`/boards/${post.id}`)"
+                class="bg-gradient-to-br from-orange-50 to-amber-50 border border-orange-200 rounded-2xl p-5 cursor-pointer hover:shadow-lg hover:-translate-y-1 transition-all"
+              >
+                <div class="flex items-center gap-2 mb-2">
+                  <span v-if="post.problemNumber" class="px-2.5 py-1 bg-white/80 backdrop-blur-sm border border-orange-200 text-orange-700 text-xs font-bold rounded-lg shadow-sm">P{{ post.problemNumber }}</span>
+                  <div class="flex items-center gap-1.5 ml-auto">
+                    <div class="w-6 h-6 bg-rose-500 rounded-full flex items-center justify-center text-white shadow-sm shadow-rose-200">
+                       <ThumbsUp :size="12" stroke-width="3" />
+                    </div>
+                    <span class="text-rose-600 text-sm font-bold">{{ post.likeCount }}</span>
+                  </div>
+                </div>
+                <h3 class="font-bold text-slate-800 truncate mb-1">{{ post.title }}</h3>
+                <div class="flex items-center gap-2 text-xs text-slate-500">
+                  <img v-if="post.authorProfileImageUrl" :src="post.authorProfileImageUrl" class="w-5 h-5 rounded-full border border-orange-200" />
+                  <span v-if="post.studyName" class="text-brand-600 font-bold">[{{ post.studyName }}]</span>
+                  <span>{{ post.authorName }}</span>
+                </div>
               </div>
             </div>
-            <div class="col-span-2 text-center text-sm text-slate-500 flex items-center justify-center gap-3">
-              <span class="flex items-center gap-1" title="추천">
-                <ThumbsUp :size="14" class="text-rose-400" />
-                {{ post.likeCount || 0 }}
-              </span>
-              <span class="flex items-center gap-1" title="댓글">
-                <MessageCircle :size="14" class="text-brand-400" />
-                {{ post.commentCount || 0 }}
-              </span>
-            </div>
-            <div class="col-span-2 text-center text-xs text-slate-400 font-medium">
-              {{ formatDate(post.createdAt) }}
-            </div>
           </div>
-        </template>
+          
+          <!-- Additional Info or Placeholder -->
+          <div class="bg-gradient-to-br from-slate-50 to-brand-50/20 rounded-3xl p-6 border border-slate-100">
+            <h3 class="font-bold text-slate-700 text-sm mb-2 flex items-center gap-2">
+              <div class="w-6 h-6 bg-brand-500 rounded-lg flex items-center justify-center text-white shadow-sm">
+                <Lightbulb :size="14" stroke-width="2.5" />
+              </div>
+              게시판 이용 가이드
+            </h3>
+            <p class="text-xs text-slate-500 leading-relaxed">
+              자유롭게 질문하고 정보를 공유해보세요. 서로 배려하는 문화를 만들어갑시다.
+            </p>
+          </div>
+        </aside>
+
       </div>
-    </main>
+    </div>
   </div>
 </template>
 
 <script setup>
 import { ref, computed, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
-import { PenSquare, Inbox, ThumbsUp, MessageCircle, Search } from 'lucide-vue-next';
+import { PenSquare, Inbox, ThumbsUp, MessageCircle, Search, Flame, Lightbulb } from 'lucide-vue-next';
 import { boardApi } from '../api/board';
 
 const router = useRouter();
