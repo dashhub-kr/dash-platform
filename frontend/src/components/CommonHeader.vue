@@ -12,7 +12,7 @@
             @click="goHome"
             aria-label="홈으로 이동"
           >
-            <img src="/icons/dash.png" alt="DASH" class="h-10 object-contain group-hover:scale-105 transition-transform" />
+            <img src="/icons/dash_logo_new.png" alt="DASH" class="h-10 object-contain group-hover:scale-105 transition-transform" />
           </div>
         </div>
       </div>

@@ -1,6 +1,6 @@
 <template>
   <!-- Flex Container for Split View -->
-  <div class="flex h-screen overflow-hidden bg-slate-50">
+  <div class="flex h-screen overflow-hidden bg-slate-50 font-sans">
     
     <!-- CONTEXT CARD MODE: When Drawer is Open - Show only selected problem -->
     <div 
@@ -71,248 +71,215 @@
       v-else
       class="w-full overflow-y-auto"
     >
-      <div class="min-h-screen bg-white text-slate-800">
+      <div class="min-h-screen bg-slate-50 text-slate-800">
         <!-- Navbar / Header Area -->
 
-        <main class="container mx-auto px-6 py-8 pb-32 xl:mx-[370px] xl:max-w-[calc(100%-740px)] 2xl:mx-[410px] 2xl:max-w-[calc(100%-820px)]">
-          <!-- Header Section with Clean Metrics -->
-          <div class="mb-8 animate-fade-in-down">
-            <!-- Weekly Mission Section -->
-            <div class="mb-6">
-              <div v-if="targetMission" 
-                   class="rounded-3xl p-6 shadow-none relative overflow-hidden transition-all duration-500"
-                   :class="getMissionThemeClass(targetMission)">
-                
-                <!-- Decoration removed for clean look -->
-                
-                <div class="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-4">
-                  <div>
-                    <div class="flex items-center gap-2 mb-2">
-                       <span class="px-2 py-0.5 bg-white rounded-lg text-xs font-bold uppercase tracking-wider text-slate-400">
-                         #{{ targetMission.week }}
-                       </span>
-                       <span class="flex items-center gap-1 text-xs font-bold text-slate-500">
-                         <Calendar :size="12" />
-                         ~ {{ formatMissionDate(targetMission.deadline) }}
-                       </span>
-                       <span v-if="isMissionUrgent(targetMission) && !isMissionCompleted(targetMission)" class="px-2 py-0.5 bg-rose-100 text-rose-600 rounded text-xs font-bold animate-pulse">
-                         마감 임박
-                       </span>
-                    </div>
-                    <div class="flex items-center gap-2">
-                        <h2 class="text-2xl font-black text-slate-800 mb-1 tracking-tight">{{ targetMission.title }}</h2>
-                        <span v-if="isMissionCompleted(targetMission)" class="bg-emerald-100 text-emerald-700 px-2 py-0.5 rounded-lg text-xs font-bold flex items-center gap-1">
-                            <Check :size="12" /> 해결 완료!
-                        </span>
-                    </div>
-                  </div>
-                  
-                  <div class="flex flex-wrap gap-2">
-                    <a 
-                      v-for="problemId in targetMission.problemIds" 
-                      :key="problemId"
-                      :href="getProblemLink(problemId)" 
-                      target="_blank"
-                      class="flex items-center gap-2 px-4 py-2.5 rounded-xl font-bold text-sm transition-all shadow-none group"
-                      :class="isProblemSolved(problemId) 
-                        ? 'bg-emerald-500 text-white hover:bg-emerald-600' 
-                        : 'bg-white text-brand-600 hover:bg-brand-50 hover:scale-105'"
-                    >
-                      <span class="flex items-center gap-1">
-                          {{ problemId }}번
-                          <Check v-if="isProblemSolved(problemId)" :size="14" />
-                      </span>
-                      <ExternalLink v-if="!isProblemSolved(problemId)" :size="14" class="opacity-50 group-hover:opacity-100" />
-                    </a>
-                  </div>
-                </div>
-
-                <!-- Member Progress Section -->
-                <div v-if="targetMission.memberProgressList?.length > 0" class="mt-4 pt-3 border-t border-black/5 flex flex-wrap items-center gap-4">
-                  <div v-for="member in sortMembers(targetMission.memberProgressList)" :key="member.userId" 
-                       class="flex flex-col items-center gap-1 group relative cursor-help">
-                    
-                    <!-- Tooltip for Name -->
-                    <div class="absolute bottom-full mb-2 px-2 py-1 bg-black/80 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none z-20">
-                      {{ member.username }} {{ isMe(member.userId) ? '(나)' : '' }}
-                      <div class="absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-1 w-2 h-2 bg-black/80 rotate-45"></div>
-                    </div>
-
-                    <!-- Avatar -->
-                    <!-- Avatar -->
-                    <img :src="getMemberProfileImage(member)" :alt="member.username"
-                         class="w-9 h-9 rounded-full object-cover border-2 transition-all relative z-10 bg-white"
-                         :class="[
-                           isMe(member.userId) 
-                             ? 'border-emerald-400 ring-2 ring-emerald-400/30' + (member.allCompleted ? ' shadow-[0_0_12px_rgba(52,211,153,0.6)]' : '')
-                             : member.allCompleted 
-                               ? 'border-orange-400 shadow-[0_0_12px_rgba(251,146,60,0.5)]' 
-                               : 'border-slate-200 opacity-80 grayscale-[0.0]'
-                         ]" />
-                    
-                    <!-- Status -->
-                    <div class="flex items-center gap-0.5 mt-0.5">
-                       <Flame :size="13" 
-                              class="transition-all"
-                              :class="member.allCompleted ? 'fill-orange-400 text-orange-400 animate-pulse' : 'text-slate-300/40'" />
-                       <span v-if="!member.allCompleted" class="text-[11px] font-bold text-slate-400">
-                         {{ member.completedCount }}
-                       </span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              
-              <div v-if="!targetMission" class="bg-white rounded-3xl p-6 shadow-sm flex items-center justify-center gap-3 text-slate-400">
-                 <Map :size="20" />
-                 <span class="font-medium">진행 중인 미션이 없어요!</span>
-              </div>
-            </div>
-
-            <!-- Clean Stats Row -->
-            <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-              <!-- Stat 1: Acorns -->
-              <div 
-                class="flex flex-col items-center justify-center p-4 rounded-2xl hover:bg-slate-50 transition-colors cursor-pointer group"
-                @click="goToPlayground"
-              >
-                <IconAcorn class="text-fox w-10 h-10 mb-2" stroke-width="2.5" fill="currentColor" />
-                <div class="text-2xl font-black text-slate-800">{{ studyData?.acornCount || 0 }}</div>
-                <span class="text-xs font-bold text-slate-400 uppercase tracking-wide">Acorns</span>
-              </div>
-
-              <!-- Stat 2: Solutions -->
-              <div class="flex flex-col items-center justify-center p-4 rounded-2xl hover:bg-slate-50 transition-colors cursor-pointer group">
-                <BarChart2 class="text-brand-500 w-10 h-10 mb-2" stroke-width="2.5" fill="currentColor" />
-                <div class="text-2xl font-black text-slate-800">{{ records.length }}</div>
-                <span class="text-xs font-bold text-slate-400 uppercase tracking-wide">Solutions</span>
-              </div>
-
-              <!-- Stat 3: Streak -->
-              <div class="flex flex-col items-center justify-center p-4 rounded-2xl hover:bg-slate-50 transition-colors cursor-pointer group">
-                <Flame class="text-rose-500 w-10 h-10 mb-2" stroke-width="2.5" fill="currentColor" />
-                <div class="text-2xl font-black text-slate-800">{{ currentStreak }}<span class="text-sm font-bold text-slate-400 ml-1">일</span></div>
-                <span class="text-xs font-bold text-slate-400 uppercase tracking-wide">Streak</span>
-              </div>
-
-              <!-- Stat 4: Members -->
-              <div class="flex flex-col items-center justify-center p-4 rounded-2xl hover:bg-slate-50 transition-colors cursor-pointer group">
-                <Users class="text-leaf w-10 h-10 mb-2" stroke-width="2.5" fill="currentColor" />
-                <div class="text-2xl font-black text-slate-800">{{ studyData?.memberCount || 1 }}<span class="text-sm font-bold text-slate-400 ml-1">명</span></div>
-                <span class="text-xs font-bold text-slate-400 uppercase tracking-wide">Members</span>
-              </div>
-            </div>
-          </div>
-
-
-
-      <!-- Activity Section: Heatmap -->
-      <div v-if="!loading" class="mb-10 animate-fade-in-up">
-        <div class="grid grid-cols-1 lg:grid-cols-12 gap-5">
-          
-          <!-- Heatmap Card (Full Width) -->
-          <div class="lg:col-span-12 bg-white rounded-3xl p-6 shadow-sm">
-            <div class="flex items-center justify-between mb-5">
-              <h2 class="text-base font-bold text-slate-800 flex items-center gap-2">
-                <TrendingUp class="text-brand-500 w-5 h-5" />
-                스터디 활동 로그
-              </h2>
-              <!-- Legend -->
-              <div class="flex items-center gap-2 text-xs font-medium text-slate-400">
-                <span>Less</span>
-                <div class="flex gap-1">
-                  <div class="w-3 h-3 rounded-sm bg-brand-50"></div>
-                  <div class="w-3 h-3 rounded-sm bg-brand-200"></div>
-                  <div class="w-3 h-3 rounded-sm bg-brand-400"></div>
-                  <div class="w-3 h-3 rounded-sm bg-brand-600"></div>
-                  <div class="w-3 h-3 rounded-sm bg-brand-800"></div>
-                </div>
-                <span>More</span>
-              </div>
-            </div>
+        <div class="flex-1 flex justify-center p-4 md:p-8">
+            <div class="flex gap-8 max-w-screen-xl w-full">
             
-            <div ref="heatmapScrollRef" class="overflow-x-auto pb-2 custom-scrollbar">
-              <div class="min-w-max">
-                <!-- Heatmap (Grass) -->
-                <div class="flex gap-[3px]">
-                  <div v-for="(week, wIdx) in heatmapWeeks" :key="wIdx" class="flex flex-col gap-[3px]">
-                    <div 
-                      v-for="(day, dIdx) in week" 
-                      :key="dIdx"
-                      class="w-3 h-3 rounded-[2px] transition-all relative cursor-pointer hover:ring-2 hover:ring-brand-300 hover:z-10"
-                      :class="day.colorClass"
-                      @mouseenter="showTooltip($event, day)"
-                      @mouseleave="hideTooltip"
-                    >
+            <!-- 2. CENTRAL MAIN COLUMN -->
+            <main class="flex-1 min-w-0 space-y-6">
+                <!-- Header Section with Clean Metrics -->
+                <div class="animate-fade-in-down">
+                    <!-- Weekly Mission Section -->
+                    <div class="mb-6">
+                        <div v-if="targetMission" 
+                            class="rounded-3xl p-6 shadow-none relative overflow-hidden transition-all duration-500 bg-white border border-slate-200"
+                            :class="getMissionThemeClass(targetMission)">
+                            
+                            <div class="relative z-10 flex flex-col items-start gap-4">
+                                <div>
+                                    <div class="flex items-center gap-2 mb-2">
+                                        <span class="px-2 py-0.5 bg-slate-100 rounded-lg text-xs font-bold uppercase tracking-wider text-slate-400">
+                                            #{{ targetMission.week }}
+                                        </span>
+                                        <span class="flex items-center gap-1 text-xs font-bold text-slate-500">
+                                            <Calendar :size="12" />
+                                            ~ {{ formatMissionDate(targetMission.deadline) }}
+                                        </span>
+                                        <span v-if="isMissionUrgent(targetMission) && !isMissionCompleted(targetMission)" class="px-2 py-0.5 bg-rose-100 text-rose-600 rounded text-xs font-bold animate-pulse">
+                                            마감 임박
+                                        </span>
+                                    </div>
+                                    <div class="flex items-center gap-2">
+                                        <h2 class="text-3xl font-black text-slate-800 mb-1 tracking-tight">{{ targetMission.title }}</h2>
+                                        <span v-if="isMissionCompleted(targetMission)" class="bg-emerald-100 text-emerald-700 px-2 py-0.5 rounded-lg text-xs font-bold flex items-center gap-1">
+                                            <Check :size="12" /> 해결 완료!
+                                        </span>
+                                    </div>
+                                </div>
+                                
+                                <div class="flex flex-wrap gap-2 w-full">
+                                    <a 
+                                        v-for="problemId in targetMission.problemIds" 
+                                        :key="problemId"
+                                        :href="getProblemLink(problemId)" 
+                                        target="_blank"
+                                        class="flex items-center gap-2 px-6 py-3.5 rounded-2xl font-black text-sm transition-all shadow-none group flex-1 justify-center border-2"
+                                        :class="isProblemSolved(problemId) 
+                                            ? 'bg-emerald-500 border-emerald-500 text-white hover:bg-emerald-600 hover:border-emerald-600' 
+                                            : 'bg-white border-brand-200 text-brand-600 hover:bg-brand-50 hover:border-brand-300 hover:scale-[1.02]'"
+                                    >
+                                        <span class="flex items-center gap-2">
+                                            {{ problemId }}번
+                                            <Check v-if="isProblemSolved(problemId)" :size="16" stroke-width="3" />
+                                        </span>
+                                        <ExternalLink v-if="!isProblemSolved(problemId)" :size="14" class="opacity-50 group-hover:opacity-100" />
+                                    </a>
+                                </div>
+                            </div>
+
+                            <!-- Member Progress Section -->
+                            <div v-if="targetMission.memberProgressList?.length > 0" class="mt-6 pt-4 border-t border-slate-100 flex flex-wrap items-center gap-4">
+                                <div v-for="member in sortMembers(targetMission.memberProgressList)" :key="member.userId" 
+                                    class="flex flex-col items-center gap-1 group relative cursor-help">
+                                    
+                                    <!-- Tooltip for Name -->
+                                    <div class="absolute bottom-full mb-2 px-2 py-1 bg-black/80 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none z-20">
+                                        {{ member.username }} {{ isMe(member.userId) ? '(나)' : '' }}
+                                        <div class="absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-1 w-2 h-2 bg-black/80 rotate-45"></div>
+                                    </div>
+
+                                    <!-- Avatar -->
+                                    <img :src="getMemberProfileImage(member)" :alt="member.username"
+                                        class="w-10 h-10 rounded-full object-cover border-2 transition-all relative z-10 bg-white"
+                                        :class="[
+                                            isMe(member.userId) 
+                                                ? 'border-emerald-400 ring-2 ring-emerald-400/30' + (member.allCompleted ? ' shadow-[0_0_12px_rgba(52,211,153,0.6)]' : '')
+                                                : member.allCompleted 
+                                                ? 'border-orange-400 shadow-[0_0_12px_rgba(251,146,60,0.5)]' 
+                                                : 'border-slate-200 opacity-80 grayscale-[0.0]'
+                                        ]" />
+                                    
+                                    <!-- Status -->
+                                    <div class="flex items-center gap-0.5 mt-0.5">
+                                        <Flame :size="13" 
+                                            class="transition-all"
+                                            :class="member.allCompleted ? 'fill-orange-400 text-orange-400 animate-pulse' : 'text-slate-300/40'" />
+                                        <span v-if="!member.allCompleted" class="text-[11px] font-bold text-slate-400">
+                                            {{ member.completedCount }}
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div v-if="!targetMission" class="bg-white rounded-3xl p-6 shadow-sm flex items-center justify-center gap-3 text-slate-400 border border-slate-200">
+                            <Map :size="20" />
+                            <span class="font-medium">진행 중인 미션이 없어요!</span>
+                        </div>
                     </div>
-                  </div>
                 </div>
-              </div>
+
+                <!-- Timeline Section -->
+                <div>
+                    <div class="mb-4 flex items-center justify-between">
+                        <h2 class="text-xl font-bold text-slate-800 flex items-center gap-2">
+                            <Activity :size="20" class="text-brand-500 fill-brand-500"/>
+                            Timeline
+                        </h2>
+                        <!-- Filter Tabs -->
+                        <div class="flex p-1 bg-slate-200/50 rounded-xl font-bold">
+                            <button 
+                                v-for="filter in ['ALL', 'MISSION', 'MOCK_EXAM', 'DEFENSE', 'GENERAL']" 
+                                :key="filter"
+                                @click="selectedFilter = filter"
+                                class="px-3 py-1.5 rounded-lg text-xs font-bold transition-all"
+                                :class="selectedFilter === filter ? 'bg-white text-slate-800 shadow-sm' : 'text-slate-400 hover:text-slate-600'"
+                            >
+                                {{ filter === 'ALL' ? '전체' : filter === 'MOCK_EXAM' ? '모의고사' : filter === 'MISSION' ? '과제' : filter === 'DEFENSE' ? '디펜스' : '일반' }}
+                            </button>
+                        </div>
+                    </div>
+
+                    <div v-if="filteredRecords.length === 0 && !loading" class="flex flex-col items-center justify-center py-20 bg-white rounded-3xl border-2 border-dashed border-slate-200">
+                        <div class="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center mb-4">
+                            <Code2 :size="32" class="text-slate-300" />
+                        </div>
+                        <h3 class="text-lg font-bold text-slate-800 mb-1">기록된 모험이 없습니다</h3>
+                        <p class="text-sm text-slate-400 mb-0 font-medium">
+                            {{ selectedFilter === 'ALL' ? '첫 번째 알고리즘 문제를 해결하고 커밋해보세요!' : '해당 카테고리의 기록이 없습니다.' }}
+                        </p>
+                    </div>
+
+                    <div v-else class="space-y-4 pb-20">
+                        <template v-for="record in filteredRecords" :key="record.id">
+                            <DashboardRecordCard 
+                                :record="record"
+                                :is-expanded="expandedRecordId === record.id"
+                                @toggle-expand="handleToggleExpand"
+                            />
+                        </template>
+                    </div>
+                </div>
+            </main>
+
+            <!-- 3. RIGHT SIDEBAR COLUMN (Stats + Activity + Analysis Panel) -->
+            <aside class="hidden xl:flex w-[380px] shrink-0 flex-col gap-6 sticky top-8 h-[calc(100vh-4rem)]">
+                
+                <!-- 1. Stats Row (Moved here) -->
+                <div class="bg-white rounded-2xl p-4 border border-slate-200 shadow-sm flex items-center justify-around">
+                     <!-- Stat 1: Acorns -->
+                     <div class="flex items-center gap-2 group cursor-pointer" title="Acorns" @click="goToPlayground">
+                        <IconAcorn class="text-fox w-8 h-8" stroke-width="2.5" fill="currentColor" />
+                        <span class="text-xl font-black text-slate-700">{{ studyData?.acornCount || 0 }}</span>
+                    </div>
+
+                    <div class="w-px h-8 bg-slate-100"></div>
+
+                    <!-- Stat 3: Streak -->
+                    <div class="flex items-center gap-2 group cursor-pointer" title="Streak">
+                        <Flame class="w-7 h-7" :class="currentStreak > 0 ? 'text-rose-500 fill-rose-500 animate-pulse' : 'text-slate-300'" stroke-width="2.5" />
+                        <span class="text-xl font-black text-slate-700">{{ currentStreak }}</span>
+                    </div>
+                    
+                    <div class="w-px h-8 bg-slate-100"></div>
+
+                    <!-- Stat 2: Submissions -->
+                     <div class="flex items-center gap-2 group cursor-pointer" title="Submissions">
+                        <Send class="w-6 h-6 text-sky-400 fill-sky-400" stroke-width="2.5" />
+                        <span class="text-xl font-black text-slate-700">{{ records.length }}</span>
+                    </div>
+                </div>
+
+                <!-- 2. Activity Log (Moved here) -->
+                <div v-if="!loading" class="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm">
+                    <h3 class="font-black text-slate-700 text-sm mb-4">스터디 활동 로그</h3>
+                    
+                    <!-- Heatmap Visualization -->
+                    <div class="">
+                       <!-- Scroll wrapper -->
+                       <div ref="heatmapScrollRef" class="overflow-x-auto pb-2 custom-scrollbar no-scrollbar" style="direction: rtl;">
+                           <div class="flex gap-[3px] justify-end min-w-max" style="direction: ltr;">
+                               <div v-for="(week, wIdx) in heatmapWeeks" :key="wIdx" class="flex flex-col gap-[3px]">
+                                   <div v-for="(day, dIdx) in week" :key="dIdx"
+                                        class="w-2.5 h-2.5 rounded-[2px] transition-all relative"
+                                        :class="day.colorClass"
+                                        :title="`${day.dateFormatted}: ${day.count} solved`">
+                                   </div>
+                               </div>
+                           </div>
+                       </div>
+                    </div>
+                </div>
+
+                <!-- 3. Analysis Sidebar (Context) -->
+                <div class="flex-1 min-h-0 overflow-hidden rounded-2xl border border-slate-200 shadow-sm bg-white">
+                     <AnalysisSidebar :record="activeAnalysisRecord" />
+                </div>
+
+                <div class="text-center text-[10px] text-slate-300 font-bold space-x-3 pb-2 uppercase tracking-wider">
+                    <span class="hover:text-slate-400 cursor-pointer transition-colors">INFO</span>
+                    <span>&bull;</span>
+                    <span class="hover:text-slate-400 cursor-pointer transition-colors">STUDY</span>
+                    <span>&bull;</span>
+                    <span class="hover:text-slate-400 cursor-pointer transition-colors">PRIVACY</span>
+                </div>
+
+            </aside>
+
             </div>
-          </div>
-
         </div>
-      </div>
-
-      <!-- Shared Fixed Tooltip -->
-             <div v-if="tooltipData" 
-                  class="fixed z-50 pointer-events-none transform -translate-x-1/2 -translate-y-full mb-2"
-                  :style="{ left: tooltipPos.x + 'px', top: tooltipPos.y + 'px' }">
-                  <div class="bg-slate-800 text-white text-xs rounded-lg py-2 px-3 shadow-xl flex flex-col items-center gap-1 mb-2">
-                      <span class="font-bold text-slate-200">{{ tooltipData.dateFormatted }}</span>
-                      <span class="font-bold">{{ tooltipData.count }} solutions</span>
-                      <div v-if="tooltipData.count > 0" class="flex flex-wrap gap-1 max-w-[150px] justify-center mt-1 border-t border-slate-700 pt-1">
-                          <span v-for="name in tooltipData.contributors" :key="name" class="text-[10px] bg-slate-700 px-1.5 py-0.5 rounded text-brand-300">
-                              {{ name }}
-                          </span>
-                      </div>
-                  </div>
-                  <!-- Arrow -->
-                  <div class="w-2 h-2 bg-slate-800 transform rotate-45 absolute bottom-1 left-1/2 -translate-x-1/2 shadow-sm"></div>
-             </div>
-
-      
-      <div class="mb-6 flex items-center justify-between">
-          <h2 class="text-xl font-bold text-slate-800 flex items-center gap-2">
-              <Activity :size="20" class="text-brand-500"/>
-              Timeline
-          </h2>
-          <!-- Filter Tabs -->
-          <div class="flex p-1 bg-slate-200 rounded-2xl">
-              <button 
-                  v-for="filter in ['ALL', 'MISSION', 'MOCK_EXAM', 'DEFENSE', 'GENERAL']" 
-                  :key="filter"
-                  @click="selectedFilter = filter"
-                  class="px-4 py-2 rounded-xl text-xs font-bold transition-all"
-                  :class="selectedFilter === filter ? 'bg-white text-slate-800 shadow-sm' : 'text-slate-500 hover:text-slate-700'"
-              >
-                  {{ filter === 'ALL' ? '전체' : filter === 'MOCK_EXAM' ? '모의고사' : filter === 'MISSION' ? '과제' : filter === 'DEFENSE' ? '디펜스' : '일반' }}
-              </button>
-          </div>
-      </div>
-
-      
-
-      <div v-if="filteredRecords.length === 0 && !loading" class="flex flex-col items-center justify-center py-20 bg-white rounded-3xl border border-dashed border-slate-300">
-        <div class="w-20 h-20 bg-brand-50 rounded-full flex items-center justify-center mb-6">
-          <Code2 :size="40" class="text-brand-400" />
-        </div>
-        <h3 class="text-xl font-bold text-slate-800 mb-2">기록된 모험이 없습니다</h3>
-        <p class="text-slate-500 mb-6 font-medium">
-             {{ selectedFilter === 'ALL' ? '첫 번째 알고리즘 문제를 해결하고 커밋해보세요!' : '해당 카테고리의 기록이 없습니다.' }}
-        </p>
-      </div>
-
-      <div v-else class="grid grid-cols-1 gap-4">
-        <template v-for="record in filteredRecords" :key="record.id">
-            <DashboardRecordCard 
-                :record="record"
-                :is-expanded="expandedRecordId === record.id"
-                @toggle-expand="handleToggleExpand"
-            />
-        </template>
-      </div>
-    </main>
     </div>
   </div>
 
@@ -343,12 +310,13 @@
 </template>
 
 <script setup>
-import { ref, onMounted, computed, watch } from 'vue';
+import { ref, onMounted, computed, watch, nextTick } from 'vue';
 import { useRouter } from 'vue-router';
 import { dashboardApi } from '../api/dashboard';
 import { studyApi } from '../api/study';
 import { useAuth } from '../composables/useAuth';
-import DashboardRecordCard from './dashboard/DashboardRecordCard.vue'; // Import new component
+import DashboardRecordCard from './dashboard/DashboardRecordCard.vue';
+import AnalysisSidebar from './dashboard/AnalysisSidebar.vue';
 import http from '../api/http';
 import { aiApi } from '../api/ai';
 import AlgorithmRadarChart from '../components/charts/AlgorithmRadarChart.vue';
@@ -366,7 +334,7 @@ import {
   Network, 
   MessageSquare, 
   X,
-  Code,
+  Code2,
   Youtube,
   Nut,
   Trophy,
@@ -380,7 +348,9 @@ import {
   School,
   Flame,
   Users,
-  BarChart2
+  BarChart2,
+  Hexagon,
+  Send
 } from 'lucide-vue-next';
 import hljs from 'highlight.js';
 import 'highlight.js/styles/github.css';
@@ -421,11 +391,20 @@ watch(selectedFilter, () => {
 });
 
 const expandedRecordId = ref(null);
+const activeAnalysisRecord = ref(null);
+
 const handleToggleExpand = (recordId) => {
+    console.log('Dashboard: toggle-expand received for', recordId);
     if (expandedRecordId.value === recordId) {
-        expandedRecordId.value = null;  // Close if already open
+        console.log('Dashboard: Collapsing record');
+        expandedRecordId.value = null;
+        activeAnalysisRecord.value = null;
     } else {
-        expandedRecordId.value = recordId;  // Open this one, close others
+        console.log('Dashboard: Expanding record');
+        expandedRecordId.value = recordId;
+        const found = records.value.find(r => r.id == recordId);
+        console.log('Dashboard: Found record?', found);
+        activeAnalysisRecord.value = found;
     }
 };
 
@@ -494,13 +473,7 @@ const isMissionUrgent = (mission) => {
 
 // 미션별 테마 클래스
 const getMissionThemeClass = (mission) => {
-    if (isMissionCompleted(mission)) {
-        return 'bg-emerald-50'; 
-    }
-    if (isMissionUrgent(mission)) {
-        return 'bg-rose-50'; 
-    }
-    return 'bg-brand-50'; 
+    return 'bg-white';
 };
 
 // 멤버 리스트 정렬: 본인 우선, 그 외 이름순
@@ -550,12 +523,12 @@ const processHeatmap = (data) => {
                  participationRate = activeCount / totalMembers;
              }
              
-             let colorClass = 'bg-brand-50/50';
+             let colorClass = 'bg-slate-100';
              if (participationRate > 0) colorClass = 'bg-brand-200';
              if (participationRate >= 0.25) colorClass = 'bg-brand-400';
              if (participationRate >= 0.50) colorClass = 'bg-brand-500';
-             if (participationRate >= 0.75) colorClass = 'bg-brand-700';
-             if (participationRate >= 1.0) colorClass = 'bg-brand-900';
+             if (participationRate >= 0.75) colorClass = 'bg-brand-600';
+             if (participationRate >= 1.0) colorClass = 'bg-brand-800';
              // --- Participation Logic End ---
 
              currentWeek.push({
@@ -580,6 +553,11 @@ const processHeatmap = (data) => {
     }
 };
 
+const currentWeekCount = computed(() => {
+    if (!heatmapWeeks.value.length) return 0;
+    const lastWeek = heatmapWeeks.value[heatmapWeeks.value.length - 1];
+    return lastWeek.reduce((acc, day) => acc + (day.count || 0), 0);
+});
 
 const heatmapResData = ref([]);
 
@@ -705,11 +683,11 @@ onMounted(async () => {
         const heatmapRes = await dashboardApi.getHeatmap();
         heatmapResData.value = heatmapRes.data || [];
         processHeatmap(heatmapResData.value);
-        setTimeout(() => {
+        nextTick(() => {
           if (heatmapScrollRef.value) {
             heatmapScrollRef.value.scrollLeft = heatmapScrollRef.value.scrollWidth;
           }
-        }, 100);
+        });
       } catch(e) {
         console.error('Heatmap Load Error:', e);
         processHeatmap([]);
@@ -780,15 +758,6 @@ const copyCode = (code) => {
 
 const currentRecordCode = ref('');
 
-
-
-
-
-
-
-
-
-
 const parsePatterns = (jsonString) => {
     if (!jsonString) return [];
     try {
@@ -813,401 +782,23 @@ const getFileExtension = (language) => {
     const extensions = {
         'java': 'java',
         'python': 'py',
-        'javascript': 'js',
         'cpp': 'cpp',
+        'c++': 'cpp',
         'c': 'c',
-        'kotlin': 'kt',
-        'swift': 'swift',
-        'go': 'go',
-        'rust': 'rs',
+        'javascript': 'js',
         'typescript': 'ts'
     };
     return extensions[language?.toLowerCase()] || 'txt';
-};
-
-const currentRecord = ref(null);
-
-const requestTutor = (record) => {
-    currentDrawerRecord.value = record;  // Set for Context Card
-    currentRecord.value = record;
-    drawerType.value = 'tutor';
-    drawerTitle.value = `AI 튜터 · ${record.title}`;
-    showDrawer.value = true;
-    drawerData.value = null;
-};
-
-const requestCounterExample = async (record) => {
-    currentDrawerRecord.value = record;  // Set for Context Card
-    drawerType.value = 'counter_example';
-    drawerTitle.value = `AI 반례 분석 · ${record.title}`;
-    showDrawer.value = true;
-    drawerData.value = null;
-    drawerLoading.value = true;
-    
-    try {
-        const res = await aiApi.generateCounterExample({
-            problemNumber: String(record.problemNumber),
-            code: record.code,
-            language: record.language
-        });
-        drawerData.value = res.data;
-    } catch (e) {
-        console.error("Failed to generate counter example", e);
-        alert("반례 생성에 실패했습니다.");
-        showDrawer.value = false;
-    } finally {
-        drawerLoading.value = false;
-    }
-};
-
-const closeDrawer = () => {
-    showDrawer.value = false;
-    drawerData.value = null;
-    currentDrawerRecord.value = null;  // Clear Context Card
-    
-    // Collapse accordion if closing review drawer
-    // if (drawerType.value === 'review') {
-    //     expandedRecordId.value = null;
-    // }
-};
-
-
-
-const openModal = (type, title) => {
-    modalType.value = type;
-    modalTitle.value = title;
-    showModal.value = true;
-    modalData.value = null;
-};
-
-const closeModal = () => {
-    showModal.value = false;
 };
 </script>
 
 <style scoped>
 @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css');
-
-* {
-  font-family: 'Pretendard', sans-serif;
+.no-scrollbar::-webkit-scrollbar {
+    display: none;
 }
-
-.btn-primary-soft {
-  @apply flex items-center gap-2 px-4 py-2.5 rounded-xl bg-brand-50 text-brand-600 font-bold hover:bg-brand-100 transition-colors;
+.no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
 }
-
-.btn-secondary-soft {
-  @apply flex items-center gap-2 px-4 py-2.5 rounded-xl bg-slate-100 text-slate-600 font-bold hover:bg-slate-200 transition-colors;
-}
-
-.animate-pop-in {
-  animation: popIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-  opacity: 0;
-  transform: scale(0.95);
-}
-
-@keyframes popIn {
-  to { opacity: 1; transform: scale(1); }
-}
-
-.custom-scrollbar::-webkit-scrollbar {
-  width: 6px;
-}
-.custom-scrollbar::-webkit-scrollbar-track {
-  background: transparent;
-}
-.custom-scrollbar::-webkit-scrollbar-thumb {
-  background: #cbd5e1;
-  border-radius: 10px;
-}
-.custom-scrollbar::-webkit-scrollbar-thumb:hover {
-  background-color: #94a3b8;
-}
-
-/* Expand Transition for Accordion */
-.expand-enter-active,
-.expand-leave-active {
-  transition: max-height 0.4s ease-in-out, opacity 0.3s ease-in-out;
-  overflow: hidden;
-}
-
-.expand-enter-from {
-  max-height: 0;
-  opacity: 0;
-}
-
-.expand-enter-to {
-  max-height: 1000px; /* Sufficient height for code viewer */
-  opacity: 1;
-}
-
-.expand-leave-from {
-  max-height: 1000px;
-  opacity: 1;
-}
-
-.expand-leave-to {
-  max-height: 0;
-  opacity: 0;
-}
-
-.slide-up-enter-active,
-.slide-up-leave-active {
-  transition: all 0.5s ease;
-}
-.slide-up-enter-from {
-  opacity: 0;
-  transform: translateY(100%);
-}
-.slide-up-leave-to {
-  opacity: 0;
-  transform: translateY(-100%);
-}
-
-.mask-linear {
-    mask-image: linear-gradient(to bottom, transparent 0%, black 10%, black 90%, transparent 100%);
-    -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 10%, black 90%, transparent 100%);
-}
-
-/* ===== ULTRA Compact Mode - 20년차의 섬세한 최적화 ===== */
-/* 50% 너비에서도 아름답고 깔끔한 UI */
-
-/* 헤더를 한 줄로 압축 */
-.compact-mode h1 {
-  font-size: 1.25rem !important;  /* 더 작게 */
-  line-height: 1.5rem !important;
-  margin-bottom: 0 !important;
-}
-
-.compact-mode h1 + p {
-  display: none !important;  /* 서브 텍스트 숨기기 */
-}
-
-/* 모든 heading 크기 축소 */
-.compact-mode h2 {
-  font-size: 0.875rem !important;
-  line-height: 1.25rem !important;
-  font-weight: 700 !important;
-}
-
-.compact-mode h3, .compact-mode h4 {
-  font-size: 0.75rem !important;
-  font-weight: 600 !important;
-}
-
-/* 본문 텍스트 최소화 */
-.compact-mode p, .compact-mode span:not(.text-6xl):not(.text-3xl) {
-  font-size: 0.6875rem !important;
-  line-height: 1rem !important;
-}
-
-/* ===== Spacing - Ultra Tight ===== */
-.compact-mode .mb-10 {
-  margin-bottom: 0.5rem !important;  /* 더 줄임 */
-}
-
-.compact-mode .mb-8 {
-  margin-bottom: 0.375rem !important;
-}
-
-.compact-mode .mb-6 {
-  margin-bottom: 0.25rem !important;
-}
-
-.compact-mode .mb-4 {
-  margin-bottom: 0.25rem !important;
-}
-
-.compact-mode .mb-2 {
-  margin-bottom: 0.125rem !important;
-}
-
-/* Card padding - 더 aggressive */
-.compact-mode .p-8 {
-  padding: 0.5rem !important;
-}
-
-.compact-mode .p-6 {
-  padding: 0.5rem !important;
-}
-
-.compact-mode .p-5, .compact-mode .p-4 {
-  padding: 0.375rem !important;
-}
-
-.compact-mode .px-8 {
-  padding-left: 0.5rem !important;
-  padding-right: 0.5rem !important;
-}
-
-.compact-mode .py-6 {
-  padding-top: 0.5rem !important;
-  padding-bottom: 0.5rem !important;
-}
-
-/* Gap - 최소화 */
-.compact-mode .gap-8 {
-  gap: 0.375rem !important;
-}
-
-.compact-mode .gap-6 {
-  gap: 0.25rem !important;
-}
-
-.compact-mode .gap-4 {
-  gap: 0.25rem !important;
-}
-
-.compact-mode .gap-3 {
-  gap: 0.125rem !important;
-}
-
-.compact-mode .gap-2 {
-  gap: 0.125rem !important;
-}
-
-/* ===== Heatmap - 숨기기 또는 최소화 ===== */
-.compact-mode .bg-white.rounded-3xl.p-8.shadow-sm {
-  display: none !important;  /* Heatmap 카드 완전히 숨김 */
-}
-
-/* Stats flex를 single column으로 */
-.compact-mode .xl\:flex-row {
-  flex-direction: column !important;
-  gap: 0.25rem !important;
-}
-
-/* Grid 강제 single column */
-.compact-mode .grid-cols-3,
-.compact-mode .grid-cols-2,
-.compact-mode .md\:grid-cols-3,
-.compact-mode .md\:grid-cols-2 {
-  grid-template-columns: repeat(1, minmax(0, 1fr)) !important;
-}
-
-/* ===== Icon & Visual Elements ===== */
-.compact-mode svg {
-  width: 0.75rem !important;
-  height: 0.75rem !important;
-}
-
-/* Large number styling */
-.compact-mode .text-6xl {
-  font-size: 1.25rem !important;
-  line-height: 1.5rem !important;
-}
-
-.compact-mode .text-3xl {
-  font-size: 1rem !important;
-  line-height: 1.25rem !important;
-}
-
-.compact-mode .text-2xl {
-  font-size: 0.875rem !important;
-}
-
-.compact-mode .text-xl {
-  font-size: 0.75rem !important;
-}
-
-.compact-mode .text-lg {
-  font-size: 0.6875rem !important;
-}
-
-/* ===== Button & Interactive ===== */
-.compact-mode button {
-  padding: 0.25rem 0.5rem !important;
-  font-size: 0.625rem !important;
-  line-height: 1rem !important;
-}
-
-.compact-mode .text-xs {
-  font-size: 0.5rem !important;
-}
-
-/* ===== Borders & Shapes ===== */
-.compact-mode .rounded-3xl {
-  border-radius: 0.5rem !important;
-}
-
-.compact-mode .rounded-2xl {
-  border-radius: 0.375rem !important;
-}
-
-.compact-mode .rounded-xl {
-  border-radius: 0.25rem !important;
-}
-
-/* ===== Code Viewer ===== */
-.compact-mode pre {
-  font-size: 0. 625rem !important;
-  padding: 0.375rem !important;
-  line-height: 1.1 !important;
-}
-
-.compact-mode code {
-  font-size: 0.625rem !important;
-}
-
-/* ===== Shadows - Minimal ===== */
-.compact-mode .shadow-lg,
-.compact-mode .shadow-xl,
-.compact-mode .shadow-2xl {
-  box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.05) !important;
-}
-
-.compact-mode .shadow-sm {
-  box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.03) !important;
-}
-
-/* ===== Recent Activity - Compact ===== */
-.compact-mode [class*="RECENT"] {
-  max-height: 150px !important;
-  overflow-y: auto !important;
-}
-
-/* ===== Hide less important elements ===== */
-.compact-mode .animate-fade-in-down > p {
-  display: none !important;  /* 인사말 아래 설명 숨김 */
-}
-
-/* Acorns 카드 더 작게 */
-.compact-mode [class*="ACORN"] {
-  padding: 0.5rem !important;
-}
-
-/* ===== Algorithm Cards Optimization ===== */
-.compact-mode [class*="algorithm-card"] {
-  padding: 0.5rem !important;
-}
-
-/* Badge 크기 */
-.compact-mode .px-2 {
-  padding-left: 0.25rem !important;
-  padding-right: 0.25rem !important;
-}
-
-.compact-mode .py-1 {
-  padding-top: 0.125rem !important;
-  padding-bottom: 0.125rem !important;
-}
-
-/* ===== Ultra compact for specific elements ===== */
-.compact-mode [class*="Activity"] svg,
-.compact-mode [class*="TrendingUp"] {
-  width: 0.625rem !important;
-  height: 0.625rem !important;
-}
-
-/* Tight line heights everywhere */
-.compact-mode * {
-  line-height: 1.3 !important;
-}
-
-/* Remove extra top padding from main container */
-.compact-mode main {
-  padding-top: 0.5rem !important;
-}
-
-
 </style>
