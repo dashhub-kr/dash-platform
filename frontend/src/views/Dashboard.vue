@@ -1,6 +1,6 @@
 <template>
   <!-- Flex Container for Split View -->
-  <div class="flex h-screen overflow-hidden bg-slate-50 font-sans">
+  <div class="flex h-screen overflow-hidden bg-white font-sans">
     
     <!-- CONTEXT CARD MODE: When Drawer is Open - Show only selected problem -->
     <div 
@@ -70,8 +70,9 @@
     <div 
       v-else
       class="w-full overflow-y-auto"
+      @click="collapseExpandedCard"
     >
-      <div class="min-h-screen bg-slate-50 text-slate-800">
+      <div class="min-h-screen bg-white text-slate-800">
         <!-- Navbar / Header Area -->
 
         <div class="flex-1 flex justify-center p-4 md:p-8">
@@ -165,7 +166,7 @@
                         </div>
                         
                         <div v-if="!targetMission" class="bg-white rounded-3xl p-6 shadow-sm flex items-center justify-center gap-3 text-slate-400 border border-slate-200">
-                            <Map :size="20" />
+                            <MapIcon :size="20" />
                             <span class="font-medium">진행 중인 미션이 없어요!</span>
                         </div>
                     </div>
@@ -176,7 +177,7 @@
                     <div class="mb-4 flex items-center justify-between">
                         <h2 class="text-xl font-bold text-slate-800 flex items-center gap-2">
                             <Activity :size="20" class="text-brand-500 fill-brand-500"/>
-                            Timeline
+                            타임라인
                         </h2>
                         <!-- Filter Tabs -->
                         <div class="flex p-1 bg-slate-200/50 rounded-xl font-bold">
@@ -248,24 +249,66 @@
                     <h3 class="font-black text-slate-700 text-sm mb-4">스터디 활동 로그</h3>
                     
                     <!-- Heatmap Visualization -->
-                    <div class="">
+                    <div class="relative">
                        <!-- Scroll wrapper -->
                        <div ref="heatmapScrollRef" class="overflow-x-auto pb-2 custom-scrollbar no-scrollbar" style="direction: rtl;">
                            <div class="flex gap-[3px] justify-end min-w-max" style="direction: ltr;">
                                <div v-for="(week, wIdx) in heatmapWeeks" :key="wIdx" class="flex flex-col gap-[3px]">
                                    <div v-for="(day, dIdx) in week" :key="dIdx"
-                                        class="w-2.5 h-2.5 rounded-[2px] transition-all relative"
+                                        class="w-2.5 h-2.5 rounded-[2px] transition-all relative cursor-pointer hover:ring-2 hover:ring-brand-400 hover:ring-offset-1"
                                         :class="day.colorClass"
-                                        :title="`${day.dateFormatted}: ${day.count} solved`">
+                                        @mouseenter="showHeatmapTooltip($event, day)"
+                                        @mouseleave="hideHeatmapTooltip">
                                    </div>
                                </div>
                            </div>
                        </div>
+                       
+                       <!-- Custom Tooltip -->
+                       <Teleport to="body">
+                           <Transition name="fade">
+                               <div 
+                                   v-if="heatmapTooltip.visible"
+                                   class="fixed z-[9999] bg-slate-900/95 backdrop-blur-sm text-white text-xs rounded-xl p-3 shadow-2xl pointer-events-none min-w-[180px] max-w-[240px]"
+                                   :style="heatmapTooltipStyle"
+                               >
+                                   <!-- Date Header -->
+                                   <div class="flex items-center justify-between mb-2 pb-2 border-b border-slate-700">
+                                       <span class="font-bold text-sm">{{ heatmapTooltip.date }}</span>
+                                       <span class="bg-brand-500/20 text-brand-300 px-2 py-0.5 rounded-full text-[10px] font-bold">
+                                           {{ heatmapTooltip.count }}건
+                                       </span>
+                                   </div>
+                                   
+                                   <!-- Contributors List -->
+                                   <div v-if="heatmapTooltip.contributors?.length > 0" class="space-y-2">
+                                       <div v-for="c in heatmapTooltip.contributors" :key="c.userId || c.username" 
+                                            class="flex items-center gap-2 bg-slate-800/50 rounded-lg p-1.5 pr-3">
+                                           <!-- Profile Image -->
+                                           <img 
+                                               :src="c.avatarUrl || getDefaultProfileImage(c.userId)" 
+                                               :alt="c.username"
+                                               class="w-6 h-6 rounded-full object-cover border border-slate-600 bg-slate-700"
+                                           />
+                                           <!-- Name & Count -->
+                                           <div class="flex-1 min-w-0">
+                                               <div class="font-medium text-white truncate">{{ c.username }}</div>
+                                           </div>
+                                           <div class="text-brand-400 font-bold text-sm">{{ c.count }}건</div>
+                                       </div>
+                                   </div>
+                                   <div v-else class="text-slate-400 text-center py-2">
+                                       <span class="text-lg">😴</span>
+                                       <div class="mt-1">활동 없음</div>
+                                   </div>
+                               </div>
+                           </Transition>
+                       </Teleport>
                     </div>
                 </div>
 
                 <!-- 3. Analysis Sidebar (Context) -->
-                <div class="flex-1 min-h-0 overflow-hidden rounded-2xl border border-slate-200 shadow-sm bg-white">
+                <div class="flex-1 min-h-0 overflow-hidden rounded-2xl border border-slate-200 shadow-sm bg-white" @click.stop>
                      <AnalysisSidebar :record="activeAnalysisRecord" @scroll-to-line="handleScrollToLine" />
                 </div>
 
@@ -379,6 +422,78 @@ const studyData = ref(null);
 const loading = ref(true);
 const heatmapWeeks = ref([]);
 const heatmapScrollRef = ref(null);
+
+// Heatmap Tooltip State
+const heatmapTooltip = ref({
+    visible: false,
+    x: 0,
+    y: 0,
+    date: '',
+    count: 0,
+    contributors: []
+});
+
+const showHeatmapTooltip = (event, day) => {
+    const rect = event.target.getBoundingClientRect();
+    heatmapTooltip.value = {
+        visible: true,
+        x: rect.left + rect.width / 2,
+        y: rect.top - 8,
+        date: day.dateFormatted,
+        count: day.count || 0,
+        contributors: day.contributors || []
+    };
+};
+
+const hideHeatmapTooltip = () => {
+    heatmapTooltip.value.visible = false;
+};
+
+// Collapse expanded card when clicking on empty space
+const collapseExpandedCard = (event) => {
+    // Don't collapse if clicking inside a card (handled by stopPropagation on cards)
+    if (expandedRecordId.value !== null) {
+        expandedRecordId.value = null;
+        activeAnalysisRecord.value = null;
+        activeCardRef.value = null;
+    }
+};
+
+// Computed style for tooltip positioning (prevents overflow)
+const heatmapTooltipStyle = computed(() => {
+    const tooltip = heatmapTooltip.value;
+    const tooltipWidth = 200;
+    const tooltipHeight = 150;
+    const padding = 16;
+    
+    let left = tooltip.x;
+    let top = tooltip.y - tooltipHeight - 8;
+    
+    // Keep within horizontal bounds
+    if (left - tooltipWidth / 2 < padding) {
+        left = tooltipWidth / 2 + padding;
+    } else if (left + tooltipWidth / 2 > window.innerWidth - padding) {
+        left = window.innerWidth - tooltipWidth / 2 - padding;
+    }
+    
+    // If tooltip would go above viewport, show below instead
+    if (top < padding) {
+        top = tooltip.y + 20;
+    }
+    
+    return {
+        left: left + 'px',
+        top: top + 'px',
+        transform: 'translateX(-50%)'
+    };
+});
+
+// Default profile image based on userId
+const getDefaultProfileImage = (userId) => {
+    const id = userId || 0;
+    const index = id % profileImages.length;
+    return profileImages[index];
+};
 
 const selectedFilter = ref('ALL');
 const filteredRecords = computed(() => {
