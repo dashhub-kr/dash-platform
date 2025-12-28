@@ -1,5 +1,5 @@
 <template>
-  <div class="min-h-screen bg-slate-50 font-sans pb-20">
+  <div class="min-h-screen bg-white font-sans pb-20">
     
     <!-- Centered Container for 2-Column Layout -->
     <div class="flex justify-center p-4 md:p-8">
