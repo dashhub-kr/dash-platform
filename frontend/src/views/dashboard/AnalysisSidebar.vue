@@ -185,7 +185,16 @@
                     </h4>
                     <div class="bg-emerald-50 p-3 rounded-lg border border-emerald-100">
                         <div class="text-xs text-slate-700 leading-relaxed mb-3" v-html="renderMarkdown(record.refactorExplanation)"></div>
-                        <pre v-if="record.refactorCode" class="bg-slate-800 text-slate-300 p-2 rounded text-[10px] overflow-x-auto custom-scrollbar font-mono">{{ record.refactorCode }}</pre>
+                        <div v-if="record.refactorCode" class="rounded-lg overflow-hidden border border-slate-200 bg-white">
+                            <div class="flex items-center justify-between px-3 py-1.5 bg-slate-100 border-b border-slate-200">
+                                <span class="text-[10px] font-mono text-slate-500">{{ record.language || 'code' }}</span>
+                                <button @click="copyToClipboard(record.refactorCode)" 
+                                    class="text-[10px] text-slate-400 hover:text-brand-500 font-bold flex items-center gap-1 transition-colors">
+                                    <Copy :size="10" /> 복사
+                                </button>
+                            </div>
+                            <pre class="p-3 overflow-x-auto custom-scrollbar text-xs leading-relaxed"><code class="language-java" v-html="highlightCode(record.refactorCode, record.language)"></code></pre>
+                        </div>
                     </div>
                 </div>
                 <div v-if="!hasAnyAnalysis" class="text-center py-10 text-slate-400">
@@ -337,6 +346,8 @@ import { ExternalLink, ChevronDown, Bot, Bug, Send, Loader2, Activity, LayoutLis
 import { aiApi } from '../../api/ai'; 
 import { useAuth } from '../../composables/useAuth';
 import { marked } from 'marked';
+import hljs from 'highlight.js';
+import 'highlight.js/styles/github.css';
 
 const props = defineProps({
   record: { type: Object, default: null }
@@ -450,6 +461,20 @@ const renderMarkdown = (text) => text ? marked.parse(text) : '';
 const copyToClipboard = async (text) => {
     if (!text) return;
     try { await navigator.clipboard.writeText(text); } catch (err) { console.error('Failed to copy', err); }
+};
+
+const highlightCode = (code, language) => {
+    if (!code) return '';
+    try {
+        const lang = language?.toLowerCase() || 'java';
+        return hljs.highlight(code, { language: lang }).value;
+    } catch (err) {
+        try {
+            return hljs.highlightAuto(code).value;
+        } catch (e) {
+            return code;
+        }
+    }
 };
 
 const findCounterExample = async () => {

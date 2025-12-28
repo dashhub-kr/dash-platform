@@ -2,6 +2,7 @@
   <div 
     class="group relative bg-white rounded-3xl shadow-sm transition-all duration-300"
     :class="{ 'hover:shadow-md hover:-translate-y-0.5': !isExpanded, 'shadow-md': isExpanded, ...cardBorderClass }"
+    @click.stop
   >
     <!-- STATUS HEADER BAR -->
     <div :class="statusHeaderClass" class="px-5 py-3 flex items-center gap-2 text-sm font-bold rounded-t-3xl cursor-pointer" @click="toggleExpand">
