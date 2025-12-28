@@ -137,6 +137,13 @@ public class AlgorithmRecordService {
             records = algorithmRecordRepository.findByUserId(userId);
         }
 
+        // Get user info map for avatarUrl
+        Map<Long, com.ssafy.dash.user.domain.User> userMap = new java.util.HashMap<>();
+        records.stream()
+                .map(AlgorithmRecord::getUserId)
+                .distinct()
+                .forEach(uid -> userRepository.findById(uid).ifPresent(u -> userMap.put(uid, u)));
+
         // Group by Date (YYYY-MM-DD)
         Map<String, List<AlgorithmRecord>> groupedByDate = records.stream()
                 .collect(Collectors.groupingBy(record -> record.getCommittedAt().toLocalDate().toString()));
@@ -147,10 +154,19 @@ public class AlgorithmRecordService {
                     List<AlgorithmRecord> dailyRecords = entry.getValue();
                     Long count = (long) dailyRecords.size();
 
-                    List<String> contributors = dailyRecords.stream()
-                            .map(AlgorithmRecord::getUsername)
-                            .filter(java.util.Objects::nonNull)
-                            .distinct()
+                    // Group by userId and count submissions per user
+                    List<HeatmapItem.ContributorInfo> contributors = dailyRecords.stream()
+                            .collect(Collectors.groupingBy(AlgorithmRecord::getUserId, Collectors.counting()))
+                            .entrySet().stream()
+                            .map(e -> {
+                                Long uid = e.getKey();
+                                Long submitCount = e.getValue();
+                                com.ssafy.dash.user.domain.User user = userMap.get(uid);
+                                String username = user != null ? user.getUsername() : "Unknown";
+                                String avatarUrl = user != null ? user.getAvatarUrl() : null;
+                                return HeatmapItem.ContributorInfo.of(uid, username, avatarUrl, submitCount);
+                            })
+                            .sorted((a, b) -> Long.compare(b.getCount(), a.getCount())) // Sort by count desc
                             .collect(Collectors.toList());
 
                     return HeatmapItem.of(date, count, contributors);
