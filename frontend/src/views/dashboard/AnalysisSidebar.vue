@@ -556,4 +556,24 @@ const sendSuggestion = (q) => {
   background-color: #cbd5e1;
   border-radius: 4px;
 }
+
+/* Inline code styling for markdown rendered content */
+:deep(.prose code:not(pre code)),
+:deep(code:not(pre code)) {
+  background-color: #f1f5f9;
+  color: #0f172a;
+  padding: 0.15rem 0.4rem;
+  border-radius: 0.25rem;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 0.85em;
+  font-weight: 500;
+  border: 1px solid #e2e8f0;
+  word-break: break-word;
+}
+
+/* Slightly darker background for code in tutor chat bubbles */
+:deep(.bg-white code:not(pre code)) {
+  background-color: #e2e8f0;
+  border-color: #cbd5e1;
+}
 </style>
