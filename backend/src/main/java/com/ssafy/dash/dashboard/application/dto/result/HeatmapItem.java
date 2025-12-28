@@ -12,9 +12,23 @@ import java.util.List;
 public class HeatmapItem {
     private String date;
     private Long count;
-    private List<String> contributors;
+    private List<ContributorInfo> contributors;
 
-    public static HeatmapItem of(String date, Long count, List<String> contributors) {
+    public static HeatmapItem of(String date, Long count, List<ContributorInfo> contributors) {
         return new HeatmapItem(date, count, contributors);
+    }
+
+    @Getter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class ContributorInfo {
+        private Long userId;
+        private String username;
+        private String avatarUrl;
+        private Long count;
+
+        public static ContributorInfo of(Long userId, String username, String avatarUrl, Long count) {
+            return new ContributorInfo(userId, username, avatarUrl, count);
+        }
     }
 }
