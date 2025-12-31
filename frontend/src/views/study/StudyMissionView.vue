@@ -291,7 +291,6 @@ import { ref, onMounted, computed, nextTick } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import axios from 'axios';
 import StudyMissionCreateModal from '@/components/study/StudyMissionCreateModal.vue';
-import StudyMissionDetailDrawer from '@/components/study/StudyMissionDetailDrawer.vue';
 import StudyMissionSidebarDetail from '@/components/study/StudyMissionSidebarDetail.vue';
 import BaseIconBadge from '@/components/common/BaseIconBadge.vue';
 import IconAcorn from '@/components/icons/IconAcorn.vue';

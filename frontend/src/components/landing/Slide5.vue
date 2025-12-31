@@ -1,169 +1,191 @@
 <script setup lang="ts">
-import { Brain, MessageSquare, AlertTriangle, Code } from 'lucide-vue-next'
+import { ArrowRight, Github, Mail, Globe } from 'lucide-vue-next'
+
+const socialIcons = [
+  { emoji: '🌐', color: '#3396F4', link: '#' },
+  { emoji: '📱', color: '#58CC02', link: '#' },
+  { emoji: '💬', color: '#2DD4BF', link: '#' },
+  { emoji: '📧', color: '#FFC800', link: '#' }
+]
+
+const sparkles = Array.from({ length: 6 }, (_, i) => ({
+  id: i,
+  initial: { x: 0, y: 0, scale: 0, opacity: 0 },
+  enter: {
+    x: (Math.random() - 0.5) * 400,
+    y: (Math.random() - 0.5) * 400,
+    scale: [0, 1, 0],
+    opacity: [0, 1, 0],
+    transition: {
+      duration: 2000,
+      delay: 1500 + i * 200,
+      repeat: Infinity,
+      repeatDelay: 3000,
+    }
+  }
+}))
+
+const handleLogin = () => {
+  window.location.href = `/oauth2/authorization/github`
+}
 </script>
 
 <template>
   <div class="relative h-full w-full overflow-hidden bg-[#F8FAFC]">
-    <!-- Decorative elements -->
-    <div class="absolute top-20 left-20 w-64 h-64 bg-[#3396F4] opacity-5 rounded-full blur-3xl"></div>
-    <div class="absolute bottom-20 right-20 w-80 h-80 bg-[#FF9600] opacity-5 rounded-full blur-3xl"></div>
+    <!-- Animated gradient orbs -->
+    <div class="absolute inset-0">
+      <div
+        class="absolute top-1/4 left-1/4 w-96 h-96 bg-[#3396F4] opacity-10 rounded-full blur-3xl"
+        v-motion
+        :enter="{
+          scale: [1, 1.2, 1],
+          x: [0, 50, 0],
+          y: [0, -30, 0],
+          transition: {
+            duration: 10000,
+            repeat: Infinity,
+            repeatType: 'reverse',
+          }
+        }"
+      />
+      <div
+        class="absolute bottom-1/4 right-1/4 w-96 h-96 bg-[#58CC02] opacity-10 rounded-full blur-3xl"
+        v-motion
+        :enter="{
+          scale: [1, 1.3, 1],
+          x: [0, -50, 0],
+          y: [0, 50, 0],
+          transition: {
+            duration: 12000,
+            repeat: Infinity,
+            repeatType: 'reverse',
+          }
+        }"
+      />
+    </div>
 
-    <div class="relative z-10 flex h-full items-center px-8 py-16 max-w-7xl mx-auto">
-      <div class="w-full">
-        <div 
-          class="text-center mb-12"
+    <div class="relative z-10 flex h-full flex-col items-center justify-center px-8 text-center">
+      <!-- Logo/Icon -->
+      <div
+        class="mb-12"
+        v-motion
+        :initial="{ scale: 0, rotate: -180 }"
+        :enter="{ scale: 1, rotate: 0, transition: { duration: 1000, ease: 'easeOut', type: 'spring' } }"
+      >
+        <div class="inline-flex items-center justify-center p-8 bg-white rounded-3xl shadow-md border-4 border-[#3396F4]">
+          <div class="text-7xl">📊</div>
+        </div>
+      </div>
+
+      <!-- Main Message -->
+      <h1
+        class="text-6xl md:text-7xl font-black mb-6 max-w-5xl tracking-tight"
+        v-motion
+        :initial="{ y: 30, opacity: 0 }"
+        :enter="{ y: 0, opacity: 1, transition: { delay: 300, duration: 800 } }"
+      >
+        <span class="text-[#3396F4]">
+          당신의 다음 커밋이
+        </span>
+        <br />
+        <span class="text-slate-800">
+          성장의 증거가 됩니다
+        </span>
+      </h1>
+
+      <p
+        class="text-3xl text-slate-700 mb-12 font-bold"
+        v-motion
+        :initial="{ y: 30, opacity: 0 }"
+        :enter="{ y: 0, opacity: 1, transition: { delay: 500, duration: 800 } }"
+      >
+        지금 DASH에서 분석을 시작하세요 ✨
+      </p>
+
+      <!-- CTA Button -->
+      <button
+        @click="handleLogin"
+        class="group px-12 py-5 bg-[#3396F4] hover:bg-[#2B7FD4] rounded-2xl text-white text-2xl font-bold shadow-md hover:shadow-lg transition-all flex items-center gap-3"
+        v-motion
+        :initial="{ scale: 0, opacity: 0 }"
+        :enter="{ scale: 1, opacity: 1, transition: { delay: 700, duration: 500, type: 'spring' } }"
+        :hover="{ scale: 1.05 }"
+        :tapped="{ scale: 0.95 }"
+      >
+        시작하기
+        <div
           v-motion
-          :initial="{ y: -50, opacity: 0 }"
-          :enter="{ y: 0, opacity: 1, transition: { duration: 800 } }"
+          :enter="{ x: [0, 5, 0], transition: { repeat: Infinity, duration: 1500 } }"
         >
-          <div 
-            class="inline-flex items-center gap-2 px-4 py-2 bg-[#3396F4] text-white rounded-xl mb-8 font-bold text-sm"
-            v-motion
-            :initial="{ scale: 0 }"
-            :enter="{ scale: 1, transition: { delay: 200, type: 'spring' } }"
-          >
-            <Brain class="w-4 h-4" :stroke-width="2.5" />
-            AI-Powered
-          </div>
-
-          <h2 class="text-5xl md:text-6xl font-black text-slate-800 mb-4 tracking-tight">
-            <span class="text-[#3396F4]">
-              AI가 리뷰어의 눈으로
-            </span>
-            <br />당신의 코드를 해부합니다
-          </h2>
-
-          <p class="text-2xl text-slate-700 font-bold">
-            지능형 피드백: AI 코드 리뷰 & 튜터 🤖
-          </p>
+          <ArrowRight class="w-7 h-7" :stroke-width="2.5" />
         </div>
+      </button>
 
-        <div class="grid md:grid-cols-2 gap-8">
-          <!-- Code editor mockup -->
-          <div
-            class="relative"
-            v-motion
-            :initial="{ x: -50, opacity: 0 }"
-            :enter="{ x: 0, opacity: 1, transition: { delay: 300, duration: 800 } }"
-          >
-            <div class="p-6 bg-white rounded-3xl border-2 border-slate-200 shadow-sm">
-              <div class="flex items-center gap-2 mb-4 pb-3 border-b-2 border-slate-100">
-                <div class="flex gap-1.5">
-                  <div class="w-3 h-3 bg-[#FF4B4B] rounded-full"></div>
-                  <div class="w-3 h-3 bg-[#FFC800] rounded-full"></div>
-                  <div class="w-3 h-3 bg-[#58CC02] rounded-full"></div>
-                </div>
-                <span class="text-sm text-slate-600 ml-3 font-bold">solution.py</span>
-              </div>
-
-              <div class="font-mono text-sm space-y-2 mb-4">
-                <div class="text-slate-500"><span class="select-none">1 </span><span class="text-[#FF4B4B]">def</span> <span class="text-[#3396F4]">binary_search</span>(<span class="text-[#FF9600]">arr, target</span>):</div>
-                <div class="text-slate-500"><span class="select-none">2   </span><span class="text-slate-700">left, right = 0, len(arr) - 1</span></div>
-                <div class="text-slate-500 relative">
-                  <span class="select-none">3   </span><span class="text-[#FF4B4B]">for</span> <span class="text-slate-700">i in</span> <span class="text-[#3396F4]">range</span>(<span class="text-[#3396F4]">len</span>(<span class="text-[#FF9600]">arr</span>)):
-                  <div
-                    class="absolute -right-2 top-1 w-2 h-2 bg-[#FFC800] rounded-full"
-                    v-motion
-                    :initial="{ scale: 0 }"
-                    :enter="{ scale: 1, transition: { delay: 1000 } }"
-                  ></div>
-                </div>
-                <div class="text-slate-500"><span class="select-none">4     </span><span class="text-slate-700">result.append(arr[i] * 2)</span></div>
-                <div class="text-slate-500"><span class="select-none">5   </span><span class="text-[#FF4B4B]">return</span> <span class="text-slate-700">result</span></div>
-              </div>
-
-              <!-- AI comment bubbles -->
-              <div
-                class="mt-4 p-4 bg-[#3396F4] bg-opacity-10 rounded-2xl border-2 border-[#3396F4] relative"
-                v-motion
-                :initial="{ x: -20, opacity: 0 }"
-                :enter="{ x: 0, opacity: 1, transition: { delay: 1200 } }"
-              >
-                <div class="flex items-start gap-3">
-                  <div class="w-8 h-8 bg-[#3396F4] rounded-full flex items-center justify-center flex-shrink-0">
-                    <Brain class="w-5 h-5 text-white" :stroke-width="2.5" />
-                  </div>
-                  <div class="flex-1">
-                    <p class="text-sm font-bold text-[#3396F4] mb-1">💡 AI 리뷰</p>
-                    <p class="text-sm text-slate-700 font-medium mb-2">리스트 컴프리헨션을 사용하면 더 효율적입니다:</p>
-                    <code class="block p-2 bg-slate-100 rounded-lg text-xs text-[#58CC02] font-bold">
-                      return [x * 2 for x in arr]
-                    </code>
-                  </div>
-                </div>
-              </div>
-
-              <div
-                class="mt-3 p-4 bg-[#FF9600] bg-opacity-10 rounded-2xl border-2 border-[#FF9600]"
-                v-motion
-                :initial="{ x: -20, opacity: 0 }"
-                :enter="{ x: 0, opacity: 1, transition: { delay: 1500 } }"
-              >
-                <div class="flex items-start gap-3">
-                  <AlertTriangle class="w-6 h-6 text-[#FF9600] flex-shrink-0" :stroke-width="2.5" />
-                  <div class="flex-1">
-                    <p class="text-sm font-bold text-[#FF9600] mb-1">⚠️ 반례 탐색</p>
-                    <p class="text-sm text-slate-700 font-medium">빈 배열이 입력될 경우를 고려하세요</p>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <!-- Features -->
-          <div class="flex flex-col justify-center space-y-6">
-            <div
-              class="p-6 bg-white rounded-2xl border-2 border-slate-200 shadow-sm hover:shadow-md transition-all"
-              v-motion
-              :initial="{ x: 50, opacity: 0 }"
-              :enter="{ x: 0, opacity: 1, transition: { delay: 500 } }"
-            >
-              <div class="flex items-start gap-4">
-                <div class="w-12 h-12 bg-[#3396F4] bg-opacity-10 rounded-2xl flex items-center justify-center flex-shrink-0">
-                  <Code class="w-6 h-6 text-[#3396F4]" :stroke-width="2.5" />
-                </div>
-                <div>
-                  <h3 class="text-2xl font-bold text-slate-800 mb-2 tracking-tight">라인별 해석</h3>
-                  <p class="text-lg text-slate-600 font-medium">복잡한 로직을 AI가 알기 쉽게 설명</p>
-                </div>
-              </div>
-            </div>
-
-            <div
-              class="p-6 bg-white rounded-2xl border-2 border-slate-200 shadow-sm hover:shadow-md transition-all"
-              v-motion
-              :initial="{ x: 50, opacity: 0 }"
-              :enter="{ x: 0, opacity: 1, transition: { delay: 700 } }"
-            >
-              <div class="flex items-start gap-4">
-                <div class="w-12 h-12 bg-[#FF9600] bg-opacity-20 rounded-2xl flex items-center justify-center flex-shrink-0">
-                  <AlertTriangle class="w-6 h-6 text-[#FF9600]" :stroke-width="2.5" />
-                </div>
-                <div>
-                  <h3 class="text-2xl font-bold text-slate-800 mb-2 tracking-tight">반례 탐색</h3>
-                  <p class="text-lg text-slate-600 font-medium">놓치기 쉬운 엣지 케이스와 반례 자동 제안</p>
-                </div>
-              </div>
-            </div>
-
-            <div
-              class="p-6 bg-white rounded-2xl border-2 border-slate-200 shadow-sm hover:shadow-md transition-all"
-              v-motion
-              :initial="{ x: 50, opacity: 0 }"
-              :enter="{ x: 0, opacity: 1, transition: { delay: 900 } }"
-            >
-              <div class="flex items-start gap-4">
-                <div class="w-12 h-12 bg-[#2DD4BF] bg-opacity-20 rounded-2xl flex items-center justify-center flex-shrink-0">
-                  <MessageSquare class="w-6 h-6 text-[#2DD4BF]" :stroke-width="2.5" />
-                </div>
-                <div>
-                  <h3 class="text-2xl font-bold text-slate-800 mb-2 tracking-tight">AI 튜터</h3>
-                  <p class="text-lg text-slate-600 font-medium">막히는 순간, 실시간 질의응답으로 힌트 획득</p>
-                </div>
-              </div>
-            </div>
-          </div>
+      <!-- Service URL -->
+      <div
+        class="mt-16 p-8 bg-white rounded-3xl border-2 border-slate-200 shadow-sm"
+        v-motion
+        :initial="{ y: 30, opacity: 0 }"
+        :enter="{ y: 0, opacity: 1, transition: { delay: 900, duration: 800 } }"
+      >
+        <div class="flex items-center gap-3 justify-center mb-6">
+          <Globe class="w-6 h-6 text-[#3396F4]" :stroke-width="2.5" />
+          <span class="text-2xl text-[#3396F4] font-black font-mono">www.dash-algo.com</span>
         </div>
+        
+        <div class="flex items-center justify-center gap-8 text-slate-600">
+          <a
+            href="#"
+            class="flex items-center gap-2 hover:text-[#3396F4] transition-colors font-medium"
+            v-motion
+            :hover="{ scale: 1.1 }"
+          >
+            <Mail class="w-5 h-5" :stroke-width="2" />
+            <span>contact@dash.com</span>
+          </a>
+          
+          <a
+            href="#"
+            class="flex items-center gap-2 hover:text-[#3396F4] transition-colors font-medium"
+            v-motion
+            :hover="{ scale: 1.1 }"
+          >
+            <Github class="w-5 h-5" :stroke-width="2" />
+            <span>https://github.com/utact/dash</span>
+          </a>
+        </div>
+      </div>
+
+      <!-- Social Icons -->
+      <div
+        class="mt-8 flex gap-4"
+        v-motion
+        :initial="{ y: 30, opacity: 0 }"
+        :enter="{ y: 0, opacity: 1, transition: { delay: 1100, duration: 800 } }"
+      >
+        <div
+          v-for="(item, index) in socialIcons"
+          :key="index"
+          class="w-14 h-14 bg-white rounded-2xl flex items-center justify-center border-2 border-slate-200 shadow-sm hover:shadow-md cursor-pointer transition-all"
+          :style="{ borderColor: item.color + '40' }"
+          v-motion
+          :hover="{ scale: 1.2, rotate: 10 }"
+          :tapped="{ scale: 0.9 }"
+        >
+          <span class="text-2xl">{{ item.emoji }}</span>
+        </div>
+      </div>
+
+      <!-- Sparkle effects -->
+      <div
+        v-for="s in sparkles"
+        :key="s.id"
+        class="absolute text-4xl"
+        v-motion
+        :initial="s.initial"
+        :enter="s.enter"
+      >
+        ✨
       </div>
     </div>
   </div>

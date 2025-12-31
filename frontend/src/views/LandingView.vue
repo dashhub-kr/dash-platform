@@ -11,12 +11,6 @@ import Slide2 from '../components/landing/Slide2.vue'
 import Slide3 from '../components/landing/Slide3.vue'
 import Slide4 from '../components/landing/Slide4.vue'
 import Slide5 from '../components/landing/Slide5.vue'
-import Slide6 from '../components/landing/Slide6.vue'
-import Slide7 from '../components/landing/Slide7.vue'
-import Slide8 from '../components/landing/Slide8.vue'
-import Slide9 from '../components/landing/Slide9.vue'
-import Slide10 from '../components/landing/Slide10.vue'
-import Slide11 from '../components/landing/Slide11.vue'
 
 // Import landing styles
 import '../assets/styles/landing/index.css'
@@ -33,10 +27,10 @@ watch(authChecked, (checked) => {
 
 const slides = [
   { component: Slide1, title: 'Intro' },
-  { component: Slide3, title: 'Features' },
-  { component: Slide5, title: 'Details' },
-  { component: Slide8, title: 'Benefits' },
-  { component: Slide11, title: 'Outro' },
+  { component: Slide2, title: 'Features' },
+  { component: Slide3, title: 'Details' },
+  { component: Slide4, title: 'Benefits' },
+  { component: Slide5, title: 'Outro' },
 ]
 
 const currentSlide = ref(0)
