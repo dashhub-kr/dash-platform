@@ -7,7 +7,6 @@ import com.ssafy.dash.comment.domain.Comment;
 import com.ssafy.dash.comment.domain.CommentRepository;
 import com.ssafy.dash.comment.domain.exception.CommentNotFoundException;
 import com.ssafy.dash.common.fixtures.CommentFixtures;
-import com.ssafy.dash.common.fixtures.FixtureTime;
 import com.ssafy.dash.common.fixtures.UserFixtures;
 import com.ssafy.dash.user.domain.User;
 import com.ssafy.dash.user.domain.UserRepository;
