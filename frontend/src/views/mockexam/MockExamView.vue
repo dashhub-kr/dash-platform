@@ -1,11 +1,11 @@
 <template>
   <div class="min-h-screen bg-white text-slate-800 pb-20">
     
-    <!-- Active Exam Overlay (Fixed Fullscreen) -->
+    <!-- 진행 중인 시험 오버레이 (전체화면 고정) -->
     <div v-if="status.examType && !loading" class="fixed inset-0 z-50 bg-slate-50 flex items-center justify-center p-4">
       <div class="w-full max-w-4xl animate-fade-in-up">
         <div class="bg-white rounded-3xl p-8 md:p-12 shadow-xl border border-slate-200 text-center relative overflow-hidden">
-          <!-- Top Accent -->
+          <!-- 상단 강조선 -->
           <div class="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-violet-500 via-purple-500 to-violet-500"></div>
 
           <div class="inline-block px-4 py-1.5 rounded-full bg-violet-100 text-violet-700 text-sm font-bold mb-6">
@@ -16,7 +16,7 @@
             ⏱️ 진행 중인 시험
           </h1>
 
-          <!-- Timer Card -->
+          <!-- 타이머 카드 -->
           <div class="bg-slate-50 p-6 rounded-2xl border border-slate-200 mb-8 inline-block">
             <span class="text-slate-500 text-xs uppercase tracking-widest mb-2 font-bold block">남은 시간</span>
             <div class="text-5xl font-mono font-black text-slate-900 tabular-nums">
@@ -24,7 +24,7 @@
             </div>
           </div>
 
-          <!-- Problem List -->
+          <!-- 문제 목록 -->
           <div class="mb-10">
             <h3 class="text-lg font-bold text-slate-700 mb-4">출제 문제 ({{ status.solvedCount }}/{{ status.totalCount }})</h3>
             <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -65,14 +65,14 @@
       </div>
     </div>
 
-    <!-- Main Layout Container (Selection View) -->
+    <!-- 메인 레이아웃 컨테이너 (선택 화면) -->
     <div v-else class="flex justify-center p-4 md:p-8">
       <div class="flex gap-8 max-w-screen-xl w-full items-start">
       
-      <!-- Main Feed -->
+      <!-- 메인 피드 -->
       <div class="flex-1 min-w-0 space-y-8">
         
-        <!-- Header -->
+        <!-- 헤더 -->
         <h1 class="text-2xl font-black text-slate-800 flex items-center gap-3">
           <div class="w-10 h-10 bg-violet-100 rounded-xl flex items-center justify-center">
             <FileText class="w-6 h-6 text-violet-600" fill="currentColor" />
@@ -80,14 +80,14 @@
           모의고사 / 코딩테스트
         </h1>
 
-        <!-- Loading -->
+        <!-- 로딩 중 -->
         <div v-if="loading" class="flex flex-col items-center justify-center py-20">
           <div class="w-12 h-12 border-4 border-brand-200 border-t-brand-600 rounded-full animate-spin mb-4"></div>
           <p class="text-slate-400 font-medium">불러오는 중...</p>
         </div>
 
         <template v-else>
-          <!-- 모의고사 Section -->
+          <!-- 모의고사 섹션 -->
           <div class="bg-white rounded-3xl p-6 shadow-sm border border-slate-200">
             <h2 class="text-lg font-bold text-slate-800 mb-6 flex items-center gap-2">
               <GraduationCap class="w-5 h-5 text-violet-500" fill="currentColor" />
@@ -132,7 +132,7 @@
             </div>
           </div>
 
-          <!-- 코딩테스트 Section -->
+          <!-- 코딩테스트 섹션 -->
           <div class="bg-white rounded-3xl p-6 shadow-sm border border-slate-200">
             <h2 class="text-lg font-bold text-slate-800 mb-6 flex items-center gap-2">
               <Code class="w-5 h-5 text-amber-500" fill="currentColor" />
@@ -165,7 +165,7 @@
         </template>
       </div>
 
-      <!-- Sidebar -->
+      <!-- 사이드바 -->
       <aside class="w-[380px] hidden xl:flex flex-col sticky top-8 h-fit gap-6">
         
         <!-- 안내 카드 -->
@@ -203,7 +203,7 @@
       </aside>
     </div>
 
-    <!-- Success Modal -->
+    <!-- 성공 모달 -->
     <div v-if="showSuccessModal" class="fixed inset-0 z-[60] flex items-center justify-center bg-black/40 backdrop-blur-sm animate-fade-in">
       <div class="bg-white border border-slate-200 p-10 rounded-3xl max-w-md text-center shadow-2xl animate-bounce-in">
         <div class="text-6xl mb-6">🎉</div>
@@ -278,7 +278,7 @@ const fetchStatus = async () => {
         const res = await axios.get('/api/mockexam/status');
         status.value = res.data;
         
-        // Use solvedProblems from API response
+        // API 응답에서 solvedProblems 사용
         solvedProblems.value = new Set(res.data.solvedProblems || []);
     } catch (e) {
         console.error("시험 상태 fetch 실패", e);

@@ -1,11 +1,11 @@
 <template>
   <div class="min-h-screen bg-white text-slate-800 pb-20">
     
-    <!-- Active Defense Overlay (Fixed Fullscreen) -->
+    <!-- 활성화된 디펜스 오버레이 (전체화면 고정) -->
     <div v-if="status.defenseProblemId && !loading" class="fixed inset-0 z-50 bg-slate-50 flex items-center justify-center p-4">
       <div class="w-full max-w-3xl animate-fade-in-up">
         <div class="bg-white rounded-3xl p-8 md:p-12 shadow-xl border border-slate-200 text-center relative overflow-hidden">
-          <!-- Top Accent -->
+          <!-- 상단 강조선 -->
           <div class="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-brand-500 via-sky-500 to-brand-500"></div>
 
           <div class="inline-block px-4 py-1.5 rounded-full text-sm font-bold mb-6"
@@ -18,7 +18,7 @@
           </h1>
 
           <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-10">
-            <!-- Timer Card -->
+            <!-- 타이머 카드 -->
             <div class="bg-slate-50 p-6 rounded-2xl border border-slate-200 flex flex-col items-center justify-center">
               <span class="text-slate-500 text-xs uppercase tracking-widest mb-2 font-bold">남은 시간</span>
               <div class="text-4xl font-mono font-black text-slate-900 tabular-nums">
@@ -26,7 +26,7 @@
               </div>
             </div>
 
-            <!-- Problem Card -->
+            <!-- 문제 카드 -->
             <a :href="`https://www.acmicpc.net/problem/${status.defenseProblemId}`" target="_blank" 
                class="bg-slate-50 p-6 rounded-2xl border border-slate-200 flex flex-col items-center justify-center group hover:bg-slate-100 transition-all hover:-translate-y-1 cursor-pointer">
               <span class="text-slate-500 text-xs uppercase tracking-widest mb-2 font-bold">목표 문제</span>
@@ -51,11 +51,11 @@
       </div>
     </div>
 
-    <!-- Main Layout Container (Selection View) -->
+    <!-- 메인 레이아웃 컨테이너 (선택 화면) -->
     <div v-else class="flex justify-center p-4 md:p-8">
       <div class="flex gap-8 max-w-screen-xl w-full items-start">
       
-      <!-- Main Feed -->
+      <!-- 메인 피드 -->
       <div class="flex-1 min-w-0 space-y-8">
         
         <!-- Header -->
@@ -73,7 +73,7 @@
         </div>
 
         <template v-else>
-          <!-- Defense Cards -->
+          <!-- 디펜스 카드 -->
           <div class="bg-white rounded-3xl p-6 shadow-sm border border-slate-200">
             <h2 class="text-lg font-bold text-slate-800 mb-6 flex items-center gap-2">
               <Sword class="w-5 h-5 text-slate-500" fill="currentColor" />
@@ -110,7 +110,7 @@
         </template>
       </div>
 
-      <!-- Sidebar -->
+      <!-- 사이드바 -->
       <aside class="w-[380px] hidden xl:flex flex-col sticky top-8 h-fit space-y-6">
         
         <!-- 연승 기록 -->
@@ -250,7 +250,7 @@ const refreshStatus = async () => {
         const res = await axios.get('/api/defense/status');
         const nextId = res.data.defenseProblemId;
         
-        // Check if just succeeded
+        // 막 성공했는지 확인
         if (prevId && !nextId && (res.data.silverStreak > status.value.silverStreak || res.data.goldStreak > status.value.goldStreak)) {
              showSuccessModal.value = true;
         }

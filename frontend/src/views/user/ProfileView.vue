@@ -13,15 +13,15 @@ const { refresh, user } = useAuth();
 
 // ... (userData definition)
 
-// Tier Color Mapper for BaseIconBadge
+// BaseIconBadge용 티어 색상 매퍼
 const getTierColorName = (tier) => {
-    if (tier >= 1 && tier <= 5) return 'orange'; // Bronze
-    if (tier >= 6 && tier <= 10) return 'slate';  // Silver
-    if (tier >= 11 && tier <= 15) return 'yellow'; // Gold
-    if (tier >= 16 && tier <= 20) return 'emerald'; // Platinum
-    if (tier >= 21 && tier <= 25) return 'brand'; // Diamond
-    if (tier >= 26 && tier <= 30) return 'rose'; // Ruby
-    return 'slate'; // Unrated
+    if (tier >= 1 && tier <= 5) return 'orange'; // 브론즈
+    if (tier >= 6 && tier <= 10) return 'slate';  // 실버
+    if (tier >= 11 && tier <= 15) return 'yellow'; // 골드
+    if (tier >= 16 && tier <= 20) return 'emerald'; // 플래티넘
+    if (tier >= 21 && tier <= 25) return 'brand'; // 다이아몬드
+    if (tier >= 26 && tier <= 30) return 'rose'; // 루비
+    return 'slate'; // 언랭크
 };
 
 const getTierName = (tier) => {
@@ -65,7 +65,7 @@ onMounted(async () => {
         const res = await userApi.getMyProfile();
         userData.value = res.data;
         
-        // Fetch Study Info if exists
+        // 스터디 정보가 있다면 가져오기
         if (userData.value.studyId) {
             loadingStudy.value = true;
             try {
@@ -164,7 +164,7 @@ const handleDelete = async () => {
                     <img :src="userProfileImage" class="w-32 h-32 rounded-3xl object-cover bg-slate-50 mx-auto shadow-sm" />
                 </div>
                 <h1 class="text-2xl font-black text-slate-800 tracking-tight mb-4 relative z-10">{{ userData.username }}</h1>
-                <!-- Email Hidden as requested -->
+                <!-- 요청에 따라 이메일 숨김 -->
                 <!-- <p class="text-slate-400 font-bold text-sm mb-4">{{ userData.email }}</p> -->
                 
                 <div class="text-xs text-slate-300 font-bold uppercase tracking-wider">Joined Dec 2024</div>
