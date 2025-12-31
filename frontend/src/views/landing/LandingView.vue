@@ -1,24 +1,24 @@
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted, watch, nextTick } from 'vue'
-import { ArrowUp, ArrowDown } from 'lucide-vue-next' // Changed icons
+import { ArrowUp, ArrowDown } from 'lucide-vue-next' // 아이콘 변경됨
 import { useAuth } from '../composables/useAuth'
 import { useRouter } from 'vue-router'
 import { useMouseInElement, useDebounceFn } from '@vueuse/core'
 
-// Import all slides
+// 모든 슬라이드 가져오기
 import Slide1 from '../components/landing/Slide1.vue'
 import Slide2 from '../components/landing/Slide2.vue'
 import Slide3 from '../components/landing/Slide3.vue'
 import Slide4 from '../components/landing/Slide4.vue'
 import Slide5 from '../components/landing/Slide5.vue'
 
-// Import landing styles
+// 랜딩 스타일 가져오기
 import '../assets/styles/landing/index.css'
 
 const { user, authChecked } = useAuth()
 const router = useRouter()
 
-// Redirect to dashboard if logged in
+// 로그인 상태라면 대시보드로 리다이렉트
 watch(authChecked, (checked) => {
   if (checked && user.value) {
     router.replace('/dashboard')
@@ -50,14 +50,14 @@ const prevSlide = () => {
   }
 }
 
-// Debounce scroll events to prevent rapid skipping
+// 빠른 스킵 방지를 위한 스크롤 이벤트 디바운스
 const handleWheel = useDebounceFn((e: WheelEvent) => {
   if (e.deltaY > 0) {
     nextSlide()
   } else if (e.deltaY < 0) {
     prevSlide()
   }
-}, 100) // 100ms debounce
+}, 100) // 100ms 디바운스
 
 const handleKeydown = (e: KeyboardEvent) => {
   if (e.key === 'ArrowDown' || e.key === ' ' || e.key === 'PageDown') {
@@ -80,7 +80,7 @@ onUnmounted(() => {
 
 <template>
   <div class="fixed inset-0 overflow-hidden bg-slate-50 font-[Pretendard]">
-    <!-- Slides -->
+    <!-- 슬라이드 -->
     <div class="relative w-full h-full">
       <Transition :name="`slide-${direction}`">
         <component
@@ -91,7 +91,7 @@ onUnmounted(() => {
       </Transition>
     </div>
 
-    <!-- Navigation Controls (Vertical) -->
+    <!-- 네비게이션 컨트롤 (수직) -->
     <div class="absolute right-8 top-1/2 -translate-y-1/2 z-50 flex flex-col items-center gap-6">
       <button 
         @click="prevSlide"
@@ -101,7 +101,7 @@ onUnmounted(() => {
         <ArrowUp class="w-6 h-6 text-slate-600" />
       </button>
 
-      <!-- Indie-style Progress Indicators (Vertical) -->
+      <!-- 인디 스타일 진행 표시기 (수직) -->
       <div class="flex flex-col gap-2">
         <button
           v-for="(_, index) in slides"
@@ -134,7 +134,7 @@ onUnmounted(() => {
 </template>
 
 <style>
-/* Slide Transitions */
+/* 슬라이드 전환 효과 */
 .slide-next-enter-active,
 .slide-next-leave-active,
 .slide-prev-enter-active,
