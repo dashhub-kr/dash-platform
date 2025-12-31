@@ -330,12 +330,10 @@ watch(isStudyLeader, (val) => {
 onBeforeUnmount(() => stopPolling());
 
 // User Profile
-const profileImages = []; // ['/profile/bag.png', '/profile/proud.png', '/profile/smart.png', '/profile/smile.png'];
 const userProfileImage = computed(() => {
   if (!user.value) return '';
   if (user.value.avatarUrl) return user.value.avatarUrl;
-  const id = user.value.id || 0;
-  return profileImages[id % profileImages.length];
+  return '/default_profile.png';
 });
 
 // Actions

@@ -54,18 +54,9 @@ const updating = ref(false);
 const syncingSolvedac = ref(false);
 const syncingRepo = ref(false);
 
-const profileImages = [
-    // '/profile/bag.png',
-    // '/profile/proud.png',
-    // '/profile/smart.png',
-    // '/profile/smile.png'
-];
-
 const userProfileImage = computed(() => {
     if (userData.value.avatarUrl) return userData.value.avatarUrl;
-    if (!userData.value.id) return profileImages[0];
-    const index = userData.value.id % profileImages.length;
-    return profileImages[index];
+    return '/default_profile.png';
 });
 
 
