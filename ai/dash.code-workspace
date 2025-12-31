@@ -1,0 +1,23 @@
+{
+    "folders": [
+        {
+            "path": "."
+        },
+        {
+            "path": "../dash"
+        },
+        {
+            "path": "../final/crwaling"
+        },
+        {
+            "path": "../dash/backend"
+        },
+        {
+            "name": "baekjoonhub-dash",
+            "path": "../baekjoonhub-dash"
+        }
+    ],
+    "settings": {
+        "java.compile.nullAnalysis.mode": "automatic"
+    }
+}
