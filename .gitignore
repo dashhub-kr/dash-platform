@@ -47,6 +47,8 @@ frontend/npm-debug.log*
 frontend/yarn-error.log*
 frontend/.parcel-cache/
 frontend/coverage/
+*.timestamp-*.mjs
+vite.config.js.timestamp-*
 
 # Backend (Maven & Java)
 backend/bin
