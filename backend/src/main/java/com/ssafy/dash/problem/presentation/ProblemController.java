@@ -1,7 +1,7 @@
 package com.ssafy.dash.problem.presentation;
 
 import com.ssafy.dash.problem.application.ProblemService;
-import com.ssafy.dash.problem.domain.ProblemRecommendationResponse;
+import com.ssafy.dash.problem.presentation.dto.response.ProblemRecommendationResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;

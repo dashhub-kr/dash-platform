@@ -19,7 +19,7 @@ import com.ssafy.dash.analytics.domain.UserTagStat;
 import com.ssafy.dash.analytics.domain.UserTagStatRepository;
 import com.ssafy.dash.analytics.infrastructure.persistence.UserTagStatMapper;
 import com.ssafy.dash.problem.application.ProblemService;
-import com.ssafy.dash.problem.domain.ProblemRecommendationResponse;
+import com.ssafy.dash.problem.presentation.dto.response.ProblemRecommendationResponse;
 import com.ssafy.dash.problem.domain.Tag;
 import com.ssafy.dash.problem.infrastructure.persistence.TagMapper;
 import com.ssafy.dash.user.domain.User;
