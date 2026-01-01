@@ -15,6 +15,8 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 
+import com.ssafy.dash.ai.application.dto.HintChatCommand;
+
 /**
  * AI 튜터 대화 서비스
  * 
@@ -30,6 +32,52 @@ public class TutorChatService {
     private final UserRepository userRepository;
     private final AlgorithmRecordRepository algorithmRecordRepository;
     private final com.ssafy.dash.acorn.application.AcornService acornService;
+
+    public HintChatResponse processChat(HintChatCommand command) {
+        if (command.recordId() != null) {
+            List<HintChatRequest.ChatMessage> history = command.history() != null
+                    ? command.history().stream()
+                            .map(m -> HintChatRequest.ChatMessage.builder()
+                                    .role(m.role())
+                                    .content(m.content())
+                                    .build())
+                            .toList()
+                    : List.of();
+
+            return hintChatWithRecord(
+                    command.userId(),
+                    command.recordId(),
+                    command.message(),
+                    command.solveStatus(),
+                    command.wrongReason(),
+                    history);
+        } else {
+            List<HintChatRequest.ChatMessage> history = command.history() != null ? command.history().stream()
+                    .map(m -> HintChatRequest.ChatMessage.builder()
+                            .role(m.role())
+                            .content(m.content())
+                            .build())
+                    .toList() : List.of();
+
+            HintChatRequest.UserContext userCtx = command.userContext() != null ? HintChatRequest.UserContext.builder()
+                    .tierName(command.userContext().tierName())
+                    .solvedCount(command.userContext().solvedCount())
+                    .weakTags(command.userContext().weakTags())
+                    .build() : null;
+
+            HintChatRequest aiRequest = HintChatRequest.builder()
+                    .message(command.message())
+                    .problemNumber(command.problemNumber())
+                    .problemTitle(command.problemTitle())
+                    .code(command.code())
+                    .language(command.language())
+                    .history(history)
+                    .userContext(userCtx)
+                    .build();
+
+            return hintChat(aiRequest);
+        }
+    }
 
     /**
      * AI 튜터 대화 (recordId로 DB에서 코드/문제 정보 조회)
