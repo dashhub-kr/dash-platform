@@ -1,4 +1,4 @@
-package com.ssafy.dash.dashboard.application.dto.result;
+package com.ssafy.dash.dashboard.application.dto.response;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

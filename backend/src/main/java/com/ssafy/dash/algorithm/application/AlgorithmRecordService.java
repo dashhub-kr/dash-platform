@@ -13,8 +13,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import com.ssafy.dash.dashboard.application.dto.result.HeatmapItem;
-import java.util.Map;
+
+
 import java.util.stream.Collectors;
 import com.ssafy.dash.defense.application.DefenseService;
 import com.ssafy.dash.mockexam.application.MockExamService;
@@ -128,51 +128,6 @@ public class AlgorithmRecordService {
         }
     }
 
-    @Transactional(readOnly = true)
-    public List<HeatmapItem> getHeatmap(Long userId, Long studyId) {
-        List<AlgorithmRecord> records;
-        if (studyId != null) {
-            records = algorithmRecordRepository.findByStudyId(studyId);
-        } else {
-            records = algorithmRecordRepository.findByUserId(userId);
-        }
 
-        // Get user info map for avatarUrl
-        Map<Long, com.ssafy.dash.user.domain.User> userMap = new java.util.HashMap<>();
-        records.stream()
-                .map(AlgorithmRecord::getUserId)
-                .distinct()
-                .forEach(uid -> userRepository.findById(uid).ifPresent(u -> userMap.put(uid, u)));
-
-        // Group by Date (YYYY-MM-DD)
-        Map<String, List<AlgorithmRecord>> groupedByDate = records.stream()
-                .collect(Collectors.groupingBy(record -> record.getCommittedAt().toLocalDate().toString()));
-
-        return groupedByDate.entrySet().stream()
-                .map(entry -> {
-                    String date = entry.getKey();
-                    List<AlgorithmRecord> dailyRecords = entry.getValue();
-                    Long count = (long) dailyRecords.size();
-
-                    // Group by userId and count submissions per user
-                    List<HeatmapItem.ContributorInfo> contributors = dailyRecords.stream()
-                            .collect(Collectors.groupingBy(AlgorithmRecord::getUserId, Collectors.counting()))
-                            .entrySet().stream()
-                            .map(e -> {
-                                Long uid = e.getKey();
-                                Long submitCount = e.getValue();
-                                com.ssafy.dash.user.domain.User user = userMap.get(uid);
-                                String username = user != null ? user.getUsername() : "Unknown";
-                                String avatarUrl = user != null ? user.getAvatarUrl() : null;
-                                return HeatmapItem.ContributorInfo.of(uid, username, avatarUrl, submitCount);
-                            })
-                            .sorted((a, b) -> Long.compare(b.getCount(), a.getCount())) // Sort by count desc
-                            .collect(Collectors.toList());
-
-                    return HeatmapItem.of(date, count, contributors);
-                })
-                .sorted((a, b) -> a.getDate().compareTo(b.getDate()))
-                .collect(Collectors.toList());
-    }
 
 }
