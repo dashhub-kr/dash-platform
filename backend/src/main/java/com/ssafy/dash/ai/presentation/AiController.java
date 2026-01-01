@@ -5,7 +5,6 @@ import com.ssafy.dash.ai.application.CodeReviewService;
 import com.ssafy.dash.ai.application.CodingStyleService;
 import com.ssafy.dash.ai.application.DebugService;
 import com.ssafy.dash.ai.application.TutorChatService;
-import com.ssafy.dash.ai.application.dto.HintChatCommand;
 import com.ssafy.dash.ai.infrastructure.client.dto.request.AiCounterExampleRequest;
 import com.ssafy.dash.ai.infrastructure.client.dto.response.AiCounterExampleResponse;
 import com.ssafy.dash.ai.infrastructure.client.dto.request.AiSimulatorRequest;
@@ -145,5 +144,3 @@ public class AiController {
                 return ResponseEntity.ok(debugService.simulate(request.getCode(), request.getLanguage()));
         }
 }
-
-
