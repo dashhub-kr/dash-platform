@@ -68,7 +68,7 @@ graph TD
     GitHub -->|Webhook Trigger| WAS[Spring Boot Backend]
     
     subgraph "DASH Core System"
-        WAS -->|Analyze Request| AI[AI Server (FastAPI)]
+        WAS -->|Analyze Request| AI["AI Server (FastAPI)"]
         AI -->|Gemini API| LLM[Google Gemini]
         AI -->|Analysis Result| WAS
         WAS -->|Persist Data| DB[(MySQL)]
@@ -80,7 +80,7 @@ graph TD
 
 ### Key Engineering Decisions
 1.  **DIP(의존성 역전 원칙) 적용**: `Domain` 레이어를 외부 기술(Infrastructure)로부터 격리하여 비즈니스 로직의 순수성을 유지했습니다.
-2.  **비동기 이벤트 처리**: GitHub Webhook 수신 시, `GitHubPushEventWorker`를 통해 코드 분석 및 데이터 갱신 작업을 비동기로 처리하여 사용자 경험을 저해하지 않습니다.
+2.  **비동기 이벤트 처리**: GitHub Webhook 수신 시, `GitHubPushEventWorker`를 통해 코드 분석 및 데이터 갱신 작업을 비동기로 처리하여 UX를 저해하지 않습니다.
 3.  **Chrome Extension 활용**: DOM 파싱의 불안정성을 제거하고, 실패한 코드(오답)까지 수집하여 학습 데이터로 활용합니다.
 
 ---
@@ -177,9 +177,9 @@ Solved.ac ID를 입력하면 3초 내에 사용자의 알고리즘 풀이 패턴
 
 | Role | Name | GitHub | Responsibility |
 |:---:|:---:|:---:|:---|
-| **PM / BE / FE** | **유승준** | [@utact](https://github.com/utact) | 기획, 시스템 설계, Backend Core, DB 모델링, Chrome Extension 개발 |
-| **AI / BE / FE** | **김용수** | [@canit0221](https://github.com/canit0221) | AI Modeling & Serving, Backend API 개발, Frontend Core, 데이터 시각화 |
-| **BE / FE** | **유소민** | [@SoMin-Yoo](https://github.com/SoMin-Yoo) | Chrome Extension 개발, UI/UX 최적화, QA 및 테스트, 코드 품질 관리 |
+| PM / BE / FE | 유승준 | [@utact](https://github.com/utact) | 기획, 시스템 설계, Backend Core, DB 모델링, Chrome Extension |
+| AI / BE / FE | 김용수 | [@canit0221](https://github.com/canit0221) | AI Modeling & Serving, Backend API, Frontend Core, 데이터 시각화 |
+| BE / FE | 유소민 | [@SoMin-Yoo](https://github.com/SoMin-Yoo) | Chrome Extension, UI/UX 최적화, QA 및 테스트, 코드 품질 관리 |
 
 ---
 
