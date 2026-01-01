@@ -80,8 +80,8 @@ graph TD
 
 ### Key Engineering Decisions
 1. **DIP(의존성 역전 원칙) 적용**: `Domain` 레이어를 외부 기술(Infra)로부터 격리하여 비즈니스 로직의 순수성을 유지했습니다.
-2. **비동기 이벤트 처리**: `GitHubPushEventWorker`를 통해 코드 분석 및 데이터 갱신 작업을 비동기 처리하여 사용자 경험을 저해하지 않습니다.
-4. **Chrome Extension 활용**: 문제 제출 시 DOM 파싱의 불안정성을 제거하고, 실패한 코드(오답)까지 수집하여 학습 데이터로 활용합니다.
+2. **비동기 이벤트 처리**: EventWorker로 코드 분석 및 데이터 갱신 작업을 비동기 처리하여 사용자 경험을 저해하지 않습니다.
+4. **크롬 익스텐션 활용**: DOM 파싱의 불안정성을 제거하고, 실패한 코드(오답)까지 수집하여 학습 데이터로 활용합니다.
 
 ---
 
@@ -165,7 +165,7 @@ Solved.ac ID를 입력하면 3초 내에 사용자의 알고리즘 풀이 패턴
 ### 🤖 Intelligent Code Review
 코드를 제출하는 즉시 AI가 다음 항목을 분석합니다:
 * **Time/Space Complexity**: Big-O 표기법 기반의 시간/공간 복잡도를 자동 계산하고, 그 이유를 명확히 설명
-* **Context-Aware Intent Analysis**: 특정 코드에 마우스를 올리면(Hover), 해당 코드의 구현 의도와 핵심 기능을 AI가 파악하여 설명
+* **AI Analysis**: 특정 코드에 마우스를 올리면(Hover), 해당 코드의 구현 의도와 핵심 기능을 AI가 파악하여 설명
 * **Algorithm Pattern**: 사용된 주요 알고리즘 기법(DP, DFS 등)을 자동으로 분류하여 태깅
 
 ### 🌲 RPG Skill Tree
