@@ -24,6 +24,10 @@ import com.ssafy.dash.problem.domain.Tag;
 import com.ssafy.dash.problem.infrastructure.persistence.TagMapper;
 import com.ssafy.dash.user.domain.User;
 import com.ssafy.dash.user.domain.UserRepository;
+import com.ssafy.dash.study.application.dto.result.StudyAnalysisResult;
+import com.ssafy.dash.study.application.dto.result.MemberTagStatsResult;
+import com.ssafy.dash.study.application.dto.result.WeaknessTagResult;
+import com.ssafy.dash.study.application.dto.result.TeamFamilyStatResult;
 
 import lombok.RequiredArgsConstructor;
 
@@ -56,22 +60,22 @@ public class StudyAnalysisService {
     /**
      * 팀 패밀리 통계 (레이더차트용) - 절대값(실제 푼 문제 수) 합산
      */
-    public List<TeamFamilyStat> getTeamFamilyStats(Long studyId) {
+    public List<TeamFamilyStatResult> getTeamFamilyStats(Long studyId) {
         List<User> members = userRepository.findByStudyId(studyId);
         if (members.isEmpty()) {
             return List.of();
         }
 
         // 패밀리별 합산 통계
-        Map<String, TeamFamilyStat> familyMap = new HashMap<>();
+        Map<String, TeamFamilyStatResult> familyMap = new HashMap<>();
 
         for (User member : members) {
             List<UserFamilyStat> memberFamilyStats = userTagStatRepository.findFamilyStatsByUserId(member.getId());
 
             for (UserFamilyStat stat : memberFamilyStats) {
                 String key = stat.getFamilyKey();
-                TeamFamilyStat teamStat = familyMap.computeIfAbsent(key,
-                        k -> new TeamFamilyStat(k, stat.getFamilyName()));
+                TeamFamilyStatResult teamStat = familyMap.computeIfAbsent(key,
+                        k -> new TeamFamilyStatResult(k, stat.getFamilyName()));
                 teamStat.addStats(stat.getSolved());
             }
         }
@@ -83,7 +87,7 @@ public class StudyAnalysisService {
      * 팀 추천 태그 - 정답률 낮은 패밀리의 하위 태그 중 추천
      */
     public List<RecommendedTag> getTeamRecommendedTags(Long studyId) {
-        List<TeamFamilyStat> familyStats = getTeamFamilyStats(studyId);
+        List<TeamFamilyStatResult> familyStats = getTeamFamilyStats(studyId);
         if (familyStats.isEmpty()) {
             return List.of();
         }
@@ -94,7 +98,7 @@ public class StudyAnalysisService {
         // 상위 3개 약점 패밀리의 태그를 추천
         List<RecommendedTag> recommended = new ArrayList<>();
         for (int i = 0; i < Math.min(3, familyStats.size()); i++) {
-            TeamFamilyStat weak = familyStats.get(i);
+            TeamFamilyStatResult weak = familyStats.get(i);
             recommended.add(new RecommendedTag(
                     weak.getFamilyKey().toLowerCase(),
                     weak.getFamilyName(),
@@ -261,14 +265,14 @@ public class StudyAnalysisService {
         }
 
         // 패밀리 기반 통계 사용
-        List<TeamFamilyStat> familyStats = getTeamFamilyStats(studyId);
+        List<TeamFamilyStatResult> familyStats = getTeamFamilyStats(studyId);
         Map<String, Double> teamAverages = new HashMap<>();
-        List<WeaknessTag> weaknessTags = new ArrayList<>();
+        List<WeaknessTagResult> weaknessTags = new ArrayList<>();
 
-        for (TeamFamilyStat stat : familyStats) {
+        for (TeamFamilyStatResult stat : familyStats) {
             double rate = stat.getCompletionRate();
             teamAverages.put(stat.getFamilyKey().toLowerCase(), rate);
-            weaknessTags.add(new WeaknessTag(stat.getFamilyKey().toLowerCase(), rate));
+            weaknessTags.add(new WeaknessTagResult(stat.getFamilyKey().toLowerCase(), rate));
         }
 
         // 약점 태그 정렬 (낮은 순)
@@ -282,7 +286,7 @@ public class StudyAnalysisService {
                 .orElse(0.0);
 
         // 멤버별 패밀리 통계
-        List<MemberTagStats> memberStats = new ArrayList<>();
+        List<MemberTagStatsResult> memberStats = new ArrayList<>();
         for (User member : members) {
             List<UserFamilyStat> memberFamilyStats = userTagStatRepository.findFamilyStatsByUserId(member.getId());
             Map<String, Double> tagRates = new HashMap<>();
@@ -292,7 +296,7 @@ public class StudyAnalysisService {
                 tagRates.put(key, stat.getCompletionRate());
                 tagSolved.put(key, stat.getSolved());
             }
-            memberStats.add(new MemberTagStats(
+            memberStats.add(new MemberTagStatsResult(
                     member.getId(),
                     member.getUsername(),
                     member.getSolvedacTier(),
@@ -308,75 +312,16 @@ public class StudyAnalysisService {
                 weaknessTags.subList(0, Math.min(3, weaknessTags.size())));
     }
 
-    // DTO Records
-    public record StudyAnalysisResult(
-            List<MemberTagStats> memberStats,
-            Map<String, Double> teamAverages,
-            double averageTier,
-            List<WeaknessTag> topWeaknesses) {
-        public static StudyAnalysisResult empty() {
-            return new StudyAnalysisResult(List.of(), Map.of(), 0.0, List.of());
-        }
-    }
-
-    public record MemberTagStats(
-            Long userId,
-            String username,
-            Integer tier,
-            String avatarUrl,
-            Map<String, Double> tagRates,
-            Map<String, Integer> tagSolved) {
-    }
-
-    public record WeaknessTag(
-            String tagKey,
-            double averageRate) {
-    }
-
-    public record RecommendedTag(
+    // Internal helper records (not exposed to presentation layer)
+    record RecommendedTag(
             String tagKey,
             String tagName,
             double completionRate) {
     }
 
-    public record ScoredTag(
+    record ScoredTag(
             String tagKey,
             String displayName,
             double score) {
-    }
-
-    public static class TeamFamilyStat {
-        private final String familyKey;
-        private final String familyName;
-        private int solved = 0;
-
-        public TeamFamilyStat(String familyKey, String familyName) {
-            this.familyKey = familyKey;
-            this.familyName = familyName;
-        }
-
-        public void addStats(Integer addSolved) {
-            this.solved += (addSolved != null ? addSolved : 0);
-        }
-
-        public String getFamilyKey() {
-            return familyKey;
-        }
-
-        public String getFamilyName() {
-            return familyName;
-        }
-
-        public int getSolved() {
-            return solved;
-        }
-
-        public int getTotal() {
-            return solved; // AlgorithmRadarChart에서 상대적 비교 용도
-        }
-
-        public double getCompletionRate() {
-            return solved; // 절대값 반환
-        }
     }
 }

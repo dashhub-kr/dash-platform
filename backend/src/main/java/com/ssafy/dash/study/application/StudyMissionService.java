@@ -18,6 +18,8 @@ import com.ssafy.dash.study.domain.StudyMissionSubmission;
 import com.ssafy.dash.study.domain.StudyMissionSubmissionRepository;
 import com.ssafy.dash.user.domain.User;
 import com.ssafy.dash.user.domain.UserRepository;
+import com.ssafy.dash.study.application.dto.result.MissionWithProgressResult;
+import com.ssafy.dash.study.application.dto.result.MemberProgressResult;
 
 import lombok.RequiredArgsConstructor;
 
@@ -128,7 +130,6 @@ public class StudyMissionService {
         }
 
         missionRepository.update(mission);
-        missionRepository.update(mission);
         return mission;
     }
 
@@ -147,9 +148,6 @@ public class StudyMissionService {
      * 미션 삭제
      */
     public void deleteMission(Long missionId) {
-        StudyMission mission = missionRepository.findById(missionId)
-                .orElseThrow(() -> new IllegalArgumentException("미션을 찾을 수 없습니다."));
-
         // 1. 관련 Submissions 삭제
         submissionRepository.deleteByMissionId(missionId);
 
@@ -187,10 +185,10 @@ public class StudyMissionService {
     /**
      * 스터디의 미션 목록 조회 (algorithm_records와 자동 동기화)
      */
-    public List<MissionWithProgress> getMissions(Long studyId, Long requestUserId) {
+    public List<MissionWithProgressResult> getMissions(Long studyId, Long requestUserId) {
         List<StudyMission> missions = missionRepository.findByStudyIdOrderByWeekDesc(studyId);
         List<User> members = userRepository.findByStudyId(studyId);
-        List<MissionWithProgress> result = new ArrayList<>();
+        List<MissionWithProgressResult> result = new ArrayList<>();
 
         for (StudyMission mission : missions) {
             List<Integer> problemIds = parseProblems(mission.getProblemIds());
@@ -203,7 +201,7 @@ public class StudyMissionService {
             int solvedCount = submissionRepository.countCompletedByMissionIdAndUserId(mission.getId(), requestUserId);
 
             // Calculate progress for ALL members
-            List<MemberProgress> memberProgressList = new ArrayList<>();
+            List<MemberProgressResult> memberProgressList = new ArrayList<>();
             for (User member : members) {
                 int memberCompleted = submissionRepository.countCompletedByMissionIdAndUserId(mission.getId(),
                         member.getId());
@@ -211,7 +209,7 @@ public class StudyMissionService {
                         member.getId());
                 List<Integer> sosProblemIds = submissionRepository.findSosProblemIds(mission.getId(), member.getId());
 
-                memberProgressList.add(new MemberProgress(
+                memberProgressList.add(new MemberProgressResult(
                         member.getId(),
                         member.getUsername(),
                         member.getAvatarUrl(),
@@ -224,8 +222,7 @@ public class StudyMissionService {
 
             // 미션 완료 여부 판단 (DB 상태 우선, 그 외엔 전원 완료 or 데드라인)
             // 전원 완료 체크 로직은 기존 유지
-            boolean isAllMembersCompleted = memberProgressList.stream().allMatch(MemberProgress::allCompleted);
-            boolean isExpired = mission.getDeadline() != null && mission.getDeadline().isBefore(LocalDate.now());
+            boolean isAllMembersCompleted = memberProgressList.stream().allMatch(MemberProgressResult::allCompleted);
 
             // Status가 null이면 IN_PROGRESS로 취급
             MissionStatus status = mission.getStatus();
@@ -244,7 +241,7 @@ public class StudyMissionService {
             // 여기서는 일단 DB 상태값을 그대로 반환. (FE에서 status == COMPLETED || allMembersCompleted 로직
             // 처리)
 
-            result.add(new MissionWithProgress(
+            result.add(new MissionWithProgressResult(
                     mission.getId(),
                     mission.getWeek(),
                     mission.getTitle(),
@@ -294,7 +291,7 @@ public class StudyMissionService {
      * 미션별 멤버 진행 현황 조회
      */
     @Transactional(readOnly = true)
-    public List<MemberProgress> getMissionProgress(Long missionId) {
+    public List<MemberProgressResult> getMissionProgress(Long missionId) {
         StudyMission mission = missionRepository.findById(missionId)
                 .orElseThrow(() -> new IllegalArgumentException("미션을 찾을 수 없습니다."));
 
@@ -302,14 +299,14 @@ public class StudyMissionService {
         int totalProblems = problemIds.size();
 
         List<User> members = userRepository.findByStudyId(mission.getStudyId());
-        List<MemberProgress> result = new ArrayList<>();
+        List<MemberProgressResult> result = new ArrayList<>();
 
         for (User member : members) {
             int completed = submissionRepository.countCompletedByMissionIdAndUserId(missionId, member.getId());
             List<Integer> solvedProblemIds = submissionRepository.findCompletedProblemIds(missionId, member.getId());
             List<Integer> sosProblemIds = submissionRepository.findSosProblemIds(missionId, member.getId());
 
-            result.add(new MemberProgress(
+            result.add(new MemberProgressResult(
                     member.getId(),
                     member.getUsername(),
                     member.getAvatarUrl(),
@@ -414,27 +411,4 @@ public class StudyMissionService {
         }
     }
 
-    public record MissionWithProgress(
-            Long id,
-            Integer week,
-            String title,
-            List<Integer> problemIds,
-            String sourceType,
-            LocalDate deadline,
-            MissionStatus status,
-            int solvedCount,
-            int totalProblems,
-            List<MemberProgress> memberProgressList) {
-    }
-
-    public record MemberProgress(
-            Long userId,
-            String username,
-            String avatarUrl,
-            int completedCount,
-            int totalProblems,
-            boolean allCompleted,
-            List<Integer> solvedProblemIds,
-            List<Integer> sosProblemIds) {
-    }
 }
