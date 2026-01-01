@@ -1,115 +1,188 @@
-# 🚀 DASH - Developer's Algorithm Study Hub
+# DASH : 기록을 넘어 성장을 설계하다
 
-![Vue.js](https://img.shields.io/badge/Vue.js-3.x-4FC08D?logo=vue.js)
-![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.5-6DB33F?logo=springboot)
-![FastAPI](https://img.shields.io/badge/FastAPI-0.100+-009688?logo=fastapi)
-![MySQL](https://img.shields.io/badge/MySQL-8.0-4479A1?logo=mysql)
+<div align="center">
+  <img src="frontend/public/images/icons/icon-512.png" alt="DASH Logo" width="120px" height="120px" />
+  <br/>
+  <h3>All-in-One Algorithm Study Platform</h3>
+  <br/>
 
-**알고리즘 학습을 위한 올인원 플랫폼**  
-스터디 관리, AI 코드 분석, 랜덤 디펜스, 모의고사 등 개발자 성장을 위한 다양한 기능을 제공합니다.
-
-> SSAFY 14기 자율 프로젝트
-
----
-
-## ✨ 주요 기능
-
-### 📊 개인 학습
-- **대시보드**: 풀이 현황, Streak, 티어 등 학습 통계 한눈에 확인
-- **스킬 트리**: 알고리즘 태그별 숙련도 시각화
-- **학습 로드맵**: AI 기반 맞춤형 4단계 학습 경로 추천
-
-### 🎯 훈련 모드
-- **랜덤 디펜스**: 티어 기반 랜덤 문제 제한시간 내 풀이 도전
-- **모의고사**: 삼성, 카카오 등 실제 코딩테스트 환경 시뮬레이션
-
-### 👥 스터디
-- **미션 관리**: 주차별 문제 배정 및 진행률 트래킹
-- **팀 분석**: 팀원별 실력 분석 및 AI 커리큘럼 추천
-- **도토리 시스템**: 스터디 활동 보상 재화
-
-### 🤖 AI 서비스
-- **코드 리뷰**: 복잡도 분석, 패턴 인식, 개선점 제안
-- **AI 튜터**: 소크라테스식 1:1 문답 튜터링
-- **반례 생성**: 틀린 코드에 대한 반례 자동 생성
-- **학습 경로**: 개인화된 단계별 커리큘럼
-
-### 💬 커뮤니티
-- **코드 리뷰 게시판**: 라인별 댓글로 상세한 코드 피드백
+  [![Java Version](https://img.shields.io/badge/Java-17-007396?style=flat-square&logo=java)](https://www.java.com/)
+  [![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.5.8-6DB33F?style=flat-square&logo=springboot)](https://spring.io/projects/spring-boot)
+  [![Vue.js](https://img.shields.io/badge/Vue.js-3.3.4-4FC08D?style=flat-square&logo=vue.js)](https://vuejs.org/)
+  [![FastAPI](https://img.shields.io/badge/FastAPI-0.112.0-009688?style=flat-square&logo=fastapi)](https://fastapi.tiangolo.com/)
+  [![Gemini](https://img.shields.io/badge/AI-Google%20Gemini-8E75B2?style=flat-square&logo=google)](https://deepmind.google/technologies/gemini/)
+</div>
 
 ---
 
-## 🛠 기술 스택
+## 📖 Introduction
 
-| 영역 | 기술 |
-|:---|:---|
-| **Frontend** | Vue 3, Vite, Tailwind CSS, Pinia, Chart.js |
-| **Backend** | Spring Boot 3.5, Java 17, MyBatis, Spring Security |
-| **AI Service** | FastAPI, Python 3.9+, Google Gemini |
-| **Database** | MySQL 8.0 |
-| **External** | GitHub API (OAuth, Webhook), Solved.ac API |
+**DASH**는 알고리즘 스터디 운영의 고질적인 문제점(커리큘럼 부재, 형식적인 코드 리뷰, 수동 기록의 번거로움)을 기술적으로 해결하기 위해 개발된 **알고리즘 통합 플랫폼**입니다.
+
+Chrome Extension과 GitHub Webhook을 활용한 **Zero-Manual 파이프라인**을 구축하여, 사용자가 문제 풀이에만 집중하면 **기록, 분석, AI 피드백**까지 모든 과정이 자동으로 이루어집니다. Solved.ac 데이터를 기반으로 개인의 역량을 정밀 진단하고, RPG 게임 요소를 결합한 스킬 트리 시스템을 통해 성장의 즐거움을 제공합니다.
+
+### 💡 Core Value
+* **Zero-Manual Automation**: 문제 풀이 제출 시 자동 커밋, 코드 분석, 대시보드 갱신까지 원스톱 처리
+* **Data-Driven Growth**: Solved.ac 연동을 통한 객관적 실력 지표(Radar Chart) 및 취약점 분석
+* **AI Coaching**: Google Gemini 기반의 코드 복잡도 분석, 인라인 코드 리뷰, 맞춤형 힌트 제공
+* **Gamification**: RPG 스타일의 스킬 트리, 실전 모의고사, 랜덤 디펜스 게임
 
 ---
 
-## 🚀 시작하기
+## 🛠 Tech Stack
 
-### 백엔드
+### Backend (`/backend`)
+안정적인 데이터 처리와 확장성을 고려하여 **Hexagonal Architecture(Port-Adapter 패턴)** 지향 설계를 적용했습니다.
+* **Framework**: Spring Boot 3.5.8
+* **Language**: Java 17
+* **Persistence**: MyBatis 3.0.5, MySQL, H2 (Test)
+* **Security**: Spring Security, OAuth2 Client (GitHub), JWT
+* **API Documentation**: SpringDoc OpenAPI (Swagger) 2.8.5
+* **Architecture**: Domain-Driven Design (DDD) principles, Layered Architecture with DIP
+
+### Frontend (`/frontend`)
+사용자 경험(UX) 최적화와 시각적 데이터 표현에 중점을 두었습니다.
+* **Framework**: Vue 3 (Composition API)
+* **Build Tool**: Vite
+* **State Management**: Pinia
+* **Styling**: TailwindCSS, PostCSS
+* **Visualization**: Chart.js (통계), Vue Flow (스킬 트리/로드맵), D3.js
+* **Editor**: Monaco Editor (VS Code 경험 제공)
+
+### AI Server (`/ai`)
+LLM을 활용한 고품질 코드 분석 및 튜터링 서비스를 제공합니다.
+* **Framework**: FastAPI
+* **Model**: Google Gemini Pro (via `google-genai` SDK)
+* **Architecture**: Modular Service Layer, Pydantic Schema Validation
+
+---
+
+## 🏗 System Architecture
+
+DASH는 **Web Client**, **Backend API**, **AI Serving**, 그리고 **Chrome Extension**이 유기적으로 연결된 구조를 가집니다.
+
+```mermaid
+graph TD
+    User[User] -->|Submit Code| Ext[Chrome Extension]
+    Ext -->|Push Code| GitHub[GitHub Repository]
+    GitHub -->|Webhook Trigger| WAS[Spring Boot Backend]
+    
+    subgraph "DASH Core System"
+        WAS -->|Analyze Request| AI[AI Server (FastAPI)]
+        AI -->|Gemini API| LLM[Google Gemini]
+        AI -->|Analysis Result| WAS
+        WAS -->|Persist Data| DB[(MySQL)]
+    end
+    
+    User -->|View Dashboard| Web[Vue.js Client]
+    Web -->|API Call| WAS
+```
+
+### Key Engineering Decisions
+1.  **DIP(의존성 역전 원칙) 적용**: `Domain` 레이어를 외부 기술(Infrastructure)로부터 격리하여 비즈니스 로직의 순수성을 유지했습니다.
+2.  **비동기 이벤트 처리**: GitHub Webhook 수신 시, `GitHubPushEventWorker`를 통해 코드 분석 및 데이터 갱신 작업을 비동기로 처리하여 사용자 경험을 저해하지 않습니다.
+3.  **Chrome Extension 활용**: DOM 파싱의 불안정성을 제거하고, 실패한 코드(오답)까지 수집하여 학습 데이터로 활용합니다.
+
+---
+
+## 📂 Project Structure
+
+모노레포(Monorepo) 구조로 구성되어 있습니다.
+
+```bash
+utact/dash/
+├── backend/                # Spring Boot Application
+│   ├── src/main/java/com/ssafy/dash/
+│   │   ├── acorn/          # 재화(도토리) 도메인
+│   │   ├── ai/             # AI 서비스 연동
+│   │   ├── algorithm/      # 알고리즘 기록 관리
+│   │   ├── analytics/      # 통계 및 분석
+│   │   ├── board/          # 커뮤니티 게시판
+│   │   ├── defense/        # 디펜스 게임 로직
+│   │   ├── github/         # GitHub Webhook 처리
+│   │   ├── mockexam/       # 모의고사 시스템
+│   │   ├── problem/        # 문제 및 태그 관리
+│   │   └── study/          # 스터디 그룹 관리
+│   └── ...
+├── frontend/               # Vue.js Application
+│   ├── src/
+│   │   ├── api/            # Axios API 모듈
+│   │   ├── components/     # 재사용 가능한 UI 컴포넌트
+│   │   ├── views/          # 페이지 단위 뷰
+│   │   └── ...
+└── ai/                     # FastAPI AI Service
+    ├── app/
+    │   ├── api/            # Endpoints (Routes)
+    │   ├── core/           # LLM Prompts & Configs
+    │   └── services/       # Business Logic
+    └── ...
+```
+
+---
+
+## 🚀 Getting Started
+
+각 모듈별 설정이 필요합니다.
+
+### Prerequisites
+* Java JDK 17+
+* Node.js 18+
+* Python 3.10+
+* MySQL 8.0+
+
+### 1. Backend Setup
 ```bash
 cd backend
+# application.properties 설정 필요 (DB, OAuth, AI Server URL 등)
+./mvnw clean install
 ./mvnw spring-boot:run
 ```
-> MySQL 실행 필요. 설정: `backend/src/main/resources/application.properties`
 
-### 프론트엔드
+### 2. AI Server Setup
+```bash
+cd ai
+python -m venv venv
+source venv/bin/activate  # Windows: venv\Scripts\activate
+pip install -r requirements.txt
+# .env 파일 설정 필요 (GOOGLE_API_KEY 등)
+python app/main.py
+```
+
+### 3. Frontend Setup
 ```bash
 cd frontend
 npm install
-npm run dev    # http://localhost:5173
-```
-
-### AI 서비스
-```bash
-cd ai
-pip install -r requirements.txt
-uvicorn app.main:app --reload --port 8000
-```
-> `.env` 파일에 `GEMINI_API_KEY` 설정 필요
-
----
-
-## 📁 프로젝트 구조
-
-```
-├── backend/           # Spring Boot API 서버
-│   ├── src/main/java/com/ssafy/dash/
-│   │   ├── algorithm/     # 알고리즘 기록
-│   │   ├── ai/            # AI 연동
-│   │   ├── study/         # 스터디 관리
-│   │   ├── board/         # 게시판
-│   │   └── oauth/         # GitHub OAuth
-│   └── docs/              # 백엔드 문서
-├── frontend/          # Vue 3 클라이언트
-│   ├── src/views/         # 페이지 컴포넌트
-│   ├── src/components/    # 공통 컴포넌트
-│   └── DESIGN_SYSTEM.md   # 디자인 시스템
-├── ai/                # FastAPI AI 서버
-│   └── app/
-│       ├── services/      # AI 비즈니스 로직
-│       └── schemas/       # Pydantic 스키마
-└── docs/              # 프로젝트 문서
+npm run dev
 ```
 
 ---
 
-## 👥 팀원
+## ✨ Key Features Showcase
 
-| 이름 | 역할 |
-|:---|:---|
-| 김용수 | AI, BE, FE|
-| 유승준 | PM, BE ,FE|
+### 📊 AI Competency Analysis
+Solved.ac ID를 입력하면 3초 내에 사용자의 알고리즘 풀이 패턴을 분석하여 **Radar Chart**와 **강점/약점 태그**를 시각화합니다.
+
+### 🤖 Intelligent Code Review
+코드를 제출하는 즉시 AI가 다음 항목을 분석합니다:
+* **Time/Space Complexity**: Big-O 표기법 기반의 시간/공간 복잡도 자동 계산
+* **Context-Aware Intent Analysis**: 특정 변수나 메서드에 마우스를 올리면(Hover), 해당 코드의 **구현 의도**와 **핵심 기능**을 AI가 파악하여 설명합니다.
+* **Algorithm Pattern**: 사용된 주요 알고리즘 기법(DP, DFS 등)을 자동으로 분류하여 태깅합니다.
+
+### 🌲 RPG Skill Tree
+마치 게임을 하듯 알고리즘 스킬을 해금해 나갑니다. 선행 개념을 익혀야 상위 알고리즘 문제에 도전할 수 있는 체계적인 커리큘럼을 제공합니다.
 
 ---
 
-## 📄 라이선스
+## 👨‍💻 Contributors
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+| Role | Name | GitHub | Responsibility |
+|:---:|:---:|:---:|:---|
+| **PM / BE / FE** | **유승준** | [@utact](https://github.com/utact) | 기획, 시스템 설계, Backend Core, DB 모델링, Chrome Extension 개발 |
+| **AI / BE / FE** | **김용수** | [@canit0221](https://github.com/canit0221) | AI Modeling & Serving, Backend API 개발, Frontend Core, 데이터 시각화 |
+| **BE / FE** | **유소민** | [@SoMin-Yoo](https://github.com/SoMin-Yoo) | Chrome Extension 개발, UI/UX 최적화, QA 및 테스트, 코드 품질 관리 |
+
+---
+
+## 📜 License
+
+This project is licensed under the [MIT License](LICENSE).
