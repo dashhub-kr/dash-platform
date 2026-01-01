@@ -1,11 +1,10 @@
 package com.ssafy.dash.ai.application;
 
-import com.ssafy.dash.ai.client.AiServerClient;
-import com.ssafy.dash.ai.client.dto.AiCounterExampleRequest;
-import com.ssafy.dash.ai.client.dto.AiCounterExampleResponse;
-import com.ssafy.dash.ai.client.dto.AiSimulatorRequest;
-import com.ssafy.dash.ai.client.dto.AiSimulatorResponse;
-import com.ssafy.dash.ai.client.dto.AiSimulatorResponse;
+import com.ssafy.dash.ai.infrastructure.client.AiServerClient;
+import com.ssafy.dash.ai.infrastructure.client.dto.request.AiCounterExampleRequest;
+import com.ssafy.dash.ai.infrastructure.client.dto.response.AiCounterExampleResponse;
+import com.ssafy.dash.ai.infrastructure.client.dto.request.AiSimulatorRequest;
+import com.ssafy.dash.ai.infrastructure.client.dto.response.AiSimulatorResponse;
 import com.ssafy.dash.algorithm.domain.AlgorithmRecord;
 import com.ssafy.dash.algorithm.domain.AlgorithmRecordRepository;
 import lombok.RequiredArgsConstructor;

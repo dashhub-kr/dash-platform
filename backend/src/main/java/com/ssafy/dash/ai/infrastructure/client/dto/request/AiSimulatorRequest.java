@@ -1,4 +1,4 @@
-package com.ssafy.dash.ai.client.dto;
+package com.ssafy.dash.ai.infrastructure.client.dto.request;
 
 import lombok.Builder;
 import lombok.Getter;

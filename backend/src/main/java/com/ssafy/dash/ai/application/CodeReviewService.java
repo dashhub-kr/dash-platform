@@ -2,11 +2,10 @@ package com.ssafy.dash.ai.application;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.ssafy.dash.ai.client.AiServerClient;
-import com.ssafy.dash.ai.client.dto.CodeReviewRequest;
-import com.ssafy.dash.ai.client.dto.CodeReviewResponse;
-import com.ssafy.dash.ai.client.dto.CodeReviewResponse;
-import com.ssafy.dash.ai.client.dto.AiCounterExampleResponse;
+import com.ssafy.dash.ai.infrastructure.client.AiServerClient;
+import com.ssafy.dash.ai.infrastructure.client.dto.request.CodeReviewRequest;
+import com.ssafy.dash.ai.infrastructure.client.dto.response.CodeReviewResponse;
+import com.ssafy.dash.ai.infrastructure.client.dto.response.AiCounterExampleResponse;
 import com.ssafy.dash.ai.domain.CodeAnalysisResult;
 import com.ssafy.dash.ai.infrastructure.CodeAnalysisResultMapper;
 import lombok.RequiredArgsConstructor;

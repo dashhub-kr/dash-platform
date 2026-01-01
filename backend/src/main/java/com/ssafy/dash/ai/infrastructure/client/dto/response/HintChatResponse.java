@@ -1,4 +1,4 @@
-package com.ssafy.dash.ai.client.dto;
+package com.ssafy.dash.ai.infrastructure.client.dto.response;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
