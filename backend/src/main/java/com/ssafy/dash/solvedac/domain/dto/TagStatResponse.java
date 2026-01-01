@@ -1,4 +1,4 @@
-package com.ssafy.dash.external.solvedac.dto;
+package com.ssafy.dash.solvedac.domain.dto;
 
 import lombok.Getter;
 import lombok.Setter;

@@ -1,8 +1,9 @@
-package com.ssafy.dash.external.solvedac;
+package com.ssafy.dash.solvedac.domain;
 
-import com.ssafy.dash.external.solvedac.dto.ClassStatResponse;
-import com.ssafy.dash.external.solvedac.dto.SolvedacUserResponse;
-import com.ssafy.dash.external.solvedac.dto.TagStatResponse;
+import com.ssafy.dash.solvedac.domain.dto.ClassStatResponse;
+import com.ssafy.dash.solvedac.domain.dto.SolvedacUserResponse;
+import com.ssafy.dash.solvedac.domain.dto.TagStatResponse;
+import com.ssafy.dash.solvedac.domain.dto.Top100Response;
 import java.util.List;
 
 /**
@@ -31,5 +32,5 @@ public interface SolvedacApiClient {
      * 상위 100개 문제 조회
      * GET /user/top_100?handle={handle}
      */
-    com.ssafy.dash.external.solvedac.dto.Top100Response getTop100Problems(String handle);
+    Top100Response getTop100Problems(String handle);
 }
