@@ -6,8 +6,17 @@ import com.ssafy.dash.study.application.StudyMissionService;
 import com.ssafy.dash.study.application.StudyService;
 import com.ssafy.dash.study.domain.Study;
 import com.ssafy.dash.study.presentation.dto.CreateStudyRequest;
+import com.ssafy.dash.study.presentation.dto.request.ApplyStudyRequest;
+import com.ssafy.dash.study.presentation.dto.request.CreateMissionRequest;
+import com.ssafy.dash.study.presentation.dto.request.AddMissionProblemsRequest;
+import com.ssafy.dash.study.presentation.dto.request.UpdateMissionRequest;
+import com.ssafy.dash.study.presentation.dto.request.UpdateMissionStatusRequest;
 import com.ssafy.dash.study.presentation.dto.response.StudyListResponse;
 import com.ssafy.dash.study.presentation.dto.response.StudyStatsResponse;
+import com.ssafy.dash.study.application.dto.result.StudyAnalysisResult;
+import com.ssafy.dash.study.application.dto.result.TeamFamilyStatResult;
+import com.ssafy.dash.study.application.dto.result.MissionWithProgressResult;
+import com.ssafy.dash.study.application.dto.result.MemberProgressResult;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -143,8 +152,7 @@ public class StudyController {
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
     }
 
-    public record ApplyStudyRequest(String message) {
-    }
+
 
     @Operation(summary = "스터디 문제 풀이 통계 조회", description = "스터디의 티어별 문제 해결 수를 조회합니다.")
     @GetMapping("/{studyId}/stats")
@@ -162,21 +170,21 @@ public class StudyController {
 
     @Operation(summary = "스터디 팀 분석", description = "멤버별 태그 통계와 팀 평균을 조회합니다. 육각차트 표시용.")
     @GetMapping("/{studyId}/analysis")
-    public ResponseEntity<StudyAnalysisService.StudyAnalysisResult> getStudyAnalysis(
+    public ResponseEntity<StudyAnalysisResult> getStudyAnalysis(
             @PathVariable Long studyId) {
         return ResponseEntity.ok(studyAnalysisService.analyzeStudy(studyId));
     }
 
     @Operation(summary = "팀 패밀리 통계", description = "레이더차트용 팀 패밀리별 통계를 조회합니다.")
     @GetMapping("/{studyId}/family-stats")
-    public ResponseEntity<List<StudyAnalysisService.TeamFamilyStat>> getTeamFamilyStats(
+    public ResponseEntity<List<TeamFamilyStatResult>> getTeamFamilyStats(
             @PathVariable Long studyId) {
         return ResponseEntity.ok(studyAnalysisService.getTeamFamilyStats(studyId));
     }
 
     @Operation(summary = "커리큘럼 문제 추천", description = "팀 약점 기반 문제를 추천합니다.")
     @GetMapping("/{studyId}/curriculum")
-    public ResponseEntity<List<com.ssafy.dash.problem.domain.ProblemRecommendationResponse>> getCurriculum(
+    public ResponseEntity<List<com.ssafy.dash.problem.presentation.dto.response.ProblemRecommendationResponse>> getCurriculum(
             @PathVariable Long studyId) {
         return ResponseEntity.ok(studyAnalysisService.getCurriculumProblems(studyId));
     }
@@ -185,7 +193,7 @@ public class StudyController {
 
     @Operation(summary = "미션 목록 조회", description = "스터디의 주차별 미션 목록을 조회합니다.")
     @GetMapping("/{studyId}/missions")
-    public ResponseEntity<List<StudyMissionService.MissionWithProgress>> getMissions(
+    public ResponseEntity<List<MissionWithProgressResult>> getMissions(
             @Parameter(hidden = true) @AuthenticationPrincipal OAuth2User principal,
             @PathVariable Long studyId) {
         if (principal instanceof CustomOAuth2User customUser) {
@@ -206,7 +214,7 @@ public class StudyController {
 
     @Operation(summary = "미션 진행 현황", description = "미션별 멤버들의 제출 현황을 조회합니다.")
     @GetMapping("/{studyId}/missions/{missionId}/progress")
-    public ResponseEntity<List<StudyMissionService.MemberProgress>> getMissionProgress(
+    public ResponseEntity<List<MemberProgressResult>> getMissionProgress(
             @PathVariable Long studyId,
             @PathVariable Long missionId) {
         return ResponseEntity.ok(studyMissionService.getMissionProgress(missionId));
@@ -220,17 +228,6 @@ public class StudyController {
             @RequestBody AddMissionProblemsRequest request) {
         studyMissionService.addProblemsToMission(missionId, request.problemIds());
         return ResponseEntity.ok().build();
-    }
-
-    public record CreateMissionRequest(
-            Integer week,
-            String title,
-            List<Integer> problemIds,
-            java.time.LocalDate deadline) {
-    }
-
-    public record AddMissionProblemsRequest(
-            List<Integer> problemIds) {
     }
 
     @Operation(summary = "미션 정보 수정", description = "미션의 제목이나 마감일을 수정합니다.")
@@ -276,11 +273,6 @@ public class StudyController {
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
     }
 
-    public record UpdateMissionRequest(
-            String title,
-            java.time.LocalDate deadline) {
-    }
-
     @Operation(summary = "미션 상태 강제 변경 (완료 처리)", description = "스터디장이 미션을 강제로 완료(종료) 처리합니다.")
     @PatchMapping("/{studyId}/missions/{missionId}/status")
     public ResponseEntity<Void> updateMissionStatus(
@@ -291,8 +283,5 @@ public class StudyController {
             studyMissionService.completeMission(missionId);
         }
         return ResponseEntity.ok().build();
-    }
-
-    public record UpdateMissionStatusRequest(String status) {
     }
 }

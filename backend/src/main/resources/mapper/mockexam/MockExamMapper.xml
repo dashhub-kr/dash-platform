@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ssafy.dash.mockexam.infrastructure.mapper.MockExamMapper">
+
+  <insert id="insert" parameterType="MockExam" useGeneratedKeys="true" keyProperty="id">
+    INSERT INTO mock_exams (user_id, exam_type, problems, start_time, solved_count, status, created_at)
+    VALUES (#{userId}, #{examType}, #{problems}, #{startTime}, #{solvedCount}, #{status}, #{createdAt})
+  </insert>
+
+  <select id="selectActiveByUserId" resultType="MockExam" parameterType="long">
+    SELECT * FROM mock_exams 
+    WHERE user_id = #{userId} AND status = 'IN_PROGRESS'
+    ORDER BY created_at DESC
+    LIMIT 1
+  </select>
+
+  <select id="selectById" resultType="MockExam" parameterType="long">
+    SELECT * FROM mock_exams WHERE id = #{id}
+  </select>
+
+  <update id="update" parameterType="MockExam">
+    UPDATE mock_exams
+    SET exam_type = #{examType},
+        problems = #{problems},
+        start_time = #{startTime},
+        solved_count = #{solvedCount},
+        status = #{status}
+    WHERE id = #{id}
+  </update>
+
+  <update id="delete" parameterType="long">
+    DELETE FROM mock_exams WHERE id = #{id}
+  </update>
+
+</mapper>

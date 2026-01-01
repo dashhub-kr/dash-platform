@@ -1,9 +1,22 @@
 package com.ssafy.dash.ai.presentation;
 
-import com.ssafy.dash.ai.application.*;
-import com.ssafy.dash.ai.client.dto.*;
-import com.ssafy.dash.ai.presentation.dto.LearningDashboardResponse;
+import com.ssafy.dash.ai.application.AiLearningPathService;
+import com.ssafy.dash.ai.application.CodeReviewService;
+import com.ssafy.dash.ai.application.CodingStyleService;
+import com.ssafy.dash.ai.application.DebugService;
+import com.ssafy.dash.ai.application.TutorChatService;
+import com.ssafy.dash.ai.infrastructure.client.dto.request.AiCounterExampleRequest;
+import com.ssafy.dash.ai.infrastructure.client.dto.response.AiCounterExampleResponse;
+import com.ssafy.dash.ai.infrastructure.client.dto.request.AiSimulatorRequest;
+import com.ssafy.dash.ai.infrastructure.client.dto.response.AiSimulatorResponse;
+import com.ssafy.dash.ai.infrastructure.client.dto.response.CodingStyleResponse;
+import com.ssafy.dash.ai.infrastructure.client.dto.response.HintChatResponse;
+import com.ssafy.dash.ai.infrastructure.client.dto.request.HintChatRequest;
 import com.ssafy.dash.ai.domain.CodeAnalysisResult;
+import com.ssafy.dash.ai.presentation.dto.LearningDashboardResponse;
+import com.ssafy.dash.ai.presentation.dto.request.CodeReviewRequest;
+import com.ssafy.dash.ai.presentation.dto.request.HintChatRequestDto;
+import com.ssafy.dash.ai.presentation.dto.response.HintChatResponseDto;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
@@ -129,71 +142,5 @@ public class AiController {
         @PostMapping("/simulator/run")
         public ResponseEntity<AiSimulatorResponse> runSimulation(@RequestBody AiSimulatorRequest request) {
                 return ResponseEntity.ok(debugService.simulate(request.getCode(), request.getLanguage()));
-        }
-
-        // === DTOs ===
-
-        public record CodeReviewRequest(
-                        Long algorithmRecordId,
-                        String code,
-                        String language,
-                        String problemNumber,
-                        String platform,
-                        String problemTitle) {
-        }
-
-        public record HintRequest(
-                        Long userId,
-                        String problemNumber,
-                        String problemTitle,
-                        int level) {
-        }
-
-        public record TutorChatRequestDto(
-                        Long userId,
-                        String sessionId, // nullable - 새 세션이면 null
-                        String message,
-                        String problemNumber,
-                        String code) {
-        }
-
-        // === AI Tutor Chat DTOs ===
-
-        public record HintChatRequestDto(
-                        Long userId, // 사용자 ID (필수)
-                        Long recordId, // 알고리즘 기록 ID (권장 - DB에서 코드/문제 조회)
-                        String message, // 사용자 메시지 (필수)
-                        String solveStatus, // "solved" | "wrong" (필수)
-                        String wrongReason, // 틀린 이유 (시간초과, 틀렸습니다 등)
-                        List<ChatMessageDto> history,
-                        // Fallback fields (recordId가 없을 때 사용)
-                        String problemNumber,
-                        String problemTitle,
-                        String code,
-                        String language,
-                        UserContextDto userContext) {
-        }
-
-        public record ChatMessageDto(String role, String content) {
-        }
-
-        public record UserContextDto(String tierName, int solvedCount, List<String> weakTags) {
-        }
-
-        public record HintChatResponseDto(
-                        String reply,
-                        String teachingStyle,
-                        List<String> followUpQuestions,
-                        List<String> relatedConcepts,
-                        String encouragement) {
-
-                public static HintChatResponseDto from(HintChatResponse response) {
-                        return new HintChatResponseDto(
-                                        response.getReply(),
-                                        response.getTeachingStyle(),
-                                        response.getFollowUpQuestions(),
-                                        response.getRelatedConcepts(),
-                                        response.getEncouragement());
-                }
         }
 }

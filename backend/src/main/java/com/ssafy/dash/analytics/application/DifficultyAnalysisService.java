@@ -1,7 +1,7 @@
 package com.ssafy.dash.analytics.application;
 
-import com.ssafy.dash.analytics.application.dto.ClassProgressDto;
-import com.ssafy.dash.analytics.application.dto.DifficultyAnalysisDto;
+import com.ssafy.dash.analytics.application.dto.response.ClassProgressDto;
+import com.ssafy.dash.analytics.application.dto.response.DifficultyAnalysisDto;
 import com.ssafy.dash.analytics.domain.UserClassStat;
 import com.ssafy.dash.analytics.infrastructure.persistence.UserClassStatMapper;
 import lombok.RequiredArgsConstructor;

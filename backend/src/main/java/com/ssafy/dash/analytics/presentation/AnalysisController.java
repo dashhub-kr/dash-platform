@@ -1,12 +1,13 @@
 package com.ssafy.dash.analytics.presentation;
 
+import com.ssafy.dash.analytics.application.AnalyticsService;
 import com.ssafy.dash.analytics.application.BalanceAnalysisService;
 import com.ssafy.dash.analytics.application.DifficultyAnalysisService;
 import com.ssafy.dash.analytics.application.GrowthAnalysisService;
-import com.ssafy.dash.analytics.application.LearningPathService;
+import com.ssafy.dash.analytics.application.RuleBasedLearningPathService;
 import com.ssafy.dash.analytics.application.StatsSnapshotService;
 import com.ssafy.dash.analytics.application.UserSkillAnalysisService;
-import com.ssafy.dash.analytics.application.dto.*;
+import com.ssafy.dash.analytics.application.dto.response.*;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
@@ -27,11 +28,24 @@ public class AnalysisController {
     private final UserSkillAnalysisService analysisService;
     private final BalanceAnalysisService balanceService;
     private final DifficultyAnalysisService difficultyService;
-    private final LearningPathService learningPathService;
+    private final RuleBasedLearningPathService learningPathService;
     private final GrowthAnalysisService growthService;
     private final StatsSnapshotService snapshotService;
+    private final AnalyticsService analyticsService;
 
     // === Phase 1: 기본 분석 ===
+
+    @Operation(summary = "레이더 차트 데이터", description = "사용자의 패밀리별 점수 분포를 반환합니다.")
+    @GetMapping("/radar")
+    public ResponseEntity<List<FamilyScoreDto>> getRadar(@PathVariable Long userId) {
+        return ResponseEntity.ok(analyticsService.getUserFamilyScores(userId));
+    }
+
+    @Operation(summary = "코어 태그 커버리지", description = "코어 태그(S/A 티어) 달성 현황을 반환합니다.")
+    @GetMapping("/coverage")
+    public ResponseEntity<TagCoverageDto> getCoverage(@PathVariable Long userId) {
+        return ResponseEntity.ok(analyticsService.getUserCoreCoverage(userId));
+    }
 
     @Operation(summary = "종합 스킬 요약", description = "사용자의 종합적인 알고리즘 실력 분석 결과를 반환합니다.")
     @GetMapping("/summary")

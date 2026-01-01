@@ -239,7 +239,7 @@ public class GitHubPushEventWorker {
                 tag = "MISSION";
             }
             // 2. Mock Exam Check
-            else if (user.getExamType() != null && isProblemInList(user.getExamProblems(), problemId)) {
+            else if (mockExamService.isActiveProblem(userId, problemId)) {
                 tag = "MOCK_EXAM";
             }
             // 3. Random Defense Check (Check defenseProblemId)
@@ -281,19 +281,6 @@ public class GitHubPushEventWorker {
         }
 
         return record;
-    }
-
-    private boolean isProblemInList(String problemsJson, Integer problemId) {
-        if (!StringUtils.hasText(problemsJson) || problemId == null) {
-            return false;
-        }
-        try {
-            List<Integer> problems = objectMapper.readValue(problemsJson, new TypeReference<List<Integer>>() {
-            });
-            return problems.contains(problemId);
-        } catch (JsonProcessingException e) {
-            return false;
-        }
     }
 
     private record QueuedPushFile(

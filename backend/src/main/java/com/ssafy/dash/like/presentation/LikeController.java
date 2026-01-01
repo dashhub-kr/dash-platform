@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.ssafy.dash.like.application.LikeService;
-import com.ssafy.dash.like.application.dto.LikeResponse;
+import com.ssafy.dash.like.presentation.dto.response.LikeResponse;
 import com.ssafy.dash.oauth.presentation.security.CustomOAuth2User;
 
 import io.swagger.v3.oas.annotations.Parameter;

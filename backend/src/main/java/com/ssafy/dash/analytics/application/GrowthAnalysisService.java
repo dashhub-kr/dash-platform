@@ -1,7 +1,7 @@
 package com.ssafy.dash.analytics.application;
 
-import com.ssafy.dash.analytics.application.dto.GrowthTrendDto;
-import com.ssafy.dash.analytics.application.dto.TagGrowthDto;
+import com.ssafy.dash.analytics.application.dto.response.GrowthTrendDto;
+import com.ssafy.dash.analytics.application.dto.response.TagGrowthDto;
 import com.ssafy.dash.analytics.domain.UserStatsSnapshot;
 import com.ssafy.dash.analytics.domain.UserTagStat;
 import com.ssafy.dash.analytics.infrastructure.persistence.UserStatsSnapshotMapper;
@@ -24,21 +24,6 @@ public class GrowthAnalysisService {
     private final UserStatsSnapshotMapper snapshotMapper;
     private final UserTagStatMapper tagStatMapper;
     private final StatsSnapshotService snapshotService;
-
-    // 태그 이름 매핑
-    private static final Map<String, String> TAG_NAMES = Map.ofEntries(
-            Map.entry("implementation", "구현"),
-            Map.entry("math", "수학"),
-            Map.entry("dp", "다이나믹 프로그래밍"),
-            Map.entry("data_structures", "자료 구조"),
-            Map.entry("graphs", "그래프 이론"),
-            Map.entry("greedy", "그리디 알고리즘"),
-            Map.entry("string", "문자열"),
-            Map.entry("bruteforcing", "브루트포스"),
-            Map.entry("sorting", "정렬"),
-            Map.entry("bfs", "너비 우선 탐색"),
-            Map.entry("dfs", "깊이 우선 탐색"),
-            Map.entry("binary_search", "이분 탐색"));
 
     /**
      * 성장 추세 분석
@@ -118,7 +103,4 @@ public class GrowthAnalysisService {
                 .build();
     }
 
-    private String getTagName(String tagKey) {
-        return TAG_NAMES.getOrDefault(tagKey, tagKey);
-    }
 }

@@ -13,6 +13,8 @@ import com.ssafy.dash.user.domain.User;
 import com.ssafy.dash.user.domain.UserRepository;
 import com.ssafy.dash.user.domain.exception.UserNotFoundException;
 
+import com.ssafy.dash.defense.application.dto.result.DefenseStatusResult;
+
 @Service
 @Transactional
 public class DefenseService {
@@ -167,13 +169,5 @@ public class DefenseService {
                 .collect(java.util.stream.Collectors.toList());
     }
 
-    public record DefenseStatusResult(
-            String defenseType,
-            Integer defenseProblemId,
-            LocalDateTime defenseStartTime,
-            Integer silverStreak,
-            Integer goldStreak,
-            Integer maxSilverStreak,
-            Integer maxGoldStreak) {
-    }
+
 }

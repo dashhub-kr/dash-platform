@@ -25,16 +25,16 @@ import com.ssafy.dash.onboarding.presentation.dto.request.RepositorySetupRequest
 import com.ssafy.dash.onboarding.presentation.dto.response.RepositorySetupResponse;
 import com.ssafy.dash.onboarding.presentation.dto.response.RepositorySearchResponse;
 import com.ssafy.dash.onboarding.presentation.dto.response.SolvedacVerifyResponse;
-import com.ssafy.dash.external.solvedac.SolvedacApiClient;
-import com.ssafy.dash.external.solvedac.dto.SolvedacUserResponse;
-import com.ssafy.dash.external.solvedac.SolvedacApiException;
+import com.ssafy.dash.solvedac.domain.SolvedacApiClient;
+import com.ssafy.dash.solvedac.domain.SolvedacUser;
+import com.ssafy.dash.solvedac.domain.exception.SolvedacApiException;
 import com.ssafy.dash.github.domain.GitHubClient;
 import com.ssafy.dash.github.domain.RepositoryInfo;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import com.ssafy.dash.analytics.application.SolvedacSyncService;
-import com.ssafy.dash.analytics.application.dto.RegisterHandleRequest;
+import com.ssafy.dash.analytics.application.dto.request.RegisterHandleRequest;
 
 @RestController
 @RequestMapping("/api/onboarding")
@@ -60,7 +60,7 @@ public class OnboardingController {
     public ResponseEntity<SolvedacVerifyResponse> verifySolvedacHandle(
             @RequestParam String handle) {
         try {
-            SolvedacUserResponse userResponse = solvedacApiClient.getUserInfo(handle.trim());
+            SolvedacUser userResponse = solvedacApiClient.getUserInfo(handle.trim());
             return ResponseEntity.ok(SolvedacVerifyResponse.from(userResponse));
         } catch (SolvedacApiException e) {
             return ResponseEntity.notFound().build();

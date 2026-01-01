@@ -1,6 +1,5 @@
 package com.ssafy.dash.mockexam.presentation;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 import org.springframework.http.ResponseEntity;
@@ -13,6 +12,9 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.ssafy.dash.mockexam.application.MockExamService;
 import com.ssafy.dash.mockexam.domain.MockExamType;
+import com.ssafy.dash.mockexam.presentation.dto.request.StartExamRequest;
+import com.ssafy.dash.mockexam.presentation.dto.response.ExamStatusResponse;
+import com.ssafy.dash.mockexam.presentation.dto.response.ExamTypeInfoResponse;
 import com.ssafy.dash.oauth.presentation.security.CustomOAuth2User;
 
 @RestController
@@ -56,37 +58,13 @@ public class MockExamController {
     }
 
     @GetMapping("/types")
-    public ResponseEntity<List<ExamTypeInfo>> getExamTypes() {
-        List<ExamTypeInfo> types = List.of(
-                new ExamTypeInfo("IM", "IM 모의고사", "모의고사", 1, 2, "IM 등급 대비"),
-                new ExamTypeInfo("A", "A형 모의고사", "모의고사", 2, 2, "A형 대비 (1문제=A, 2문제=A+)"),
-                new ExamTypeInfo("B", "B형 모의고사", "모의고사", 1, 4, "B형 대비"),
-                new ExamTypeInfo("SAMSUNG", "삼성 코딩테스트", "코딩테스트", 3, 2, "삼성 기출 문제"),
-                new ExamTypeInfo("KAKAO", "카카오 코딩테스트", "코딩테스트", 3, 2, "카카오 문제"));
+    public ResponseEntity<List<ExamTypeInfoResponse>> getExamTypes() {
+        List<ExamTypeInfoResponse> types = List.of(
+                new ExamTypeInfoResponse("IM", "IM 모의고사", "모의고사", 1, 2, "IM 등급 대비"),
+                new ExamTypeInfoResponse("A", "A형 모의고사", "모의고사", 2, 2, "A형 대비 (1문제=A, 2문제=A+)"),
+                new ExamTypeInfoResponse("B", "B형 모의고사", "모의고사", 1, 4, "B형 대비"),
+                new ExamTypeInfoResponse("SAMSUNG", "삼성 코딩테스트", "코딩테스트", 3, 2, "삼성 기출 문제"),
+                new ExamTypeInfoResponse("KAKAO", "카카오 코딩테스트", "코딩테스트", 3, 2, "카카오 문제"));
         return ResponseEntity.ok(types);
-    }
-
-    public record ExamStatusResponse(
-            String examType,
-            String displayName,
-            String category,
-            List<Integer> problems,
-            List<Integer> solvedProblems,
-            LocalDateTime startTime,
-            int timeLimitHours,
-            int solvedCount,
-            int totalCount) {
-    }
-
-    public record StartExamRequest(String examType) {
-    }
-
-    public record ExamTypeInfo(
-            String type,
-            String displayName,
-            String category,
-            int problemCount,
-            int timeLimitHours,
-            String description) {
     }
 }

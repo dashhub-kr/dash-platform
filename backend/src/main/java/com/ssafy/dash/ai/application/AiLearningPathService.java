@@ -1,9 +1,9 @@
 package com.ssafy.dash.ai.application;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.ssafy.dash.ai.client.AiServerClient;
-import com.ssafy.dash.ai.client.dto.LearningPathRequest;
-import com.ssafy.dash.ai.client.dto.LearningPathResponse;
+import com.ssafy.dash.ai.infrastructure.client.AiServerClient;
+import com.ssafy.dash.ai.infrastructure.client.dto.request.LearningPathRequest;
+import com.ssafy.dash.ai.infrastructure.client.dto.response.LearningPathResponse;
 import com.ssafy.dash.ai.domain.LearningPathCache;
 import com.ssafy.dash.ai.infrastructure.persistence.LearningPathCacheMapper;
 import com.ssafy.dash.ai.presentation.dto.LearningDashboardResponse;

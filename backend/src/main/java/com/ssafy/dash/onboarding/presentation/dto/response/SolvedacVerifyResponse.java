@@ -1,6 +1,6 @@
 package com.ssafy.dash.onboarding.presentation.dto.response;
 
-import com.ssafy.dash.external.solvedac.dto.SolvedacUserResponse;
+import com.ssafy.dash.solvedac.domain.SolvedacUser;
 import lombok.Builder;
 import lombok.Getter;
 
@@ -27,18 +27,18 @@ public class SolvedacVerifyResponse {
             "Ruby V", "Ruby IV", "Ruby III", "Ruby II", "Ruby I",
             "Master" };
 
-    public static SolvedacVerifyResponse from(SolvedacUserResponse userResponse) {
-        int tier = userResponse.getTier() != null ? userResponse.getTier() : 0;
+    public static SolvedacVerifyResponse from(SolvedacUser userResponse) {
+        int tier = userResponse.tier();
         String tierName = tier >= 0 && tier < TIER_NAMES.length ? TIER_NAMES[tier] : "Unknown";
 
         return SolvedacVerifyResponse.builder()
-                .handle(userResponse.getHandle())
+                .handle(userResponse.handle())
                 .tier(tier)
                 .tierName(tierName)
-                .profileImageUrl(userResponse.getProfileImageUrl())
-                .solvedCount(userResponse.getSolvedCount())
-                .classLevel(userResponse.getClassLevel())
-                .rating(userResponse.getRating())
+                .profileImageUrl(userResponse.profileImageUrl())
+                .solvedCount(userResponse.solvedCount())
+                .classLevel(userResponse.classLevel())
+                .rating(userResponse.rating())
                 .build();
     }
 }

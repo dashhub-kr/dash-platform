@@ -1,7 +1,7 @@
 package com.ssafy.dash.analytics.presentation;
 
 import com.ssafy.dash.analytics.application.SolvedacSyncService;
-import com.ssafy.dash.analytics.application.dto.RegisterHandleRequest;
+import com.ssafy.dash.analytics.application.dto.request.RegisterHandleRequest;
 import com.ssafy.dash.analytics.domain.UserClassStat;
 import com.ssafy.dash.analytics.domain.UserClassStatRepository;
 import com.ssafy.dash.analytics.domain.UserTagStat;

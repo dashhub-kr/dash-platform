@@ -1,8 +1,8 @@
 package com.ssafy.dash.ai.presentation.dto;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.ssafy.dash.ai.client.dto.LearningPathResponse;
-import com.ssafy.dash.ai.client.dto.LearningPathRequest;
+import com.ssafy.dash.ai.infrastructure.client.dto.response.LearningPathResponse;
+import com.ssafy.dash.ai.infrastructure.client.dto.request.LearningPathRequest;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;

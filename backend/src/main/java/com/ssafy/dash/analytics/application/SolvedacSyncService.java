@@ -4,10 +4,10 @@ import com.ssafy.dash.analytics.domain.UserClassStat;
 import com.ssafy.dash.analytics.domain.UserClassStatRepository;
 import com.ssafy.dash.analytics.domain.UserTagStat;
 import com.ssafy.dash.analytics.domain.UserTagStatRepository;
-import com.ssafy.dash.external.solvedac.SolvedacApiClient;
-import com.ssafy.dash.external.solvedac.dto.ClassStatResponse;
-import com.ssafy.dash.external.solvedac.dto.SolvedacUserResponse;
-import com.ssafy.dash.external.solvedac.dto.TagStatResponse;
+import com.ssafy.dash.solvedac.domain.SolvedacApiClient;
+import com.ssafy.dash.solvedac.domain.ClassStat;
+import com.ssafy.dash.solvedac.domain.SolvedacUser;
+import com.ssafy.dash.solvedac.domain.TagStat;
 import com.ssafy.dash.user.domain.User;
 import com.ssafy.dash.user.domain.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -39,19 +39,14 @@ public class SolvedacSyncService {
         log.info("Registering Solved.ac handle for user {}: {}", userId, handle);
 
         // 1. 사용자 기본 정보 조회
-        SolvedacUserResponse userInfo = solvedacClient.getUserInfo(handle);
+        SolvedacUser userInfo = solvedacClient.getUserInfo(handle);
 
         // 2. User 테이블 업데이트
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("User not found: " + userId));
 
-        // 프로필 이미지가 제공되면 사용, 아니면 solved.ac 이미지 사용 (또는 기존 로직 유지)
-        // 여기서는 random profile image가 우선순위가 높다고 가정 (가입 시점)
-        // 하지만 solved.ac 정보도 중요하므로, profileImageUrl이 있으면 그걸 쓰고, 없으면 기존 로직?
-        // User.updateSolvedacProfile does not update avatarUrl. We need to handle it.
-
-        user.updateSolvedacProfile(handle, userInfo.getTier(),
-                userInfo.getRating(), userInfo.getClassLevel(), userInfo.getSolvedCount());
+        user.updateSolvedacProfile(handle, userInfo.tier(),
+                userInfo.rating(), userInfo.classLevel(), userInfo.solvedCount());
 
         if (profileImageUrl != null && !profileImageUrl.isBlank()) {
             user.setAvatarUrl(profileImageUrl);
@@ -76,17 +71,17 @@ public class SolvedacSyncService {
      */
     @Transactional
     public void syncClassStats(Long userId, String handle) {
-        List<ClassStatResponse> classStats = solvedacClient.getClassStats(handle);
+        List<ClassStat> classStats = solvedacClient.getClassStats(handle);
 
         classStats.forEach(stat -> {
             UserClassStat entity = UserClassStat.create(
                     userId,
-                    stat.getClassNumber(),
-                    stat.getTotal(),
-                    stat.getTotalSolved(),
-                    stat.getEssentials(),
-                    stat.getEssentialSolved(),
-                    stat.getDecoration());
+                    stat.classNumber(),
+                    stat.total(),
+                    stat.totalSolved(),
+                    stat.essentials(),
+                    stat.essentialSolved(),
+                    stat.decoration());
             classStatRepository.save(entity);
         });
 
@@ -98,20 +93,20 @@ public class SolvedacSyncService {
      */
     @Transactional
     public void syncTagStats(Long userId, String handle) {
-        TagStatResponse response = solvedacClient.getTagStats(handle);
+        TagStat response = solvedacClient.getTagStats(handle);
 
-        response.getItems().forEach(item -> {
+        response.items().forEach(item -> {
             UserTagStat entity = UserTagStat.create(
                     userId,
-                    item.getTag().getKey(),
-                    item.getTotal(),
-                    item.getSolved(),
-                    item.getPartial(),
-                    item.getTried());
+                    item.tag().key(),
+                    item.total(),
+                    item.solved(),
+                    item.partial(),
+                    item.tried());
             tagStatRepository.save(entity);
         });
 
-        log.info("Synced {} tag stats for user {}", response.getCount(), userId);
+        log.info("Synced {} tag stats for user {}", response.count(), userId);
     }
 
     /**
@@ -126,8 +121,8 @@ public class SolvedacSyncService {
                 .collect(java.util.stream.Collectors.toSet());
 
         int count = 0;
-        for (var item : response.getItems()) {
-            if (existingProblemNumbers.contains(item.getProblemId())) {
+        for (var item : response.items()) {
+            if (existingProblemNumbers.contains(item.problemId())) {
                 continue;
             }
 
@@ -136,8 +131,8 @@ public class SolvedacSyncService {
                     .create(
                             userId,
                             null, // studyId
-                            item.getProblemId(),
-                            item.getTitleKo(),
+                            item.problemId(),
+                            item.titleKo(),
                             "none", // 언어 필수
                             "", // 코드 없음
                             LocalDateTime.now());
@@ -145,7 +140,7 @@ public class SolvedacSyncService {
             // 난이도(레벨) 등의 메타데이터 추가
             record.enrichMetadata(
                     "BOJ",
-                    String.valueOf(item.getLevel()),
+                    String.valueOf(item.level()),
                     null,
                     null,
                     "Solved.ac Sync",

@@ -60,8 +60,10 @@ public class StudyService {
             throw new IllegalStateException("User already belongs to a study");
         }
 
-        Study study = studyRepository.findById(studyId)
-                .orElseThrow(() -> new IllegalArgumentException("Study not found"));
+        // Check if study exists
+        if (studyRepository.findById(studyId).isEmpty()) {
+            throw new IllegalArgumentException("Study not found");
+        }
 
         // Check if already applied
         if (studyRepository.findApplicationByStudyIdAndUserId(studyId, userId).isPresent()) {

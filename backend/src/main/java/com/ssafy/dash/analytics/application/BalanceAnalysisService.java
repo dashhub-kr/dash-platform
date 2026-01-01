@@ -1,6 +1,6 @@
 package com.ssafy.dash.analytics.application;
 
-import com.ssafy.dash.analytics.application.dto.BalanceAnalysisDto;
+import com.ssafy.dash.analytics.application.dto.response.BalanceAnalysisDto;
 import com.ssafy.dash.analytics.domain.UserTagStat;
 import com.ssafy.dash.analytics.infrastructure.persistence.UserTagStatMapper;
 import lombok.RequiredArgsConstructor;

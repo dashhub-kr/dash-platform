@@ -11,6 +11,7 @@ public enum ErrorCode {
     WEBHOOK_REGISTRATION_FAILED(HttpStatus.BAD_GATEWAY, "WEBHOOK_REGISTRATION_FAILED", "GitHub 웹훅 등록에 실패했습니다."),
     VALIDATION_FAILED(HttpStatus.BAD_REQUEST, "VALIDATION_FAILED", "요청 값이 올바르지 않습니다."),
     RESOURCE_NOT_FOUND(HttpStatus.NOT_FOUND, "RESOURCE_NOT_FOUND", "요청한 리소스를 찾을 수 없습니다."),
+    UNAUTHORIZED_ACCESS(HttpStatus.FORBIDDEN, "UNAUTHORIZED_ACCESS", "접근 권한이 없습니다."),
     INTERNAL_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "INTERNAL_SERVER_ERROR", "예상치 못한 오류가 발생했습니다.");
 
     private final HttpStatus status;

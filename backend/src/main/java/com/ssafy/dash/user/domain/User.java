@@ -39,12 +39,6 @@ public class User {
     private Integer maxSilverStreak = 0;
     private Integer maxGoldStreak = 0;
 
-    // 모의고사/코딩테스트 필드
-    private String examType; // IM, A, B, SAMSUNG, KAKAO
-    private String examProblems; // JSON 배열 "[1234, 5678, 9012]"
-    private LocalDateTime examStartTime;
-    private Integer examSolvedCount;
-
     private User(Long id, String username, String email, LocalDateTime createdAt,
             String provider, String providerId, String avatarUrl) {
         this.id = id;
