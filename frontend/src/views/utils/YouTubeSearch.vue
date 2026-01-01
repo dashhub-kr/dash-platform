@@ -83,7 +83,7 @@
 <script setup>
 import { ref } from 'vue';
 import { Youtube, Search, Play } from 'lucide-vue-next';
-import { youtubeApi } from '../api/youtube';
+import { youtubeApi } from '@/api/youtube';
 
 const keyword = ref('');
 const videos = ref([]);

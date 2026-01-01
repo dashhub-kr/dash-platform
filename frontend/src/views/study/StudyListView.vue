@@ -79,7 +79,7 @@
 import { ref, onMounted } from 'vue';
 import axios from 'axios';
 import { Trophy, Flame } from 'lucide-vue-next';
-import StudyExplorer from '../../components/study/StudyExplorer.vue';
+import StudyExplorer from '@/components/study/StudyExplorer.vue';
 
 const studies = ref([]);
 

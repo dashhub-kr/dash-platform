@@ -170,7 +170,7 @@
 import { ref, computed, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
 import { PenSquare, Inbox, ThumbsUp, MessageCircle, Search, Flame, Lightbulb } from 'lucide-vue-next';
-import { boardApi } from '../api/board';
+import { boardApi } from '@/api/board';
 
 const router = useRouter();
 const posts = ref([]);

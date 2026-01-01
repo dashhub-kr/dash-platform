@@ -149,14 +149,14 @@ import {
     Search, Loader2, Send, RotateCcw, LayoutGrid,
     Map as MapIcon, FileText, TrendingUp, Target, Activity, AlertTriangle, Zap
 } from 'lucide-vue-next';
-import AlgorithmRadarChart from '../components/charts/AlgorithmRadarChart.vue';
-import LearningRoadmap from '../components/skill/LearningRoadmap.vue';
-import SkillTreeView from '../components/skill/SkillTreeView.vue';
-import SkillAnalysisCard from '../components/skill/SkillAnalysisCard.vue';
-import LectureModal from '../components/lecture/LectureModal.vue';
-import AiAnalysisReport from '../components/ai/AiAnalysisReport.vue';
+import AlgorithmRadarChart from '@/components/charts/AlgorithmRadarChart.vue';
+import LearningRoadmap from '@/components/skill/LearningRoadmap.vue';
+import SkillTreeView from '@/components/skill/SkillTreeView.vue';
+import SkillAnalysisCard from '@/components/skill/SkillAnalysisCard.vue';
+import LectureModal from '@/components/lecture/LectureModal.vue';
+import AiAnalysisReport from '@/components/ai/AiAnalysisReport.vue';
 import { useAuth } from '@/composables/useAuth';
-import { aiApi } from '../api/ai';
+import { aiApi } from '@/api/ai';
 import { marked } from 'marked';
 
 // 상태

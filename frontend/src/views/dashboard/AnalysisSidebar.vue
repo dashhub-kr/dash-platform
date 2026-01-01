@@ -343,7 +343,7 @@
 <script setup>
 import { ref, watch, computed, nextTick } from 'vue';
 import { ExternalLink, ChevronDown, Bot, Bug, Send, Loader2, Activity, LayoutList, Lightbulb, Tag, MessageSquare, Wand2, CheckCircle2, BookOpen, Footprints, HelpCircle, Trophy, Copy, Key, Sparkles, MessageCircle, Brain, Zap } from 'lucide-vue-next';
-import { aiApi } from '../../api/ai'; 
+import { aiApi } from '@/api/ai'; 
 import { useAuth } from '@/composables/useAuth';
 import { marked } from 'marked';
 import hljs from 'highlight.js';

@@ -64,15 +64,15 @@
 import { ref, onMounted, computed } from 'vue';
 import { useRouter } from 'vue-router';
 // Components
-import AlgorithmRadarChart from '../../components/charts/AlgorithmRadarChart.vue';
-import LearningRoadmap from '../../components/skill/LearningRoadmap.vue';
-import ClassBadgeGrid from '../../components/study/ClassBadgeGrid.vue';
-import SkillAnalysisCard from '../../components/skill/SkillAnalysisCard.vue';
-import AiAnalysisReport from '../../components/ai/AiAnalysisReport.vue';
+import AlgorithmRadarChart from '@/components/charts/AlgorithmRadarChart.vue';
+import LearningRoadmap from '@/components/skill/LearningRoadmap.vue';
+import ClassBadgeGrid from '@/components/study/ClassBadgeGrid.vue';
+import SkillAnalysisCard from '@/components/skill/SkillAnalysisCard.vue';
+import AiAnalysisReport from '@/components/ai/AiAnalysisReport.vue';
 // API
-import { aiApi } from '../../api/ai';
+import { aiApi } from '@/api/ai';
 import { useAuth } from '@/composables/useAuth';
-import { onboardingApi } from '../../api/onboarding'; // To verify if user info needed again
+import { onboardingApi } from '@/api/onboarding'; // To verify if user info needed again
 
 const router = useRouter();
 const { user, refresh } = useAuth();

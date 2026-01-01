@@ -142,7 +142,7 @@
 <script setup>
 import { ref, onMounted } from "vue";
 import { useRouter } from "vue-router";
-import { onboardingApi } from "../../api/onboarding";
+import { onboardingApi } from "@/api/onboarding";
 import { Puzzle, Loader2, Folder, Lock, Check, CheckCircle2 } from 'lucide-vue-next';
 
 const router = useRouter();

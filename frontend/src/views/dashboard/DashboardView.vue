@@ -356,16 +356,16 @@
 <script setup>
 import { ref, onMounted, computed, watch, nextTick } from 'vue';
 import { useRouter } from 'vue-router';
-import { dashboardApi } from '../api/dashboard';
-import { studyApi } from '../api/study';
+import { dashboardApi } from '@/api/dashboard';
+import { studyApi } from '@/api/study';
 import { useAuth } from '@/composables/useAuth';
-import DashboardRecordCard from './dashboard/DashboardRecordCard.vue';
-import AnalysisSidebar from './dashboard/AnalysisSidebar.vue';
-import http from '../api/http';
-import { aiApi } from '../api/ai';
-import AlgorithmRadarChart from '../components/charts/AlgorithmRadarChart.vue';
-import AiDrawer from '../components/ai/AiDrawer.vue';
-import IconAcorn from '../components/icons/IconAcorn.vue';
+import DashboardRecordCard from './DashboardRecordCard.vue';
+import AnalysisSidebar from './AnalysisSidebar.vue';
+import http from '@/api/http';
+import { aiApi } from '@/api/ai';
+import AlgorithmRadarChart from '@/components/charts/AlgorithmRadarChart.vue';
+import AiDrawer from '@/components/ai/AiDrawer.vue';
+import IconAcorn from '@/components/icons/IconAcorn.vue';
 import { 
   Bot, 
   Lightbulb, 

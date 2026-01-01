@@ -112,9 +112,9 @@
 <script setup>
 import { ref, watch, computed, nextTick } from 'vue';
 import { ExternalLink, ChevronDown, ChevronUp, Bot, Bug, Send, Loader2, Activity, LayoutList, Lightbulb, Tag, MessageSquare, Wand2, CheckCircle2, BookOpen, Footprints, HelpCircle, Trophy, Clock, Check, X, Shield, ShieldAlert, Package, Key, Flame, Sparkles, MessageCircle, Copy } from 'lucide-vue-next';
-import CodeViewer from '../../components/editor/CodeViewer.vue';
-import { boardApi, commentApi } from '../../api/board';
-import { aiApi } from '../../api/ai'; 
+import CodeViewer from '@/components/editor/CodeViewer.vue';
+import { boardApi, commentApi } from '@/api/board';
+import { aiApi } from '@/api/ai'; 
 import { useAuth } from '@/composables/useAuth';
 import { marked } from 'marked';
 
