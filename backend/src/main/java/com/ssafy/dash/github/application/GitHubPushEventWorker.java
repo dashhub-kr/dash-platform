@@ -283,19 +283,6 @@ public class GitHubPushEventWorker {
         return record;
     }
 
-    private boolean isProblemInList(String problemsJson, Integer problemId) {
-        if (!StringUtils.hasText(problemsJson) || problemId == null) {
-            return false;
-        }
-        try {
-            List<Integer> problems = objectMapper.readValue(problemsJson, new TypeReference<List<Integer>>() {
-            });
-            return problems.contains(problemId);
-        } catch (JsonProcessingException e) {
-            return false;
-        }
-    }
-
     private record QueuedPushFile(
             String path,
             String status,
