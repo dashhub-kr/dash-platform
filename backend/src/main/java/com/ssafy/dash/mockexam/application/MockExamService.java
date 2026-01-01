@@ -21,6 +21,8 @@ import com.ssafy.dash.user.domain.User;
 import com.ssafy.dash.user.domain.UserRepository;
 import com.ssafy.dash.user.domain.exception.UserNotFoundException;
 
+import com.ssafy.dash.mockexam.application.dto.result.ExamStatusResult;
+
 @Service
 @Transactional
 public class MockExamService {
@@ -220,15 +222,5 @@ public class MockExamService {
         }
     }
 
-    public record ExamStatusResult(
-            String examType,
-            String displayName,
-            String category,
-            List<Integer> problems,
-            List<Integer> solvedProblems,
-            LocalDateTime startTime,
-            int timeLimitHours,
-            int solvedCount,
-            int totalCount) {
-    }
+
 }
