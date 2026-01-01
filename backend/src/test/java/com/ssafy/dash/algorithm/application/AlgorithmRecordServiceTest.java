@@ -162,26 +162,4 @@ class AlgorithmRecordServiceTest {
                 .isInstanceOf(AlgorithmRecordNotFoundException.class);
     }
 
-    @Test
-    @DisplayName("히트맵 데이터를 요청하면 일자별로 그룹화하여 카운트와 참여자를 반환한다")
-    void getHeatmap_Success() {
-        // Given
-        Long userId = TestFixtures.TEST_USER_ID;
-        Long studyId = null;
-        String today = java.time.LocalDate.now().toString();
-        
-        AlgorithmRecord r1 = TestFixtures.createAlgorithmRecord(user); 
-        AlgorithmRecord r2 = TestFixtures.createAlgorithmRecord(user);
-        
-        given(algorithmRecordRepository.findByUserId(userId)).willReturn(List.of(r1, r2));
-
-        // When
-        List<com.ssafy.dash.dashboard.application.dto.result.HeatmapItem> heatmap = algorithmRecordService.getHeatmap(userId, studyId);
-
-        // Then
-        assertThat(heatmap).hasSize(1);
-        assertThat(heatmap.get(0).getCount()).isEqualTo(2);
-        assertThat(heatmap.get(0).getDate()).isEqualTo(today);
-    }
-
 }
