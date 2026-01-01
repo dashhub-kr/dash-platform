@@ -176,7 +176,7 @@ public class StudyController {
 
     @Operation(summary = "커리큘럼 문제 추천", description = "팀 약점 기반 문제를 추천합니다.")
     @GetMapping("/{studyId}/curriculum")
-    public ResponseEntity<List<com.ssafy.dash.problem.domain.ProblemRecommendationResponse>> getCurriculum(
+    public ResponseEntity<List<com.ssafy.dash.problem.presentation.dto.response.ProblemRecommendationResponse>> getCurriculum(
             @PathVariable Long studyId) {
         return ResponseEntity.ok(studyAnalysisService.getCurriculumProblems(studyId));
     }

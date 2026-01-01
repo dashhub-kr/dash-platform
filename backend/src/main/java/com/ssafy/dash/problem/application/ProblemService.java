@@ -74,12 +74,12 @@ public class ProblemService {
         }
     }
 
-    public java.util.List<com.ssafy.dash.problem.domain.ProblemRecommendationResponse> getRecommendedProblems(
+    public java.util.List<com.ssafy.dash.problem.presentation.dto.response.ProblemRecommendationResponse> getRecommendedProblems(
             String tag, int userTier, Long userId) {
         return getRecommendedProblems(tag, userTier, userId, null);
     }
 
-    public java.util.List<com.ssafy.dash.problem.domain.ProblemRecommendationResponse> getRecommendedProblems(
+    public java.util.List<com.ssafy.dash.problem.presentation.dto.response.ProblemRecommendationResponse> getRecommendedProblems(
             String tag, int userTier, Long userId, java.util.List<String> additionalExcludedIds) {
         // 난이도 범위: 내 티어 ~ 내 티어 + 2
         int minLevel = Math.max(1, userTier);
@@ -99,7 +99,7 @@ public class ProblemService {
         return problems.stream()
                 .map(problem -> {
                     java.util.List<String> tags = problemMapper.findTagsByProblemNumber(problem.getProblemNumber());
-                    return com.ssafy.dash.problem.domain.ProblemRecommendationResponse.from(problem, tags);
+                    return com.ssafy.dash.problem.presentation.dto.response.ProblemRecommendationResponse.from(problem, tags);
                 })
                 .collect(java.util.stream.Collectors.toList());
     }

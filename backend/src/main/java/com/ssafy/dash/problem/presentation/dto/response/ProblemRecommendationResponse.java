@@ -1,5 +1,6 @@
-package com.ssafy.dash.problem.domain;
+package com.ssafy.dash.problem.presentation.dto.response;
 
+import com.ssafy.dash.problem.domain.Problem;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
