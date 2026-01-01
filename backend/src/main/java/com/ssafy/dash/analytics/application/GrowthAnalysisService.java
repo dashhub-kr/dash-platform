@@ -117,8 +117,5 @@ public class GrowthAnalysisService {
                 .recommendation(recommendation)
                 .build();
     }
-
-    private String getTagName(String tagKey) {
-        return TAG_NAMES.getOrDefault(tagKey, tagKey);
-    }
+    
 }

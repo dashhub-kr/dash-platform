@@ -8,7 +8,6 @@ import com.ssafy.dash.user.domain.User;
 import com.ssafy.dash.user.domain.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -88,13 +87,4 @@ public class StatsSnapshotService {
         log.info("Cleaned up snapshots older than {}", cutoffDate);
     }
 
-    /**
-     * 매일 자정에 모든 활성 사용자의 스냅샷 생성 (스케줄링)
-     * 주의: 프로덕션에서는 배치 처리로 대체 권장
-     */
-    // @Scheduled(cron = "0 0 0 * * *")
-    // public void createDailySnapshots() {
-    // log.info("Starting daily snapshots creation...");
-    // // 모든 사용자 조회 및 스냅샷 생성 로직
-    // }
 }
