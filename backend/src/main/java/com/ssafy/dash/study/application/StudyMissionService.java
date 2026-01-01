@@ -222,7 +222,7 @@ public class StudyMissionService {
 
             // 미션 완료 여부 판단 (DB 상태 우선, 그 외엔 전원 완료 or 데드라인)
             // 전원 완료 체크 로직은 기존 유지
-            boolean isAllMembersCompleted = memberProgressList.stream().allMatch(MemberProgressResult::allCompleted);
+            // Note: 모든 멤버 완료 여부는 memberProgressList의 allCompleted 필드로 FE에서 확인 가능
 
             // Status가 null이면 IN_PROGRESS로 취급
             MissionStatus status = mission.getStatus();
