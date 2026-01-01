@@ -1,4 +1,4 @@
-package com.ssafy.dash.ai.client;
+package com.ssafy.dash.ai.infrastructure.client;
 
 /**
  * AI 서버 통신 예외

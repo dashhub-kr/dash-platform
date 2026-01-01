@@ -1,8 +1,8 @@
 package com.ssafy.dash.ai.application;
 
-import com.ssafy.dash.ai.client.AiServerClient;
-import com.ssafy.dash.ai.client.dto.HintChatRequest;
-import com.ssafy.dash.ai.client.dto.HintChatResponse;
+import com.ssafy.dash.ai.infrastructure.client.AiServerClient;
+import com.ssafy.dash.ai.infrastructure.client.dto.request.HintChatRequest;
+import com.ssafy.dash.ai.infrastructure.client.dto.response.HintChatResponse;
 import com.ssafy.dash.algorithm.domain.AlgorithmRecord;
 import com.ssafy.dash.algorithm.domain.AlgorithmRecordRepository;
 import com.ssafy.dash.analytics.application.UserSkillAnalysisService;

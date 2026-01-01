@@ -1,8 +1,8 @@
 package com.ssafy.dash.ai.application;
 
-import com.ssafy.dash.ai.client.AiServerClient;
-import com.ssafy.dash.ai.client.dto.CodingStyleRequest;
-import com.ssafy.dash.ai.client.dto.CodingStyleResponse;
+import com.ssafy.dash.ai.infrastructure.client.AiServerClient;
+import com.ssafy.dash.ai.infrastructure.client.dto.request.CodingStyleRequest;
+import com.ssafy.dash.ai.infrastructure.client.dto.response.CodingStyleResponse;
 import com.ssafy.dash.algorithm.domain.AlgorithmRecord;
 import com.ssafy.dash.algorithm.domain.AlgorithmRecordRepository;
 import com.ssafy.dash.analytics.domain.UserTagStat;

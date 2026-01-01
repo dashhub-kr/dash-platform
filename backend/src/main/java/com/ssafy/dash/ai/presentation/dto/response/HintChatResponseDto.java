@@ -2,7 +2,7 @@ package com.ssafy.dash.ai.presentation.dto.response;
 
 import java.util.List;
 
-import com.ssafy.dash.ai.client.dto.HintChatResponse;
+import com.ssafy.dash.ai.infrastructure.client.dto.response.HintChatResponse;
 
 public record HintChatResponseDto(
         String reply,

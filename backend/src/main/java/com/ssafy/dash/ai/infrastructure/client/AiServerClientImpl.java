@@ -1,6 +1,7 @@
-package com.ssafy.dash.ai.client;
+package com.ssafy.dash.ai.infrastructure.client;
 
-import com.ssafy.dash.ai.client.dto.*;
+import com.ssafy.dash.ai.infrastructure.client.dto.request.*;
+import com.ssafy.dash.ai.infrastructure.client.dto.response.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
