@@ -34,7 +34,7 @@ import com.ssafy.dash.github.domain.RepositoryInfo;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import com.ssafy.dash.analytics.application.SolvedacSyncService;
-import com.ssafy.dash.analytics.application.dto.RegisterHandleRequest;
+import com.ssafy.dash.analytics.application.dto.request.RegisterHandleRequest;
 
 @RestController
 @RequestMapping("/api/onboarding")

@@ -1,7 +1,7 @@
 package com.ssafy.dash.analytics.application;
 
-import com.ssafy.dash.analytics.application.dto.GrowthTrendDto;
-import com.ssafy.dash.analytics.application.dto.TagGrowthDto;
+import com.ssafy.dash.analytics.application.dto.response.GrowthTrendDto;
+import com.ssafy.dash.analytics.application.dto.response.TagGrowthDto;
 import com.ssafy.dash.analytics.domain.UserStatsSnapshot;
 import com.ssafy.dash.analytics.domain.UserTagStat;
 import com.ssafy.dash.analytics.infrastructure.persistence.UserStatsSnapshotMapper;

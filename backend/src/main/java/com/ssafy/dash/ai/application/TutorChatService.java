@@ -6,7 +6,7 @@ import com.ssafy.dash.ai.infrastructure.client.dto.response.HintChatResponse;
 import com.ssafy.dash.algorithm.domain.AlgorithmRecord;
 import com.ssafy.dash.algorithm.domain.AlgorithmRecordRepository;
 import com.ssafy.dash.analytics.application.UserSkillAnalysisService;
-import com.ssafy.dash.analytics.application.dto.TagWeaknessDto;
+import com.ssafy.dash.analytics.application.dto.response.TagWeaknessDto;
 import com.ssafy.dash.user.domain.User;
 import com.ssafy.dash.user.domain.UserRepository;
 import lombok.RequiredArgsConstructor;

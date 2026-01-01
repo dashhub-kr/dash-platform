@@ -1,6 +1,6 @@
 package com.ssafy.dash.analytics.application;
 
-import com.ssafy.dash.analytics.application.dto.*;
+import com.ssafy.dash.analytics.application.dto.response.*;
 import com.ssafy.dash.analytics.domain.UserClassStat;
 import com.ssafy.dash.analytics.domain.UserTagStat;
 import com.ssafy.dash.analytics.infrastructure.persistence.UserClassStatMapper;
@@ -20,7 +20,7 @@ import java.util.stream.Collectors;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class LearningPathService {
+public class RuleBasedLearningPathService {
 
     private final UserTagStatMapper tagStatMapper;
     private final UserClassStatMapper classStatMapper;

@@ -1,8 +1,8 @@
 package com.ssafy.dash.analytics.application;
 
-import com.ssafy.dash.analytics.application.dto.SkillSummaryDto;
-import com.ssafy.dash.analytics.application.dto.TagStrengthDto;
-import com.ssafy.dash.analytics.application.dto.TagWeaknessDto;
+import com.ssafy.dash.analytics.application.dto.response.SkillSummaryDto;
+import com.ssafy.dash.analytics.application.dto.response.TagStrengthDto;
+import com.ssafy.dash.analytics.application.dto.response.TagWeaknessDto;
 import com.ssafy.dash.analytics.domain.UserClassStat;
 import com.ssafy.dash.analytics.domain.UserTagStat;
 import com.ssafy.dash.analytics.infrastructure.persistence.UserClassStatMapper;

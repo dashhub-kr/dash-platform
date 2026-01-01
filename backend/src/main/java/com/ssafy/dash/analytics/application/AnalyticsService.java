@@ -1,7 +1,7 @@
 package com.ssafy.dash.analytics.application;
 
-import com.ssafy.dash.analytics.application.dto.FamilyScoreDto;
-import com.ssafy.dash.analytics.application.dto.TagCoverageDto;
+import com.ssafy.dash.analytics.application.dto.response.FamilyScoreDto;
+import com.ssafy.dash.analytics.application.dto.response.TagCoverageDto;
 import com.ssafy.dash.analytics.infrastructure.persistence.AnalyticsMapper;
 import java.util.List;
 import lombok.RequiredArgsConstructor;

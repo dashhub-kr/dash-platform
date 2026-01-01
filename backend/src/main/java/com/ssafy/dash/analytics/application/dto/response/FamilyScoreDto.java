@@ -1,4 +1,4 @@
-package com.ssafy.dash.analytics.application.dto;
+package com.ssafy.dash.analytics.application.dto.response;
 
 import lombok.Data;
 
