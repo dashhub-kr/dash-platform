@@ -19,7 +19,7 @@ import com.ssafy.dash.common.exception.ApiErrorResponse;
 import com.ssafy.dash.common.exception.ErrorCode;
 import com.ssafy.dash.onboarding.domain.exception.WebhookRegistrationException;
 import com.ssafy.dash.user.domain.exception.UserNotFoundException;
-import com.ssafy.dash.common.exception.UnauthorizedAccessException;
+import com.ssafy.dash.common.exception.BusinessException;
 
 import jakarta.servlet.http.HttpServletRequest;
 
@@ -68,9 +68,10 @@ public class GlobalExceptionHandler {
         return buildResponse(ErrorCode.RESOURCE_NOT_FOUND, ex.getMessage(), request);
     }
 
-    @ExceptionHandler(UnauthorizedAccessException.class)
-    public ResponseEntity<ApiErrorResponse> handleUnauthorized(UnauthorizedAccessException ex, HttpServletRequest request) {
-        return buildResponse(ErrorCode.UNAUTHORIZED_ACCESS, ex.getMessage(), request);
+    @ExceptionHandler(BusinessException.class)
+    public ResponseEntity<ApiErrorResponse> handleBusinessException(BusinessException ex, HttpServletRequest request) {
+        // BusinessException contains ErrorCode, use it directly
+        return buildResponse(ex.getErrorCode(), ex.getMessage(), request);
     }
 
     @ExceptionHandler(Exception.class)

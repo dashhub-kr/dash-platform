@@ -8,7 +8,8 @@ import com.ssafy.dash.board.application.dto.result.BoardResult;
 import com.ssafy.dash.board.domain.Board;
 import com.ssafy.dash.board.domain.BoardRepository;
 import com.ssafy.dash.board.domain.exception.BoardNotFoundException;
-import com.ssafy.dash.common.exception.UnauthorizedAccessException;
+import com.ssafy.dash.common.exception.BusinessException;
+import com.ssafy.dash.common.exception.ErrorCode;
 import com.ssafy.dash.like.application.LikeService;
 import com.ssafy.dash.study.domain.Study;
 import com.ssafy.dash.study.domain.StudyRepository;
@@ -154,7 +155,8 @@ public class BoardService {
 
     private void validateOwnership(Board board, Long requestUserId) {
         if (!board.getUserId().equals(requestUserId)) {
-            throw new UnauthorizedAccessException("Board", board.getId(), requestUserId);
+            throw new BusinessException(ErrorCode.UNAUTHORIZED_ACCESS, 
+                String.format("User %d is not authorized to modify Board with id %d", requestUserId, board.getId()));
         }
     }
 
