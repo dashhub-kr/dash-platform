@@ -1,4 +1,4 @@
-package com.ssafy.dash.external.solvedac;
+package com.ssafy.dash.solvedac.domain.exception;
 
 /**
  * Solved.ac API 호출 중 발생하는 예외

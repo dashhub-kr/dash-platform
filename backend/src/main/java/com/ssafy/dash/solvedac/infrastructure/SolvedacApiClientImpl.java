@@ -1,8 +1,10 @@
-package com.ssafy.dash.external.solvedac;
+package com.ssafy.dash.solvedac.infrastructure;
 
-import com.ssafy.dash.external.solvedac.dto.ClassStatResponse;
-import com.ssafy.dash.external.solvedac.dto.SolvedacUserResponse;
-import com.ssafy.dash.external.solvedac.dto.TagStatResponse;
+import com.ssafy.dash.solvedac.domain.SolvedacApiClient;
+import com.ssafy.dash.solvedac.domain.dto.ClassStatResponse;
+import com.ssafy.dash.solvedac.domain.dto.SolvedacUserResponse;
+import com.ssafy.dash.solvedac.domain.dto.TagStatResponse;
+import com.ssafy.dash.solvedac.domain.dto.Top100Response;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -68,13 +70,13 @@ public class SolvedacApiClientImpl implements SolvedacApiClient {
     }
 
     @Override
-    public com.ssafy.dash.external.solvedac.dto.Top100Response getTop100Problems(String handle) {
+    public Top100Response getTop100Problems(String handle) {
         try {
             log.debug("Fetching top 100 problems for handle: {}", handle);
             return restClient.get()
                     .uri(baseUrl + "/user/top_100?handle={handle}", handle)
                     .retrieve()
-                    .body(com.ssafy.dash.external.solvedac.dto.Top100Response.class);
+                    .body(Top100Response.class);
         } catch (RestClientException e) {
             log.error("Failed to fetch top 100 problems for handle: {}", handle, e);
             throw new SolvedacApiException("상위 100개 문제를 가져올 수 없습니다: " + handle, e);

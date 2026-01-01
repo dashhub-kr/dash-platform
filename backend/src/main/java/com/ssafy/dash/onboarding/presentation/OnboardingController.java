@@ -25,9 +25,9 @@ import com.ssafy.dash.onboarding.presentation.dto.request.RepositorySetupRequest
 import com.ssafy.dash.onboarding.presentation.dto.response.RepositorySetupResponse;
 import com.ssafy.dash.onboarding.presentation.dto.response.RepositorySearchResponse;
 import com.ssafy.dash.onboarding.presentation.dto.response.SolvedacVerifyResponse;
-import com.ssafy.dash.external.solvedac.SolvedacApiClient;
-import com.ssafy.dash.external.solvedac.dto.SolvedacUserResponse;
-import com.ssafy.dash.external.solvedac.SolvedacApiException;
+import com.ssafy.dash.solvedac.domain.SolvedacApiClient;
+import com.ssafy.dash.solvedac.domain.dto.SolvedacUserResponse;
+import com.ssafy.dash.solvedac.domain.exception.SolvedacApiException;
 import com.ssafy.dash.github.domain.GitHubClient;
 import com.ssafy.dash.github.domain.RepositoryInfo;
 

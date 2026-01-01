@@ -1,6 +1,6 @@
 package com.ssafy.dash.onboarding.presentation.dto.response;
 
-import com.ssafy.dash.external.solvedac.dto.SolvedacUserResponse;
+import com.ssafy.dash.solvedac.domain.dto.SolvedacUserResponse;
 import lombok.Builder;
 import lombok.Getter;
 
