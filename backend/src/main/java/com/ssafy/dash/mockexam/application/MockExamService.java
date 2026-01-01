@@ -15,11 +15,10 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ssafy.dash.algorithm.domain.AlgorithmRecordRepository;
+import com.ssafy.dash.mockexam.domain.MockExam;
 import com.ssafy.dash.mockexam.domain.MockExamProblemBank;
+import com.ssafy.dash.mockexam.domain.MockExamRepository;
 import com.ssafy.dash.mockexam.domain.MockExamType;
-import com.ssafy.dash.user.domain.User;
-import com.ssafy.dash.user.domain.UserRepository;
-import com.ssafy.dash.user.domain.exception.UserNotFoundException;
 
 import com.ssafy.dash.mockexam.application.dto.result.ExamStatusResult;
 
@@ -27,28 +26,27 @@ import com.ssafy.dash.mockexam.application.dto.result.ExamStatusResult;
 @Transactional
 public class MockExamService {
 
-    private final UserRepository userRepository;
+    private final MockExamRepository mockExamRepository;
     private final AlgorithmRecordRepository algorithmRecordRepository;
     private final ObjectMapper objectMapper;
     private final Random random = new Random();
 
-    public MockExamService(UserRepository userRepository,
+    public MockExamService(MockExamRepository mockExamRepository,
             AlgorithmRecordRepository algorithmRecordRepository,
             ObjectMapper objectMapper) {
-        this.userRepository = userRepository;
+        this.mockExamRepository = mockExamRepository;
         this.algorithmRecordRepository = algorithmRecordRepository;
         this.objectMapper = objectMapper;
     }
 
     public void startExam(Long userId, MockExamType examType) {
-        User user = getUser(userId);
-
         // 이전 세션 타임아웃 체크
-        checkTimeout(user);
+        checkAndTimeoutActiveExam(userId);
 
-        if (user.getExamStartTime() != null) {
+        // 이미 진행 중인 시험이 있는지 확인
+        mockExamRepository.findActiveByUserId(userId).ifPresent(exam -> {
             throw new IllegalStateException("이미 시험이 진행 중입니다.");
-        }
+        });
 
         // 문제 은행에서 해당 타입 문제 가져오기
         List<Integer> problemBank = getProblemBank(examType);
@@ -64,22 +62,22 @@ public class MockExamService {
         // 랜덤으로 N개 선택
         List<Integer> selectedProblems = pickRandomProblems(unsolvedProblems, examType.getProblemCount());
 
-        user.setExamType(examType.name());
-        user.setExamProblems(toJson(selectedProblems));
-        user.setExamStartTime(LocalDateTime.now());
-        user.setExamSolvedCount(0);
-
-        userRepository.update(user);
+        // MockExam 엔티티 생성 및 저장
+        MockExam mockExam = MockExam.create(userId, examType, toJson(selectedProblems), LocalDateTime.now());
+        mockExamRepository.save(mockExam);
     }
 
     public ExamStatusResult getExamStatus(Long userId) {
-        User user = getUser(userId);
-        checkTimeout(user);
+        checkAndTimeoutActiveExam(userId);
 
-        List<Integer> problems = parseProblems(user.getExamProblems());
-        MockExamType examType = user.getExamType() != null
-                ? MockExamType.valueOf(user.getExamType())
-                : null;
+        MockExam mockExam = mockExamRepository.findActiveByUserId(userId).orElse(null);
+        
+        if (mockExam == null) {
+            return new ExamStatusResult(null, null, null, List.of(), List.of(), null, 0, 0, 0);
+        }
+
+        List<Integer> problems = parseProblems(mockExam.getProblems());
+        MockExamType examType = mockExam.getExamTypeEnum();
 
         // Check which problems are solved
         List<Integer> solvedProblems = problems.stream()
@@ -87,30 +85,33 @@ public class MockExamService {
                 .collect(Collectors.toList());
 
         return new ExamStatusResult(
-                user.getExamType(),
+                mockExam.getExamType(),
                 examType != null ? examType.getDisplayName() : null,
                 examType != null ? examType.getCategory() : null,
                 problems,
                 solvedProblems,
-                user.getExamStartTime(),
+                mockExam.getStartTime(),
                 examType != null ? examType.getTimeLimitHours() : 0,
                 solvedProblems.size(),
                 examType != null ? examType.getProblemCount() : 0);
     }
 
     public void verifyExam(Long userId, Integer solvedProblemId) {
-        User user = getUser(userId);
-
-        if (user.getExamStartTime() == null) {
+        MockExam mockExam = mockExamRepository.findActiveByUserId(userId).orElse(null);
+        
+        if (mockExam == null) {
             return; // 시험 모드가 아님
         }
 
-        checkTimeout(user);
-        if (user.getExamStartTime() == null) {
-            return; // 방금 타임아웃됨
+        // 타임아웃 체크
+        MockExamType examType = mockExam.getExamTypeEnum();
+        if (examType != null && mockExam.isTimeout(examType.getTimeLimitHours())) {
+            mockExam.timeout();
+            mockExamRepository.update(mockExam);
+            return;
         }
 
-        List<Integer> problems = parseProblems(user.getExamProblems());
+        List<Integer> problems = parseProblems(mockExam.getProblems());
         if (problems.contains(solvedProblemId)) {
             // 이 문제에 대한 성공적인 제출이 있는지 확인
             if (!algorithmRecordRepository.existsSuccessfulSubmission(userId, String.valueOf(solvedProblemId))) {
@@ -120,7 +121,7 @@ public class MockExamService {
             // 풀이 시간 계산 및 저장
             algorithmRecordRepository.findLatestSuccessfulByUserAndProblem(userId, String.valueOf(solvedProblemId))
                     .ifPresent(record -> {
-                        LocalDateTime startTime = user.getExamStartTime();
+                        LocalDateTime startTime = mockExam.getStartTime();
                         LocalDateTime endTime = record.getCreatedAt() != null ? record.getCreatedAt()
                                 : LocalDateTime.now();
                         long elapsedSeconds = java.time.Duration.between(startTime, endTime).getSeconds();
@@ -129,47 +130,47 @@ public class MockExamService {
                     });
 
             // 푼 문제 수 증가
-            int newSolvedCount = (user.getExamSolvedCount() != null ? user.getExamSolvedCount() : 0) + 1;
-            user.setExamSolvedCount(newSolvedCount);
+            mockExam.markProblemSolved();
 
-            MockExamType examType = MockExamType.valueOf(user.getExamType());
-
-            // 모든 문제를 풀었거나 시험이 완료된 경우
-            if (newSolvedCount >= examType.getProblemCount()) {
-                // 시험 완료 - 상태 초기화
-                clearExamState(user);
+            // 모든 문제를 풀었는지 확인
+            if (mockExam.getSolvedCount() >= examType.getProblemCount()) {
+                mockExam.complete();
             }
 
-            userRepository.update(user);
+            mockExamRepository.update(mockExam);
         }
     }
 
     public void cancelExam(Long userId) {
-        User user = getUser(userId);
-        if (user.getExamStartTime() != null) {
-            clearExamState(user);
-            userRepository.update(user);
-        }
+        mockExamRepository.findActiveByUserId(userId).ifPresent(mockExam -> {
+            mockExam.cancel();
+            mockExamRepository.update(mockExam);
+        });
     }
 
-    private void checkTimeout(User user) {
-        if (user.getExamStartTime() != null && user.getExamType() != null) {
-            MockExamType examType = MockExamType.valueOf(user.getExamType());
-            LocalDateTime deadline = user.getExamStartTime().plusHours(examType.getTimeLimitHours());
-
-            if (deadline.isBefore(LocalDateTime.now())) {
-                // 시간 초과
-                clearExamState(user);
-                userRepository.update(user);
+    /**
+     * 활성화된 시험의 타임아웃 여부를 확인하고 처리
+     */
+    private void checkAndTimeoutActiveExam(Long userId) {
+        mockExamRepository.findActiveByUserId(userId).ifPresent(mockExam -> {
+            MockExamType examType = mockExam.getExamTypeEnum();
+            if (examType != null && mockExam.isTimeout(examType.getTimeLimitHours())) {
+                mockExam.timeout();
+                mockExamRepository.update(mockExam);
             }
-        }
+        });
     }
 
-    private void clearExamState(User user) {
-        user.setExamType(null);
-        user.setExamProblems(null);
-        user.setExamStartTime(null);
-        user.setExamSolvedCount(null);
+    /**
+     * 사용자가 현재 진행 중인 모의고사의 문제인지 확인
+     */
+    public boolean isActiveProblem(Long userId, Integer problemId) {
+        return mockExamRepository.findActiveByUserId(userId)
+                .map(mockExam -> {
+                    List<Integer> problems = parseProblems(mockExam.getProblems());
+                    return problems.contains(problemId);
+                })
+                .orElse(false);
     }
 
     private List<Integer> getProblemBank(MockExamType examType) {
@@ -197,11 +198,6 @@ public class MockExamService {
         return shuffled.subList(0, Math.min(count, shuffled.size()));
     }
 
-    private User getUser(Long userId) {
-        return userRepository.findById(userId)
-                .orElseThrow(() -> new UserNotFoundException(userId));
-    }
-
     private String toJson(List<Integer> problems) {
         try {
             return objectMapper.writeValueAsString(problems);
@@ -221,6 +217,5 @@ public class MockExamService {
             return List.of();
         }
     }
-
 
 }

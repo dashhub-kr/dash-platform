@@ -31,12 +31,6 @@ CREATE TABLE IF NOT EXISTS users (
     max_silver_streak INT DEFAULT 0,
     max_gold_streak INT DEFAULT 0,
 
-    -- Mock Exam / Coding Test
-    exam_type VARCHAR(20),
-    exam_problems TEXT,
-    exam_start_time TIMESTAMP NULL DEFAULT NULL,
-    exam_solved_count INT DEFAULT 0,
-
 	created_at TIMESTAMP,
 	
     provider VARCHAR(50),
@@ -45,6 +39,21 @@ CREATE TABLE IF NOT EXISTS users (
     study_id BIGINT,
     deleted_at TIMESTAMP NULL DEFAULT NULL,
     FOREIGN KEY (study_id) REFERENCES studies(id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+
+-- Mock Exam Sessions
+CREATE TABLE IF NOT EXISTS mock_exams (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    user_id BIGINT NOT NULL,
+    exam_type VARCHAR(20) NOT NULL COMMENT 'IM, A, B, SAMSUNG, KAKAO',
+    problems TEXT COMMENT 'JSON array of problem IDs',
+    start_time TIMESTAMP NOT NULL,
+    solved_count INT DEFAULT 0,
+    status VARCHAR(20) NOT NULL DEFAULT 'IN_PROGRESS' COMMENT 'IN_PROGRESS, COMPLETED, TIMEOUT, CANCELLED',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+    INDEX idx_mock_exams_user_status (user_id, status)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 

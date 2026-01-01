@@ -239,7 +239,7 @@ public class GitHubPushEventWorker {
                 tag = "MISSION";
             }
             // 2. Mock Exam Check
-            else if (user.getExamType() != null && isProblemInList(user.getExamProblems(), problemId)) {
+            else if (mockExamService.isActiveProblem(userId, problemId)) {
                 tag = "MOCK_EXAM";
             }
             // 3. Random Defense Check (Check defenseProblemId)
