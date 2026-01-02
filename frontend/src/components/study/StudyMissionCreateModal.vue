@@ -259,6 +259,17 @@ const handleCreateOrUpdate = async () => {
       .map(input => parseInt(input.value))
       .filter(n => !isNaN(n));
       
+    // 마감일 검증
+    if (newMission.value.deadline) {
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        const deadlineDate = new Date(newMission.value.deadline);
+        if (deadlineDate < today) {
+            alert('마감일은 과거 날짜로 설정할 수 없습니다.');
+            return;
+        }
+    }
+      
     if (problemIds.length === 0) {
         alert('추가할 문제 번호를 입력해주세요.');
         return;

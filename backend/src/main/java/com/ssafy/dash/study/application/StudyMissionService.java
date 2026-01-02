@@ -42,6 +42,9 @@ public class StudyMissionService {
      */
     public StudyMission createMissionManual(Long studyId, Integer week, String title,
             List<Integer> problemIds, LocalDate deadline) {
+        if (deadline != null && deadline.isBefore(LocalDate.now())) {
+            throw new IllegalArgumentException("마감일은 과거 날짜일 수 없습니다.");
+        }
         String problemsJson = toJson(problemIds);
         StudyMission mission = StudyMission.create(studyId, week, title, problemsJson, "MANUAL", deadline);
         missionRepository.save(mission);
@@ -57,6 +60,9 @@ public class StudyMissionService {
      */
     public StudyMission createMissionFromCurriculum(Long studyId, Integer week, String title,
             List<Integer> problemIds, LocalDate deadline) {
+        if (deadline != null && deadline.isBefore(LocalDate.now())) {
+            throw new IllegalArgumentException("마감일은 과거 날짜일 수 없습니다.");
+        }
         String problemsJson = toJson(problemIds);
         StudyMission mission = StudyMission.create(studyId, week, title, problemsJson, "AI_RECOMMENDED", deadline);
         missionRepository.save(mission);
@@ -126,6 +132,9 @@ public class StudyMissionService {
             mission.setTitle(title);
         }
         if (deadline != null) {
+            if (deadline.isBefore(LocalDate.now())) {
+                throw new IllegalArgumentException("마감일은 과거 날짜일 수 없습니다.");
+            }
             mission.setDeadline(deadline);
         }
 
