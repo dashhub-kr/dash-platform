@@ -19,6 +19,10 @@
     SELECT * FROM study_missions WHERE study_id = #{studyId} ORDER BY week DESC
   </select>
 
+  <select id="selectByStudyIdAndWeek" resultType="StudyMission">
+    SELECT * FROM study_missions WHERE study_id = #{studyId} AND week = #{week} LIMIT 1
+  </select>
+
   <delete id="delete" parameterType="long">
     DELETE FROM study_missions WHERE id = #{id}
   </delete>

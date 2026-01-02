@@ -38,6 +38,11 @@ public class StudyMissionRepositoryImpl implements StudyMissionRepository {
     }
 
     @Override
+    public Optional<StudyMission> findByStudyIdAndWeek(Long studyId, Integer week) {
+        return Optional.ofNullable(mapper.selectByStudyIdAndWeek(studyId, week));
+    }
+
+    @Override
     public void delete(Long id) {
         mapper.delete(id);
     }

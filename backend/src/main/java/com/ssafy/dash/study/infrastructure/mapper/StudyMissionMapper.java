@@ -3,6 +3,7 @@ package com.ssafy.dash.study.infrastructure.mapper;
 import java.util.List;
 
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 
 import com.ssafy.dash.study.domain.StudyMission;
 
@@ -19,6 +20,8 @@ public interface StudyMissionMapper {
     List<StudyMission> selectByStudyId(Long studyId);
 
     List<StudyMission> selectByStudyIdOrderByWeekDesc(Long studyId);
+
+    StudyMission selectByStudyIdAndWeek(@Param("studyId") Long studyId, @Param("week") Integer week);
 
     int delete(Long id);
 

@@ -3,6 +3,7 @@ package com.ssafy.dash.study.application;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -45,6 +46,23 @@ public class StudyMissionService {
         if (deadline != null && deadline.isBefore(LocalDate.now())) {
             throw new IllegalArgumentException("마감일은 과거 날짜일 수 없습니다.");
         }
+
+        // Check if mission for the week already exists
+        Optional<StudyMission> existingMissionOpt = missionRepository.findByStudyIdAndWeek(studyId, week);
+        if (existingMissionOpt.isPresent()) {
+            StudyMission existingMission = existingMissionOpt.get();
+            // Merge problems
+            List<Integer> currentProblems = parseProblems(existingMission.getProblemIds());
+            List<Integer> mergedProblems = new ArrayList<>(currentProblems);
+            for (Integer pid : problemIds) {
+                if (!mergedProblems.contains(pid)) {
+                    mergedProblems.add(pid);
+                }
+            }
+            // Update metadata and problem list
+            return updateMission(existingMission.getId(), title, deadline, mergedProblems);
+        }
+
         String problemsJson = toJson(problemIds);
         StudyMission mission = StudyMission.create(studyId, week, title, problemsJson, "MANUAL", deadline);
         missionRepository.save(mission);
@@ -63,6 +81,20 @@ public class StudyMissionService {
         if (deadline != null && deadline.isBefore(LocalDate.now())) {
             throw new IllegalArgumentException("마감일은 과거 날짜일 수 없습니다.");
         }
+
+        Optional<StudyMission> existingMissionOpt = missionRepository.findByStudyIdAndWeek(studyId, week);
+        if (existingMissionOpt.isPresent()) {
+            StudyMission existingMission = existingMissionOpt.get();
+            List<Integer> currentProblems = parseProblems(existingMission.getProblemIds());
+            List<Integer> mergedProblems = new ArrayList<>(currentProblems);
+            for (Integer pid : problemIds) {
+                if (!mergedProblems.contains(pid)) {
+                    mergedProblems.add(pid);
+                }
+            }
+            return updateMission(existingMission.getId(), title, deadline, mergedProblems);
+        }
+
         String problemsJson = toJson(problemIds);
         StudyMission mission = StudyMission.create(studyId, week, title, problemsJson, "AI_RECOMMENDED", deadline);
         missionRepository.save(mission);
