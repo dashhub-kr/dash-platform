@@ -34,7 +34,7 @@ public class ProblemService {
 
         log.info("문제 데이터 초기화 시작...");
         try {
-            File file = new ClassPathResource("problems_with_keys.json").getFile();
+            File file = new ClassPathResource("data/problems_with_keys.json").getFile();
             JsonNode rootNode = objectMapper.readTree(file);
 
             for (JsonNode node : rootNode) {
