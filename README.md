@@ -22,10 +22,10 @@
 Chrome Extension과 GitHub Webhook을 활용한 **Zero-Manual 파이프라인**을 구축하여, 사용자가 문제 풀이에만 집중하면 **기록, 분석, AI 피드백**까지 모든 과정이 자동으로 이루어집니다. Solved.ac 데이터를 기반으로 개인의 역량을 정밀 진단하고, RPG 게임 요소를 결합한 스킬 트리 시스템을 통해 성장의 즐거움을 제공합니다.
 
 ### 💡 Core Value
-* **Zero-Manual Automation**: 문제 풀이 제출 시 자동 커밋, 코드 분석, 대시보드 갱신까지 원스톱 처리
-* **Data-Driven Growth**: Solved.ac 연동을 통한 객관적 실력 지표(Radar Chart) 및 취약점 분석
-* **AI Coaching**: Google Gemini 기반의 코드 복잡도 분석, 인라인 코드 리뷰, 맞춤형 힌트 제공
-* **Gamification**: RPG 스타일의 스킬 트리, 실전 모의고사, 랜덤 디펜스 게임
+* **Zero-Manual Automation**: 문제 풀이 제출 시 자동 커밋 ＆ 코드 분석 ＆ 대시보드 갱신까지 원스톱으로 처리합니다.
+* **Data-Driven Growth**: Solved.ac ID 입력 하나만으로 객관적 실력 지표(Radar Chart) 및 취약점을 분석합니다.
+* **AI Coaching**: Google Gemini 기반의 코드 복잡도 분석, 인라인 코드 리뷰, 맞춤형 튜터를 지원합니다.
+* **Gamification**: RPG 스타일의 스킬 트리, 실전 모의고사, 랜덤 디펜스로 재미와 성장을 엮었습니다.
 
 ---
 
@@ -68,7 +68,7 @@ graph TD
     GitHub -->|Webhook Trigger| WAS[Spring Boot Backend]
     
     subgraph "DASH Core System"
-        WAS -->|Analyze Request| AI[AI Server (FastAPI)]
+        WAS -->|Analyze Request| AI["AI Server (FastAPI)"]
         AI -->|Gemini API| LLM[Google Gemini]
         AI -->|Analysis Result| WAS
         WAS -->|Persist Data| DB[(MySQL)]
@@ -79,9 +79,9 @@ graph TD
 ```
 
 ### Key Engineering Decisions
-1.  **DIP(의존성 역전 원칙) 적용**: `Domain` 레이어를 외부 기술(Infrastructure)로부터 격리하여 비즈니스 로직의 순수성을 유지했습니다.
-2.  **비동기 이벤트 처리**: GitHub Webhook 수신 시, `GitHubPushEventWorker`를 통해 코드 분석 및 데이터 갱신 작업을 비동기로 처리하여 사용자 경험을 저해하지 않습니다.
-3.  **Chrome Extension 활용**: DOM 파싱의 불안정성을 제거하고, 실패한 코드(오답)까지 수집하여 학습 데이터로 활용합니다.
+1. **DIP(의존성 역전 원칙) 적용**: `Domain` 레이어를 외부 기술(Infra)로부터 격리하여 비즈니스 로직의 순수성을 유지했습니다.
+2. **비동기 이벤트 처리**: EventWorker로 코드 분석 및 데이터 갱신 작업을 비동기 처리하여 사용자 경험을 저해하지 않습니다.
+4. **크롬 익스텐션 활용**: DOM 파싱의 불안정성을 제거하고, 실패한 코드(오답)까지 수집하여 학습 데이터로 활용합니다.
 
 ---
 
@@ -164,9 +164,9 @@ Solved.ac ID를 입력하면 3초 내에 사용자의 알고리즘 풀이 패턴
 
 ### 🤖 Intelligent Code Review
 코드를 제출하는 즉시 AI가 다음 항목을 분석합니다:
-* **Time/Space Complexity**: Big-O 표기법 기반의 시간/공간 복잡도 자동 계산
-* **Context-Aware Intent Analysis**: 특정 변수나 메서드에 마우스를 올리면(Hover), 해당 코드의 **구현 의도**와 **핵심 기능**을 AI가 파악하여 설명합니다.
-* **Algorithm Pattern**: 사용된 주요 알고리즘 기법(DP, DFS 등)을 자동으로 분류하여 태깅합니다.
+* **Time/Space Complexity**: Big-O 표기법 기반의 시간/공간 복잡도를 자동 계산하고, 그 이유를 명확히 설명
+* **AI Analysis**: 특정 코드에 마우스를 올리면(Hover), 해당 코드의 구현 의도와 핵심 기능을 AI가 파악하여 설명
+* **Algorithm Pattern**: 사용된 주요 알고리즘 기법(DP, DFS 등)을 자동으로 분류하여 태깅
 
 ### 🌲 RPG Skill Tree
 마치 게임을 하듯 알고리즘 스킬을 해금해 나갑니다. 선행 개념을 익혀야 상위 알고리즘 문제에 도전할 수 있는 체계적인 커리큘럼을 제공합니다.
@@ -175,11 +175,11 @@ Solved.ac ID를 입력하면 3초 내에 사용자의 알고리즘 풀이 패턴
 
 ## 👨‍💻 Contributors
 
-| Role | Name | GitHub | Responsibility |
-|:---:|:---:|:---:|:---|
-| **PM / BE / FE** | **유승준** | [@utact](https://github.com/utact) | 기획, 시스템 설계, Backend Core, DB 모델링, Chrome Extension 개발 |
-| **AI / BE / FE** | **김용수** | [@canit0221](https://github.com/canit0221) | AI Modeling & Serving, Backend API 개발, Frontend Core, 데이터 시각화 |
-| **BE / FE** | **유소민** | [@SoMin-Yoo](https://github.com/SoMin-Yoo) | Chrome Extension 개발, UI/UX 최적화, QA 및 테스트, 코드 품질 관리 |
+| Role | Name | Responsibility |
+|:---:|:---:|:---|
+| PM / BE / FE | [유승준](https://github.com/utact) | 기획, 시스템 설계, Backend Core, DB 모델링, Chrome Extension |
+| AI / BE / FE | [김용수](https://github.com/canit0221) | AI Modeling & Serving, Backend API, Frontend Core, 데이터 시각화 |
+| BE / FE | [유소민](https://github.com/SoMin-Yoo) | Chrome Extension, UI/UX 최적화, QA 및 테스트, 코드 품질 관리 |
 
 ---
 
