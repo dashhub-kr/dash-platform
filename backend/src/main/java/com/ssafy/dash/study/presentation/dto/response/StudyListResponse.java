@@ -13,7 +13,9 @@ public record StudyListResponse(
         String tierBadge, // 티어 뱃지 (Bronze, Silver, Gold 등)
         Integer totalSolved,
         Integer acornCount,
-        String mvpUsername) {
+        String mvpUsername,
+        Integer streak,
+        Double averageSubmissionRate) {
 
     public static StudyListResponse from(Study study) {
         return new StudyListResponse(
@@ -24,7 +26,9 @@ public record StudyListResponse(
                 getTierBadge(study.getAverageTier()),
                 study.getTotalSolved() != null ? study.getTotalSolved() : 0,
                 study.getAcornCount() != null ? study.getAcornCount() : 0,
-                study.getMvpUsername());
+                study.getMvpUsername(),
+                study.getStreak() != null ? study.getStreak() : 0,
+                study.getAverageSubmissionRate() != null ? study.getAverageSubmissionRate() : 0.0);
     }
 
     private static String getTierBadge(Double tier) {
