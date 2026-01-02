@@ -122,15 +122,16 @@
                                       </button>
                                     </div>
 
-                                    <div v-for="(problemId, idx) in mission.problemIds" :key="problemId"
-                                        class="px-3 py-1.5 rounded-xl font-bold text-sm transition-all flex items-center gap-1.5"
+                                    <a v-for="(problemId, idx) in mission.problemIds" :key="problemId"
+                                        :href="`https://www.acmicpc.net/problem/${problemId}`" target="_blank"
+                                        class="px-3 py-1.5 rounded-xl font-bold text-sm transition-all flex items-center gap-1.5 hover:opacity-80 hover:shadow-sm"
                                         :class="idx < mission.solvedCount 
                                             ? 'bg-emerald-50 text-emerald-600 border border-emerald-100' 
                                             : 'bg-slate-50 text-slate-400 border border-slate-100'"
                                     >
                                     <div class="w-2 h-2 rounded-full" :class="idx < mission.solvedCount ? 'bg-emerald-500' : 'bg-slate-300'"></div>
                                     <span>{{ problemId }}</span>
-                                    </div>
+                                    </a>
                                 </div>
                             </div>
 
