@@ -556,7 +556,13 @@ const sendTutorMessage = async () => {
         });
     } catch (e) {
         console.error("Tutor chat failed", e);
-        tutorMessages.value.push({ role: 'assistant', content: "죄송합니다, 답변을 생성하는 중 오류가 발생했습니다." });
+        
+        const errorMsg = e.response?.data?.message || '';
+        if (errorMsg.includes('Not enough acorns')) {
+             tutorMessages.value.push({ role: 'assistant', content: "도토리가 부족해 응답을 생성할 수 없습니다." });
+        } else {
+             tutorMessages.value.push({ role: 'assistant', content: "죄송합니다, 답변을 생성하는 중 오류가 발생했습니다." });
+        }
     } finally {
         loadingTutorResponse.value = false;
         nextTick(() => { if(chatContainer.value) chatContainer.value.scrollTop = chatContainer.value.scrollHeight; });
