@@ -235,7 +235,7 @@ const ensureBoardExists = async () => {
     if (board.value) return board.value;
     try {
         const res = await boardApi.create({
-            title: `Code Review: ${props.record.title}`,
+            title: `${props.record.title}`,
             content: `Code review for ${props.record.title} (${props.record.problemNumber})`,
             boardType: 'CODE_REVIEW',
             algorithmRecordId: props.record.id

@@ -76,9 +76,13 @@
               >
                 <div class="col-span-1 text-center text-slate-400 font-mono text-sm group-hover:text-brand-500 transition-colors">{{ post.id }}</div>
                 <div class="col-span-5 pl-2 pr-4 flex items-center gap-2">
-                  <span v-if="post.boardType === 'CODE_REVIEW'" class="px-2 py-0.5 text-xs font-bold rounded-full bg-emerald-100 text-emerald-700">코드리뷰</span>
-                  <span v-if="post.problemNumber" class="px-2 py-0.5 text-xs font-bold rounded-full bg-blue-100 text-blue-700">P{{ post.problemNumber }}</span>
-                  <h3 class="text-slate-800 font-bold text-lg group-hover:text-brand-600 transition-colors truncate">
+                  <span v-if="post.boardType === 'CODE_REVIEW'" class="shrink-0 flex items-center justify-center w-6 h-6 rounded-full bg-emerald-100 text-emerald-700 border border-emerald-200/50 shadow-sm" title="Code Review">
+                    <Code2 :size="14" stroke-width="2.5" />
+                  </span>
+                  <span v-if="post.problemNumber" class="shrink-0 px-2.5 py-1 text-[11px] font-bold rounded-full bg-blue-50 text-blue-600 whitespace-nowrap border border-blue-200 shadow-sm flex items-center h-fit">
+                    P{{ post.problemNumber }}
+                  </span>
+                  <h3 class="text-slate-800 font-bold text-lg group-hover:text-brand-600 transition-colors truncate leading-normal">
                     {{ post.title }}
                   </h3>
                 </div>
@@ -169,7 +173,7 @@
 <script setup>
 import { ref, computed, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
-import { PenSquare, Inbox, ThumbsUp, MessageCircle, Search, Flame, Lightbulb } from 'lucide-vue-next';
+import { PenSquare, Inbox, ThumbsUp, MessageCircle, Search, Flame, Lightbulb, Code2 } from 'lucide-vue-next';
 import { boardApi } from '@/api/board';
 
 const router = useRouter();
