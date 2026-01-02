@@ -360,7 +360,7 @@ const props = defineProps({
   record: { type: Object, default: null }
 });
 
-const emit = defineEmits(['scroll-to-line']);
+const emit = defineEmits(['scroll-to-line', 'acorn-used']);
 
 const { user } = useAuth();
 
@@ -563,6 +563,8 @@ const sendTutorMessage = async () => {
             concepts: res.data.relatedConcepts,
             encouragement: res.data.encouragement
         });
+        
+        emit('acorn-used');
     } catch (e) {
         console.error("Tutor chat failed", e);
         

@@ -309,10 +309,12 @@
 
                 <!-- 3. 분석 사이드바 (컨텍스트) -->
                 <div class="flex-1 min-h-0 overflow-hidden rounded-2xl border border-slate-200 shadow-sm bg-white" @click.stop>
-                     <AnalysisSidebar :record="activeAnalysisRecord" @scroll-to-line="handleScrollToLine" />
+                     <AnalysisSidebar :record="activeAnalysisRecord" @scroll-to-line="handleScrollToLine" @acorn-used="handleAcornUsed" />
                 </div>
 
                 <div class="text-center text-[10px] text-slate-300 font-bold space-x-3 pb-2 uppercase tracking-wider">
+<!-- ... (skip intermediate lines) -->
+<!-- Replace AiDrawer part separately if contiguous block is too large or risky -->
                     <span class="hover:text-slate-400 cursor-pointer transition-colors">INFO</span>
                     <span>&bull;</span>
                     <span class="hover:text-slate-400 cursor-pointer transition-colors">STUDY</span>
@@ -346,6 +348,7 @@
         :problem-number="currentDrawerRecord?.problemNumber"
         :problem-title="currentDrawerRecord?.title"
         @close="closeDrawer"
+        @acorn-used="handleAcornUsed"
       />
     </div>
 
@@ -769,6 +772,32 @@ const hideTooltip = () => {
 
 
 
+const fetchStudyData = async () => {
+    if (!user.value?.studyId) return;
+    try {
+        const studyRes = await studyApi.get(user.value.studyId);
+        studyData.value = studyRes.data;
+
+        const logsRes = await studyApi.getAcornLogs(user.value.studyId);
+        acornLogs.value = logsRes.data || [];
+
+        const missionsRes = await studyApi.getMissions(user.value.studyId);
+        missions.value = missionsRes.data || [];
+        
+        // 히트맵 데이터 처리
+        const heatmapRes = await studyApi.getHeatmap(user.value.studyId);
+        heatmapResData.value = heatmapRes.data || [];
+        processHeatmap(heatmapResData.value);
+    } catch(e) {
+        console.error('Study Load Error:', e);
+    }
+};
+
+const handleAcornUsed = () => {
+    console.log('Acorn used, refreshing study data...');
+    fetchStudyData();
+};
+
 onMounted(async () => {
   try {
       // 1. 사용자 기록 가져오기
@@ -789,18 +818,7 @@ onMounted(async () => {
       
       // 3. 스터디 데이터 가져오기 (해당되는 경우)
       if (user.value?.studyId) {
-          try {
-              const studyRes = await studyApi.get(user.value.studyId);
-              studyData.value = studyRes.data;
-
-              const logsRes = await studyApi.getAcornLogs(user.value.studyId);
-              acornLogs.value = logsRes.data || [];
-
-              const missionsRes = await studyApi.getMissions(user.value.studyId);
-              missions.value = missionsRes.data || [];
-          } catch (e) {
-              console.error("Study Data Load Error", e);
-          }
+          await fetchStudyData();
       }
 
       // 4. Fetch Heatmap

@@ -358,7 +358,7 @@ const props = defineProps({
   problemTitle: String   // 힌트 채팅용 (대체)
 });
 
-const emit = defineEmits(['close']);
+const emit = defineEmits(['close', 'acorn-used']);
 
 const copied = ref(false);
 const activeTab = ref('insight');
@@ -429,6 +429,8 @@ const sendChatMessage = async (message) => {
         
         // 어시스턴트 메시지 추가
         chatMessages.value.push({ role: 'assistant', content: response.data.reply });
+        
+        emit('acorn-used');
         
         // 후속 질문으로 빠른 답장 업데이트
         if (response.data.followUpQuestions?.length > 0) {
