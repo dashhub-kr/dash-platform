@@ -157,7 +157,7 @@
 
   <!-- 모바일 헤더 (작은 화면에서만 표시) -->
   <div v-if="visible" class="md:hidden fixed top-0 left-0 w-full h-16 bg-white border-b border-slate-200 z-50 flex items-center justify-between px-4">
-      <div class="flex items-center gap-2 font-['Outfit'] text-xl select-none" @click="goHome">
+      <div class="flex items-center gap-px font-['Outfit'] text-xl select-none" @click="goHome">
         <span class="font-black text-brand-600 tracking-tighter">Dash</span>
         <span class="font-bold text-slate-700 tracking-tight">Hub</span>
       </div>
