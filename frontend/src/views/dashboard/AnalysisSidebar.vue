@@ -315,7 +315,7 @@
 
                                 <div v-if="msg.suggestions && msg.suggestions.length > 0" class="mt-3 pt-3 border-t border-slate-100 flex flex-wrap gap-2 animate-fade-in">
                                     <button v-for="q in msg.suggestions" :key="q" @click="sendSuggestion(q)" 
-                                        class="px-2.5 py-1.5 bg-brand-50 hover:bg-brand-100 text-brand-700 rounded-lg text-[10px] font-bold transition-colors flex items-center gap-1.5">
+                                        class="px-3 py-1.5 bg-brand-50 hover:bg-brand-100 text-brand-700 rounded-xl text-xs font-medium transition-colors flex items-center gap-1.5 border border-brand-200 shadow-sm">
                                         <MessageCircle :size="12"/> {{ q }}
                                     </button>
                                 </div>
@@ -526,13 +526,18 @@ const sendTutorMessage = async () => {
     const userMsg = tutorInput.value;
     tutorMessages.value.push({ role: 'user', content: userMsg });
     tutorInput.value = '';
+    
+    // Add temporary loading message
+    const loadingMsg = { role: 'assistant', content: '', isLoading: true };
+    tutorMessages.value.push(loadingMsg);
     loadingTutorResponse.value = true;
     
     // Auto-scroll
     nextTick(() => { if(chatContainer.value) chatContainer.value.scrollTop = chatContainer.value.scrollHeight; });
 
     // History excludes current & loading
-    const history = tutorMessages.value.slice(0, -1).map(m => ({ 
+    // We already pushed userMsg and loadingMsg, so slice -2 to get history before this turn
+    const history = tutorMessages.value.slice(0, -2).map(m => ({ 
         role: m.role === 'user' ? 'user' : 'assistant', 
         content: m.content 
     }));
@@ -547,6 +552,9 @@ const sendTutorMessage = async () => {
              history: history
         });
 
+        // Remove loading message
+        tutorMessages.value.pop();
+
         tutorMessages.value.push({ 
             role: 'assistant', 
             content: res.data.reply || res.data.answer || "답변을 생성할 수 없습니다.",
@@ -556,6 +564,9 @@ const sendTutorMessage = async () => {
         });
     } catch (e) {
         console.error("Tutor chat failed", e);
+        
+        // Remove loading message
+        tutorMessages.value.pop();
         
         const errorMsg = e.response?.data?.message || '';
         if (errorMsg.includes('Not enough acorns')) {
