@@ -43,6 +43,12 @@ const stopPolling = () => {
 };
 
 onMounted(async () => {
+  // If already has studyId, skip this step
+  if (user.value?.studyId) {
+     emit('next');
+     return;
+  }
+
   try {
     const res = await studyApi.getMyApplication();
     if (res.status === 200 && res.data) {

@@ -155,10 +155,10 @@ router.beforeEach(async (to, from, next) => {
     return next();
   }
 
-  // 3. Authenticated User Handling
   // Check completion status
+  // 3. Authenticated User Handling
   const isOnboardingComplete = user.value && 
-                               user.value.solvedacId && 
+                               (user.value.solvedacId || user.value.solvedacHandle) && 
                                user.value.studyId && 
                                user.value.repositoryName;
 

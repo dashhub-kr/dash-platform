@@ -51,26 +51,31 @@ const determineInitialStep = () => {
     return;
   }
 
+  // Solved.ac 연동 여부 확인 (solvedacId 또는 solvedacHandle 확인)
+  const hasSolvedac = user.value.solvedacId || user.value.solvedacHandle;
+  const hasStudy = !!user.value.studyId;
+  const hasRepo = !!user.value.repositoryName;
+
   // 사용자가 모든 단계를 완료한 경우 -> 대시보드로 리다이렉트
-  if (user.value.solvedacId && user.value.studyId && user.value.repositoryName) {
+  if (hasSolvedac && hasStudy && hasRepo) {
     router.replace('/dashboard');
     return;
   }
 
-  // solvedacId 없음 -> 환영 단계
-  if (!user.value.solvedacId) {
+  // solvedac 연동 안됨 -> 환영 단계
+  if (!hasSolvedac) {
     currentStepIndex.value = 0; // welcome
     return;
   }
 
-  // solvedacId 있음, studyId 없음 -> 스터디 단계 (새로고침 시 분석 생략)
-  if (!user.value.studyId) {
-    currentStepIndex.value = 2; // study
+  // solvedac 있음, study 없음 -> 분석 단계 (새로고침 시 분석 페이지 보여주기)
+  if (!hasStudy) {
+    currentStepIndex.value = 1; // analysis
     return;
   }
 
-  // studyId 있음, repositoryName 없음 -> 저장소 단계
-  if (!user.value.repositoryName) {
+  // study 있음, repo 없음 -> 저장소 단계
+  if (!hasRepo) {
     currentStepIndex.value = 3; // repo
     return;
   }
@@ -93,12 +98,30 @@ watch(() => user.value?.studyId, (newStudyId, oldStudyId) => {
 
 const nextStep = () => {
   hasNavigatedManually.value = true;
+  
+  // Current Step: Welcome (0) -> Next: Analysis (1)
+  // Current Step: Analysis (1) -> Next: Study (2) OR Repo (3) if study done
+  // Current Step: Study (2) -> Next: Repo (3)
+  
   if (currentStepIndex.value < steps.length - 1) {
-    currentStepIndex.value++;
+    // If moving from Analysis (1) to Study (2), check if study is already done
+    if (currentStepIndex.value === 1 && user.value?.studyId) {
+      currentStepIndex.value = 3; // Skip Study, go to Repo
+    } else {
+      currentStepIndex.value++;
+    }
   }
 };
 
-const finishOnboarding = () => {
+const finishOnboarding = async (repoName) => {
+  await refresh();
+  
+  // Guard Bypass: If backend is slow to update, optimistically set the repo name locally
+  // so the Router Guard allows access to Dashboard.
+  if (user.value && !user.value.repositoryName && repoName) {
+    user.value.repositoryName = repoName;
+  }
+  
   router.replace('/dashboard');
 };
 </script>

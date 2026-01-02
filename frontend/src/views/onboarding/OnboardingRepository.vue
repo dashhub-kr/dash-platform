@@ -211,7 +211,7 @@ const emit = defineEmits(['finish']);
 
 const scheduleRedirect = () => {
   setTimeout(() => {
-    emit('finish');
+    emit('finish', selectedRepo.value?.fullName);
   }, 1500);
 };
 
