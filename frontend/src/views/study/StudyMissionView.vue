@@ -144,6 +144,10 @@
                                 </div>
 
                                 <div class="relative h-3 bg-slate-200 rounded-full mb-8 mx-2 overflow-visible">
+                                    <!-- 진행률 채움 바 -->
+                                    <div class="absolute top-0 left-0 h-full bg-brand-200 rounded-full transition-all duration-500 ease-out"
+                                         :style="{ width: `${Math.round((mission.memberProgressList?.reduce((acc, cur) => acc + cur.completedCount, 0) / (Math.max(mission.memberProgressList?.length * Math.max(mission.totalProblems, 1), 1))) * 100)}%` }">
+                                    </div>
                                     <!-- 참여자 (러너) -->
                                     <template v-for="(members, progress) in getGroupedMembers(mission.memberProgressList)" :key="progress">
                                         <div 
