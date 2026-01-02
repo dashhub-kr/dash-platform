@@ -18,12 +18,13 @@
     WHERE c.id = #{id}
   </select>
 
-  <select id="selectByBoardId" resultType="Comment" parameterType="long">
+  <select id="selectByBoardId" resultType="Comment">
     SELECT 
       c.id, c.board_id, c.user_id, c.parent_id, c.line_number, c.content, c.like_count, 
       c.created_at, c.updated_at,
       u.username as author_name,
-      u.avatar_url as author_profile_image_url
+      u.avatar_url as author_profile_image_url,
+      (SELECT COUNT(*) FROM comment_likes cl WHERE cl.comment_id = c.id AND cl.user_id = #{userId}) > 0 as is_liked
     FROM comments c
     LEFT JOIN users u ON c.user_id = u.id
     WHERE c.board_id = #{boardId}
@@ -35,7 +36,8 @@
       c.id, c.board_id, c.user_id, c.parent_id, c.line_number, c.content, c.like_count, 
       c.created_at, c.updated_at,
       u.username as author_name,
-      u.avatar_url as author_profile_image_url
+      u.avatar_url as author_profile_image_url,
+      (SELECT COUNT(*) FROM comment_likes cl WHERE cl.comment_id = c.id AND cl.user_id = #{userId}) > 0 as is_liked
     FROM comments c
     LEFT JOIN users u ON c.user_id = u.id
     WHERE c.board_id = #{boardId} AND c.line_number = #{lineNumber}
@@ -44,7 +46,9 @@
 
   <update id="update" parameterType="Comment">
     UPDATE comments 
-    SET content = #{content}, updated_at = #{updatedAt}
+    SET content = #{content}, 
+        like_count = #{likeCount},
+        updated_at = #{updatedAt}
     WHERE id = #{id}
   </update>
 

@@ -28,13 +28,13 @@ public class CommentRepositoryImpl implements CommentRepository {
     }
 
     @Override
-    public List<Comment> findByBoardId(Long boardId) {
-        return commentMapper.selectByBoardId(boardId);
+    public List<Comment> findByBoardId(Long boardId, Long currentUserId) {
+        return commentMapper.selectByBoardId(boardId, currentUserId);
     }
 
     @Override
-    public List<Comment> findByBoardIdAndLineNumber(Long boardId, Integer lineNumber) {
-        return commentMapper.selectByBoardIdAndLineNumber(boardId, lineNumber);
+    public List<Comment> findByBoardIdAndLineNumber(Long boardId, Integer lineNumber, Long currentUserId) {
+        return commentMapper.selectByBoardIdAndLineNumber(boardId, lineNumber, currentUserId);
     }
 
     @Override
