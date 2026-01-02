@@ -16,6 +16,7 @@ public record CommentResponse(
                 Integer lineNumber,
                 String content,
                 Integer likeCount,
+                boolean isLiked,
                 List<CommentResponse> replies,
                 LocalDateTime createdAt,
                 LocalDateTime updatedAt) {
@@ -35,6 +36,7 @@ public record CommentResponse(
                                 result.lineNumber(),
                                 result.content(),
                                 result.likeCount(),
+                                result.isLiked(),
                                 repliesResponse,
                                 result.createdAt(),
                                 result.updatedAt());

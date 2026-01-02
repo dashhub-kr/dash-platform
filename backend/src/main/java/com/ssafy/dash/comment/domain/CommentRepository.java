@@ -9,9 +9,9 @@ public interface CommentRepository {
 
     Optional<Comment> findById(Long id);
 
-    List<Comment> findByBoardId(Long boardId);
+    List<Comment> findByBoardId(Long boardId, Long currentUserId);
 
-    List<Comment> findByBoardIdAndLineNumber(Long boardId, Integer lineNumber);
+    List<Comment> findByBoardIdAndLineNumber(Long boardId, Integer lineNumber, Long currentUserId);
 
     void update(Comment comment);
 

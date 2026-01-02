@@ -56,9 +56,15 @@ public class CommentController {
     @GetMapping
     public ResponseEntity<List<CommentResponse>> findByBoardId(
             @PathVariable Long boardId,
-            @RequestParam(required = false) Integer lineNumber) {
+            @RequestParam(required = false) Integer lineNumber,
+            @Parameter(hidden = true) @AuthenticationPrincipal OAuth2User principal) {
 
-        List<CommentResponse> responses = commentService.findByBoardId(boardId, lineNumber).stream()
+        Long userId = null;
+        if (principal instanceof CustomOAuth2User customUser) {
+            userId = customUser.getUserId();
+        }
+
+        List<CommentResponse> responses = commentService.findByBoardId(boardId, lineNumber, userId).stream()
                 .map(CommentResponse::from)
                 .collect(Collectors.toList());
 

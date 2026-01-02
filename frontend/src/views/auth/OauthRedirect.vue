@@ -15,16 +15,16 @@
            <div class="absolute inset-0 rounded-full border-4 border-brand-500 border-t-transparent animate-spin"></div>
            <!-- 내부 아이콘 -->
            <div class="absolute inset-0 flex items-center justify-center text-brand-500">
-             <Compass :size="40" class="animate-pulse" />
+             <TreeDeciduous :size="40" class="animate-pulse" />
            </div>
         </div>
 
         <div class="space-y-2">
             <h2 class="text-2xl font-black text-slate-800">
               <span v-if="isSignUp">새로운 모험을 준비하고 있어요!</span>
-              <span v-else>알고리즘의 바다로 이동 중...</span>
+              <span v-else>알고리즘 숲으로 이동 중...</span>
             </h2>
-            <p class="text-slate-500 font-medium">잠시만 기다려주세요, 선장님!</p>
+            <p class="text-slate-500 font-medium">잠시만 기다려주세요!</p>
         </div>
       </div>
 
@@ -33,7 +33,7 @@
         <div class="w-16 h-16 bg-red-50 rounded-full flex items-center justify-center mx-auto mb-4 text-red-500">
             <Ghost :size="32" />
         </div>
-        <h2 class="text-xl font-bold text-slate-800 mb-2">항해를 시작할 수 없습니다</h2>
+        <h2 class="text-xl font-bold text-slate-800 mb-2">숲에 들어갈 수 없습니다</h2>
         <p class="text-sm text-slate-500 mb-6">{{ error }}</p>
         <button 
           @click="goHome" 
@@ -51,7 +51,7 @@
 import { ref, onMounted, computed } from "vue";
 import { useRouter } from "vue-router";
 import { authApi } from "@/api/auth";
-import { Compass, Ghost } from "lucide-vue-next";
+import { TreeDeciduous, Ghost } from "lucide-vue-next";
 
 const router = useRouter();
 const error = ref(null);

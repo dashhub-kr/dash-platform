@@ -27,6 +27,7 @@ public class Comment {
     private String authorName;
     private String authorProfileImageUrl;
     private List<Comment> replies; // 대댓글 목록
+    private boolean isLiked; // 현재 사용자의 좋아요 여부 (조회용)
 
     private Comment(Long boardId, Long userId, Long parentId, Integer lineNumber,
             String content, LocalDateTime createdAt, LocalDateTime updatedAt) {
