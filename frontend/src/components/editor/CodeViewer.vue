@@ -2,8 +2,8 @@
   <div ref="rootRef" class="code-viewer bg-white border border-slate-200 rounded-xl relative">
     <!-- 헤더 -->
     <div class="px-4 py-2 bg-slate-50 text-slate-500 text-xs font-mono border-b border-slate-200 flex justify-between items-center select-none rounded-t-xl">
-      <span class="font-bold text-slate-600">{{ filename }}</span>
-      <div class="flex items-center gap-3">
+      <span class="font-bold text-slate-600 truncate min-w-0">{{ filename }}</span>
+      <div class="flex items-center gap-3 flex-shrink-0">
         <!-- 작성자 필터 -->
         <select v-if="uniqueAuthors.length > 0" v-model="selectedAuthorFilter" class="text-[10px] bg-white border border-slate-200 rounded px-2 py-1 focus:outline-none focus:ring-1 focus:ring-brand-400">
           <option value="">모든 댓글</option>
@@ -55,7 +55,7 @@
               </td>
               
               <!-- 댓글 배지 (우측 표시기) -->
-              <td class="w-16 text-center py-0.5 align-middle">
+              <td class="w-16 whitespace-nowrap text-center py-0.5 align-middle">
                 <!-- 접힘: 쌓인 아바타 표시 -->
                 <div v-if="filteredCommentsByLine[index + 1]?.length > 0 && !isLineExpanded(index + 1)" 
                      class="flex items-center justify-center cursor-pointer" 
