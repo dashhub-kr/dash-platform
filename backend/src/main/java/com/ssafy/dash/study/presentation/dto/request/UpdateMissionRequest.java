@@ -7,5 +7,6 @@ import java.time.LocalDate;
  */
 public record UpdateMissionRequest(
         String title,
-        LocalDate deadline) {
+        LocalDate deadline,
+        java.util.List<Integer> problemIds) {
 }
