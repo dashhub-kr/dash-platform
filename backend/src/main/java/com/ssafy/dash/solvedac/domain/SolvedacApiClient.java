@@ -24,9 +24,5 @@ public interface SolvedacApiClient {
      */
     TagStat getTagStats(String handle);
 
-    /**
-     * 상위 100개 문제 조회
-     * GET /user/top_100?handle={handle}
-     */
-    Top100Problems getTop100Problems(String handle);
+
 }

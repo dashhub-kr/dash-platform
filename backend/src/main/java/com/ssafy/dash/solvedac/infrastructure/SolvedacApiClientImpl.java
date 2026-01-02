@@ -4,12 +4,12 @@ import com.ssafy.dash.solvedac.domain.ClassStat;
 import com.ssafy.dash.solvedac.domain.SolvedacApiClient;
 import com.ssafy.dash.solvedac.domain.SolvedacUser;
 import com.ssafy.dash.solvedac.domain.TagStat;
-import com.ssafy.dash.solvedac.domain.Top100Problems;
+
 import com.ssafy.dash.solvedac.domain.exception.SolvedacApiException;
 import com.ssafy.dash.solvedac.infrastructure.dto.ClassStatResponse;
 import com.ssafy.dash.solvedac.infrastructure.dto.SolvedacUserResponse;
 import com.ssafy.dash.solvedac.infrastructure.dto.TagStatResponse;
-import com.ssafy.dash.solvedac.infrastructure.dto.Top100Response;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -86,20 +86,7 @@ public class SolvedacApiClientImpl implements SolvedacApiClient {
         }
     }
 
-    @Override
-    public Top100Problems getTop100Problems(String handle) {
-        try {
-            log.debug("Fetching top 100 problems for handle: {}", handle);
-            Top100Response response = restClient.get()
-                    .uri(baseUrl + "/user/top_100?handle={handle}", handle)
-                    .retrieve()
-                    .body(Top100Response.class);
-            return mapToTop100Problems(response);
-        } catch (RestClientException e) {
-            log.error("Failed to fetch top 100 problems for handle: {}", handle, e);
-            throw new SolvedacApiException("상위 100개 문제를 가져올 수 없습니다: " + handle, e);
-        }
-    }
+
 
     // Mappers
 
@@ -147,27 +134,5 @@ public class SolvedacApiClientImpl implements SolvedacApiClient {
         return new TagStat(dto.getCount(), items);
     }
 
-    private Top100Problems mapToTop100Problems(Top100Response dto) {
-        if (dto == null) return null;
-        List<Top100Problems.Problem> items = dto.getItems().stream()
-                .map(itemDto -> new Top100Problems.Problem(
-                        itemDto.getProblemId(),
-                        itemDto.getTitleKo(),
-                        itemDto.getLevel(),
-                        itemDto.getTags().stream()
-                                .map(tagDto -> new Top100Problems.Tag(
-                                        tagDto.getKey(),
-                                        tagDto.getBojTagId(),
-                                        tagDto.getDisplayNames().stream()
-                                                .map(dnDto -> new Top100Problems.DisplayName(
-                                                        dnDto.getLanguage(),
-                                                        dnDto.getName()
-                                                ))
-                                                .collect(Collectors.toList())
-                                ))
-                                .collect(Collectors.toList())
-                ))
-                .collect(Collectors.toList());
-        return new Top100Problems(dto.getCount(), items);
-    }
+
 }

@@ -14,7 +14,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import java.time.LocalDateTime;
 import java.util.List;
 
 /**
@@ -29,8 +28,6 @@ public class SolvedacSyncService {
     private final UserRepository userRepository;
     private final UserClassStatRepository classStatRepository;
     private final UserTagStatRepository tagStatRepository;
-    private final com.ssafy.dash.algorithm.domain.AlgorithmRecordRepository recordRepository;
-
     /**
      * 사용자 Solved.ac 핸들 등록 및 초기 데이터 동기화
      */
@@ -60,8 +57,7 @@ public class SolvedacSyncService {
         // 4. 태그 통계 동기화
         syncTagStats(userId, handle);
 
-        // 5. 상위 100 문제 동기화
-        syncTop100Problems(userId, handle);
+
 
         log.info("Successfully synced Solved.ac data for user {}", userId);
     }
@@ -109,55 +105,7 @@ public class SolvedacSyncService {
         log.info("Synced {} tag stats for user {}", response.count(), userId);
     }
 
-    /**
-     * 상위 100 문제 동기화
-     */
-    @Transactional
-    public void syncTop100Problems(Long userId, String handle) {
-        var response = solvedacClient.getTop100Problems(handle);
-        var existingRecords = recordRepository.findByUserId(userId);
-        var existingProblemNumbers = existingRecords.stream()
-                .map(com.ssafy.dash.algorithm.domain.AlgorithmRecord::getProblemNumber)
-                .collect(java.util.stream.Collectors.toSet());
 
-        int count = 0;
-        for (var item : response.items()) {
-            if (existingProblemNumbers.contains(item.problemId())) {
-                continue;
-            }
-
-            // 코드 없이 레코드 생성
-            com.ssafy.dash.algorithm.domain.AlgorithmRecord record = com.ssafy.dash.algorithm.domain.AlgorithmRecord
-                    .create(
-                            userId,
-                            null, // studyId
-                            item.problemId(),
-                            item.titleKo(),
-                            "none", // 언어 필수
-                            "", // 코드 없음
-                            LocalDateTime.now());
-
-            // 난이도(레벨) 등의 메타데이터 추가
-            record.enrichMetadata(
-                    "BOJ",
-                    String.valueOf(item.level()),
-                    null,
-                    null,
-                    "Solved.ac Sync",
-                    null,
-                    null,
-                    null,
-                    LocalDateTime.now());
-
-            // Set record type to distinguish from user solutions
-            record.setRecordType("TOP100_PROBLEM");
-
-            recordRepository.save(record);
-            count++;
-        }
-
-        log.info("Synced {} new problems from Top 100 for user {}", count, userId);
-    }
 
     /**
      * 전체 통계 재동기화 (주기적 업데이트용)
