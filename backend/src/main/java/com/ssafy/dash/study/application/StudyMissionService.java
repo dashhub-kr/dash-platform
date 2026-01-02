@@ -116,9 +116,9 @@ public class StudyMissionService {
     }
 
     /**
-     * 미션 정보 수정 (제목, 마감일)
+     * 미션 정보 수정 (제목, 마감일, 문제 목록)
      */
-    public StudyMission updateMission(Long missionId, String title, LocalDate deadline) {
+    public StudyMission updateMission(Long missionId, String title, LocalDate deadline, List<Integer> problemIds) {
         StudyMission mission = missionRepository.findById(missionId)
                 .orElseThrow(() -> new IllegalArgumentException("미션을 찾을 수 없습니다."));
 
@@ -127,6 +127,31 @@ public class StudyMissionService {
         }
         if (deadline != null) {
             mission.setDeadline(deadline);
+        }
+
+        if (problemIds != null) {
+            List<Integer> currentProblems = parseProblems(mission.getProblemIds());
+            
+            // 1. Identify removed problems
+            List<Integer> removedProblems = new ArrayList<>(currentProblems);
+            removedProblems.removeAll(problemIds);
+
+            // 2. Identify added problems
+            List<Integer> addedProblems = new ArrayList<>(problemIds);
+            addedProblems.removeAll(currentProblems);
+
+            // 3. Update mission with NEW complete list (preserves order)
+            mission.setProblemIds(toJson(problemIds));
+
+            // 4. Process cleanup for removed problems
+            for (Integer pid : removedProblems) {
+                submissionRepository.deleteByMissionIdAndProblemId(missionId, pid);
+            }
+
+            // 5. Initialize submissions for added problems
+            if (!addedProblems.isEmpty()) {
+                initializeSubmissions(mission.getId(), mission.getStudyId(), addedProblems);
+            }
         }
 
         missionRepository.update(mission);

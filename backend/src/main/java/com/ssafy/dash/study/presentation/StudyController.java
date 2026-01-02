@@ -236,7 +236,7 @@ public class StudyController {
             @PathVariable Long studyId,
             @PathVariable Long missionId,
             @RequestBody UpdateMissionRequest request) {
-        studyMissionService.updateMission(missionId, request.title(), request.deadline());
+        studyMissionService.updateMission(missionId, request.title(), request.deadline(), request.problemIds());
         return ResponseEntity.ok().build();
     }
 
