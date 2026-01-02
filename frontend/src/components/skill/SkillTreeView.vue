@@ -442,23 +442,6 @@ const openLecture = async (tag) => {
   closeActionModal();
   lectureTag.value = tag;
   lectureModalOpen.value = true;
-  lectureLoading.value = true;
-  lectureVideos.value = [];
-  lectureProblems.value = [];
-  
-  try {
-    const query = `${tag.name} 알고리즘 강의`;
-    const [videoRes, probRes] = await Promise.all([
-      youtubeApi.search(query),
-      problemApi.getRecommendations(tag.key, userTier.value || 1)
-    ]);
-    lectureVideos.value = videoRes.data || [];
-    lectureProblems.value = probRes.data || [];
-  } catch (e) {
-    console.error('Failed to load lecture data:', e);
-  } finally {
-    lectureLoading.value = false;
-  }
 };
 
 const closeLectureModal = () => {

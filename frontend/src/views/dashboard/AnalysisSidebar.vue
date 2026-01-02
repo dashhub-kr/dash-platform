@@ -315,8 +315,9 @@
 
                                 <div v-if="msg.suggestions && msg.suggestions.length > 0" class="mt-3 pt-3 border-t border-slate-100 flex flex-wrap gap-2 animate-fade-in">
                                     <button v-for="q in msg.suggestions" :key="q" @click="sendSuggestion(q)" 
-                                        class="px-2.5 py-1.5 bg-brand-50 hover:bg-brand-100 text-brand-700 rounded-lg text-[10px] font-bold transition-colors flex items-center gap-1.5">
-                                        <MessageCircle :size="12"/> {{ q }}
+                                        class="px-3 py-2 bg-brand-50 hover:bg-brand-100 text-brand-700 rounded-xl text-xs font-medium transition-colors flex items-start gap-2 border border-brand-200 shadow-sm w-full text-left">
+                                        <MessageCircle :size="14" class="shrink-0 mt-0.5"/> 
+                                        <span class="leading-relaxed">{{ q }}</span>
                                     </button>
                                 </div>
                             </div>
@@ -359,7 +360,7 @@ const props = defineProps({
   record: { type: Object, default: null }
 });
 
-const emit = defineEmits(['scroll-to-line']);
+const emit = defineEmits(['scroll-to-line', 'acorn-used']);
 
 const { user } = useAuth();
 
@@ -526,13 +527,18 @@ const sendTutorMessage = async () => {
     const userMsg = tutorInput.value;
     tutorMessages.value.push({ role: 'user', content: userMsg });
     tutorInput.value = '';
+    
+    // Add temporary loading message
+    const loadingMsg = { role: 'assistant', content: '', isLoading: true };
+    tutorMessages.value.push(loadingMsg);
     loadingTutorResponse.value = true;
     
     // Auto-scroll
     nextTick(() => { if(chatContainer.value) chatContainer.value.scrollTop = chatContainer.value.scrollHeight; });
 
     // History excludes current & loading
-    const history = tutorMessages.value.slice(0, -1).map(m => ({ 
+    // We already pushed userMsg and loadingMsg, so slice -2 to get history before this turn
+    const history = tutorMessages.value.slice(0, -2).map(m => ({ 
         role: m.role === 'user' ? 'user' : 'assistant', 
         content: m.content 
     }));
@@ -547,6 +553,9 @@ const sendTutorMessage = async () => {
              history: history
         });
 
+        // Remove loading message
+        tutorMessages.value.pop();
+
         tutorMessages.value.push({ 
             role: 'assistant', 
             content: res.data.reply || res.data.answer || "답변을 생성할 수 없습니다.",
@@ -554,9 +563,20 @@ const sendTutorMessage = async () => {
             concepts: res.data.relatedConcepts,
             encouragement: res.data.encouragement
         });
+        
+        emit('acorn-used');
     } catch (e) {
         console.error("Tutor chat failed", e);
-        tutorMessages.value.push({ role: 'assistant', content: "죄송합니다, 답변을 생성하는 중 오류가 발생했습니다." });
+        
+        // Remove loading message
+        tutorMessages.value.pop();
+        
+        const errorMsg = e.response?.data?.message || '';
+        if (errorMsg.includes('Not enough acorns')) {
+             tutorMessages.value.push({ role: 'assistant', content: "도토리가 부족해 응답을 생성할 수 없습니다." });
+        } else {
+             tutorMessages.value.push({ role: 'assistant', content: "죄송합니다, 답변을 생성하는 중 오류가 발생했습니다." });
+        }
     } finally {
         loadingTutorResponse.value = false;
         nextTick(() => { if(chatContainer.value) chatContainer.value.scrollTop = chatContainer.value.scrollHeight; });

@@ -158,26 +158,28 @@
       </table>
     </div>
 
-    <!-- AI 주석 툴팁 (절대 위치, 텔레포트 안함) -->
-    <div v-if="hoveredLine && keyBlocksByLine[hoveredLine]?.length > 0"
-         class="absolute z-[100] bg-white text-slate-800 rounded-2xl shadow-2xl p-5 max-w-md pointer-events-none border border-brand-200"
-         :style="{ left: tooltipPosition.x + 'px', top: tooltipPosition.y + 'px', transform: 'translateY(-100%) translateY(-12px)' }">
-      <div class="flex items-center gap-2 mb-3 text-brand-600 font-bold text-sm">
-        <span>💡</span>
-        <span>AI 코드 설명</span>
-      </div>
-      <div v-for="(block, idx) in keyBlocksByLine[hoveredLine]" :key="idx" class="space-y-3">
-        <div v-if="block.code" class="bg-slate-100 rounded-lg p-3 text-xs font-mono text-slate-700 border border-slate-200">
-          {{ block.code }}
+    <!-- AI 주석 툴팁 (Teleport로 body로 이동) -->
+    <Teleport to="body">
+      <div v-if="hoveredLine && keyBlocksByLine[hoveredLine]?.length > 0"
+           class="absolute z-[9999] bg-white text-slate-800 rounded-2xl shadow-2xl p-5 max-w-md pointer-events-none border border-brand-200"
+           :style="{ left: tooltipPosition.x + 'px', top: tooltipPosition.y + 'px', transform: 'translateY(-100%) translateY(-12px)' }">
+        <div class="flex items-center gap-2 mb-3 text-brand-600 font-bold text-sm">
+          <span>💡</span>
+          <span>AI 코드 설명</span>
         </div>
-        <p class="text-sm text-slate-600 leading-relaxed">{{ block.explanation }}</p>
+        <div v-for="(block, idx) in keyBlocksByLine[hoveredLine]" :key="idx" class="space-y-3">
+          <div v-if="block.code" class="bg-slate-100 rounded-lg p-3 text-xs font-mono text-slate-700 border border-slate-200">
+            {{ block.code }}
+          </div>
+          <p class="text-sm text-slate-600 leading-relaxed">{{ block.explanation }}</p>
+        </div>
+        <!-- 아래 화살표 (하단) -->
+        <div class="absolute bottom-0 left-6 translate-y-[95%] text-brand-200 drop-shadow-sm">
+             <div class="w-0 h-0 border-l-[8px] border-r-[8px] border-t-[8px] border-l-transparent border-r-transparent border-t-brand-200"></div>
+             <div class="w-0 h-0 border-l-[6px] border-r-[6px] border-t-[6px] border-l-transparent border-r-transparent border-t-white absolute bottom-[2px] left-[-6px]"></div>
+        </div>
       </div>
-      <!-- 아래 화살표 (하단) -->
-      <div class="absolute bottom-0 left-6 translate-y-[95%] text-brand-200 drop-shadow-sm">
-           <div class="w-0 h-0 border-l-[8px] border-r-[8px] border-t-[8px] border-l-transparent border-r-transparent border-t-brand-200"></div>
-           <div class="w-0 h-0 border-l-[6px] border-r-[6px] border-t-[6px] border-l-transparent border-r-transparent border-t-white absolute bottom-[2px] left-[-6px]"></div>
-      </div>
-    </div>
+    </Teleport>
   </div>
 </template>
 
@@ -330,10 +332,10 @@ const updateTooltipPosition = () => {
     }
 
     if (targetRect) {
-        // Calculate position RELATIVE to the root container
+        // Calculate position RELATIVE to the document body (for Teleport)
         tooltipPosition.value = {
-            x: targetRect.left - rootRect.left,
-            y: targetRect.top - rootRect.top
+            x: targetRect.left + window.scrollX,
+            y: targetRect.top + window.scrollY
         };
     }
     
