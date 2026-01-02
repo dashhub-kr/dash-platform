@@ -12,7 +12,9 @@
     <select id="selectByStudyId" resultType="com.ssafy.dash.acorn.domain.AcornLog">
         SELECT 
             al.id, al.study_id, al.user_id, al.amount, al.reason, al.created_at,
-            u.username as username
+            u.username as username,
+            u.avatar_url as avatarUrl,
+            u.solvedac_handle as solvedacHandle
         FROM acorn_log al
         LEFT JOIN users u ON al.user_id = u.id
         WHERE al.study_id = #{studyId}

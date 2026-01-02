@@ -160,7 +160,7 @@
               게시판 이용 가이드
             </h3>
             <p class="text-xs text-slate-500 leading-relaxed">
-              자유롭게 질문하고 정보를 공유해보세요. 서로 배려하는 문화를 만들어갑시다.
+              자유롭게 질문하고 정보를 공유해보세요.
             </p>
           </div>
         </aside>

@@ -150,7 +150,7 @@ const reorderBodies = () => {
 const centerX = () => window.innerWidth / 2;
 const spawnXForType = (type) => {
   const vw = window.innerWidth;
-  const spread = vw;
+  const spread = vw * 0.5; // Reduced from 1.0 to 0.5 for tighter center grouping
   let sum = 0;
   for (let i = 0; i < 6; i++) sum += Math.random();
   const rand = (sum - 3) / 6;

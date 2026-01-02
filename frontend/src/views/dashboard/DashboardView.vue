@@ -197,7 +197,7 @@
                         <div class="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center mb-4">
                             <Code2 :size="32" class="text-slate-300" />
                         </div>
-                        <h3 class="text-lg font-bold text-slate-800 mb-1">기록된 모험이 없습니다</h3>
+                        <h3 class="text-lg font-bold text-slate-800 mb-1">알고리즘 숲이 텅 비어있습니다</h3>
                         <p class="text-sm text-slate-400 mb-0 font-medium">
                             {{ selectedFilter === 'ALL' ? '첫 번째 알고리즘 문제를 해결하고 커밋해보세요!' : '해당 카테고리의 기록이 없습니다.' }}
                         </p>
@@ -224,7 +224,7 @@
                      <!-- 통계 1: 도토리 -->
                      <div class="flex items-center gap-2 group cursor-pointer" title="Acorns" @click="goToPlayground">
                         <IconAcorn class="text-fox w-8 h-8" stroke-width="2.5" fill="currentColor" />
-                        <span class="text-xl font-black text-slate-700">{{ studyData?.acornCount || 0 }}</span>
+                        <span class="text-xl font-black text-slate-700">{{ (studyData?.acornCount || 0).toLocaleString() }}</span>
                     </div>
 
                     <div class="w-px h-8 bg-slate-100"></div>
@@ -232,7 +232,7 @@
                     <!-- 통계 3: 스트릭 -->
                     <div class="flex items-center gap-2 group cursor-pointer" title="Streak">
                         <Flame class="w-7 h-7" :class="currentStreak > 0 ? 'text-rose-500 fill-rose-500 animate-pulse' : 'text-slate-300'" stroke-width="2.5" />
-                        <span class="text-xl font-black text-slate-700">{{ currentStreak }}</span>
+                        <span class="text-xl font-black text-slate-700">{{ currentStreak.toLocaleString() }}</span>
                     </div>
                     
                     <div class="w-px h-8 bg-slate-100"></div>
@@ -240,7 +240,7 @@
                     <!-- 통계 2: 제출 수 -->
                      <div class="flex items-center gap-2 group cursor-pointer" title="Submissions">
                         <Send class="w-6 h-6 text-sky-400 fill-sky-400" stroke-width="2.5" />
-                        <span class="text-xl font-black text-slate-700">{{ records.length }}</span>
+                        <span class="text-xl font-black text-slate-700">{{ records.length.toLocaleString() }}</span>
                     </div>
                 </div>
 

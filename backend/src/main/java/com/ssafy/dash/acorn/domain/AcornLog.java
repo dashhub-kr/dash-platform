@@ -20,6 +20,8 @@ public class AcornLog {
     
     // Optional: for joining
     private String username;
+    private String avatarUrl;
+    private String solvedacHandle;
 
     public AcornLog(Long studyId, Long userId, Integer amount, String reason) {
         this.studyId = studyId;
