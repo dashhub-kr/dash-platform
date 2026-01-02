@@ -96,6 +96,7 @@
                                 <div class="flex flex-wrap gap-2">
                                     <div v-if="isLeader" class="flex gap-1 mb-2 w-full">
                                       <button 
+                                        v-if="mission.status !== 'COMPLETED' && getDaysLeft(mission.deadline) >= 0"
                                         @click.stop="openEditModal(mission)"
                                         class="flex items-center gap-1 px-2 py-1 text-slate-400 hover:text-brand-500 hover:bg-brand-50 rounded-lg transition-all text-xs font-bold"
                                         title="미션 수정">
