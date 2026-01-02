@@ -174,9 +174,9 @@ const backToSelection = () => {
           <!-- 헤더 -->
           <div class="text-center mb-12">
             <h1 class="text-4xl font-black bg-gradient-to-r from-indigo-600 to-cyan-500 bg-clip-text text-transparent mb-4">
-              여정의 시작
+              함께할 숲 찾기
             </h1>
-            <p class="text-slate-500 text-lg">혼자 가면 빨리 가지만, 함께 가면 멀리 갑니다.<br>어떤 방식으로 참여하시겠습니까?</p>
+            <p class="text-slate-500 text-lg">작은 묘목들이 모여 울창한 숲을 이룹니다.<br>어떤 숲에서 동료들과 함께하시겠어요?</p>
           </div>
 
           <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
@@ -184,9 +184,9 @@ const backToSelection = () => {
             <div class="group relative bg-white/80 backdrop-blur border border-white/60 rounded-3xl p-8 shadow-xl shadow-indigo-500/10 hover:shadow-indigo-500/20 transition-all hover:-translate-y-1">
               <div class="absolute inset-0 bg-gradient-to-br from-indigo-50/50 to-transparent rounded-3xl opacity-0 group-hover:opacity-100 transition-opacity"></div>
               <div class="relative z-10">
-                <div class="w-16 h-16 bg-indigo-100 rounded-2xl flex items-center justify-center text-3xl mb-6">✨</div>
+                <div class="w-16 h-16 bg-indigo-100 rounded-2xl flex items-center justify-center text-3xl mb-6">🌱</div>
                 <h2 class="text-2xl font-bold text-slate-900 mb-2">새 스터디 만들기</h2>
-                <p class="text-slate-500 mb-8 h-12">나만의 스터디를 만들고<br>리더가 되어 팀을 이끌어보세요.</p>
+                <p class="text-slate-500 mb-8 h-12">새로운 숲을 조성하고<br>리더가 되어 동료들을 이끌어보세요.</p>
                 
                 <form @submit.prevent="createStudy" class="space-y-4">
                   <div>
@@ -223,9 +223,9 @@ const backToSelection = () => {
                  @click="goExplore">
               <div class="absolute inset-0 bg-gradient-to-br from-cyan-50/50 to-transparent rounded-3xl opacity-0 group-hover:opacity-100 transition-opacity"></div>
               <div class="relative z-10 h-full flex flex-col">
-                <div class="w-16 h-16 bg-cyan-100 rounded-2xl flex items-center justify-center text-3xl mb-6">🔭</div>
+                <div class="w-16 h-16 bg-cyan-100 rounded-2xl flex items-center justify-center text-3xl mb-6">🌲</div>
                 <h2 class="text-2xl font-bold text-slate-900 mb-2">스터디 찾아보기</h2>
-                <p class="text-slate-500 mb-8">이미 활동 중인 스터디를 찾아<br>동료가 되어보세요.</p>
+                <p class="text-slate-500 mb-8">이미 조성된 활기찬 숲을 찾아<br>함께 성장하는 동료가 되어보세요.</p>
                 
                 <div class="mt-auto">
                   <div class="w-full bg-cyan-500 hover:bg-cyan-400 text-white font-bold py-3.5 rounded-xl transition-all flex items-center justify-center gap-2">

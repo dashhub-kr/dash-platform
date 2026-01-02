@@ -16,6 +16,7 @@ public record CommentResult(
         Integer lineNumber,
         String content,
         Integer likeCount,
+        boolean isLiked,
         List<CommentResult> replies,
         LocalDateTime createdAt,
         LocalDateTime updatedAt) {
@@ -31,6 +32,7 @@ public record CommentResult(
                 comment.getLineNumber(),
                 comment.getContent(),
                 comment.getLikeCount() != null ? comment.getLikeCount() : 0,
+                comment.isLiked(),
                 Collections.emptyList(),
                 comment.getCreatedAt(),
                 comment.getUpdatedAt());
@@ -48,6 +50,7 @@ public record CommentResult(
                 comment.getLineNumber(),
                 comment.getContent(),
                 comment.getLikeCount() != null ? comment.getLikeCount() : 0,
+                comment.isLiked(),
                 replies,
                 comment.getCreatedAt(),
                 comment.getUpdatedAt());

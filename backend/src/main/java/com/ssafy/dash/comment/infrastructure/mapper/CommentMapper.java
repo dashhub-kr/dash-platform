@@ -14,10 +14,10 @@ public interface CommentMapper {
 
     Optional<Comment> selectById(Long id);
 
-    List<Comment> selectByBoardId(Long boardId);
+    List<Comment> selectByBoardId(@Param("boardId") Long boardId, @Param("userId") Long userId);
 
     List<Comment> selectByBoardIdAndLineNumber(@Param("boardId") Long boardId,
-            @Param("lineNumber") Integer lineNumber);
+            @Param("lineNumber") Integer lineNumber, @Param("userId") Long userId);
 
     void update(Comment comment);
 

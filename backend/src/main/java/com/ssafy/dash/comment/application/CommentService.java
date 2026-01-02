@@ -59,12 +59,12 @@ public class CommentService {
     }
 
     @Transactional(readOnly = true)
-    public List<CommentResult> findByBoardId(Long boardId, Integer lineNumber) {
+    public List<CommentResult> findByBoardId(Long boardId, Integer lineNumber, Long currentUserId) {
         List<Comment> comments;
         if (lineNumber != null) {
-            comments = commentRepository.findByBoardIdAndLineNumber(boardId, lineNumber);
+            comments = commentRepository.findByBoardIdAndLineNumber(boardId, lineNumber, currentUserId);
         } else {
-            comments = commentRepository.findByBoardId(boardId);
+            comments = commentRepository.findByBoardId(boardId, currentUserId);
         }
 
         return buildCommentTree(comments);

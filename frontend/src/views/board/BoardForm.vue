@@ -282,11 +282,16 @@ const handleSubmit = async () => {
         if (isEdit.value) {
             await boardApi.update(route.params.id, payload);
             alert("게시글이 수정되었습니다.");
+            router.push(`/boards/${route.params.id}`);
         } else {
-            await boardApi.create(payload);
+            const res = await boardApi.create(payload);
             alert("게시글이 등록되었습니다.");
+            if (res.data && res.data.id) {
+                router.push(`/boards/${res.data.id}`);
+            } else {
+                router.push('/boards');
+            }
         }
-        router.push('/boards');
     } catch (e) {
         console.error("Failed to submit", e);
         alert("처리에 실패했습니다.");

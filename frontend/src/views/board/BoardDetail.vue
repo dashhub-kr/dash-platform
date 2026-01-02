@@ -136,13 +136,54 @@
               </div>
               <button 
                 @click="toggleCommentLike(comment)"
-                class="flex items-center gap-1 text-sm text-slate-400 hover:text-rose-500 transition-colors"
+                :class="['flex items-center gap-1 text-sm transition-colors', comment.isLiked ? 'text-rose-500 font-bold' : 'text-slate-400 hover:text-rose-500']"
               >
-                <ThumbsUp :size="14" />
+                <ThumbsUp :size="14" :fill="comment.isLiked ? 'currentColor' : 'none'" />
                 {{ comment.likeCount || 0 }}
               </button>
             </div>
-            <p class="text-slate-700 whitespace-pre-wrap pl-11">{{ comment.content }}</p>
+            
+            <!-- 댓글 내용 (수정 모드 아닐 때) -->
+            <p v-if="!comment.isEditing" class="text-slate-700 whitespace-pre-wrap pl-11 mb-2">{{ comment.content }}</p>
+
+            <!-- 댓글 수정 폼 (수정 모드) -->
+            <div v-else class="pl-11 mb-4 mt-2">
+                <textarea
+                    v-model="comment.editContent"
+                    class="w-full bg-white border border-brand-200 rounded-xl p-3 text-slate-800 focus:outline-none focus:ring-2 focus:ring-brand-500 resize-none text-sm"
+                    rows="3"
+                ></textarea>
+                <div class="flex justify-end gap-2 mt-2">
+                    <button 
+                        @click="cancelEditComment(comment)"
+                        class="flex items-center gap-1 px-3 py-1.5 text-xs font-bold text-slate-500 hover:bg-slate-100 rounded-lg transition-colors"
+                    >
+                        <X :size="14" /> 취소
+                    </button>
+                    <button 
+                        @click="saveEditComment(comment)"
+                        class="flex items-center gap-1 px-3 py-1.5 text-xs font-bold text-white bg-brand-500 hover:bg-brand-600 rounded-lg transition-colors shadow-sm"
+                    >
+                        <Check :size="14" /> 저장
+                    </button>
+                </div>
+            </div>
+
+            <!-- 댓글 액션 버튼 (작성자 본인일 때만 표시) -->
+            <div v-if="user && user.id === comment.userId && !comment.isEditing" class="flex justify-end gap-3 pl-11 mt-1">
+                <button 
+                    @click="editComment(comment)"
+                    class="flex items-center gap-1 text-xs text-slate-400 hover:text-brand-600 transition-colors font-medium"
+                >
+                    <Pencil :size="12" /> 수정
+                </button>
+                <button 
+                    @click="deleteComment(comment)"
+                    class="flex items-center gap-1 text-xs text-slate-400 hover:text-rose-500 transition-colors font-medium"
+                >
+                    <Trash2 :size="12" /> 삭제
+                </button>
+            </div>
 
             <!-- 답글 -->
             <div v-if="comment.replies && comment.replies.length > 0" class="mt-4 pl-11 border-l-2 border-slate-200 space-y-3">
@@ -161,7 +202,48 @@
                   <span class="font-medium text-slate-700 text-sm">{{ reply.authorName }}</span>
                   <span class="text-xs text-slate-400">{{ formatDate(reply.createdAt) }}</span>
                 </div>
-                <p class="text-slate-600 text-sm">{{ reply.content }}</p>
+                
+                <!-- 대댓글 내용 및 수정 폼 -->
+                <div v-if="!reply.isEditing">
+                    <p class="text-slate-600 text-sm">{{ reply.content }}</p>
+                </div>
+                <div v-else class="mt-2 mb-2">
+                    <textarea
+                        v-model="reply.editContent"
+                        class="w-full bg-slate-50 border border-slate-200 rounded-lg p-2 text-slate-700 focus:outline-none focus:ring-1 focus:ring-brand-500 resize-none text-xs"
+                        rows="2"
+                    ></textarea>
+                     <div class="flex justify-end gap-2 mt-2">
+                        <button 
+                            @click="cancelEditComment(reply)"
+                            class="flex items-center gap-1 px-2 py-1 text-[10px] font-bold text-slate-500 hover:bg-slate-200 rounded transition-colors"
+                        >
+                            <X :size="12" /> 취소
+                        </button>
+                        <button 
+                            @click="saveEditComment(reply)"
+                            class="flex items-center gap-1 px-2 py-1 text-[10px] font-bold text-white bg-brand-500 hover:bg-brand-600 rounded transition-colors shadow-sm"
+                        >
+                            <Check :size="12" /> 저장
+                        </button>
+                    </div>
+                </div>
+
+                <!-- 대댓글 액션 -->
+                <div v-if="user && user.id === reply.userId && !reply.isEditing" class="flex justify-end gap-2 mt-1">
+                    <button 
+                        @click="editComment(reply)"
+                        class="flex items-center gap-1 text-[10px] text-slate-400 hover:text-brand-600 transition-colors"
+                    >
+                        <Pencil :size="10" /> 수정
+                    </button>
+                    <button 
+                        @click="deleteComment(reply)"
+                        class="flex items-center gap-1 text-[10px] text-slate-400 hover:text-rose-500 transition-colors"
+                    >
+                        <Trash2 :size="10" /> 삭제
+                    </button>
+                </div>
               </div>
             </div>
           </div>
@@ -190,7 +272,7 @@
 <script setup>
 import { ref, onMounted, computed } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
-import { ArrowLeft, ThumbsUp, MessageCircle, Code2 } from 'lucide-vue-next';
+import { ArrowLeft, ThumbsUp, MessageCircle, Code2, Pencil, Trash2, X, Check } from 'lucide-vue-next';
 import { boardApi, commentApi } from '@/api/board';
 import { algorithmApi } from '@/api/algorithm';
 import { useAuth } from '@/composables/useAuth';
@@ -297,10 +379,64 @@ const toggleLike = async () => {
 
 const toggleCommentLike = async (comment) => {
     try {
-        await commentApi.like(comment.id);
-        comment.likeCount = (comment.likeCount || 0) + 1;
+        if (comment.isLiked) {
+            await commentApi.unlike(comment.id);
+            comment.likeCount = Math.max(0, (comment.likeCount || 0) - 1);
+            comment.isLiked = false;
+        } else {
+            await commentApi.like(comment.id);
+            comment.likeCount = (comment.likeCount || 0) + 1;
+            comment.isLiked = true;
+        }
     } catch (e) {
         console.error("Comment like failed", e);
+    }
+};
+
+// 댓글 수정 모드 진입
+const editComment = (comment) => {
+    comment.isEditing = true;
+    comment.editContent = comment.content;
+};
+
+// 댓글 수정 취소
+const cancelEditComment = (comment) => {
+    comment.isEditing = false;
+    comment.editContent = '';
+};
+
+// 댓글 수정 저장
+const saveEditComment = async (comment) => {
+    if (!comment.editContent || !comment.editContent.trim()) {
+        alert("내용을 입력해주세요.");
+        return;
+    }
+    
+    try {
+        const res = await commentApi.update(post.value.id, comment.id, { 
+            content: comment.editContent 
+        });
+        
+        // 업데이트된 내용 반영
+        comment.content = res.data.content;
+        comment.updatedAt = res.data.updatedAt;
+        comment.isEditing = false;
+    } catch (e) {
+        console.error("Comment update failed", e);
+        alert("댓글 수정에 실패했습니다.");
+    }
+};
+
+// 댓글 삭제
+const deleteComment = async (comment) => {
+    if (!confirm("댓글을 삭제하시겠습니까?")) return;
+    
+    try {
+        await commentApi.delete(post.value.id, comment.id);
+        comments.value = comments.value.filter(c => c.id !== comment.id);
+    } catch (e) {
+        console.error("Comment delete failed", e);
+        alert("댓글 삭제에 실패했습니다.");
     }
 };
 
