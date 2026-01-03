@@ -113,7 +113,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, onUnmounted } from 'vue';
 import { onboardingApi } from '@/api/onboarding';
 import { Search, Loader2, CheckCircle2 } from 'lucide-vue-next';
 
@@ -128,42 +128,54 @@ const repositories = ref([]);
 const selectedRepo = ref(null);
 
 let debounceTimer = null;
+let pollInterval = null;
 
-// Fake detection for UX demo + Real logic
+// 엄격한 감지 로직 (Strict Detection Logic)
 const detectRepository = async () => {
-    // 1. Check DOM (injected by extension)
-    let repoName = null;
-    const dataEl = document.getElementById('baekjoonhub-dash-data');
-    if (dataEl?.dataset.repo) {
-       repoName = dataEl.dataset.repo;
+    detecting.value = true;
+    
+    // 1. DOM 확인 (Strict: data-hook 우선)
+    // 익스텐션이 주입하는 데이터:
+    // data-repo: "repo-name" (단순 이름)
+    // data-hook: "user/repo-name" (실제 훅 경로 - 설정 완료 증거)
+    const dataEl = document.getElementById('DashHub-dash-data');
+    if (dataEl) {
+       const hook = dataEl.getAttribute('data-hook');
+       const repo = dataEl.getAttribute('data-repo');
+       
+       if (hook) {
+           onRepoDetected(hook, 'Extension Hook Detected');
+           return;
+       } else if (repo) {
+           // 리포지토리 이름으로 폴백 (덜 엄격하지만, 의미는 있음)
+           // 단순 이름인 경우 사용자에게 좀 더 신중한 확인을 요구할 수도 있음
+           onRepoDetected(repo, 'Extension Settings Detected');
+           return;
+       }
     }
     
-    // If not found, listen for event (with timeout)
-    if (!repoName) {
-        // Wait for event...
-        // For logic simplicity, if not found immediately or via short polling, fallback.
-    }
-
-    // UX Delay
-    await new Promise(r => setTimeout(r, 1500));
-    
-    // Simulate finding one if repoName exists, or if we want to show detection success for demo (if user has repo)
-    // For now, let's assume we proceed to manual if nothing is found.
-    // However, if we found it:
-    if (repoName) {
-        // Extract "owner/repo"
-        if (repoName.includes('github.com/')) repoName = repoName.split('github.com/')[1];
-        
-        detectedRepo.value = {
-            fullName: repoName,
-            description: 'Extension detected repository'
-        };
-    }
-    
-    detecting.value = false;
+    // 2. 요청 발송 (Dispatch Request)
+    window.dispatchEvent(new CustomEvent('DashHub-dash-request'));
 };
 
-// Handle manual search
+const onRepoDetected = (repoName, desc) => {
+    // "user/repo" 형태의 훅 문자열이거나 전체 URL인 경우 파싱
+    // "repo" 단순 이름인 경우 나중에 백엔드 검증에 의존
+    let fullName = repoName;
+    if (fullName.includes('github.com/')) {
+        fullName = fullName.split('github.com/')[1];
+    }
+    
+    detectedRepo.value = {
+        fullName: fullName,
+        description: desc
+    };
+    detecting.value = false;
+    
+    if (pollInterval) clearInterval(pollInterval);
+};
+
+// 수동 검색 처리
 const onSearchInput = () => {
     clearTimeout(debounceTimer);
     if (searchQuery.value.length < 2) return;
@@ -188,6 +200,7 @@ const selectRepo = (repo) => {
 const startManualSearch = () => {
     detectedRepo.value = null;
     detecting.value = false;
+    if (pollInterval) clearInterval(pollInterval);
 };
 
 const confirmRepo = async () => {
@@ -197,7 +210,7 @@ const confirmRepo = async () => {
     saving.value = true;
     try {
         await onboardingApi.submitRepository(repo.fullName);
-        // Success
+        // 성공
         emit('finish', repo.fullName);
     } catch (e) {
         alert('저장소 연결 실패. 다시 시도해주세요.');
@@ -206,19 +219,40 @@ const confirmRepo = async () => {
 };
 
 onMounted(() => {
-    // Listen for real extension data
-    window.addEventListener('baekjoonhub-dash-ready', (e) => {
-        if (detecting.value && e.detail?.repo) {
-            const repoUrl = e.detail.repo;
-            const repoName = repoUrl.includes('github.com/') ? repoUrl.split('github.com/')[1] : repoUrl;
-            detectedRepo.value = { fullName: repoName, description: 'Detected from Extension' };
-            detecting.value = false;
+    // 실제 익스텐션 데이터 수신
+    window.addEventListener('DashHub-dash-ready', (e) => {
+        // 우선순위: hook > repo
+        const hook = e.detail?.hook;
+        const repo = e.detail?.repo;
+        
+        if (detecting.value) {
+            if (hook) {
+                 onRepoDetected(hook, 'Extension Hook Verified');
+            } else if (repo) {
+                 onRepoDetected(repo, 'Extension Repo Detected');
+            }
         }
     });
-    // Trigger detection
-    window.dispatchEvent(new CustomEvent('baekjoonhub-dash-request'));
-    
+
     detectRepository();
+    
+    // 지연 주입을 잡기 위해 잠시 동안 폴링 (예: 10초)
+    let attempt = 0;
+    pollInterval = setInterval(() => {
+        attempt++;
+        if (attempt > 10) { // 약 10초 후 폴링 중지
+             clearInterval(pollInterval);
+             if (detecting.value) {
+                 // 아무것도 발견되지 않으면 수동 모드로 전환? (선택사항)
+                 // detecting.value = false; 
+             }
+        }
+        detectRepository();
+    }, 1000);
+});
+
+onUnmounted(() => {
+    if (pollInterval) clearInterval(pollInterval);
 });
 </script>
 
