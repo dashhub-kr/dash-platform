@@ -120,7 +120,7 @@ const updateSolvedac = async () => {
 const copyVerificationCode = () => {
     const code = `DashHub:${userData.value.username}`;
     navigator.clipboard.writeText(code).then(() => {
-        alert("인증 코드가 복사되었습니다!\nSolved.ac 설정 > 자기소개에 붙여넣어주세요.");
+        alert("인증 코드가 복사되었습니다!\nSolved.ac 로그인 > '프로필 편집'을 통해 붙여넣어주세요.");
     });
 };
 
@@ -331,8 +331,8 @@ const showFaq = ref(false);
                             </h4>
                             <p class="text-xs text-slate-400 leading-relaxed mb-3">
                                 타인 도용 방지를 위해, 
-                                <a href="https://solved.ac/settings/profile" target="_blank" class="text-emerald-600 hover:underline font-bold">Solved.ac 설정 > 자기소개</a>란에
-                                아래 코드를 포함시켜주세요.
+                                <a :href="`https://solved.ac/profile/${userData.solvedacHandle}`" target="_blank" class="text-emerald-600 hover:underline font-bold">Solved.ac</a>
+                                로그인 후 '프로필 편집' 버튼을 눌러 아래 코드를 입력해주세요.
                             </p>
                             <div 
                                 @click="copyVerificationCode"

@@ -21,14 +21,14 @@
 
       <!-- Main Card -->
       <div class="bg-white/70 backdrop-blur-xl border border-white/50 rounded-3xl p-8 shadow-2xl shadow-brand-500/5 ring-1 ring-black/5 transition-all duration-500 hover:shadow-brand-500/10">
-        <form @submit.prevent="submitHandle" class="space-y-6">
+        <form @submit.prevent="handleButtonClick" class="space-y-6">
           
           <!-- Input Field -->
           <div class="space-y-2">
             <label class="text-sm font-bold text-slate-700 ml-1 flex items-center justify-between">
               <span>Solved.ac Handle</span>
-              <span v-if="handle" class="text-xs font-medium" :class="verifiedUser ? 'text-emerald-500' : 'text-slate-400'">
-                {{ verifiedUser ? '확인되었습니다' : '검색 중...' }}
+              <span v-if="handle" class="text-xs font-medium" :class="verificationSuccess ? 'text-emerald-500' : (confirmed ? 'text-blue-500' : 'text-slate-400')">
+                {{ verificationSuccess ? '확인되었습니다' : (confirmed ? '인증 대기중...' : '검색 중...') }}
               </span>
             </label>
             <div class="relative group">
@@ -37,14 +37,14 @@
                 type="text"
                 placeholder="백준 핸들 입력"
                 class="w-full bg-white border-2 border-slate-100 rounded-2xl pl-5 pr-12 py-4 text-lg font-bold text-slate-800 placeholder:text-slate-300 placeholder:font-medium focus:outline-none focus:border-brand-500 focus:ring-4 focus:ring-brand-500/10 transition-all duration-300 shadow-sm"
-                :class="{'border-emerald-400 focus:border-emerald-500 focus:ring-emerald-500/10': confirmed}"
+                :class="{'border-emerald-400 focus:border-emerald-500 focus:ring-emerald-500/10': verificationSuccess}"
                 :disabled="loading || confirmed"
                 @input="onHandleInput"
                 required
               />
               <div class="absolute right-4 top-1/2 -translate-y-1/2 transition-all duration-300 pointer-events-none">
                 <Loader2 v-if="verifying" class="w-6 h-6 text-brand-500 animate-spin" />
-                <CheckCircle2 v-else-if="confirmed" class="w-6 h-6 text-emerald-500 animate-scale-in" />
+                <CheckCircle2 v-else-if="verificationSuccess" class="w-6 h-6 text-emerald-500 animate-scale-in" />
                 <Search v-else class="w-6 h-6 text-slate-300 group-focus-within:text-brand-400" />
               </div>
             </div>
@@ -101,7 +101,7 @@
 
                 <!-- Verification Guide (Only when confirmed) -->
                 <transition name="fade">
-                  <div v-if="confirmed" class="mt-4 pt-4 border-t border-slate-100 space-y-3">
+                  <div v-if="confirmed && !verificationSuccess" class="mt-4 pt-4 border-t border-slate-100 space-y-3">
                     <div class="p-4 bg-slate-50 rounded-xl border border-slate-200">
                         <h4 class="text-sm font-bold text-slate-700 mb-2 flex items-center gap-1.5">
                             <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
@@ -109,8 +109,8 @@
                         </h4>
                         <p class="text-xs text-slate-500 leading-relaxed mb-3">
                             타인 도용 방지를 위해, 
-                            <a :href="`https://solved.ac/profile/${handle}`" target="_blank" class="text-blue-500 hover:underline font-bold">Solved.ac 프로필</a>의
-                            <strong>자기소개</strong>란에 아래 코드를 적어주세요.
+                            <a :href="`https://solved.ac/profile/${handle}`" target="_blank" class="text-blue-500 hover:underline font-bold">Solved.ac</a>
+                            로그인 후 '프로필 편집' 버튼을 눌러 아래 코드를 입력해주세요.
                         </p>
                         
                         <div class="flex items-center gap-2">
@@ -123,10 +123,10 @@
                             </div>
                             
                             <a 
-                                :href="`https://solved.ac/settings/profile`" 
+                                :href="`https://solved.ac/profile/${handle}`" 
                                 target="_blank"
                                 class="p-2.5 bg-white border border-slate-200 rounded-lg text-slate-400 hover:text-blue-500 hover:border-blue-200 transition-colors"
-                                title="Solved.ac 설정으로 이동"
+                                title="Solved.ac 프로필로 이동"
                             >
                                 <ExternalLink class="w-5 h-5" />
                             </a>
@@ -157,8 +157,18 @@
             <div v-if="verifyError" class="bg-rose-50/50 border border-rose-100 rounded-2xl p-4 flex items-start gap-3">
               <AlertCircle class="w-5 h-5 text-rose-500 shrink-0 mt-0.5" />
               <div>
-                <p class="text-sm font-bold text-rose-600">계정을 찾을 수 없어요</p>
-                <p class="text-xs text-rose-400 mt-1">아이디를 다시 한 번 확인해주세요.</p>
+                <p class="text-sm font-bold text-rose-600">
+                    {{ verifyError.includes('존재하지') ? '계정을 찾을 수 없어요' : '인증에 실패했습니다' }}
+                </p>
+                <p class="text-xs text-rose-400 mt-1">{{ verifyError }}</p>
+                <a 
+                    v-if="confirmed && verifyError && !verifyError.includes('존재하지')"
+                    :href="`https://solved.ac/profile/${handle}`"
+                    target="_blank"
+                    class="inline-flex items-center gap-1 text-xs font-bold text-rose-600 underline mt-2 hover:text-rose-700"
+                >
+                    내 프로필 확인하기 <ExternalLink class="w-3 h-3" />
+                </a>
               </div>
             </div>
           </transition>
@@ -171,11 +181,22 @@
           >
             <Loader2 v-if="loading" class="animate-spin h-5 w-5 text-slate-400" />
             <span v-else class="flex items-center gap-2">
-              분석 시작하기
-              <ArrowRight class="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+              {{ verificationSuccess ? '분석 시작하기' : (verifyError ? '다시 인증하기' : '인증하기') }}
+              <ArrowRight v-if="verificationSuccess" class="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+              <RotateCcw v-else-if="verifyError" class="w-5 h-5 group-hover:-rotate-180 transition-transform" />
+              <CheckCircle2 v-else class="w-5 h-5 group-hover:scale-110 transition-transform" />
             </span>
           </button>
 
+          <!-- Retry Helper (Only when error) -->
+          <button 
+            v-if="verifyError" 
+            type="button" 
+            @click="resetConfirmation"
+            class="w-full text-center text-xs text-slate-400 hover:text-rose-500 underline transition-colors"
+          >
+            아이디를 잘못 입력하셨나요? 다시 검색하기
+          </button>
         </form>
       </div>
       
@@ -193,7 +214,7 @@
 import { ref } from 'vue';
 import { onboardingApi } from '@/api/onboarding';
 import { useAuth } from '@/composables/useAuth';
-import { Loader2, Search, CheckCircle2, ArrowRight, X, AlertCircle, Puzzle, Copy, ExternalLink } from 'lucide-vue-next';
+import { Loader2, Search, CheckCircle2, ArrowRight, X, AlertCircle, Puzzle, Copy, ExternalLink, RotateCcw } from 'lucide-vue-next';
 
 // Props 및 Emits
 const emit = defineEmits(['next']);
@@ -206,7 +227,7 @@ const copyVerificationCode = () => {
     const code = `DashHub:${user.value.username}`;
     navigator.clipboard.writeText(code).then(() => {
         // Toast notification would be better but alert is consistent with profile view
-        alert("인증 코드가 복사되었습니다!\nSolved.ac 설정 > 자기소개에 붙여넣어주세요.");
+        alert("인증 코드가 복사되었습니다!\nSolved.ac 로그인 > '프로필 편집'을 통해 붙여넣어주세요.");
     });
 };
 
@@ -216,6 +237,7 @@ const verifying = ref(false);
 const verifiedUser = ref(null);
 const verifyError = ref(null);
 const confirmed = ref(false);
+const verificationSuccess = ref(false);
 
 let debounceTimer = null;
 
@@ -224,6 +246,7 @@ const onHandleInput = () => {
   verifiedUser.value = null;
   verifyError.value = null;
   confirmed.value = false;
+  verificationSuccess.value = false;
   
   clearTimeout(debounceTimer);
   if (handle.value.trim().length >= 2) {
@@ -260,7 +283,9 @@ const confirmUser = () => {
 
 const resetConfirmation = () => {
   confirmed.value = false;
+  verificationSuccess.value = false;
   verifiedUser.value = null;
+  verifyError.value = null;
   handle.value = '';
 };
 
@@ -275,23 +300,36 @@ const getTierImage = (tier) => {
     return `https://static.solved.ac/tier_small/${tier}.svg`;
 };
 
-const submitHandle = async () => {
+const processVerification = async () => {
   if (!handle.value || !confirmed.value) return;
   
+  console.log("Starting verification for:", handle.value);
   loading.value = true;
+  verifyError.value = null;
+
   try {
-    let profileImage = null;
-    if (!user.value?.avatarUrl) {
+    // 프로필 이미지 선택 로직 개선
+    // 사용자가 이미 프로필 이미지를 가지고 있다면 그것을 사용, 없다면 기본 이미지
+    // 단, Solved.ac 연동 시에는 Solved.ac 이미지가 우선순위가 높을 수 있으나,
+    // 현재 API는 registerSolvedac에 profileImage를 보내면 그것으로 User Avatar를 업데이트함.
+    // 여기서는 "User의 현재 Avatar가 없으면 Default를 보낸다"는 로직 유지.
+    let profileImage = user.value?.avatarUrl || null;
+    
+    // 만약 user.avatarUrl도 없고, null을 보내면 백엔드에서 처리가 안될 수도 있으니 기본값 설정
+    if (!profileImage) {
         profileImage = '/images/profiles/default-profile.png';
     }
     
+    console.log("Sending verification request with image:", profileImage);
     await onboardingApi.registerSolvedac(handle.value, profileImage);
     
-    // 다음 단계로 이동
-    emit('next');
+    console.log("Verification successful");
+    // 인증 성공 처리
+    verificationSuccess.value = true;
+    loading.value = false;
     
   } catch (error) {
-    console.error(error);
+    console.error("Verification failed:", error);
     const msg = error.response?.data?.message || '연동 중 문제가 발생했습니다. 다시 시도해주세요.';
     if (msg.includes("Bio")) {
          verifyError.value = "인증에 실패했습니다. 자기소개를 확인해주세요.";
@@ -299,7 +337,21 @@ const submitHandle = async () => {
          verifyError.value = msg;
     }
     loading.value = false;
+    verificationSuccess.value = false;
   }
+};
+
+const handleButtonClick = async () => {
+    try {
+        if (verificationSuccess.value) {
+            console.log("Emitting next");
+            emit('next');
+        } else {
+            await processVerification();
+        }
+    } catch (e) {
+        console.error("Error in button handler:", e);
+    }
 };
 </script>
 
