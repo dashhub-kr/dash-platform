@@ -99,6 +99,45 @@
                   <span class="flex items-center gap-1">클릭해서 선택 <ArrowRight class="w-3 h-3" /></span>
                 </div>
 
+                <!-- Verification Guide (Only when confirmed) -->
+                <transition name="fade">
+                  <div v-if="confirmed" class="mt-4 pt-4 border-t border-slate-100 space-y-3">
+                    <div class="p-4 bg-slate-50 rounded-xl border border-slate-200">
+                        <h4 class="text-sm font-bold text-slate-700 mb-2 flex items-center gap-1.5">
+                            <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+                            본인 인증이 필요합니다
+                        </h4>
+                        <p class="text-xs text-slate-500 leading-relaxed mb-3">
+                            타인 도용 방지를 위해, 
+                            <a :href="`https://solved.ac/profile/${handle}`" target="_blank" class="text-blue-500 hover:underline font-bold">Solved.ac 프로필</a>의
+                            <strong>자기소개</strong>란에 아래 코드를 적어주세요.
+                        </p>
+                        
+                        <div class="flex items-center gap-2">
+                             <div 
+                                @click="copyVerificationCode"
+                                class="flex-1 flex items-center justify-between bg-white border border-slate-200 rounded-lg p-2.5 cursor-pointer hover:border-emerald-500 hover:text-emerald-600 transition-all group"
+                            >
+                                <code class="font-mono text-sm font-bold text-slate-700 group-hover:text-emerald-600">DashHub:{{ user?.username }}</code>
+                                <Copy class="w-4 h-4 text-slate-400 group-hover:text-emerald-500" />
+                            </div>
+                            
+                            <a 
+                                :href="`https://solved.ac/settings/profile`" 
+                                target="_blank"
+                                class="p-2.5 bg-white border border-slate-200 rounded-lg text-slate-400 hover:text-blue-500 hover:border-blue-200 transition-colors"
+                                title="Solved.ac 설정으로 이동"
+                            >
+                                <ExternalLink class="w-5 h-5" />
+                            </a>
+                        </div>
+                         <p class="text-[10px] text-slate-400 mt-2 text-right">
+                            * 설정 저장 후 아래 버튼을 눌러주세요.
+                        </p>
+                    </div>
+                  </div>
+                </transition>
+
                 <!-- Change Button (Only when confirmed) -->
                 <button 
                   v-if="confirmed"
@@ -154,77 +193,24 @@
 import { ref } from 'vue';
 import { onboardingApi } from '@/api/onboarding';
 import { useAuth } from '@/composables/useAuth';
-import { Loader2, Search, CheckCircle2, ArrowRight, X, AlertCircle, Puzzle } from 'lucide-vue-next';
+import { Loader2, Search, CheckCircle2, ArrowRight, X, AlertCircle, Puzzle, Copy, ExternalLink } from 'lucide-vue-next';
 
 // Props 및 Emits
 const emit = defineEmits(['next']);
 
 // 상태 (State)
 const { user } = useAuth();
-const handle = ref('');
-const loading = ref(false);
-const verifying = ref(false);
-const verifiedUser = ref(null);
-const verifyError = ref(null);
-const confirmed = ref(false);
+// ...
 
-let debounceTimer = null;
-
-// 메서드 (Methods)
-const onHandleInput = () => {
-  verifiedUser.value = null;
-  verifyError.value = null;
-  confirmed.value = false;
-  
-  clearTimeout(debounceTimer);
-  if (handle.value.trim().length >= 2) {
-    verifying.value = true;
-    debounceTimer = setTimeout(() => {
-      verifyHandle();
-    }, 600);
-  } else {
-    verifying.value = false;
-  }
+const copyVerificationCode = () => {
+    const code = `DashHub:${user.value.username}`;
+    navigator.clipboard.writeText(code).then(() => {
+        // Toast notification would be better but alert is consistent with profile view
+        alert("인증 코드가 복사되었습니다!\nSolved.ac 설정 > 자기소개에 붙여넣어주세요.");
+    });
 };
 
-const verifyHandle = async () => {
-  if (!handle.value.trim()) {
-    verifying.value = false;
-    return;
-  }
-  
-  try {
-    const res = await onboardingApi.verifySolvedac(handle.value.trim());
-    verifiedUser.value = res.data;
-  } catch (error) {
-    // console.error(error);
-    verifyError.value = '존재하지 않는 아이디입니다.';
-    verifiedUser.value = null;
-  } finally {
-    verifying.value = false;
-  }
-};
-
-const confirmUser = () => {
-  confirmed.value = true;
-};
-
-const resetConfirmation = () => {
-  confirmed.value = false;
-  verifiedUser.value = null;
-  handle.value = '';
-};
-
-// 이미지 경로 매핑 대신 SVG 활용도 가능하지만, 일단 기존 로직 참고하여 아이콘/이미지 사용
-// 여기서는 간단히 Tier 번호를 받아 이미지 URL을 생성한다고 가정
-// 만약 이미지가 없다면 뱃지 컴포넌트 사용 권장. 여기선 예시로 svg 아이콘으로 대체 가능하나, 
-// 사용자 요청이 'Senior Design'이므로 가능한 시각적 요소를 풍부하게.
-const getTierImage = (tier) => {
-    // 실제 구현시엔 tier 숫자에 맞는 이미지 경로 반환
-    // 예: https://static.solved.ac/tier_small/1.svg
-    if (!tier) return 'https://static.solved.ac/tier_small/0.svg';
-    return `https://static.solved.ac/tier_small/${tier}.svg`;
-};
+// ...
 
 const submitHandle = async () => {
   if (!handle.value || !confirmed.value) return;
@@ -243,7 +229,12 @@ const submitHandle = async () => {
     
   } catch (error) {
     console.error(error);
-    verifyError.value = '연동 중 문제가 발생했습니다. 다시 시도해주세요.';
+    const msg = error.response?.data?.message || '연동 중 문제가 발생했습니다. 다시 시도해주세요.';
+    if (msg.includes("Bio")) {
+         verifyError.value = "인증에 실패했습니다. 자기소개를 확인해주세요.";
+    } else {
+         verifyError.value = msg;
+    }
     loading.value = false;
   }
 };
