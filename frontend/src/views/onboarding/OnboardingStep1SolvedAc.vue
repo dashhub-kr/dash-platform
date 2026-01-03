@@ -210,7 +210,70 @@ const copyVerificationCode = () => {
     });
 };
 
-// ...
+const handle = ref('');
+const loading = ref(false);
+const verifying = ref(false);
+const verifiedUser = ref(null);
+const verifyError = ref(null);
+const confirmed = ref(false);
+
+let debounceTimer = null;
+
+// 메서드 (Methods)
+const onHandleInput = () => {
+  verifiedUser.value = null;
+  verifyError.value = null;
+  confirmed.value = false;
+  
+  clearTimeout(debounceTimer);
+  if (handle.value.trim().length >= 2) {
+    verifying.value = true;
+    debounceTimer = setTimeout(() => {
+      verifyHandle();
+    }, 600);
+  } else {
+    verifying.value = false;
+  }
+};
+
+const verifyHandle = async () => {
+  if (!handle.value.trim()) {
+    verifying.value = false;
+    return;
+  }
+  
+  try {
+    const res = await onboardingApi.verifySolvedac(handle.value.trim());
+    verifiedUser.value = res.data;
+  } catch (error) {
+    // console.error(error);
+    verifyError.value = '존재하지 않는 아이디입니다.';
+    verifiedUser.value = null;
+  } finally {
+    verifying.value = false;
+  }
+};
+
+const confirmUser = () => {
+  confirmed.value = true;
+};
+
+const resetConfirmation = () => {
+  confirmed.value = false;
+  verifiedUser.value = null;
+  handle.value = '';
+};
+
+// 이미지 경로 매핑 대신 SVG 활용도 가능하지만, 일단 기존 로직 참고하여 아이콘/이미지 사용
+// 여기서는 간단히 Tier 번호를 받아 이미지 URL을 생성한다고 가정
+// 만약 이미지가 없다면 뱃지 컴포넌트 사용 권장. 여기선 예시로 svg 아이콘으로 대체 가능하나, 
+// 사용자 요청이 'Senior Design'이므로 가능한 시각적 요소를 풍부하게.
+const getTierImage = (tier) => {
+    // 실제 구현시엔 tier 숫자에 맞는 이미지 경로 반환
+    // 예: https://static.solved.ac/tier_small/1.svg
+    if (!tier) return 'https://static.solved.ac/tier_small/0.svg';
+    return `https://static.solved.ac/tier_small/${tier}.svg`;
+};
 
 const submitHandle = async () => {
   if (!handle.value || !confirmed.value) return;
