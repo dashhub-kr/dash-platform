@@ -54,57 +54,37 @@
               </button>
               
               <button 
-                @click="startManualSearch"
-                class="w-full py-3 text-slate-400 hover:text-slate-600 font-bold text-sm transition-colors"
+                @click="redetect"
+                class="w-full py-3 text-brand-600 hover:text-brand-700 font-bold text-sm transition-colors flex items-center justify-center gap-2"
               >
-                 아니요, 직접 검색할게요
+                 <RotateCcw class="w-4 h-4" /> 설정 다시 확인하기 (재탐지)
               </button>
            </div>
         </div>
 
-        <!-- State: Manual Search (Fallback) -->
-        <div v-else class="space-y-6 animate-fade-in">
-           <div class="text-center">
-               <p class="text-sm text-amber-500 font-bold mb-2">⚠ 저장소를 자동으로 찾지 못했습니다.</p>
-               <h3 class="text-lg font-bold text-slate-800">직접 검색해서 선택해주세요</h3>
+        <!-- State: Manual Search Removed / Guide -->
+        <div v-else class="space-y-6 animate-fade-in text-center py-6">
+           <div class="w-16 h-16 bg-amber-50 rounded-full flex items-center justify-center mx-auto mb-4 text-amber-500">
+               <AlertTriangle class="w-8 h-8" />
+           </div>
+           <div>
+               <p class="text-sm text-amber-600 font-bold mb-1">익스텐션 설정을 찾을 수 없습니다</p>
+               <h3 class="text-lg font-bold text-slate-800">브라우저 우측 상단의 익스텐션을 확인해주세요</h3>
            </div>
            
-           <!-- Search Input -->
-           <div class="relative">
-              <input
-                v-model="searchQuery"
-                type="text"
-                placeholder="예: username/repository"
-                class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 pl-11 font-medium focus:bg-white focus:border-brand-500 focus:ring-4 focus:ring-brand-500/10 transition-all outline-none"
-                @input="onSearchInput"
-              />
-              <Search class="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
-              <Loader2 v-if="searching" class="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-brand-500 animate-spin" />
-           </div>
-
-           <!-- Search Results -->
-           <div v-if="repositories.length > 0" class="max-h-60 overflow-y-auto custom-scrollbar space-y-2">
-              <div 
-                v-for="repo in repositories" 
-                :key="repo.fullName"
-                @click="selectRepo(repo)"
-                class="p-3 bg-white border border-slate-100 rounded-xl hover:border-brand-300 hover:shadow-md transition-all cursor-pointer flex items-center justify-between group"
-              >
-                 <div class="min-w-0">
-                    <div class="font-bold text-slate-800 group-hover:text-brand-700 truncate text-sm">{{ repo.fullName }}</div>
-                    <div class="text-[10px] text-slate-400 truncate">{{ repo.description }}</div>
-                 </div>
-                 <div v-if="repo.isPrivate" class="px-1.5 py-0.5 bg-amber-50 text-amber-600 rounded text-[10px] font-bold">Private</div>
-              </div>
+           <div class="bg-slate-50 p-4 rounded-xl text-left text-sm text-slate-600 space-y-2 border border-slate-100">
+               <p>1. Chrome 익스텐션 목록에서 <span class="font-bold text-slate-800">DASH Hub</span>를 클릭하세요.</p>
+               <p>2. <span class="font-bold text-slate-800">Authenticate</span> 버튼을 눌러 인증을 완료하세요.</p>
+               <p>3. <span class="font-bold text-slate-800">Repository</span>를 선택/연결하세요.</p>
+               <p>4. 아래 버튼을 눌러 다시 탐지하세요.</p>
            </div>
            
-           <!-- Selected (Manual) -->
-           <div v-if="selectedRepo" class="bg-brand-50 border border-brand-200 p-4 rounded-xl flex items-center justify-between">
-              <div class="font-bold text-brand-800 truncate pr-2">{{ selectedRepo.fullName }}</div>
-              <button @click="confirmRepo" class="px-4 py-2 bg-brand-600 text-white rounded-lg text-sm font-bold shadow-md hover:bg-brand-500 shrink-0">
-                 선택
-              </button>
-           </div>
+           <button 
+             @click="redetect"
+             class="w-full py-3 bg-slate-900 text-white font-bold rounded-xl shadow-lg hover:bg-slate-800 transition-all flex items-center justify-center gap-2"
+           >
+              <RotateCcw class="w-4 h-4" /> 설정 다시 탐지하기
+           </button>
         </div>
 
       </div>
@@ -115,17 +95,13 @@
 <script setup>
 import { ref, onMounted, onUnmounted } from 'vue';
 import { onboardingApi } from '@/api/onboarding';
-import { Search, Loader2, CheckCircle2 } from 'lucide-vue-next';
+import { Search, Loader2, CheckCircle2, RotateCcw, AlertTriangle } from 'lucide-vue-next';
 
 const emit = defineEmits(['finish']);
 
 const detecting = ref(true);
 const detectedRepo = ref(null);
-const searching = ref(false);
 const saving = ref(false);
-const searchQuery = ref('');
-const repositories = ref([]);
-const selectedRepo = ref(null);
 
 let debounceTimer = null;
 let pollInterval = null;
@@ -175,36 +151,41 @@ const onRepoDetected = (repoName, desc) => {
     if (pollInterval) clearInterval(pollInterval);
 };
 
-// 수동 검색 처리
-const onSearchInput = () => {
-    clearTimeout(debounceTimer);
-    if (searchQuery.value.length < 2) return;
+const redetect = () => {
+    detectedRepo.value = null;
+    detecting.value = true;
     
-    searching.value = true;
-    debounceTimer = setTimeout(async () => {
-        try {
-            const res = await onboardingApi.searchRepositories(searchQuery.value);
-            repositories.value = res.data || [];
-        } catch (e) {
-            console.error(e);
-        } finally {
-            searching.value = false;
-        }
+    // 재시도 시 DOM 데이터 초기화 시도 (필요한 경우)
+    const dataEl = document.getElementById('DashHub-dash-data');
+    if (dataEl) {
+        dataEl.removeAttribute('data-hook');
+        dataEl.removeAttribute('data-repo');
+    }
+
+    setTimeout(() => {
+        detectRepository();
+        // 다시 폴링 시작
+        startPolling();
     }, 500);
 };
 
-const selectRepo = (repo) => {
-    selectedRepo.value = repo;
-};
-
-const startManualSearch = () => {
-    detectedRepo.value = null;
-    detecting.value = false;
+const startPolling = () => {
     if (pollInterval) clearInterval(pollInterval);
+    let attempt = 0;
+    pollInterval = setInterval(() => {
+        attempt++;
+        if (attempt > 10) { 
+             clearInterval(pollInterval);
+             if (detecting.value) {
+                 detecting.value = false; // 타임아웃
+             }
+        }
+        detectRepository();
+    }, 1000);
 };
 
 const confirmRepo = async () => {
-    const repo = detectedRepo.value || selectedRepo.value;
+    const repo = detectedRepo.value;
     if (!repo) return;
     
     saving.value = true;
@@ -236,20 +217,9 @@ onMounted(() => {
 
     detectRepository();
     
-    // 지연 주입을 잡기 위해 잠시 동안 폴링 (예: 10초)
-    let attempt = 0;
-    pollInterval = setInterval(() => {
-        attempt++;
-        if (attempt > 10) { // 약 10초 후 폴링 중지
-             clearInterval(pollInterval);
-             if (detecting.value) {
-                 // 아무것도 발견되지 않으면 수동 모드로 전환? (선택사항)
-                 // detecting.value = false; 
-             }
-        }
-        detectRepository();
-    }, 1000);
+    startPolling();
 });
+
 
 onUnmounted(() => {
     if (pollInterval) clearInterval(pollInterval);
