@@ -1,6 +1,14 @@
 package com.ssafy.dash.oauth.presentation.security;
 
+import java.util.List;
 import java.util.Map;
+
+import org.springframework.web.client.RestTemplate;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.ResponseEntity;
+import org.springframework.core.ParameterizedTypeReference;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -53,8 +61,14 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
         String login = (String) attributes.get("login");
         String avatarUrl = (String) attributes.get("avatar_url");
 
-        if (email == null) {
-            email = login + "@github.placeholder";
+        if (email == null || email.isEmpty()) {
+            String accessTokenValue = userRequest.getAccessToken().getTokenValue();
+            String fetchedEmail = fetchGithubEmail(accessTokenValue);
+            if (fetchedEmail != null) {
+                email = fetchedEmail;
+            } else {
+                email = login + "@github.placeholder";
+            }
         }
 
         OAuthLoginResult loginResult = oauthUserService.createOrUpdateOAuthUser(registrationId, providerId, login, email, avatarUrl);
@@ -86,6 +100,43 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
             return "null";
         }
         return tokenValue.length() > 8 ? tokenValue.substring(0, 6) + "..." : "***";
+    }
+
+    private String fetchGithubEmail(String accessToken) {
+        if (accessToken == null) {
+            return null;
+        }
+
+        try {
+            RestTemplate restTemplate = new RestTemplate();
+            HttpHeaders headers = new HttpHeaders();
+            headers.set("Authorization", "Bearer " + accessToken);
+            headers.set("Accept", "application/vnd.github.v3+json");
+            HttpEntity<String> entity = new HttpEntity<>(headers);
+
+            ResponseEntity<List<Map<String, Object>>> response = restTemplate.exchange(
+                    "https://api.github.com/user/emails",
+                    HttpMethod.GET,
+                    entity,
+                    new ParameterizedTypeReference<List<Map<String, Object>>>() {
+                    });
+
+            List<Map<String, Object>> emails = response.getBody();
+            if (emails != null) {
+                for (Map<String, Object> emailObj : emails) {
+                    Boolean primary = (Boolean) emailObj.get("primary");
+                    Boolean verified = (Boolean) emailObj.get("verified");
+                    String emailAddr = (String) emailObj.get("email");
+
+                    if (Boolean.TRUE.equals(primary) && Boolean.TRUE.equals(verified)) {
+                        return emailAddr;
+                    }
+                }
+            }
+        } catch (Exception e) {
+            log.error("Failed to fetch emails from GitHub", e);
+        }
+        return null;
     }
 
 }
