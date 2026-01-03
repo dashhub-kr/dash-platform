@@ -168,10 +168,10 @@ import { useAuth } from '@/composables/useAuth';
 import AlgorithmRadarChart from '@/components/charts/AlgorithmRadarChart.vue';
 import { BrainCircuit, ArrowRight, Target, Sparkles } from 'lucide-vue-next';
 
-// Props & Emits
+// Props 및 Emits
 const emit = defineEmits(['next']);
 
-// State
+// 상태 (State)
 const { user, refresh } = useAuth();
 const loading = ref(true);
 const analysisData = ref(null);
@@ -184,7 +184,7 @@ const loadingMessages = [
   '거의 다 되었습니다!'
 ];
 
-// Computed
+// 계산된 속성 (Computed)
 const userName = computed(() => user.value?.solvedacHandle || '사용자');
 
 const chartTags = computed(() => {
@@ -215,7 +215,7 @@ const chartTags = computed(() => {
 });
 
 onMounted(async () => {
-  // Loading Text Animation
+  // 로딩 텍스트 애니메이션 (Loading Text Animation)
   let msgIdx = 0;
   const interval = setInterval(() => {
      msgIdx = (msgIdx + 1) % loadingMessages.length;
@@ -227,7 +227,7 @@ onMounted(async () => {
     const userId = user.value?.id;
     if (!userId) throw new Error("No User ID");
 
-    // Fetch Data
+    // 데이터 가져오기 (Fetch Data)
     const [pathRes, familyRes] = await Promise.allSettled([
        aiApi.getLearningPath(userId),
        aiApi.getFamilyStats(userId)
@@ -240,7 +240,7 @@ onMounted(async () => {
     console.error(e);
   } finally {
     clearInterval(interval);
-    // Minimum loading time for UX
+    // UX를 위한 최소 로딩 시간
     setTimeout(() => {
        loading.value = false;
     }, 1500);

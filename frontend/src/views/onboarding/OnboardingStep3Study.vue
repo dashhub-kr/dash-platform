@@ -137,7 +137,7 @@
 <script setup>
 import { ref } from 'vue';
 import { ArrowLeft, ArrowRight, Loader2 } from 'lucide-vue-next';
-import StudyExplorer from '@/components/study/StudyExplorer.vue'; // Reuse existing component
+import StudyExplorer from '@/components/study/StudyExplorer.vue'; // 기존 컴포넌트 재사용
 import axios from 'axios';
 import { useAuth } from '@/composables/useAuth';
 
@@ -179,7 +179,7 @@ const submitCreate = async () => {
         description: newDescription.value 
     });
     
-    // Refresh auth user to get studyId
+    // studyId를 얻기 위해 인증 사용자 정보 갱신
     await refresh();
     emit('next');
   } catch (error) {

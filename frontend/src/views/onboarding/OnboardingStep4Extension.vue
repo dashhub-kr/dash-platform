@@ -56,20 +56,37 @@
            </span>
         </a>
 
-        <!-- Confirmation -->
+        <!-- Confirmation & Detection State -->
         <div v-if="installClicked" class="text-center animate-fade-in space-y-4 pt-4 border-t border-slate-100">
-           <p class="text-sm text-slate-600 font-bold">
-             설치와 설정을 마치셨나요?
-           </p>
-           <button 
-             @click="emit('next')"
-             class="px-8 py-3 bg-brand-500 hover:bg-brand-600 text-white font-bold rounded-xl shadow-lg shadow-brand-500/20 transition-all hover:scale-105"
-           >
-             네, 완료했습니다!
-           </button>
-           <p class="text-xs text-slate-400 mt-2">
-             * 설치가 완료되면 자동으로 감지합니다.
-           </p>
+           
+           <!-- State: Detecting -->
+           <div v-if="detecting && !isInstalled" class="py-2">
+               <div class="flex items-center justify-center gap-2 text-slate-500 mb-2">
+                   <Loader2 class="w-5 h-5 animate-spin text-brand-500" />
+                   <span class="font-bold text-sm">익스텐션 설치 확인 중...</span>
+               </div>
+               <p class="text-xs text-slate-400">설치가 완료되면 자동으로 감지합니다.</p>
+           </div>
+
+           <!-- State: Detected (Success) -->
+           <div v-else-if="isInstalled" class="py-2 animate-scale-in">
+               <div class="flex items-center justify-center gap-2 text-emerald-600 mb-2">
+                   <CheckCircle2 class="w-6 h-6" />
+                   <span class="font-bold text-lg">익스텐션 감지 완료!</span>
+               </div>
+               <button 
+                 @click="emit('next')"
+                 class="px-8 py-3 bg-brand-600 hover:bg-brand-500 text-white font-bold rounded-xl shadow-lg shadow-brand-500/20 transition-all hover:scale-105"
+               >
+                 다음 단계로
+               </button>
+           </div>
+
+           <!-- Fallback / Retry (If taking too long) -->
+           <div v-else class="text-xs text-slate-400 pb-2">
+               <span class="block mb-2">감지가 되지 않으시나요?</span>
+               <button @click="checkExtension" class="underline hover:text-slate-600">다시 확인하기</button>
+           </div>
         </div>
 
       </div>
@@ -79,36 +96,64 @@
 
 <script setup>
 import { ref, onMounted, onUnmounted } from 'vue';
-import { ArrowRight, ArrowDown, Chrome } from 'lucide-vue-next';
+import { ArrowRight, ArrowDown, Chrome, Loader2, CheckCircle2 } from 'lucide-vue-next';
 
 const emit = defineEmits(['next']);
-const installClicked = ref(false);
+
+const installClicked = ref(false); // "감지 중..." UI를 표시하는 데 사용
+const detecting = ref(false);
+const isInstalled = ref(false);
 
 const onInstallClick = () => {
   installClicked.value = true;
+  detecting.value = true;
+  checkExtension(); // 클릭 시 즉시 확인
 };
 
-// Auto-detection logic (Optional UX enhancement)
-// Listen for extension content script message if available
-const checkExtension = (e) => {
-    // If we receive a message from the extension (injected script), we know it's installed.
-    // However, the extension might only inject on refresh or specific pages.
-    // This is a "Nice to have".
-    console.log("Extension detected!", e.detail);
-    emit('next');
+// 엄격한 검증 로직 (Strict Verification Logic)
+const checkExtension = () => {
+    // 1. DOM 확인 (Strict)
+    const dataEl = document.getElementById('DashHub-dash-data');
+    if (dataEl && dataEl.getAttribute('data-extension-installed') === 'true') {
+        onExtensionDetected();
+        return;
+    }
+    
+    // 2. 요청 발송 (익스텐션에게 응답 요청)
+    window.dispatchEvent(new CustomEvent('DashHub-dash-request'));
+};
+
+const onExtensionDetected = () => {
+    isInstalled.value = true;
+    detecting.value = false;
+};
+
+// 익스텐션 응답 이벤트 리스너
+const onExtensionReady = (e) => {
+    // 올바른 이벤트 데이터 구조인지 확인
+    if (e.detail && e.detail.extensionInstalled) {
+        onExtensionDetected();
+    }
 };
 
 onMounted(() => {
-    window.addEventListener('baekjoonhub-dash-ready', checkExtension);
-    // Poll or dispatch event to ask extension "Are you there?"
-    // The content script should listen to this and reply.
+    window.addEventListener('DashHub-dash-ready', onExtensionReady);
+    
+    // 주기적 확인 (Polling) - 감지되면 중지
     const interval = setInterval(() => {
-        window.dispatchEvent(new CustomEvent('baekjoonhub-dash-request'));
+        if (!isInstalled.value) {
+           window.dispatchEvent(new CustomEvent('DashHub-dash-request'));
+           // DOM도 직접 확인
+           const dataEl = document.getElementById('DashHub-dash-data');
+           if (dataEl && dataEl.getAttribute('data-extension-installed') === 'true') {
+               onExtensionDetected();
+           }
+        }
     }, 1000);
     
     onUnmounted(() => {
         clearInterval(interval);
-        window.removeEventListener('baekjoonhub-dash-ready', checkExtension);
+        window.removeEventListener('DashHub-dash-ready', onExtensionReady);
     });
 });
 </script>
