@@ -137,9 +137,9 @@ class CommentServiceTest {
             reply.setAuthorName(user.getUsername());
             parent.setAuthorName(user.getUsername());
 
-            given(commentRepository.findByBoardId(1L)).willReturn(List.of(parent, reply));
+            given(commentRepository.findByBoardId(1L, null)).willReturn(List.of(parent, reply));
 
-            List<CommentResult> results = commentService.findByBoardId(1L, null);
+            List<CommentResult> results = commentService.findByBoardId(1L, null, null);
 
             assertThat(results).hasSize(1); // 최상위 댓글만
             assertThat(results.get(0).replies()).hasSize(1); // 대댓글은 replies에
@@ -151,9 +151,9 @@ class CommentServiceTest {
             Comment lineComment = CommentFixtures.createLineComment(1L, user, 42);
             lineComment.setAuthorName(user.getUsername());
 
-            given(commentRepository.findByBoardIdAndLineNumber(1L, 42)).willReturn(List.of(lineComment));
+            given(commentRepository.findByBoardIdAndLineNumber(1L, 42, null)).willReturn(List.of(lineComment));
 
-            List<CommentResult> results = commentService.findByBoardId(1L, 42);
+            List<CommentResult> results = commentService.findByBoardId(1L, 42, null);
 
             assertThat(results).hasSize(1);
             assertThat(results.get(0).lineNumber()).isEqualTo(42);
