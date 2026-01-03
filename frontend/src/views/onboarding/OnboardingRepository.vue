@@ -14,7 +14,7 @@
             <Puzzle :size="20" class="text-emerald-600" fill="currentColor" />
           </div>
           <div>
-            <div class="font-bold text-emerald-800 text-sm">BaekjoonHub Dash 익스텐션 감지됨</div>
+            <div class="font-bold text-emerald-800 text-sm">DashHub Dash 익스텐션 감지됨</div>
             <div class="text-emerald-600 text-xs">저장소가 자동으로 선택되었습니다. 변경하려면 검색하세요.</div>
           </div>
         </div>
@@ -26,7 +26,7 @@
           </h3>
           <ol class="list-decimal list-inside text-sm text-slate-600 space-y-2 marker:font-bold marker:text-brand-500 font-medium">
             <li :class="extensionDetected ? 'line-through text-slate-400' : ''">
-                 <a href="https://chromewebstore.google.com/detail/kimjgflahdmnlhilmojcoaechlgkokhc?utm_source=item-share-cb" target="_blank" class="font-bold text-brand-600 hover:text-brand-500 hover:underline transition-colors" :class="extensionDetected ? 'text-slate-400' : ''">BaekjoonHub Dash</a> 익스텐션을 설치합니다.
+                 <a href="https://chromewebstore.google.com/detail/kimjgflahdmnlhilmojcoaechlgkokhc?utm_source=item-share-cb" target="_blank" class="font-bold text-brand-600 hover:text-brand-500 hover:underline transition-colors" :class="extensionDetected ? 'text-slate-400' : ''">DashHub Dash</a> 익스텐션을 설치합니다.
                  <span v-if="extensionDetected" class="text-emerald-500 ml-1">✓</span>
             </li>
             <li>연결할 저장소 이름을 검색합니다.</li>
@@ -145,6 +145,7 @@ import { useRouter } from "vue-router";
 import { onboardingApi } from "@/api/onboarding";
 import { Puzzle, Loader2, Folder, Lock, Check, CheckCircle2 } from 'lucide-vue-next';
 
+// 라우터 및 상태
 const router = useRouter();
 const searchQuery = ref("");
 const repositories = ref([]);
@@ -157,7 +158,7 @@ const extensionDetected = ref(false);
 
 let debounceTimer = null;
 
-// BaekjoonHub Dash 익스텐션에서 repo 값을 읽어 기본값으로 설정
+// DashHub Dash 익스텐션에서 repo 값을 읽어 기본값으로 설정
 const handleExtensionData = async (repoUrl) => {
   if (!repoUrl) return;
   
@@ -191,20 +192,20 @@ const handleExtensionData = async (repoUrl) => {
 
 onMounted(() => {
   // 방법 1: DOM에서 익스텐션 데이터 읽기 (Content Script가 주입)
-  const dataElement = document.getElementById('baekjoonhub-dash-data');
+  const dataElement = document.getElementById('DashHub-dash-data');
   if (dataElement && dataElement.dataset.repo) {
     handleExtensionData(dataElement.dataset.repo);
   }
   
   // 방법 2: CustomEvent 리스닝 (Content Script가 발송)
-  window.addEventListener('baekjoonhub-dash-ready', (e) => {
+  window.addEventListener('DashHub-dash-ready', (e) => {
     if (e.detail && e.detail.repo && !extensionDetected.value) {
       handleExtensionData(e.detail.repo);
     }
   });
   
   // 익스텐션에 데이터 요청 (이미 로드된 경우 대비)
-  window.dispatchEvent(new CustomEvent('baekjoonhub-dash-request'));
+  window.dispatchEvent(new CustomEvent('DashHub-dash-request'));
 });
 
 const emit = defineEmits(['finish']);

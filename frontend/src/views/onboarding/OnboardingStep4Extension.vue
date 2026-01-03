@@ -59,20 +59,34 @@
         <!-- Confirmation & Detection State -->
         <div v-if="installClicked" class="text-center animate-fade-in space-y-4 pt-4 border-t border-slate-100">
            
-           <!-- State: Detecting -->
-           <div v-if="detecting && !isInstalled" class="py-2">
-               <div class="flex items-center justify-center gap-2 text-slate-500 mb-2">
-                   <Loader2 class="w-5 h-5 animate-spin text-brand-500" />
-                   <span class="font-bold text-sm">익스텐션 설치 확인 중...</span>
+           <!-- State: Detecting or Incomplete -->
+           <div v-if="detecting || (!isHookLinked)" class="py-2">
+               <!-- Case 1: Installing... -->
+               <div v-if="!isInstalled" class="flex flex-col items-center justify-center gap-2 text-slate-500 mb-2">
+                   <div class="flex items-center gap-2">
+                       <Loader2 class="w-5 h-5 animate-spin text-brand-500" />
+                       <span class="font-bold text-sm">익스텐션 설치 확인 중...</span>
+                   </div>
+                   <p class="text-xs text-slate-400">설치가 완료되면 자동으로 감지합니다.</p>
                </div>
-               <p class="text-xs text-slate-400">설치가 완료되면 자동으로 감지합니다.</p>
+               
+               <!-- Case 2: Installed but No Repo Linked -->
+               <div v-else-if="isInstalled && !isHookLinked" class="flex flex-col items-center justify-center gap-2 text-amber-600 mb-2 animate-pulse">
+                   <div class="flex items-center gap-2">
+                       <Loader2 class="w-5 h-5 animate-spin text-amber-500" />
+                       <span class="font-bold text-sm">저장소 연결 확인 중...</span>
+                   </div>
+                   <p class="text-xs text-amber-600 font-bold bg-amber-50 px-3 py-1 rounded-lg">
+                     익스텐션 팝업을 열어 저장소를 연결해주세요!
+                   </p>
+               </div>
            </div>
 
-           <!-- State: Detected (Success) -->
-           <div v-else-if="isInstalled" class="py-2 animate-scale-in">
+           <!-- State: All Detected (Success) -->
+           <div v-else-if="isInstalled && isHookLinked" class="py-2 animate-scale-in">
                <div class="flex items-center justify-center gap-2 text-emerald-600 mb-2">
                    <CheckCircle2 class="w-6 h-6" />
-                   <span class="font-bold text-lg">익스텐션 감지 완료!</span>
+                   <span class="font-bold text-lg">설치 및 연결 완료!</span>
                </div>
                <button 
                  @click="emit('next')"
@@ -82,7 +96,7 @@
                </button>
            </div>
 
-           <!-- Fallback / Retry (If taking too long) -->
+           <!-- Fallback / Retry -->
            <div v-else class="text-xs text-slate-400 pb-2">
                <span class="block mb-2">감지가 되지 않으시나요?</span>
                <button @click="checkExtension" class="underline hover:text-slate-600">다시 확인하기</button>
@@ -98,11 +112,13 @@
 import { ref, onMounted, onUnmounted } from 'vue';
 import { ArrowRight, ArrowDown, Chrome, Loader2, CheckCircle2 } from 'lucide-vue-next';
 
+// Emits 정의
 const emit = defineEmits(['next']);
 
 const installClicked = ref(false); // "감지 중..." UI를 표시하는 데 사용
 const detecting = ref(false);
 const isInstalled = ref(false);
+const isHookLinked = ref(false); // 저장소 연결 여부
 
 const onInstallClick = () => {
   installClicked.value = true;
@@ -110,44 +126,60 @@ const onInstallClick = () => {
   checkExtension(); // 클릭 시 즉시 확인
 };
 
-// 엄격한 검증 로직 (Strict Verification Logic)
+// 엄격한 이중 검증 로직 (Strict Dual Verification Logic)
 const checkExtension = () => {
-    // 1. DOM 확인 (Strict)
     const dataEl = document.getElementById('DashHub-dash-data');
+    
+    // 1. 설치 확인
     if (dataEl && dataEl.getAttribute('data-extension-installed') === 'true') {
-        onExtensionDetected();
-        return;
+        isInstalled.value = true;
+        
+        // 2. 저장소 연결(Hook) 확인
+        const hook = dataEl.getAttribute('data-hook');
+        if (hook && hook.length > 0) {
+            isHookLinked.value = true;
+            onAllDetected(); // 모두 완료
+        } else {
+            isHookLinked.value = false; // 설치는 됐으나 연결 안됨
+        }
+    } else {
+        // 설치도 안됨
+        isInstalled.value = false;
+        isHookLinked.value = false;
     }
     
-    // 2. 요청 발송 (익스텐션에게 응답 요청)
-    window.dispatchEvent(new CustomEvent('DashHub-dash-request'));
+    if (!isInstalled.value || !isHookLinked.value) {
+        // 아직 완료되지 않았으면 재요청
+        window.dispatchEvent(new CustomEvent('DashHub-dash-request'));
+    }
 };
 
-const onExtensionDetected = () => {
+const onAllDetected = () => {
     isInstalled.value = true;
+    isHookLinked.value = true;
     detecting.value = false;
 };
 
 // 익스텐션 응답 이벤트 리스너
 const onExtensionReady = (e) => {
-    // 올바른 이벤트 데이터 구조인지 확인
     if (e.detail && e.detail.extensionInstalled) {
-        onExtensionDetected();
+        isInstalled.value = true;
+        if (e.detail.hook) {
+            isHookLinked.value = true;
+            onAllDetected();
+        } else {
+            isHookLinked.value = false;
+        }
     }
 };
 
 onMounted(() => {
     window.addEventListener('DashHub-dash-ready', onExtensionReady);
     
-    // 주기적 확인 (Polling) - 감지되면 중지
+    // 주기적 확인 (Polling) - 모두 감지되면 중지
     const interval = setInterval(() => {
-        if (!isInstalled.value) {
-           window.dispatchEvent(new CustomEvent('DashHub-dash-request'));
-           // DOM도 직접 확인
-           const dataEl = document.getElementById('DashHub-dash-data');
-           if (dataEl && dataEl.getAttribute('data-extension-installed') === 'true') {
-               onExtensionDetected();
-           }
+        if (!isInstalled.value || !isHookLinked.value) {
+           checkExtension();
         }
     }, 1000);
     

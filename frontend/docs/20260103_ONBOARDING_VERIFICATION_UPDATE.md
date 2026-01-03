@@ -18,7 +18,9 @@
   - "다음" 버튼을 비활성화(Disabled) 상태로 시작.
   - 웹페이지가 로드될 때 및 주기적으로 `DashHub-dash-ready` 이벤트를 감지.
   - 익스텐션이 주입하는 `#DashHub-dash-data` 요소의 `data-extension-installed="true"` 속성 확인.
-  - 검증 성공 시에만 "다음" 버튼 활성화 및 "익스텐션 감지됨" 상태 표시.
+  - **이중 검증 (Dual Verification)**: 설치 여부뿐만 아니라 **저장소 연결(`data-hook`)** 여부까지 확인.
+  - 설치는 되었으나 저장소가 연결되지 않은 경우, 사용자에게 명확한 안내 메시지 표시 및 진행 차단.
+  - 모든 검증(설치 + 연결) 성공 시에만 "다음" 버튼 활성화 및 "설치 및 연결 완료" 상태 표시.
 
 ### 2.2 저장소 설정 검증 (Step 5)
 - **기존 방식**: `repo` 데이터(저장소 이름)만 확인하거나, 없으면 수동 검색 유도.
@@ -33,8 +35,8 @@
 
 ## 3. 구현 계획
 1. **Frontend**: `OnboardingStep4Extension.vue` 및 `OnboardingStep5Repo.vue` 내 이벤트 리스너 이름 변경.
-2. **Frontend**: `OnboardingStep4Extension.vue`에 설치 감지 전 버튼 비활성화 로직 추가.
-3. **Frontend**: `OnboardingStep5Repo.vue`에서 `data-hook` 속성 기반의 엄격한 검증 로직 추가.
+2. **Frontend**: `OnboardingStep4Extension.vue`에 **엄격한 이중 검증(설치 + 저장소 연결)** 로직 추가.
+3. **Frontend**: `OnboardingStep5Repo.vue`에서 `data-hook` 속성 기반의 엄격한 검증 로직 추가 (Step 4에서 넘어왔으므로 사실상 확인용).
 
 ## 4. 기대 효과
 - **사용자 경험**: 온보딩 단계에서 설정 오류를 조기에 발견하여, 실제 서비스 이용 시 발생할 수 있는 문제를 예방.

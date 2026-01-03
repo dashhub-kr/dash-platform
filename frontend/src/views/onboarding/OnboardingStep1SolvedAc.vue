@@ -156,10 +156,10 @@ import { onboardingApi } from '@/api/onboarding';
 import { useAuth } from '@/composables/useAuth';
 import { Loader2, Search, CheckCircle2, ArrowRight, X, AlertCircle, Puzzle } from 'lucide-vue-next';
 
-// Props & Emits
+// Props 및 Emits
 const emit = defineEmits(['next']);
 
-// State
+// 상태 (State)
 const { user } = useAuth();
 const handle = ref('');
 const loading = ref(false);
@@ -170,7 +170,7 @@ const confirmed = ref(false);
 
 let debounceTimer = null;
 
-// Methods
+// 메서드 (Methods)
 const onHandleInput = () => {
   verifiedUser.value = null;
   verifyError.value = null;
