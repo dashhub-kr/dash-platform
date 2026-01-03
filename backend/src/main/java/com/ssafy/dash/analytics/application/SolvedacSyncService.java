@@ -36,13 +36,23 @@ public class SolvedacSyncService {
     public void registerSolvedacHandle(Long userId, String handle, String profileImageUrl) {
         log.info("Registering Solved.ac handle for user {}: {}", userId, handle);
 
-        // 1. 사용자 기본 정보 조회
-        SolvedacUser userInfo = solvedacClient.getUserInfo(handle);
-
-        // 2. User 테이블 업데이트
+        // 1. 사용자 기본 정보 조회 (User entity 먼저 조회)
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("User not found: " + userId));
 
+        SolvedacUser userInfo = solvedacClient.getUserInfo(handle);
+
+        // 2. 소유권 검증 (Bio Check)
+        // 형식: "DashHub:{GitHubUsername}"
+        String verificationCode = "DashHub:" + user.getUsername();
+        String bio = userInfo.bio() != null ? userInfo.bio() : "";
+
+        // 대소문자 무시 체크
+        if (!bio.toLowerCase().contains(verificationCode.toLowerCase())) {
+            throw new IllegalArgumentException("Solved.ac 소유권 인증 실패: Bio에 '" + verificationCode + "'를 포함해주세요.");
+        }
+
+        // 3. User 테이블 업데이트
         user.updateSolvedacProfile(handle, userInfo.tier(),
                 userInfo.rating(), userInfo.classLevel(), userInfo.solvedCount());
 
@@ -52,10 +62,10 @@ public class SolvedacSyncService {
 
         userRepository.update(user);
 
-        // 3. 클래스 통계 동기화
+        // 4. 클래스 통계 동기화
         syncClassStats(userId, handle);
 
-        // 4. 태그 통계 동기화
+        // 5. 태그 통계 동기화
         syncTagStats(userId, handle);
 
         // 5. 학습 경로 캐시 무효화 (데이터 변경됨)

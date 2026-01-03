@@ -5,8 +5,7 @@ import { userApi } from '@/api/user';
 import { studyApi } from '@/api/study';
 import { useAuth } from '@/composables/useAuth';
 import { onboardingApi } from '@/api/onboarding';
-import { Settings, LogOut, Github, Award, Users, Crown, RotateCcw, Loader2, HelpCircle, Zap as ZapIcon } from 'lucide-vue-next'; // Renamed Zap to ZapIcon to avoid conflict or just use Zap
-import Zap from 'lucide-vue-next/dist/esm/icons/zap'; // Wait, standard import is safer
+import { Settings, LogOut, Github, Award, Users, Crown, RotateCcw, Loader2, HelpCircle, Zap as ZapIcon, Copy } from 'lucide-vue-next';
 import BaseIconBadge from '@/components/common/BaseIconBadge.vue';
 
 const router = useRouter();
@@ -110,10 +109,19 @@ const updateSolvedac = async () => {
         window.location.reload();
     } catch (e) {
         console.error(e);
-        alert("Solved.ac 연동 실패. 아이디를 확인해주세요.");
+        // 백엔드 에러 메시지 표시
+        const msg = e.response?.data?.message || "Solved.ac 연동 실패. 아이디를 확인해주세요.";
+        alert(msg);
     } finally {
         syncingSolvedac.value = false;
     }
+};
+
+const copyVerificationCode = () => {
+    const code = `DashHub:${userData.value.username}`;
+    navigator.clipboard.writeText(code).then(() => {
+        alert("인증 코드가 복사되었습니다!\nSolved.ac 설정 > 자기소개에 붙여넣어주세요.");
+    });
 };
 
 const handleRedetect = async () => {
@@ -314,6 +322,25 @@ const showFaq = ref(false);
                             >
                                 {{ syncingSolvedac ? '...' : '연동' }}
                             </button>
+                        </div>
+                        <!-- Verification Guide -->
+                        <div class="mt-3 p-4 bg-slate-50 rounded-xl border border-slate-200">
+                            <h4 class="text-xs font-bold text-slate-500 mb-2 flex items-center gap-1.5">
+                                <span class="w-1.5 h-1.5 rounded-full bg-slate-400"></span>
+                                본인 인증이 필요합니다
+                            </h4>
+                            <p class="text-xs text-slate-400 leading-relaxed mb-3">
+                                타인 도용 방지를 위해, 
+                                <a href="https://solved.ac/settings/profile" target="_blank" class="text-emerald-600 hover:underline font-bold">Solved.ac 설정 > 자기소개</a>란에
+                                아래 코드를 포함시켜주세요.
+                            </p>
+                            <div 
+                                @click="copyVerificationCode"
+                                class="flex items-center justify-between bg-white border border-slate-200 rounded-lg p-2.5 cursor-pointer hover:border-emerald-500 hover:text-emerald-600 transition-all group"
+                            >
+                                <code class="font-mono text-sm font-bold text-slate-700 group-hover:text-emerald-600">DashHub:{{ userData.username }}</code>
+                                <Copy class="w-4 h-4 text-slate-400 group-hover:text-emerald-500" />
+                            </div>
                         </div>
                     </div>
 
