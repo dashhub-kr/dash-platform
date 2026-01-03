@@ -35,7 +35,7 @@
 
       <!-- CTA 버튼 -->
       <div class="flex flex-col sm:flex-row gap-4 pt-4 animate-in fade-in slide-in-from-bottom-8 duration-700 delay-500">
-         <button @click="router.push('/login')" 
+         <button @click="window.location.href = '/oauth2/authorization/github'" 
                  class="group relative px-8 py-4 bg-white text-slate-900 rounded-2xl font-black text-lg shadow-xl shadow-brand-500/20 hover:scale-105 hover:shadow-brand-500/40 transition-all duration-300 overflow-hidden">
             <span class="relative z-10 flex items-center justify-center gap-2">
                GitHub로 시작하기
