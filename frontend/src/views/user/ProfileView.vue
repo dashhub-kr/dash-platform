@@ -110,7 +110,9 @@ const updateSolvedac = async () => {
     } catch (e) {
         console.error(e);
         // 백엔드 에러 메시지 표시
-        const msg = e.response?.data?.message || "Solved.ac 연동 실패. 아이디를 확인해주세요.";
+        let msg = e.response?.data?.message || "Solved.ac 연동 실패. 아이디를 확인해주세요.";
+        // 자바 예외 클래스 명 제거 (모든 Exception Class 포괄)
+        msg = msg.replace(/^[\w.]+Exception:\s*/, '');
         alert(msg);
     } finally {
         syncingSolvedac.value = false;
