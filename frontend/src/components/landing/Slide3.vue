@@ -38,7 +38,7 @@
                        <!-- AI 분석 오버레이 -->
                        <div class="absolute top-16 right-8 w-64 bg-white/90 backdrop-blur-md rounded-xl border border-violet-100 p-4 shadow-xl animate-in fade-in zoom-in duration-500 delay-500">
                            <div class="flex items-center gap-2 mb-3">
-                               <Sparkles class="w-4 h-4 text-violet-500 animate-spin-slow" />
+                               <Sparkles class="w-4 h-4 text-violet-500" />
                                <span class="text-xs font-bold text-violet-700">AI Analysis</span>
                            </div>
                            <div class="space-y-2">

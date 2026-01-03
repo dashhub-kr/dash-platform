@@ -17,7 +17,7 @@
       <div class="animate-in fade-in slide-in-from-bottom-4 duration-700 delay-100">
         <span class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-white/10 bg-white/5 backdrop-blur-md text-brand-200 text-sm font-bold shadow-lg shadow-brand-500/10 hover:bg-white/10 transition-colors cursor-default">
           <span class="w-2 h-2 rounded-full bg-brand-400 animate-pulse"></span>
-          AI-Powered Study Platform
+          알고리즘 스터디 자동화 플랫폼
         </span>
       </div>
 

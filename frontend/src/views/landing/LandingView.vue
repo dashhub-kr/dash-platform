@@ -9,6 +9,8 @@ import { useMouseInElement, useDebounceFn } from '@vueuse/core'
 import Slide1 from '@/components/landing/Slide1.vue'
 import Slide2 from '@/components/landing/Slide2.vue'
 import Slide3 from '@/components/landing/Slide3.vue'
+import Slide4 from '@/components/landing/Slide4.vue'
+import Slide5 from '@/components/landing/Slide5.vue'
 
 // 랜딩 스타일 가져오기
 import '@/assets/styles/landing/index.css'
@@ -27,6 +29,8 @@ const slides = [
   { component: Slide1, title: 'Intro' },
   { component: Slide2, title: 'Features' },
   { component: Slide3, title: 'Details' },
+  { component: Slide4, title: 'Analysis' },
+  { component: Slide5, title: 'Join' },
 ]
 
 const currentSlide = ref(0)
@@ -83,6 +87,7 @@ onUnmounted(() => {
           :is="slides[currentSlide].component"
           :key="currentSlide"
           class="absolute inset-0 w-full h-full"
+          @next="nextSlide"
         />
       </Transition>
     </div>
