@@ -19,88 +19,114 @@
 
       <div class="bg-white/80 backdrop-blur-xl border border-white rounded-3xl p-8 shadow-2xl relative overflow-hidden">
         
-        <!-- Step Illustrations -->
-        <div class="flex flex-col md:flex-row items-center gap-6 mb-8 relative z-10">
-           
-           <!-- Step A -->
-           <div class="flex-1 bg-slate-50 rounded-2xl p-5 border border-slate-100 text-center group hover:bg-white hover:shadow-lg transition-all duration-300">
-              <div class="w-12 h-12 bg-white rounded-xl shadow-sm flex items-center justify-center mx-auto mb-3 text-2xl group-hover:scale-110 transition-transform">
-                🧩
-              </div>
-              <h3 class="font-bold text-slate-800 mb-1">익스텐션 설치</h3>
-              <p class="text-xs text-slate-500">Chrome Web Store에서<br>설치 버튼 클릭</p>
-           </div>
+        <!-- Main Checklist Area -->
+        <div class="relative z-10 space-y-6">
 
-           <ArrowRight class="hidden md:block text-slate-300 w-6 h-6" />
-           <ArrowDown class="md:hidden text-slate-300 w-6 h-6" />
-
-           <!-- Step B -->
-           <div class="flex-1 bg-slate-50 rounded-2xl p-5 border border-slate-100 text-center group hover:bg-white hover:shadow-lg transition-all duration-300">
-              <div class="w-12 h-12 bg-white rounded-xl shadow-sm flex items-center justify-center mx-auto mb-3 text-2xl group-hover:scale-110 transition-transform">
-                🔑
-              </div>
-              <h3 class="font-bold text-slate-800 mb-1">인증 및 설정</h3>
-              <p class="text-xs text-slate-500">설치된 퍼즐 조각 아이콘 클릭<br>→ 깃허브 로그인</p>
-           </div>
-        </div>
-
-        <!-- CTA Button -->
-        <a 
-          href="https://chromewebstore.google.com/detail/kimjgflahdmnlhilmojcoaechlgkokhc?utm_source=item-share-cb" 
-          target="_blank"
-          @click="onInstallClick"
-          class="block w-full py-4 bg-slate-900 hover:bg-slate-800 text-white font-bold text-center rounded-2xl text-lg shadow-xl shadow-slate-900/10 hover:shadow-slate-900/20 hover:-translate-y-1 transition-all mb-4"
-        >
-           <span class="flex items-center justify-center gap-2">
-             <Chrome class="w-5 h-5" /> Chrome Web Store 방문하기
-           </span>
-        </a>
-
-        <!-- Confirmation & Detection State -->
-        <div v-if="installClicked" class="text-center animate-fade-in space-y-4 pt-4 border-t border-slate-100">
-           
-           <!-- State: Detecting or Incomplete -->
-           <div v-if="detecting || (!isHookLinked)" class="py-2">
-               <!-- Case 1: Installing... -->
-               <div v-if="!isInstalled" class="flex flex-col items-center justify-center gap-2 text-slate-500 mb-2">
-                   <div class="flex items-center gap-2">
-                       <Loader2 class="w-5 h-5 animate-spin text-brand-500" />
-                       <span class="font-bold text-sm">익스텐션 설치 확인 중...</span>
+           <!-- 3-Step Checklist -->
+           <div class="space-y-3 text-left w-full bg-slate-50 p-6 rounded-2xl border border-slate-100">
+               <!-- Step 1: Install -->
+               <div class="flex flex-col gap-2">
+                   <div class="flex items-center justify-between">
+                       <div class="flex items-center gap-3">
+                           <div :class="isInstalled ? 'bg-emerald-500 text-white' : 'bg-slate-200 text-slate-400'" class="w-8 h-8 rounded-full flex items-center justify-center transition-colors shrink-0">
+                               <CheckCircle2 v-if="isInstalled" class="w-5 h-5" />
+                               <span v-else class="text-sm font-bold">1</span>
+                           </div>
+                           <div>
+                               <span :class="isInstalled ? 'text-slate-800 font-bold' : 'text-slate-500'" class="text-base">익스텐션 설치</span>
+                               <p v-if="!isInstalled" class="text-xs text-slate-400 mt-0.5">Chrome Web Store에서 설치해주세요</p>
+                           </div>
+                       </div>
+                       
+                       <!-- Install Button -->
+                       <div v-if="!isInstalled" class="flex items-center gap-2">
+                           <button 
+                             @click="reloadPage"
+                             class="px-3 py-1.5 bg-white border border-slate-200 text-slate-600 text-[10px] font-bold rounded-lg hover:bg-slate-50 transition-colors flex items-center gap-1"
+                           >
+                             <RotateCcw class="w-3 h-3" /> 새로고침
+                           </button>
+                           <a 
+                              href="https://chromewebstore.google.com/detail/kimjgflahdmnlhilmojcoaechlgkokhc?utm_source=item-share-cb" 
+                              target="_blank"
+                              class="px-3 py-1.5 bg-slate-900 text-white text-[10px] font-bold rounded-lg hover:bg-slate-700 transition-colors flex items-center gap-1"
+                           >
+                             설치하기
+                           </a>
+                       </div>
                    </div>
-                   <p class="text-xs text-slate-400">설치가 완료되면 자동으로 감지합니다.</p>
-               </div>
-               
-               <!-- Case 2: Installed but No Repo Linked -->
-               <div v-else-if="isInstalled && !isHookLinked" class="flex flex-col items-center justify-center gap-2 text-amber-600 mb-2 animate-pulse">
-                   <div class="flex items-center gap-2">
-                       <Loader2 class="w-5 h-5 animate-spin text-amber-500" />
-                       <span class="font-bold text-sm">저장소 연결 확인 중...</span>
+                   <!-- Stylish Hint -->
+                   <div v-if="!isInstalled" class="ml-11 bg-slate-100 rounded-lg p-3 text-[11px] text-slate-500 leading-relaxed flex items-start gap-2">
+                      <Info class="w-3.5 h-3.5 mt-0.5 shrink-0 text-slate-400" />
+                      <span>설치가 완료되면 <strong>새로고침</strong> 버튼을 눌러주세요.<br>자동으로 설치가 감지됩니다.</span>
                    </div>
-                   <p class="text-xs text-amber-600 font-bold bg-amber-50 px-3 py-1 rounded-lg">
-                     익스텐션 팝업을 열어 저장소를 연결해주세요!
-                   </p>
+               </div>
+
+               <!-- Step 2: Login -->
+               <div class="flex flex-col gap-2 pt-2">
+                   <div class="flex items-center justify-between">
+                       <div class="flex items-center gap-3">
+                           <div :class="isLoggedIn ? 'bg-emerald-500 text-white' : 'bg-slate-200 text-slate-400'" class="w-8 h-8 rounded-full flex items-center justify-center transition-colors shrink-0">
+                               <CheckCircle2 v-if="isLoggedIn" class="w-5 h-5" />
+                               <span v-else class="text-sm font-bold">2</span>
+                           </div>
+                           <div>
+                               <span :class="isLoggedIn ? 'text-slate-800 font-bold' : 'text-slate-500'" class="text-base">GitHub 인증</span>
+                               <p v-if="isInstalled && !isLoggedIn" class="text-xs text-amber-600 font-bold mt-0.5 animate-pulse">
+                                   로그인이 필요합니다
+                               </p>
+                           </div>
+                       </div>
+                       <!-- Open Extension Button -->
+                       <button 
+                         v-if="isInstalled && !isLoggedIn"
+                         @click="openExtensionHome"
+                         class="px-3 py-1.5 bg-slate-900 text-white text-[10px] font-bold rounded-lg hover:bg-slate-700 transition-colors"
+                       >
+                         인증하기
+                       </button>
+                   </div>
+               </div>
+
+               <!-- Step 3: Link -->
+               <div class="flex flex-col gap-2 pt-2">
+                   <div class="flex items-center justify-between">
+                       <div class="flex items-center gap-3">
+                           <div :class="isHookLinked ? 'bg-emerald-500 text-white' : 'bg-slate-200 text-slate-400'" class="w-8 h-8 rounded-full flex items-center justify-center transition-colors shrink-0">
+                               <CheckCircle2 v-if="isHookLinked" class="w-5 h-5" />
+                               <span v-else class="text-sm font-bold">3</span>
+                           </div>
+                           <div>
+                               <span :class="isHookLinked ? 'text-slate-800 font-bold' : 'text-slate-500'" class="text-base">저장소 연결</span>
+                               <p v-if="isLoggedIn && !isHookLinked" class="text-xs text-amber-600 font-bold mt-0.5 animate-pulse">
+                                   저장소를 선택해주세요
+                               </p>
+                           </div>
+                       </div>
+                       <!-- Open Extension Button -->
+                       <button 
+                         v-if="isLoggedIn && !isHookLinked"
+                         @click="openExtensionHome"
+                         class="px-3 py-1.5 bg-slate-900 text-white text-[10px] font-bold rounded-lg hover:bg-slate-700 transition-colors"
+                       >
+                         설정하기
+                       </button>
+                   </div>
                </div>
            </div>
 
-           <!-- State: All Detected (Success) -->
-           <div v-else-if="isInstalled && isHookLinked" class="py-2 animate-scale-in">
-               <div class="flex items-center justify-center gap-2 text-emerald-600 mb-2">
-                   <CheckCircle2 class="w-6 h-6" />
-                   <span class="font-bold text-lg">설치 및 연결 완료!</span>
-               </div>
+           <!-- Success Action -->
+           <div v-if="isHookLinked" class="animate-scale-in pt-2">
                <button 
                  @click="emit('next')"
-                 class="px-8 py-3 bg-brand-600 hover:bg-brand-500 text-white font-bold rounded-xl shadow-lg shadow-brand-500/20 transition-all hover:scale-105"
+                 class="w-full py-3 bg-brand-600 hover:bg-brand-500 text-white font-bold rounded-xl shadow-lg shadow-brand-500/20 transition-all hover:scale-105 flex items-center justify-center gap-2"
                >
-                 다음 단계로
+                 <span>다음 단계로</span>
+                 <ArrowRight class="w-4 h-4" />
                </button>
            </div>
-
-           <!-- Fallback / Retry -->
-           <div v-else class="text-xs text-slate-400 pb-2">
-               <span class="block mb-2">감지가 되지 않으시나요?</span>
-               <button @click="checkExtension" class="underline hover:text-slate-600">다시 확인하기</button>
-           </div>
+           
+           <!-- Retry Manual : Removed as requested -->
         </div>
 
       </div>
@@ -110,20 +136,29 @@
 
 <script setup>
 import { ref, onMounted, onUnmounted } from 'vue';
-import { ArrowRight, ArrowDown, Chrome, Loader2, CheckCircle2 } from 'lucide-vue-next';
+import { ArrowRight, Chrome, Loader2, CheckCircle2, RotateCcw, Info } from 'lucide-vue-next';
 
 // Emits 정의
 const emit = defineEmits(['next']);
 
-const installClicked = ref(false); // "감지 중..." UI를 표시하는 데 사용
-const detecting = ref(false);
-const isInstalled = ref(false);
-const isHookLinked = ref(false); // 저장소 연결 여부
+const navigating = ref(false);
+const detecting = ref(true); // Default to true to start detecting immediately
 
-const onInstallClick = () => {
-  installClicked.value = true;
-  detecting.value = true;
-  checkExtension(); // 클릭 시 즉시 확인
+const isInstalled = ref(false);
+const isLoggedIn = ref(false);
+const isHookLinked = ref(false); // 저장소 연결 여부
+const extensionId = ref(null);
+
+const reloadPage = () => {
+    window.location.reload();
+};
+
+const openExtensionHome = () => {
+    if (extensionId.value) {
+        window.open(`chrome-extension://${extensionId.value}/welcome.html`, '_blank');
+    } else {
+        alert('익스텐션 ID를 찾을 수 없습니다. 새로고침 후 다시 시도해주세요.');
+    }
 };
 
 // 엄격한 이중 검증 로직 (Strict Dual Verification Logic)
@@ -133,18 +168,30 @@ const checkExtension = () => {
     // 1. 설치 확인
     if (dataEl && dataEl.getAttribute('data-extension-installed') === 'true') {
         isInstalled.value = true;
+        extensionId.value = dataEl.getAttribute('data-extension-id');
         
-        // 2. 저장소 연결(Hook) 확인
-        const hook = dataEl.getAttribute('data-hook');
-        if (hook && hook.length > 0) {
-            isHookLinked.value = true;
-            onAllDetected(); // 모두 완료
+        // 2. 로그인(Username) 확인
+        const username = dataEl.getAttribute('data-username');
+        if (username && username.length > 0) {
+            isLoggedIn.value = true;
+            
+            // 3. 저장소 연결(Hook) 확인
+            const hook = dataEl.getAttribute('data-hook');
+            if (hook && hook.length > 0) {
+                isHookLinked.value = true;
+                onAllDetected(); // 모두 완료
+            } else {
+                isHookLinked.value = false;
+            }
         } else {
-            isHookLinked.value = false; // 설치는 됐으나 연결 안됨
+            isLoggedIn.value = false;
+            isHookLinked.value = false;
         }
+
     } else {
         // 설치도 안됨
         isInstalled.value = false;
+        isLoggedIn.value = false;
         isHookLinked.value = false;
     }
     
@@ -156,6 +203,7 @@ const checkExtension = () => {
 
 const onAllDetected = () => {
     isInstalled.value = true;
+    isLoggedIn.value = true;
     isHookLinked.value = true;
     detecting.value = false;
 };
@@ -164,10 +212,19 @@ const onAllDetected = () => {
 const onExtensionReady = (e) => {
     if (e.detail && e.detail.extensionInstalled) {
         isInstalled.value = true;
-        if (e.detail.hook) {
-            isHookLinked.value = true;
-            onAllDetected();
+        extensionId.value = e.detail.extensionId;
+        
+        if (e.detail.username) {
+            isLoggedIn.value = true;
+            
+            if (e.detail.hook) {
+                isHookLinked.value = true;
+                onAllDetected();
+            } else {
+                isHookLinked.value = false;
+            }
         } else {
+            isLoggedIn.value = false;
             isHookLinked.value = false;
         }
     }
@@ -178,7 +235,7 @@ onMounted(() => {
     
     // 주기적 확인 (Polling) - 모두 감지되면 중지
     const interval = setInterval(() => {
-        if (!isInstalled.value || !isHookLinked.value) {
+        if (!isInstalled.value || !isLoggedIn.value || !isHookLinked.value) {
            checkExtension();
         }
     }, 1000);

@@ -5,7 +5,8 @@ import { userApi } from '@/api/user';
 import { studyApi } from '@/api/study';
 import { useAuth } from '@/composables/useAuth';
 import { onboardingApi } from '@/api/onboarding';
-import { Settings, LogOut, Github, Award, Users, Crown } from 'lucide-vue-next';
+import { Settings, LogOut, Github, Award, Users, Crown, RotateCcw, Loader2, HelpCircle, Zap as ZapIcon } from 'lucide-vue-next'; // Renamed Zap to ZapIcon to avoid conflict or just use Zap
+import Zap from 'lucide-vue-next/dist/esm/icons/zap'; // Wait, standard import is safer
 import BaseIconBadge from '@/components/common/BaseIconBadge.vue';
 
 const router = useRouter();
@@ -115,23 +116,44 @@ const updateSolvedac = async () => {
     }
 };
 
-const updateRepository = async () => {
-    if (!userData.value.repositoryName) return;
+const handleRedetect = async () => {
     syncingRepo.value = true;
+    
+    // 1. 요청 발송 (Request Extension Data)
+    window.dispatchEvent(new CustomEvent('DashHub-dash-request'));
+    
+    // 2. 잠시 대기 (Wait for Bridge)
+    await new Promise(resolve => setTimeout(resolve, 500));
+    
+    // 3. DOM 확인 (Check DOM)
+    const dataEl = document.getElementById('DashHub-dash-data');
+    const hook = dataEl?.getAttribute('data-hook');
+    const repo = dataEl?.getAttribute('data-repo');
+    
+    // 감지된 저장소 (Hook 우선)
+    const detectedName = hook || repo;
+    
+    if (!detectedName) {
+        alert("익스텐션 설정을 감지할 수 없습니다.\n\n다음 항목을 확인해주세요:\n1. DashHub 익스텐션이 설치되어 있는지\n2. 익스텐션에서 GitHub 로그인이 완료되었는지\n3. 저장소가 연결되어 있는지");
+        syncingRepo.value = false;
+        return;
+    }
+
+    // 4. 서버로 전송 (Submit Update)
     try {
-        const res = await onboardingApi.submitRepository(userData.value.repositoryName);
+        const res = await onboardingApi.submitRepository(detectedName);
         const data = res.data;
         userData.value.repositoryName = data.repositoryName;
         userData.value.webhookConfigured = data.webhookConfigured;
         
         if (data.webhookConfigured) {
-             alert("저장소가 연결되고 웹훅이 설정되었습니다!");
+             alert(`저장소가 '${detectedName}'(으)로 업데이트되었습니다!`);
         } else {
-             alert("저장소는 연결되었으나 웹훅 설정에 실패했습니다.\n잠시 후 다시 시도해주세요.");
+             alert(`저장소가 '${detectedName}'(으)로 설정되었으나 웹훅 확인에 실패했습니다.`);
         }
     } catch (e) {
         console.error(e);
-        alert("저장소 연결 실패. 이름을 확인해주세요.");
+        alert("저장소 업데이트 실패. 잠시 후 다시 시도해주세요.");
     } finally {
         syncingRepo.value = false;
     }
@@ -148,6 +170,8 @@ const handleDelete = async () => {
         alert("실패했습니다.");
     }
 };
+import TroubleshootingModal from '@/components/common/TroubleshootingModal.vue';
+const showFaq = ref(false);
 </script>
 
 <template>
@@ -257,10 +281,19 @@ const handleDelete = async () => {
 
              <!-- Repository Sync -->
             <section class="bg-white rounded-3xl p-6 md:p-8 shadow-sm">
-                 <h2 class="text-xl font-bold text-slate-800 mb-6 flex items-center gap-2">
-                    <Zap :size="20" class="text-slate-400"/>
-                    계정 연동
-                </h2>
+                <div class="flex items-center justify-between mb-6">
+                    <h2 class="text-xl font-bold text-slate-800 flex items-center gap-2">
+                        <ZapIcon :size="20" class="text-slate-400"/>
+                        계정 연동
+                    </h2>
+                    <button 
+                        @click="showFaq = true"
+                        class="text-xs font-bold text-slate-400 hover:text-slate-600 flex items-center gap-1.5 px-3 py-1.5 bg-slate-50 hover:bg-slate-100 rounded-lg transition-colors"
+                    >
+                        <HelpCircle class="w-3.5 h-3.5" />
+                        연동 문제 해결
+                    </button>
+                </div>
                 <div class="space-y-6">
                     <!-- Solved.ac -->
                     <div>
@@ -284,32 +317,40 @@ const handleDelete = async () => {
                         </div>
                     </div>
 
-                    <!-- Github -->
+                     <!-- Github -->
                      <div>
                          <label class="block text-xs font-bold text-slate-400 mb-2 uppercase flex items-center gap-2">
                             <Github :size="14" />
                             Github Repository
                          </label>
                         <div class="flex gap-3">
-                            <input 
-                                v-model="userData.repositoryName"
-                                class="flex-1 bg-slate-50 border-2 border-slate-200 rounded-xl px-4 py-3 font-bold text-slate-700 focus:outline-none focus:border-slate-800 focus:bg-white transition-all"
-                                placeholder="owner/repo"
-                            />
-                            <button 
-                                @click="updateRepository"
-                                :disabled="syncingRepo"
-                                class="px-6 bg-slate-800 hover:bg-slate-700 text-white rounded-xl font-bold transition-colors disabled:opacity-50 shrink-0"
+                            <div 
+                                class="flex-1 bg-slate-100 border-2 border-slate-200 rounded-xl px-4 py-3 font-bold text-slate-500 flex items-center"
                             >
-                                {{ syncingRepo ? '...' : '연결' }}
+                                <span v-if="userData.repositoryName">{{ userData.repositoryName }}</span>
+                                <span v-else class="text-slate-400 font-normal">연결된 저장소 없음</span>
+                            </div>
+                            <button 
+                                @click="handleRedetect"
+                                :disabled="syncingRepo"
+                                class="px-4 bg-slate-800 hover:bg-slate-700 text-white rounded-xl font-bold transition-colors disabled:opacity-50 shrink-0 flex items-center gap-2"
+                            >
+                                <Loader2 v-if="syncingRepo" class="animate-spin w-4 h-4" />
+                                <RotateCcw v-else class="w-4 h-4" />
+                                <span class="hidden md:inline">{{ syncingRepo ? '감지 중...' : '재탐지' }}</span>
+                                <span class="md:hidden">재탐지</span>
                             </button>
                         </div>
+
                          <div v-if="userData.webhookConfigured" class="mt-2 text-xs font-bold text-emerald-600 flex items-center gap-1.5 px-1">
                             <span class="relative flex h-2 w-2">
                               <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
                               <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
                             </span>
                             웹훅이 정상적으로 연결되었습니다
+                        </div>
+                        <div v-else class="mt-2 text-xs text-slate-400 px-1">
+                            * 저장소 변경은 대시허브 익스텐션에서 설정 후 '재탐지'를 눌러주세요.
                         </div>
                     </div>
                 </div>
@@ -327,6 +368,9 @@ const handleDelete = async () => {
         </div>
       </div>
 
+
+    <!-- Global Modals -->
+    <TroubleshootingModal :isOpen="showFaq" @close="showFaq = false" />
     </main>
   </div>
 </template>

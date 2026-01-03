@@ -142,8 +142,8 @@
       
       <!-- Footer Note -->
       <p class="text-center text-xs text-slate-400 font-medium">
-        이미 Solved.ac 계정이 있으신가요? <br>
-        없다면 <a href="https://solved.ac" target="_blank" class="text-brand-500 hover:underline">여기서 가입</a>할 수 있습니다.
+        Solved.ac 계정이 없으신가요? <br>
+        <a href="https://solved.ac" target="_blank" class="text-brand-500 hover:underline">여기서 가입</a>할 수 있습니다.
       </p>
 
     </div>

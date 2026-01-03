@@ -12,7 +12,7 @@
           저장소 확인
         </h1>
         <p class="text-slate-500 font-medium">
-          익스텐션(백준허브)에 설정된 저장소를 감지합니다.
+          대시허브 익스텐션에 설정된 저장소를 감지합니다.
         </p>
       </div>
 
@@ -73,7 +73,7 @@
            </div>
            
            <div class="bg-slate-50 p-4 rounded-xl text-left text-sm text-slate-600 space-y-2 border border-slate-100">
-               <p>1. Chrome 익스텐션 목록에서 <span class="font-bold text-slate-800">DASH Hub</span>를 클릭하세요.</p>
+               <p>1. Chrome 익스텐션 목록에서 <span class="font-bold text-slate-800">DashHub</span>를 클릭하세요.</p>
                <p>2. <span class="font-bold text-slate-800">Authenticate</span> 버튼을 눌러 인증을 완료하세요.</p>
                <p>3. <span class="font-bold text-slate-800">Repository</span>를 선택/연결하세요.</p>
                <p>4. 아래 버튼을 눌러 다시 탐지하세요.</p>
