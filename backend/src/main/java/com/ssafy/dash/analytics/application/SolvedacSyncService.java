@@ -16,9 +16,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 
-/**
- * Solved.ac 데이터 동기화 서비스
- */
+import com.ssafy.dash.ai.infrastructure.persistence.LearningPathCacheMapper;
+
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -28,6 +27,8 @@ public class SolvedacSyncService {
     private final UserRepository userRepository;
     private final UserClassStatRepository classStatRepository;
     private final UserTagStatRepository tagStatRepository;
+    private final LearningPathCacheMapper cacheMapper;
+
     /**
      * 사용자 Solved.ac 핸들 등록 및 초기 데이터 동기화
      */
@@ -57,7 +58,9 @@ public class SolvedacSyncService {
         // 4. 태그 통계 동기화
         syncTagStats(userId, handle);
 
-
+        // 5. 학습 경로 캐시 무효화 (데이터 변경됨)
+        cacheMapper.deleteByUserId(userId);
+        log.info("Invalidated learning path cache for user {}", userId);
 
         log.info("Successfully synced Solved.ac data for user {}", userId);
     }

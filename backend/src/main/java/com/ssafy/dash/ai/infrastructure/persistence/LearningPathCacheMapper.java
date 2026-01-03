@@ -28,4 +28,8 @@ public interface LearningPathCacheMapper {
     void update(@Param("userId") Long userId,
             @Param("analysisJson") String analysisJson,
             @Param("generatedAt") LocalDate generatedAt);
+    /**
+     * 캐시 삭제
+     */
+    void deleteByUserId(@Param("userId") Long userId);
 }
