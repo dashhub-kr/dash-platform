@@ -73,7 +73,7 @@ import { useRouter } from 'vue-router';
 const router = useRouter();
 
 const handleLogin = () => {
-    router.push('/login');
+    window.location.href = '/oauth2/authorization/github';
 };
 </script>
 
