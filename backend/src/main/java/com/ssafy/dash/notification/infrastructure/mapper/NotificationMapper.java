@@ -1,4 +1,4 @@
-package com.ssafy.dash.notification.infrastructure;
+package com.ssafy.dash.notification.infrastructure.mapper;
 
 import java.util.List;
 import java.util.Optional;

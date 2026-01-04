@@ -1,4 +1,4 @@
-package com.ssafy.dash.notification.infrastructure;
+package com.ssafy.dash.notification.infrastructure.persistence;
 
 import java.util.List;
 import java.util.Optional;
@@ -7,12 +7,13 @@ import org.springframework.stereotype.Repository;
 
 import com.ssafy.dash.notification.domain.Notification;
 import com.ssafy.dash.notification.domain.NotificationRepository;
+import com.ssafy.dash.notification.infrastructure.mapper.NotificationMapper;
 
 import lombok.RequiredArgsConstructor;
 
 @Repository
 @RequiredArgsConstructor
-public class MyBatisNotificationRepository implements NotificationRepository {
+public class NotificationRepositoryImpl implements NotificationRepository {
 
     private final NotificationMapper mapper;
 
