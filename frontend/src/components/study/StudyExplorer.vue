@@ -34,16 +34,16 @@
       <div class="mb-10 bg-slate-50 p-6 rounded-3xl border border-slate-100">
         <label class="block text-sm font-bold text-slate-500 mb-3 ml-1 flex items-center justify-between">
            <span>스터디 찾기</span>
-           <span v-if="studies.length === 1 && searchId" class="text-brand-600 cursor-pointer hover:underline" @click="resetSearch">
+           <span v-if="searchKeyword" class="text-brand-600 cursor-pointer hover:underline" @click="resetSearch">
               전체 목록 보기
            </span>
         </label>
         <div class="relative">
           <input 
-            v-model="searchId"
+            v-model="searchKeyword"
             @keyup.enter="searchStudy"
-            type="number" 
-            placeholder="스터디 번지수(ID)를 입력하세요" 
+            type="text" 
+            placeholder="스터디 이름을 검색하세요" 
             class="w-full bg-white border border-slate-200 rounded-2xl pl-12 pr-20 py-4 font-medium text-slate-800 focus:outline-none focus:border-brand-500 focus:ring-4 focus:ring-brand-500/10 transition-all shadow-sm placeholder:text-slate-400"
           />
           <Search class="w-5 h-5 text-slate-400 absolute left-4 top-1/2 -translate-y-1/2" />
@@ -137,9 +137,14 @@
                         취소
                      </button>
                 </div>
-                <button v-else-if="(user?.studyId && user?.studyType !== 'PERSONAL') || pendingApp" disabled
+                <button v-else-if="pendingApp" disabled
                         class="w-full py-3 bg-slate-100 text-slate-400 font-bold rounded-xl cursor-not-allowed border border-slate-200">
-                   {{ user?.studyId && user?.studyType !== 'PERSONAL' ? '가입 불가' : '신청 진행 중' }}
+                   신청 진행 중
+                </button>
+                <button v-else-if="user?.studyId && user?.studyType !== 'PERSONAL'" 
+                        @click="showLeaveRequiredAlert"
+                        class="w-full py-3 bg-violet-600 hover:bg-violet-700 text-white font-bold rounded-xl shadow-md hover:shadow-lg transition-all flex items-center justify-center gap-2">
+                   가입 신청 <ArrowRight class="w-4 h-4 opacity-50" />
                 </button>
                 <button v-else 
                         @click="openApplyModal(study)"
@@ -226,9 +231,14 @@
                      </button>
                 </div>
 
-                <button v-else-if="(user?.studyId && user?.studyType !== 'PERSONAL') || pendingApp" disabled
+                <button v-else-if="pendingApp" disabled
                         class="w-full py-3 bg-slate-100 text-slate-400 font-bold rounded-xl cursor-not-allowed border border-slate-200">
-                   {{ user?.studyId && user?.studyType !== 'PERSONAL' ? '가입 불가' : '신청 진행 중' }}
+                   신청 진행 중
+                </button>
+                <button v-else-if="user?.studyId && user?.studyType !== 'PERSONAL'" 
+                        @click="showLeaveRequiredAlert"
+                        class="w-full py-3 bg-brand-600 hover:bg-brand-700 text-white font-bold rounded-xl shadow-md hover:shadow-lg transition-all flex items-center justify-center gap-2">
+                   가입 신청 <ArrowRight class="w-4 h-4 opacity-50" />
                 </button>
 
                 <!-- 신청하기 -->
@@ -379,7 +389,7 @@ const applyMessage = ref('');
 
 const applying = ref(false);
 
-const searchId = ref('');
+const searchKeyword = ref('');
 const searchError = ref('');
 
 const pendingApp = ref(null);
@@ -433,7 +443,7 @@ const fetchAllStudies = async () => {
 };
 
 const searchStudy = async () => {
-    if (!searchId.value) {
+    if (!searchKeyword.value.trim()) {
         await fetchAllStudies();
         return;
     }
@@ -442,19 +452,22 @@ const searchStudy = async () => {
     searchError.value = '';
     
     try {
-        const res = await axios.get(`/api/studies/${searchId.value}`);
-        studies.value = [res.data];
+        const res = await axios.get('/api/studies', { params: { keyword: searchKeyword.value } });
+        studies.value = res.data;
+        if (res.data.length === 0) {
+            searchError.value = '검색 결과가 없습니다.';
+        }
     } catch (e) {
         console.error('검색 실패', e);
         studies.value = [];
-        searchError.value = '해당 번지수의 스터디를 찾을 수 없습니다.';
+        searchError.value = '검색 중 오류가 발생했습니다.';
     } finally {
         loading.value = false;
     }
 };
 
 const resetSearch = async () => {
-    searchId.value = '';
+    searchKeyword.value = '';
     await fetchAllStudies();
 };
 
@@ -488,6 +501,10 @@ const openApplyModal = (study) => {
 const closeModal = () => {
   showModal.value = false;
   selectedStudy.value = null;
+};
+
+const showLeaveRequiredAlert = () => {
+  alert('현재 가입된 스터디가 있습니다.\n\n다른 스터디에 가입하려면 먼저 기존 스터디를 탈퇴해야 합니다.\n\n[프로필 > 스터디 탈퇴] 에서 탈퇴 가능합니다.');
 };
 
 const submitApplication = async () => {
