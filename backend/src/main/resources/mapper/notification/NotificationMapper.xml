@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.ssafy.dash.notification.infrastructure.NotificationMapper">
+
+    <select id="findById" resultType="com.ssafy.dash.notification.domain.Notification">
+        SELECT *
+        FROM notification
+        WHERE id = #{id}
+    </select>
+
+    <select id="findByReceiverIdOrderByCreatedAtDesc" resultType="com.ssafy.dash.notification.domain.Notification">
+        SELECT *
+        FROM notification
+        WHERE receiver_id = #{receiverId}
+        ORDER BY created_at DESC
+    </select>
+    
+    <insert id="save" parameterType="com.ssafy.dash.notification.domain.Notification" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO notification (receiver_id, content, url, type, is_read, created_at)
+        VALUES (#{receiverId}, #{content}, #{url}, #{type}, #{isRead}, #{createdAt})
+    </insert>
+
+    <update id="update" parameterType="com.ssafy.dash.notification.domain.Notification">
+        UPDATE notification
+        SET is_read = #{isRead},
+            url = #{url},
+            content = #{content},
+            type = #{type}
+        WHERE id = #{id}
+    </update>
+    
+    <update id="markAllAsRead">
+        UPDATE notification
+        SET is_read = true
+        WHERE receiver_id = #{receiverId} AND is_read = false
+    </update>
+    <delete id="deleteReadBefore">
+        DELETE FROM notification
+        WHERE is_read = true AND created_at &lt; #{before}
+    </delete>
+
+</mapper>
