@@ -41,10 +41,14 @@ public class StudyController {
     private final StudyMissionService studyMissionService;
     private final com.ssafy.dash.acorn.application.AcornService acornService;
 
-    @Operation(summary = "스터디 목록 조회", description = "참여 가능한 스터디 목록을 조회합니다. 평균 티어, 멤버 수, 총 풀이 수 포함.")
+    @Operation(summary = "스터디 목록 조회", description = "참여 가능한 스터디 목록을 조회합니다. 평균 티어, 멤버 수, 총 풀이 수 포함. keyword로 이름 검색 가능.")
     @GetMapping
-    public ResponseEntity<List<StudyListResponse>> getStudies() {
-        List<StudyListResponse> response = studyService.findAll().stream()
+    public ResponseEntity<List<StudyListResponse>> getStudies(
+            @RequestParam(required = false) String keyword) {
+        List<Study> studies = (keyword != null && !keyword.isBlank())
+                ? studyService.searchByKeyword(keyword)
+                : studyService.findAll();
+        List<StudyListResponse> response = studies.stream()
                 .map(StudyListResponse::from)
                 .toList();
         return ResponseEntity.ok(response);

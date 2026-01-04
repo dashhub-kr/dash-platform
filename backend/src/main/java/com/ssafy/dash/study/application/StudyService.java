@@ -35,6 +35,11 @@ public class StudyService {
         return studyRepository.findAll();
     }
 
+    @Transactional(readOnly = true)
+    public List<Study> searchByKeyword(String keyword) {
+        return studyRepository.searchByKeyword(keyword);
+    }
+
     @Transactional
     public Study createStudy(Long userId, String name, String description, StudyVisibility visibility) {
         User user = userRepository.findById(userId)

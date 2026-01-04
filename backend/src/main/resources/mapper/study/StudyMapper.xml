@@ -49,6 +49,28 @@
     ORDER BY total_solved DESC, s.id
   </select>
 
+  <select id="searchByKeyword" resultType="Study">
+    SELECT s.*, 
+           (SELECT COUNT(*) FROM users u WHERE u.study_id = s.id AND u.deleted_at IS NULL) as member_count,
+           (SELECT AVG(u.solvedac_tier) FROM users u WHERE u.study_id = s.id AND u.deleted_at IS NULL AND u.solvedac_tier IS NOT NULL) as average_tier,
+           (SELECT COUNT(*) FROM algorithm_records ar 
+            INNER JOIN users u ON ar.user_id = u.id 
+            WHERE u.study_id = s.id AND u.deleted_at IS NULL AND ar.record_type = 'USER_SOLUTION') as total_solved,
+           (SELECT u2.username FROM users u2 
+            WHERE u2.study_id = s.id AND u2.deleted_at IS NULL 
+            ORDER BY (SELECT COUNT(*) FROM algorithm_records ar2 WHERE ar2.user_id = u2.id AND ar2.record_type = 'USER_SOLUTION') DESC 
+            LIMIT 1) as mvp_username,
+           (SELECT COUNT(*) 
+            FROM algorithm_records ar3 
+            JOIN users u3 ON ar3.user_id = u3.id 
+            WHERE u3.study_id = s.id 
+            AND ar3.created_at >= DATE_SUB(NOW(), INTERVAL 7 DAY)) / 
+           NULLIF((SELECT COUNT(*) FROM users u4 WHERE u4.study_id = s.id), 0) as average_submission_rate
+    FROM studies s 
+    WHERE s.study_type = 'GROUP' AND s.name LIKE CONCAT('%', #{keyword}, '%')
+    ORDER BY total_solved DESC, s.id
+  </select>
+
   <update id="update" parameterType="Study">
     UPDATE studies SET name = #{name}, acorn_count = #{acornCount}, 
     visibility = #{visibility}, description = #{description}, streak = #{streak}, study_type = #{studyType}
