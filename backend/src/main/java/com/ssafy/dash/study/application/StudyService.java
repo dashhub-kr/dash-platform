@@ -71,9 +71,13 @@ public class StudyService {
         }
 
         // Check if already applied
-        if (studyRepository.findApplicationByStudyIdAndUserId(studyId, userId).isPresent()) {
-            throw new IllegalStateException("Already applied to this study");
-        }
+        studyRepository.findApplicationByStudyIdAndUserId(studyId, userId).ifPresent(app -> {
+            if (app.getStatus() == StudyApplication.ApplicationStatus.PENDING) {
+                throw new IllegalStateException("Already applied to this study");
+            }
+            // If not pending (e.g. APPROVED but left study), delete old application record
+            studyRepository.deleteApplication(app.getId());
+        });
 
         StudyApplication application = StudyApplication.create(studyId, userId, message);
         studyRepository.saveApplication(application);
