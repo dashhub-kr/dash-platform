@@ -11,6 +11,7 @@
   [![Vue.js](https://img.shields.io/badge/Vue.js-3.3.4-4FC08D?style=flat-square&logo=vue.js)](https://vuejs.org/)
   [![FastAPI](https://img.shields.io/badge/FastAPI-0.112.0-009688?style=flat-square&logo=fastapi)](https://fastapi.tiangolo.com/)
   [![Gemini](https://img.shields.io/badge/AI-Google%20Gemini-8E75B2?style=flat-square&logo=google)](https://deepmind.google/technologies/gemini/)
+  [![DashHub](https://img.shields.io/badge/Powered%20by-DashHub-blue?style=flat-square&logo=googlechrome&logoColor=white)](https://chromewebstore.google.com/detail/kimjgflahdmnlhilmojcoaechlgkokhc)
 </div>
 
 ---
