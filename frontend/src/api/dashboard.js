@@ -1,6 +1,9 @@
 import http from './http';
 
 export const dashboardApi = {
-    getRecords: () => http.get('/dashboard/records'),
-    getHeatmap: () => http.get('/dashboard/heatmap'),
+    // 알고리즘 기록 조회
+    getRecords: (studyId) => http.get('/dashboard/records', { params: { studyId } }),
+
+    // 히트맵 데이터 조회
+    getHeatmap: (studyId) => http.get('/dashboard/heatmap', { params: { studyId } }),
 };

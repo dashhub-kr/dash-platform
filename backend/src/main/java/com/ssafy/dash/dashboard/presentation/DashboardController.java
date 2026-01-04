@@ -22,15 +22,32 @@ public class DashboardController {
 
     @GetMapping("/records")
     public ResponseEntity<List<AlgorithmRecordResult>> getDashboardRecords(
-            @AuthenticationPrincipal CustomOAuth2User oauthUser) {
+            @AuthenticationPrincipal CustomOAuth2User oauthUser,
+            @org.springframework.web.bind.annotation.RequestParam(required = false) Long studyId) {
         
+        if (studyId != null) {
+            // Check Admin role
+             if (!oauthUser.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"))) {
+                 return ResponseEntity.status(403).build();
+             }
+             return ResponseEntity.ok(dashboardService.getAlgorithmRecordsByStudyId(studyId));
+        }
+
         return ResponseEntity.ok(dashboardService.getAlgorithmRecords(oauthUser.getUserId()));
     }
 
     @GetMapping("/heatmap")
     public ResponseEntity<List<HeatmapItem>> getHeatmap(
-            @AuthenticationPrincipal CustomOAuth2User oauthUser) {
+            @AuthenticationPrincipal CustomOAuth2User oauthUser,
+            @org.springframework.web.bind.annotation.RequestParam(required = false) Long studyId) {
         
+        if (studyId != null) {
+             if (!oauthUser.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"))) {
+                 return ResponseEntity.status(403).build();
+             }
+             return ResponseEntity.ok(dashboardService.getHeatmap(null, studyId));
+        }
+
         return ResponseEntity.ok(dashboardService.getHeatmap(oauthUser.getUserId(), null));
     }
 }

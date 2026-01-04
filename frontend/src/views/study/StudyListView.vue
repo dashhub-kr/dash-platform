@@ -43,9 +43,16 @@
                             
                             <!-- 콘텐츠 -->
                             <div class="flex-1 min-w-0">
-                                <h3 class="font-bold text-slate-800 text-sm truncate mb-0.5 group-hover:text-brand-600 transition-colors">
-                                    {{ study.name }}
-                                </h3>
+                                <div class="flex items-center justify-between">
+                                    <h3 class="font-bold text-slate-800 text-sm truncate mb-0.5 group-hover:text-brand-600 transition-colors">
+                                        {{ study.name }}
+                                    </h3>
+                                    <!-- 관리자 관전 버튼 -->
+                                    <button v-if="isAdmin" @click.stop="observeStudy(study.id)" 
+                                            class="text-[10px] bg-slate-800 text-white px-1.5 py-0.5 rounded opacity-0 group-hover:opacity-100 transition-opacity">
+                                        관전
+                                    </button>
+                                </div>
                                 <div class="flex items-center gap-2 text-xs text-slate-500">
                                    <span class="flex items-center gap-0.5" :class="{'text-orange-500 font-bold': idx === 0}">
                                       <Flame :size="12" fill="currentColor" /> {{ study.streak || 0 }}일
@@ -76,12 +83,24 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, computed } from 'vue';
+import { useRouter } from 'vue-router';
 import axios from 'axios';
 import { Trophy, Flame } from 'lucide-vue-next';
 import StudyExplorer from '@/components/study/StudyExplorer.vue';
+import { useAuth } from '@/composables/useAuth';
 
 const studies = ref([]);
+const { user } = useAuth();
+const router = useRouter();
+
+const isAdmin = computed(() => {
+    return user.value?.role === 'ROLE_ADMIN' || user.value?.role === 'ADMIN'; 
+});
+
+const observeStudy = (studyId) => {
+    router.push(`/admin/study/${studyId}/dashboard`);
+};
 
 onMounted(async () => {
   try {

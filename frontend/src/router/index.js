@@ -126,6 +126,20 @@ const routes = [
     component: () => import("../views/study/StudyListView.vue"),
     meta: { requiresAuth: true }
   },
+  {
+    path: "/admin/study/:id/dashboard",
+    name: "AdminStudyDashboard",
+    component: Dashboard,
+    props: (route) => ({ studyId: Number(route.params.id) }),
+    meta: { requiresAuth: true, requiresAdmin: true }
+  },
+  {
+    path: "/admin/study/:id/missions",
+    name: "AdminStudyMissions",
+    component: () => import("../views/study/StudyMissionView.vue"),
+    props: (route) => ({ studyId: Number(route.params.id) }),
+    meta: { requiresAuth: true, requiresAdmin: true }
+  },
 ];
 
 const router = createRouter({

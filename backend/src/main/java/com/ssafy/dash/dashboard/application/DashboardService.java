@@ -39,6 +39,13 @@ public class DashboardService {
     }
 
     @Transactional(readOnly = true)
+    public List<com.ssafy.dash.algorithm.application.dto.result.AlgorithmRecordResult> getAlgorithmRecordsByStudyId(Long studyId) {
+        return algorithmRecordRepository.findByStudyId(studyId).stream()
+                .map(com.ssafy.dash.algorithm.application.dto.result.AlgorithmRecordResult::from)
+                .collect(Collectors.toList());
+    }
+
+    @Transactional(readOnly = true)
     public List<HeatmapItem> getHeatmap(Long userId, Long studyId) {
         List<AlgorithmRecord> records;
         if (studyId != null) {

@@ -74,6 +74,19 @@
     >
       <div class="min-h-screen bg-white text-slate-800">
         <!-- 네비게이션/헤더 영역 -->
+        
+        <!-- 관전 모드 배너 -->
+        <div v-if="isObserving" class="bg-slate-900 text-white px-4 py-3 flex items-center justify-between sticky top-0 z-50 shadow-md">
+            <div class="flex items-center gap-2 font-bold">
+                <div class="w-2 h-2 rounded-full bg-red-500 animate-pulse"></div>
+                <span>관리자 관전 모드</span>
+                <span class="text-slate-400 text-sm font-normal mx-2">|</span>
+                <span class="text-brand-300">{{ studyData?.name || 'Loading...' }}</span>
+            </div>
+            <button @click="exitObservation" class="text-xs bg-white/10 hover:bg-white/20 px-3 py-1.5 rounded-lg transition-colors font-bold flex items-center gap-1">
+                <X :size="14" /> 나가기
+            </button>
+        </div>
 
         <div class="flex-1 flex justify-center p-4 md:p-8">
             <div class="flex gap-8 max-w-screen-xl w-full">
@@ -422,12 +435,29 @@ const getMemberProfileImage = (member) => {
 
 // ... (other imports)
 
+// ... (other imports)
+
+const props = defineProps({
+    studyId: {
+        type: Number,
+        default: null
+    }
+});
+
 const { user } = useAuth();
+const router = useRouter();
 const records = ref([]);
 const studyData = ref(null);
 const loading = ref(true);
 const heatmapWeeks = ref([]);
 const heatmapScrollRef = ref(null);
+
+const isObserving = computed(() => !!props.studyId);
+const currentStudyId = computed(() => props.studyId || user.value?.studyId);
+
+const exitObservation = () => {
+    router.push('/study/ranking');
+};
 
 // 히트맵 툴팁 상태
 const heatmapTooltip = ref({
@@ -776,19 +806,20 @@ const hideTooltip = () => {
 
 
 const fetchStudyData = async () => {
-    if (!user.value?.studyId) return;
+    if (!currentStudyId.value) return;
     try {
-        const studyRes = await studyApi.get(user.value.studyId);
+        const studyRes = await studyApi.get(currentStudyId.value);
         studyData.value = studyRes.data;
 
-        const logsRes = await studyApi.getAcornLogs(user.value.studyId);
+        const logsRes = await studyApi.getAcornLogs(currentStudyId.value);
         acornLogs.value = logsRes.data || [];
 
-        const missionsRes = await studyApi.getMissions(user.value.studyId);
+        const missionsRes = await studyApi.getMissions(currentStudyId.value);
         missions.value = missionsRes.data || [];
         
         // 히트맵 데이터 처리
-        const heatmapRes = await studyApi.getHeatmap(user.value.studyId);
+        // Admin observation: use specific study ID if provided
+        const heatmapRes = await dashboardApi.getHeatmap(props.studyId);
         heatmapResData.value = heatmapRes.data || [];
         processHeatmap(heatmapResData.value);
     } catch(e) {

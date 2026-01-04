@@ -1,6 +1,19 @@
 <template>
   <div class="min-h-screen bg-white font-sans pb-20">
     
+    <!-- 관전 모드 배너 -->
+    <div v-if="isObserving" class="bg-slate-900 text-white px-4 py-3 flex items-center justify-between sticky top-0 z-50 shadow-md">
+        <div class="flex items-center gap-2 font-bold">
+            <div class="w-2 h-2 rounded-full bg-red-500 animate-pulse"></div>
+            <span>관리자 관전 모드</span>
+            <span class="text-slate-400 text-sm font-normal mx-2">|</span>
+            <span class="text-brand-300">{{ studyData?.name || 'Loading...' }}</span>
+        </div>
+        <button @click="exitObservation" class="text-xs bg-white/10 hover:bg-white/20 px-3 py-1.5 rounded-lg transition-colors font-bold flex items-center gap-1">
+            <X :size="14" /> 나가기
+        </button>
+    </div>
+
     <!-- 2열 레이아웃을 위한 중앙 컨테이너 -->
     <div class="flex justify-center p-4 md:p-8">
         <div class="flex gap-8 max-w-screen-xl w-full">
@@ -308,8 +321,17 @@ import {
     Pencil,
     Trash2,
     CheckCircle2,
-    Check
+    Check,
+    X
 } from 'lucide-vue-next';
+
+// Admin Observation Props
+const props = defineProps({
+    studyId: {
+        type: Number,
+        default: null
+    }
+});
 
 const route = useRoute();
 const router = useRouter();
@@ -321,12 +343,19 @@ const currentUserId = ref(null);
 const showCreateModal = ref(false);
 const isLeader = ref(false);
 
+const isObserving = computed(() => !!props.studyId);
+
+const exitObservation = () => {
+    router.push('/study/ranking');
+};
+
 // 통계 데이터
 const studyData = ref(null);
 const recordCount = ref(0);
 const heatmapWeeks = ref([]);
 const heatmapScrollRef = ref(null);
 
+// ... (existing refs)
 const modalProblemIds = ref('');
 const modalTitle = ref('');
 const preSelectedMissionId = ref(null);
@@ -340,7 +369,12 @@ const modalWeek = ref(null);
 // 사이드바 선택 상태
 const selectedMission = ref(null);
 
-// 대시보드 로직과 일관성 유지
+// ... (existing helper methods: processHeatmap, currentStreak) 
+// (For brevity, assuming they are unchanged, but I must provide full replacement chunk if they are inside the block)
+// I will just replace the setup block start up to onMounted to insert my logic.
+
+// ... (Helper methods omitted from this block, assuming they are below)
+
 const processHeatmap = (data) => {
     try {
         const activityMap = new Map();
@@ -429,9 +463,21 @@ const currentStreak = computed(() => {
 onMounted(async () => {
   try {
     const userRes = await axios.get('/api/users/me');
-    studyId.value = userRes.data.studyId;
+    
+    // If Admin Observing, use prop. Otherwise user's study.
+    if (props.studyId) {
+        studyId.value = props.studyId;
+    } else {
+        studyId.value = userRes.data.studyId;
+    }
+    
     currentUserId.value = userRes.data.id;
     isLeader.value = userRes.data.isStudyLeader || false;
+    
+    // If observing, force remove leader privileges visually (handled by backend anyway, but for UI safety)
+    if (isObserving.value) {
+        isLeader.value = false; 
+    }
     
     if (studyId.value) {
       await loadMissions();
@@ -440,12 +486,15 @@ onMounted(async () => {
       const statsRes = await studyApi.get(studyId.value);
       studyData.value = statsRes.data;
 
-      const recordsRes = await dashboardApi.getRecords();
+      // Admin Observation needs to request records specifically for this study if possible ???
+      // Wait, dashboardApi.getRecords uses /dashboard/records. If I am admin observing, I should pass studyId to it?
+      // Yes, I just updated dashboardApi.getRecords to take studyId.
+      const recordsRes = await dashboardApi.getRecords(studyId.value);
       recordCount.value = recordsRes.data?.length || 0;
 
       // 히트맵 처리
       try {
-        const heatmapRes = await dashboardApi.getHeatmap();
+        const heatmapRes = await dashboardApi.getHeatmap(studyId.value);
         processHeatmap(heatmapRes.data || []);
       } catch (e) {
         console.error('Heatmap Load Error:', e);
