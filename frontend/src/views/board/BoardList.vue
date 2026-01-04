@@ -92,9 +92,9 @@
                   <img v-else-if="post.authorProfileImageUrl" :src="post.authorProfileImageUrl" class="w-6 h-6 rounded-full border border-slate-200" />
                   <div class="flex flex-col items-start">
                     <span v-if="post.studyName" class="text-[10px] text-brand-500 font-bold">[{{ post.studyName }}]</span>
-                    <span class="flex items-center gap-1">
-                        {{ ['Unknown User', 'Unknown'].includes(post.authorName) ? '탈퇴한 회원' : post.authorName }}
-                        <span v-if="post.authorRole === 'ROLE_ADMIN'" class="px-1.5 py-0.5 rounded-md bg-slate-800 text-[10px] text-white font-bold leading-none" title="관리자">ADMIN</span>
+                    <span class="flex items-center gap-1 min-w-0 max-w-[120px]">
+                        <span class="truncate">{{ ['Unknown User', 'Unknown'].includes(post.authorName) ? '탈퇴한 회원' : post.authorName }}</span>
+                        <span v-if="post.authorRole === 'ROLE_ADMIN'" class="shrink-0 px-1.5 py-0.5 rounded-md bg-slate-800 text-[10px] text-white font-bold leading-none" title="관리자">ADMIN</span>
                     </span>
                   </div>
                 </div>
@@ -139,6 +139,7 @@
               >
                 <div class="flex items-center gap-2 mb-2">
                   <span v-if="post.problemNumber" class="px-2.5 py-1 bg-white/80 backdrop-blur-sm border border-orange-200 text-orange-700 text-xs font-bold rounded-lg shadow-sm">P{{ post.problemNumber }}</span>
+                  <span v-else class="px-2.5 py-1 bg-white/80 backdrop-blur-sm border border-slate-200 text-slate-500 text-xs font-bold rounded-lg shadow-sm">자유</span>
                   <div class="flex items-center gap-1.5 ml-auto">
                     <div class="w-6 h-6 bg-rose-500 rounded-full flex items-center justify-center text-white shadow-sm shadow-rose-200">
                        <ThumbsUp :size="12" stroke-width="3" />

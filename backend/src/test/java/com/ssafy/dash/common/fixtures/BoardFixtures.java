@@ -81,7 +81,7 @@ public final class BoardFixtures {
 
         public BoardResult toResult(LocalDateTime createdAt, LocalDateTime updatedAt) {
             return new BoardResult(id, title, content, userId, authorName, null, null, null, null, boardType, 0, 0,
-                    false, createdAt,
+                    false, null, createdAt,
                     updatedAt);
         }
 
