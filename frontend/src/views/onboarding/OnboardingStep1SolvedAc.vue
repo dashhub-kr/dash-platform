@@ -110,7 +110,7 @@
                         <p class="text-xs text-slate-500 leading-relaxed mb-3">
                             타인 도용 방지를 위해, 
                             <a :href="`https://solved.ac/profile/${handle}`" target="_blank" class="text-blue-500 hover:underline font-bold">Solved.ac</a>
-                            로그인 후 '프로필 편집' 버튼을 눌러 아래 코드를 입력해주세요.
+                            로그인 후 '프로필 편집' 버튼을 눌러 자기소개란에 아래 코드를 입력해주세요.
                         </p>
                         
                         <div class="flex items-center gap-2">
