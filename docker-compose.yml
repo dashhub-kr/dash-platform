@@ -1,0 +1,65 @@
+version: '3.8'
+
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: dash-mysql
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: dash_db
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+
+  backend:
+    image: ghcr.io/${GITHUB_REPOSITORY}/backend:latest
+    container_name: dash-backend
+    restart: always
+    environment:
+      MYSQL_URL: jdbc:mysql://mysql:3306/dash_db?useUnicode=true&characterEncoding=utf8&serverTimezone=UTC
+      MYSQL_USERNAME: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+      AI_SERVER_URL: http://ai:8000
+      GITHUB_CLIENT_ID: ${GITHUB_CLIENT_ID}
+      GITHUB_CLIENT_SECRET: ${GITHUB_CLIENT_SECRET}
+      GITHUB_WEBHOOK_SECRET: ${GITHUB_WEBHOOK_SECRET}
+      GITHUB_WEBHOOK_URL: ${GITHUB_WEBHOOK_URL}
+      YOUTUBE_API_KEY: ${YOUTUBE_API_KEY}
+    depends_on:
+      - mysql
+      - ai
+    networks:
+      - dash-network
+
+  ai:
+    image: ghcr.io/${GITHUB_REPOSITORY}/ai:latest
+    container_name: dash-ai
+    restart: always
+    environment:
+      GEMINI_API_KEY: ${GEMINI_API_KEY}
+    ports:
+      - "8000:8000"
+    networks:
+      - dash-network
+  
+  frontend:
+    image: ghcr.io/${GITHUB_REPOSITORY}/frontend:latest
+    container_name: dash-frontend
+    restart: always
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+    networks:
+      - dash-network
+
+volumes:
+  mysql_data:
+
+networks:
+  dash-network:
+    driver: bridge
