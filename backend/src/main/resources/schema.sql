@@ -429,3 +429,29 @@ CREATE TABLE IF NOT EXISTS notification (
     FOREIGN KEY (receiver_id) REFERENCES users(id) ON DELETE CASCADE,
     INDEX idx_notification_receiver (receiver_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+
+-- Social Features
+CREATE TABLE IF NOT EXISTS friendships (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    requester_id BIGINT NOT NULL,
+    receiver_id BIGINT NOT NULL,
+    status VARCHAR(20) NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (requester_id) REFERENCES users(id) ON DELETE CASCADE,
+    FOREIGN KEY (receiver_id) REFERENCES users(id) ON DELETE CASCADE,
+    UNIQUE KEY uk_friendship (requester_id, receiver_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS direct_messages (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    sender_id BIGINT NOT NULL,
+    receiver_id BIGINT NOT NULL,
+    content TEXT NOT NULL,
+    is_read BOOLEAN DEFAULT FALSE,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (sender_id) REFERENCES users(id) ON DELETE CASCADE,
+    FOREIGN KEY (receiver_id) REFERENCES users(id) ON DELETE CASCADE,
+    INDEX idx_dm_sender_receiver (sender_id, receiver_id),
+    INDEX idx_dm_receiver_sender (receiver_id, sender_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;

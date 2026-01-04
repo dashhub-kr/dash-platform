@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ssafy.dash.social.domain.DirectMessageRepository">
+
+    <insert id="save" parameterType="com.ssafy.dash.social.domain.DirectMessage" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO direct_messages (sender_id, receiver_id, content, is_read, created_at)
+        VALUES (#{senderId}, #{receiverId}, #{content}, #{isRead}, #{createdAt})
+    </insert>
+
+    <select id="findById" resultType="com.ssafy.dash.social.domain.DirectMessage">
+        SELECT * FROM direct_messages WHERE id = #{id}
+    </select>
+
+    <select id="findBySenderIdAndReceiverId" resultType="com.ssafy.dash.social.domain.DirectMessage">
+        SELECT * FROM direct_messages 
+        WHERE sender_id = #{senderId} AND receiver_id = #{receiverId}
+        ORDER BY created_at ASC
+    </select>
+    
+    <select id="findConversation" resultType="com.ssafy.dash.social.domain.DirectMessage">
+        SELECT * FROM direct_messages 
+        WHERE (sender_id = #{userId1} AND receiver_id = #{userId2})
+           OR (sender_id = #{userId2} AND receiver_id = #{userId1})
+        ORDER BY created_at ASC
+    </select>
+
+    <update id="update" parameterType="com.ssafy.dash.social.domain.DirectMessage">
+        UPDATE direct_messages SET is_read = #{isRead} WHERE id = #{id}
+    </update>
+    
+    <!-- 사용자와 대화한 고유 사용자 ID 목록 반환 -->
+    <select id="findRecentChatPartners" resultType="long">
+        SELECT DISTINCT CASE 
+            WHEN sender_id = #{userId} THEN receiver_id 
+            ELSE sender_id 
+        END as partner_id
+        FROM direct_messages
+        WHERE sender_id = #{userId} OR receiver_id = #{userId}
+        ORDER BY created_at DESC
+        LIMIT 20
+    </select>
+
+</mapper>
