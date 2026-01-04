@@ -101,9 +101,11 @@ public class StudyController {
     @PostMapping("/applications/{applicationId}/reject")
     public ResponseEntity<Void> rejectApplication(
             @Parameter(hidden = true) @AuthenticationPrincipal OAuth2User principal,
-            @PathVariable Long applicationId) {
+            @PathVariable Long applicationId,
+            @RequestBody(required = false) java.util.Map<String, String> payload) {
         if (principal instanceof CustomOAuth2User customUser) {
-            studyService.rejectApplication(customUser.getUserId(), applicationId);
+            String reason = payload != null ? payload.getOrDefault("reason", "") : "";
+            studyService.rejectApplication(customUser.getUserId(), applicationId, reason);
             return ResponseEntity.ok().build();
         }
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
