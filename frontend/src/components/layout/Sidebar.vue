@@ -275,7 +275,7 @@ import {
 
 import { useAuth } from "@/composables/useAuth";
 import { authApi } from "@/api/auth";
-import { getNotifications, markAsRead, markAllAsRead } from "@/api/notification";
+import { getNotifications, markAsRead, markAllAsRead, updateNotification } from "@/api/notification";
 import { studyApi } from "@/api/study";
 
 const emits = defineEmits(['scroll']);
@@ -391,8 +391,20 @@ const handleApproveApp = async () => {
     try {
         await studyApi.approveApplication(selectedApp.value.id);
         alert("승인되었습니다.");
+        
+        // Find corresponding notification to update
+        const relatedNotif = notifications.value.find(n => n.relatedId === selectedApp.value.id && n.type === 'STUDY_REQUEST');
+        if (relatedNotif) {
+             const newContent = `'${selectedApp.value.applicant?.username}'님의 가입 신청을 승인했습니다.`;
+             await updateNotification(relatedNotif.id, newContent, 'STUDY_RESULT');
+             // Local update
+             relatedNotif.content = newContent;
+             relatedNotif.type = 'STUDY_RESULT';
+             relatedNotif.isRead = true;
+        } else {
+             fetchNotifications();
+        }
         showApplicationModal.value = false;
-        fetchNotifications(); // Refresh notifications
     } catch (e) {
         console.error(e);
         alert(e.response?.data?.message || "승인에 실패했습니다.");
@@ -405,8 +417,20 @@ const handleRejectApp = async () => {
     try {
         await studyApi.rejectApplication(selectedApp.value.id);
         alert("거절되었습니다.");
+        
+        // Find corresponding notification to update
+        const relatedNotif = notifications.value.find(n => n.relatedId === selectedApp.value.id && n.type === 'STUDY_REQUEST');
+        if (relatedNotif) {
+             const newContent = `'${selectedApp.value.applicant?.username}'님의 가입 신청을 거절했습니다.`;
+             await updateNotification(relatedNotif.id, newContent, 'STUDY_RESULT');
+             // Local update
+             relatedNotif.content = newContent;
+             relatedNotif.type = 'STUDY_RESULT';
+             relatedNotif.isRead = true;
+        } else {
+             fetchNotifications();
+        }
         showApplicationModal.value = false;
-        fetchNotifications();
     } catch (e) {
         console.error(e);
         alert(e.response?.data?.message || "거절에 실패했습니다.");
