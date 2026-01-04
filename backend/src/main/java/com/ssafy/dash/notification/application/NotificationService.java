@@ -46,4 +46,11 @@ public class NotificationService {
     public void markAllAsRead(Long receiverId) {
         notificationRepository.markAllAsRead(receiverId);
     }
+
+    public void update(Long id, String content, NotificationType type) {
+        notificationRepository.findById(id).ifPresent(notification -> {
+            notification.updateContent(content, type);
+            notificationRepository.update(notification);
+        });
+    }
 }

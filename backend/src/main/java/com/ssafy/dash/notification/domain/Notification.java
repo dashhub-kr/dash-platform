@@ -42,4 +42,13 @@ public class Notification {
     public void markAsRead() {
         this.isRead = true;
     }
+
+    public void updateContent(String content, NotificationType type) {
+        if (content != null) {
+            this.content = content;
+        }
+        if (type != null) {
+            this.type = type;
+        }
+    }
 }

@@ -51,4 +51,18 @@ public class NotificationController {
         notificationService.markAllAsRead(principal.getUserId());
         return ResponseEntity.ok().build();
     }
+
+    @PostMapping("/{id}/update")
+    @Operation(summary = "알림 업데이트", description = "알림의 내용이나 타입을 업데이트합니다.")
+    public ResponseEntity<Void> updateNotification(
+            @PathVariable Long id,
+            @org.springframework.web.bind.annotation.RequestBody java.util.Map<String, String> payload) {
+        String content = payload.get("content");
+        String typeStr = payload.get("type");
+        com.ssafy.dash.notification.domain.NotificationType type = typeStr != null
+                ? com.ssafy.dash.notification.domain.NotificationType.valueOf(typeStr)
+                : null;
+        notificationService.update(id, content, type);
+        return ResponseEntity.ok().build();
+    }
 }
