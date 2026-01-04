@@ -319,7 +319,7 @@ import { studyApi } from "@/api/study";
 
 const emits = defineEmits(['scroll']);
 
-const { user, authChecked } = useAuth();
+const { user, loginWithGithub, logout, refresh } = useAuth();
 const route = useRoute();
 const router = useRouter();
 const mobileMenuOpen = ref(false);
@@ -508,6 +508,13 @@ const handleNotificationClick = async (notification) => {
   }
   
   notificationsOpen.value = false;
+  
+  if (notification.type === 'STUDY_RESULT') {
+      try {
+          await refresh(); // 스터디 정보 업데이트 (가입 승인 시 user.studyId 갱신)
+      } catch (e) { console.error('세션 갱신 실패', e); }
+  }
+
   if (notification.url) {
     router.push(notification.url);
   }
