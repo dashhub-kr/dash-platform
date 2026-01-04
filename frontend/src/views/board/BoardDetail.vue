@@ -25,7 +25,6 @@
               <img v-if="post.authorProfileImageUrl" 
                    :src="post.authorProfileImageUrl" 
                    class="w-8 h-8 rounded-full object-cover border border-brand-100" />
-              <UserX v-if="['탈퇴한 회원', 'Unknown', 'Unknown User', null, undefined].includes(post.authorName)" :size="20" class="w-8 h-8 rounded-full border border-brand-100 bg-brand-50 p-1.5 text-brand-400" />
               <div v-else class="w-8 h-8 rounded-full bg-brand-50 flex items-center justify-center text-brand-600 font-bold border border-brand-100">
                  {{ post.authorName?.charAt(0).toUpperCase() || 'U' }}
               </div>
@@ -131,7 +130,6 @@
                 <img v-if="comment.authorProfileImageUrl" 
                      :src="comment.authorProfileImageUrl" 
                      class="w-8 h-8 rounded-full object-cover shadow-sm border border-slate-100" />
-                <UserX v-if="['탈퇴한 회원', 'Unknown', 'Unknown User', null, undefined].includes(comment.authorName)" :size="20" class="w-8 h-8 rounded-full border border-slate-100 bg-white p-1.5 text-slate-400" />
                 <div v-else class="w-8 h-8 rounded-full bg-white shadow-sm border border-slate-100 flex items-center justify-center text-slate-500 font-bold text-sm">
                   {{ comment.authorName?.charAt(0).toUpperCase() || 'U' }}
                 </div>
@@ -202,7 +200,6 @@
                   <img v-if="reply.authorProfileImageUrl" 
                        :src="reply.authorProfileImageUrl" 
                        class="w-6 h-6 rounded-full object-cover border border-slate-100" />
-                  <UserX v-if="['탈퇴한 회원', 'Unknown', 'Unknown User', null, undefined].includes(reply.authorName)" :size="16" class="w-6 h-6 rounded-full border border-slate-100 bg-slate-50 p-1 text-slate-400" />
                   <div v-else class="w-6 h-6 rounded-full bg-slate-50 border border-slate-100 flex items-center justify-center text-slate-400 font-bold text-[10px]">
                     {{ reply.authorName?.charAt(0).toUpperCase() || 'U' }}
                   </div>
