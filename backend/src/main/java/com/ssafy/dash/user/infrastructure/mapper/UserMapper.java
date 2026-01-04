@@ -23,4 +23,8 @@ public interface UserMapper {
 
     List<User> selectByStudyId(Long studyId);
 
+    List<User> selectUsersForAnonymization(java.time.LocalDateTime threshold);
+
+    int anonymize(Long id);
+
 }

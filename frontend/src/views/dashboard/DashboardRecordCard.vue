@@ -38,7 +38,7 @@
       <div class="ml-auto flex items-center gap-3">
           <!-- 제출자 이름 & 날짜 -->
           <div class="flex items-center gap-2 text-xs opacity-50">
-              <span class="font-bold border-r border-slate-400/30 pr-2">{{ record.username || 'Unknown' }}</span>
+              <span class="font-bold border-r border-slate-400/30 pr-2">{{ record.username || '탈퇴한 회원' }}</span>
               <span>{{ formatDate(record.committedAt) }}</span>
           </div>
       </div>

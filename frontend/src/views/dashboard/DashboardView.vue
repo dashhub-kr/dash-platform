@@ -142,7 +142,8 @@
                                     </div>
 
                                     <!-- 아바타 -->
-                                    <img :src="getMemberProfileImage(member)" :alt="member.username"
+                                    <UserX v-if="member.username === '탈퇴한 회원'" :size="40" class="w-10 h-10 rounded-full border-2 border-slate-200 bg-white p-2 text-slate-400" />
+                                    <img v-else :src="getMemberProfileImage(member)" :alt="member.username"
                                         class="w-10 h-10 rounded-full object-cover border-2 transition-all relative z-10 bg-white"
                                         :class="[
                                             isMe(member.userId) 
@@ -285,7 +286,8 @@
                                        <div v-for="c in heatmapTooltip.contributors" :key="c.userId || c.username" 
                                             class="flex items-center gap-2 bg-slate-800/50 rounded-lg p-1.5 pr-3">
                                            <!-- 프로필 이미지 -->
-                                           <img 
+                                           <UserX v-if="c.username === '탈퇴한 회원'" :size="16" class="w-6 h-6 rounded-full border border-slate-600 bg-slate-700 p-1 text-slate-400" />
+                                           <img v-else
                                                :src="c.avatarUrl || getDefaultProfileImage(c.userId)" 
                                                :alt="c.username"
                                                class="w-6 h-6 rounded-full object-cover border border-slate-600 bg-slate-700"
@@ -397,7 +399,8 @@ import {
   Users,
   BarChart2,
   Hexagon,
-  Send
+  Send,
+  UserX
 } from 'lucide-vue-next';
 import hljs from 'highlight.js';
 import 'highlight.js/styles/github.css';

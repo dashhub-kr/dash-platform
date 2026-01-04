@@ -20,7 +20,8 @@ public class OAuthUserService {
     }
 
     @Transactional
-    public OAuthLoginResult createOrUpdateOAuthUser(String provider, String providerId, String login, String email, String avatarUrl) {
+    public OAuthLoginResult createOrUpdateOAuthUser(String provider, String providerId, String login, String email,
+            String avatarUrl) {
         User user = userRepository.findByProviderAndProviderId(provider, providerId).orElse(null);
         AuthFlowType flowType;
 
@@ -29,6 +30,9 @@ public class OAuthUserService {
             userRepository.save(user);
             flowType = AuthFlowType.SIGN_UP;
         } else {
+            if (user.getDeletedAt() != null) {
+                user.restore();
+            }
             user.updateProfile(login, email, avatarUrl);
             userRepository.update(user);
             flowType = AuthFlowType.LOGIN;
@@ -36,5 +40,5 @@ public class OAuthUserService {
 
         return new OAuthLoginResult(user, flowType);
     }
-    
+
 }
