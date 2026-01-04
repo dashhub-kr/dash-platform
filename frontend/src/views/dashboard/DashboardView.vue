@@ -898,11 +898,7 @@ onMounted(async () => {
 
 const getProblemLink = (problemId) => `https://www.acmicpc.net/problem/${problemId}`;
 
-const router = useRouter();
 
-const goToPlayground = () => {
-    router.push('/playground');
-};
 
 
 

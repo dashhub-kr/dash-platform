@@ -25,7 +25,7 @@ CREATE TABLE IF NOT EXISTS users (
 	solved_count INT DEFAULT 0,
 	stats_last_synced_at TIMESTAMP NULL,
 	
-    -- Random Defense
+    -- 랜덤 디펜스
     defense_type VARCHAR(20),
     defense_problem_id INT,
     defense_start_time TIMESTAMP NULL DEFAULT NULL,
@@ -33,9 +33,7 @@ CREATE TABLE IF NOT EXISTS users (
     gold_streak INT DEFAULT 0,
     max_silver_streak INT DEFAULT 0,
     max_gold_streak INT DEFAULT 0,
-
 	created_at TIMESTAMP,
-	
     provider VARCHAR(50),
 	provider_id VARCHAR(255),
     avatar_url VARCHAR(512),
@@ -45,7 +43,7 @@ CREATE TABLE IF NOT EXISTS users (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 
--- Mock Exam Sessions
+-- 모의고사 세션
 CREATE TABLE IF NOT EXISTS mock_exams (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
     user_id BIGINT NOT NULL,
@@ -60,6 +58,7 @@ CREATE TABLE IF NOT EXISTS mock_exams (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 
+-- 모임 가입 신청
 CREATE TABLE IF NOT EXISTS study_applications (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
     study_id BIGINT NOT NULL,
@@ -72,9 +71,7 @@ CREATE TABLE IF NOT EXISTS study_applications (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 
-
-
-
+-- 도토리 로그
 CREATE TABLE IF NOT EXISTS acorn_log (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
     study_id BIGINT NOT NULL,
@@ -87,6 +84,7 @@ CREATE TABLE IF NOT EXISTS acorn_log (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 
+-- 알고리즘 기록
 CREATE TABLE IF NOT EXISTS algorithm_records (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
     user_id BIGINT NOT NULL,
@@ -116,6 +114,7 @@ CREATE TABLE IF NOT EXISTS algorithm_records (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 
+-- 게시글
 CREATE TABLE IF NOT EXISTS boards (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
     title VARCHAR(255) NOT NULL,
@@ -131,6 +130,7 @@ CREATE TABLE IF NOT EXISTS boards (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 
+-- 사용자 저장소
 CREATE TABLE IF NOT EXISTS user_repositories (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
     user_id BIGINT NOT NULL,
@@ -142,6 +142,7 @@ CREATE TABLE IF NOT EXISTS user_repositories (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 
+-- 사용자 OAuth 토큰
 CREATE TABLE IF NOT EXISTS user_oauth_tokens (
     user_id BIGINT PRIMARY KEY,
     access_token TEXT NOT NULL,
@@ -155,6 +156,7 @@ CREATE TABLE IF NOT EXISTS user_oauth_tokens (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 
+-- GitHub 푸시 이벤트
 CREATE TABLE IF NOT EXISTS github_push_event (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
     delivery_id VARCHAR(100) NOT NULL,
@@ -174,6 +176,7 @@ CREATE TABLE IF NOT EXISTS github_push_event (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 
+-- 태그 모음
 CREATE TABLE IF NOT EXISTS tag_families (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
     family_key VARCHAR(50) NOT NULL UNIQUE,
@@ -182,6 +185,7 @@ CREATE TABLE IF NOT EXISTS tag_families (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 
+-- 태그
 CREATE TABLE IF NOT EXISTS tags (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
     tag_key VARCHAR(50) NOT NULL UNIQUE,
@@ -209,6 +213,7 @@ CREATE TABLE IF NOT EXISTS tag_prerequisite (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 
+-- 문제
 CREATE TABLE IF NOT EXISTS problems (
     problem_number VARCHAR(50) PRIMARY KEY,
     title VARCHAR(255),
@@ -219,6 +224,7 @@ CREATE TABLE IF NOT EXISTS problems (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 
+-- 문제 태그
 CREATE TABLE IF NOT EXISTS problem_tags (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
     problem_number VARCHAR(50) NOT NULL,
@@ -229,7 +235,7 @@ CREATE TABLE IF NOT EXISTS problem_tags (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 
--- Solved.ac User Statistics Tables
+-- Solved.ac 사용자 통계
 CREATE TABLE IF NOT EXISTS user_class_stats (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
     user_id BIGINT NOT NULL,
@@ -245,7 +251,7 @@ CREATE TABLE IF NOT EXISTS user_class_stats (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 
--- Phase 3: 성장 추세 분석용 테이블
+-- 성장 추세 분석용 테이블
 CREATE TABLE IF NOT EXISTS user_stats_snapshots (
     id BIGINT PRIMARY KEY AUTO_INCREMENT,
     user_id BIGINT NOT NULL,
@@ -261,6 +267,7 @@ CREATE TABLE IF NOT EXISTS user_stats_snapshots (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 
+-- 태그 통계 히스토리
 CREATE TABLE IF NOT EXISTS user_tag_stats_history (
     id BIGINT PRIMARY KEY AUTO_INCREMENT,
     snapshot_id BIGINT NOT NULL,
@@ -274,6 +281,7 @@ CREATE TABLE IF NOT EXISTS user_tag_stats_history (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 
+-- 태그 통계
 CREATE TABLE IF NOT EXISTS user_tag_stats (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
     user_id BIGINT NOT NULL,
@@ -358,7 +366,7 @@ CREATE TABLE IF NOT EXISTS comment_likes (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 
--- AI Tutor Conversation Table
+-- AI 튜터 대화 테이블
 CREATE TABLE IF NOT EXISTS tutor_conversation (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
     user_id BIGINT NOT NULL,
@@ -372,7 +380,7 @@ CREATE TABLE IF NOT EXISTS tutor_conversation (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 
--- AI Learning Path Cache Table (Daily Singleton)
+-- AI 학습 경로 캐시 테이블 (일일 싱글톤)
 CREATE TABLE IF NOT EXISTS learning_path_cache (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
     user_id BIGINT NOT NULL UNIQUE,
@@ -416,6 +424,7 @@ CREATE TABLE IF NOT EXISTS study_mission_submissions (
     INDEX idx_mission_submissions_user (mission_id, user_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+
 -- 통합 알림 테이블
 CREATE TABLE IF NOT EXISTS notification (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
@@ -431,7 +440,7 @@ CREATE TABLE IF NOT EXISTS notification (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 
--- Social Features
+-- 친구 관계
 CREATE TABLE IF NOT EXISTS friendships (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
     requester_id BIGINT NOT NULL,
@@ -443,6 +452,8 @@ CREATE TABLE IF NOT EXISTS friendships (
     UNIQUE KEY uk_friendship (requester_id, receiver_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+
+-- 채팅
 CREATE TABLE IF NOT EXISTS direct_messages (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
     sender_id BIGINT NOT NULL,
