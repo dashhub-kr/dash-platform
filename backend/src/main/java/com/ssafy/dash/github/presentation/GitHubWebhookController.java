@@ -63,7 +63,12 @@ public class GitHubWebhookController {
         }
 
         log.info("Accepted GitHub push event {}", deliveryId);
-        pushService.handlePushEvent(deliveryId, body);
+        try {
+            pushService.handlePushEvent(deliveryId, body);
+        } catch (Exception e) {
+            log.error("Failed to process push event {}: {}", deliveryId, e.getMessage(), e);
+            // 웹훅 처리에 실패하더라도 GitHub에는 성공으로 응답하여 재시도 방지
+        }
         return ResponseEntity.accepted().build();
     }
 

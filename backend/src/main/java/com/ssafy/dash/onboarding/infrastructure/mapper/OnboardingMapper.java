@@ -14,5 +14,7 @@ public interface OnboardingMapper {
     int insert(Onboarding repository);
 
     int update(Onboarding repository);
-    
+
+    int deleteByUserId(Long userId);
+
 }

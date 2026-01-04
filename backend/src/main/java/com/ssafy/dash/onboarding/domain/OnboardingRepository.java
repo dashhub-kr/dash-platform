@@ -9,5 +9,7 @@ public interface OnboardingRepository {
     Optional<Onboarding> findByRepositoryName(String repositoryName);
 
     void save(Onboarding repository);
-    
+
+    void deleteByUserId(Long userId);
+
 }

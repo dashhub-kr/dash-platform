@@ -54,6 +54,10 @@ public class User {
         this.deletedAt = Objects.requireNonNullElse(deletedAt, LocalDateTime.now());
     }
 
+    public void restore() {
+        this.deletedAt = null;
+    }
+
     public static User create(String username, String email, LocalDateTime createdAt,
             String provider, String providerId, String avatarUrl) {
         return new User(null, username, email, createdAt, provider, providerId, avatarUrl);

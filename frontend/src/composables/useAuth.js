@@ -16,9 +16,8 @@ export function useAuth() {
     }
   };
 
-  onMounted(() => {
-    if (!authChecked.value) refresh();
-  });
+  if (!authChecked.value && !user.value) {
+  }
 
   return { user, authChecked, refresh };
 }

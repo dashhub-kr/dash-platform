@@ -1,5 +1,5 @@
 <template>
-  <div class="space-y-6">
+  <div class="space-y-6" :class="{ 'h-full': isOnboarding }">
     <!-- 헤더 (온보딩 여부에 따라 표시) -->
     <div v-if="!isOnboarding" class="mb-8">
       <h1 class="text-2xl font-black text-slate-800 flex items-center gap-3 mb-2">
@@ -17,9 +17,10 @@
       <p class="text-slate-400 font-medium animate-pulse">스터디 목록을 불러오는 중...</p>
     </div>
 
-    <div v-else>
+    <div v-else :class="{ 'flex flex-col h-full overflow-hidden': isOnboarding }">
       <!-- 검색 창 -->
-      <div class="mb-10 bg-slate-50 p-6 rounded-3xl border border-slate-100">
+      <div class="shrink-0 bg-slate-50 p-6 rounded-3xl border border-slate-100"
+           :class="{ 'mb-4': isOnboarding, 'mb-10': !isOnboarding }">
         <label class="block text-sm font-bold text-slate-500 mb-3 ml-1 flex items-center justify-between">
            <span>스터디 찾기</span>
            <span v-if="studies.length === 1 && searchId" class="text-brand-600 cursor-pointer hover:underline" @click="resetSearch">
@@ -48,6 +49,8 @@
         </p>
       </div>
 
+      <!-- 검색창 제외 나머지 영역에 스크롤 적용 -->
+      <div :class="{ 'flex-1 min-h-0 overflow-y-auto custom-scrollbar px-1 -mx-1 pb-2': isOnboarding }">
       <!-- 추천 스터디 섹션 -->
       <div v-if="recommendedStudies.length > 0" class="mb-12">
         <div class="flex items-center gap-2 mb-6">
@@ -220,6 +223,8 @@
           뒤로가기
         </button>
       </div>
+    </div> 
+    <!-- 스크롤 래퍼 종료 -->
 
        <!-- 가입 신청 모달 (기존 위치 고정) -->
       <Teleport to="body">
@@ -401,5 +406,21 @@ const submitApplication = async () => {
 }
 .animate-bounce-slow {
   animation: bounce-slow 3s ease-in-out infinite;
+}
+
+/* 커스텀 스크롤바 스타일 (온보딩 전용) */
+.custom-scrollbar::-webkit-scrollbar {
+  width: 6px;
+}
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+  margin: 1.5rem; 
+}
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 3px;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
 }
 </style>

@@ -17,7 +17,7 @@
 
   <select id="selectByProviderAndProviderId" resultType="User">
     SELECT * FROM users 
-    WHERE provider = #{provider} AND provider_id = #{providerId} AND deleted_at IS NULL
+    WHERE provider = #{provider} AND provider_id = #{providerId}
   </select>
 
   <update id="update" parameterType="User">
@@ -34,17 +34,40 @@
         silver_streak = #{silverStreak},
         gold_streak = #{goldStreak},
         max_silver_streak = #{maxSilverStreak},
-        max_gold_streak = #{maxGoldStreak}
-    WHERE id = #{id} AND deleted_at IS NULL
+        max_gold_streak = #{maxGoldStreak},
+        deleted_at = #{deletedAt}
+    WHERE id = #{id}
   </update>
 
   <update id="delete" parameterType="long">
     UPDATE users SET deleted_at = CURRENT_TIMESTAMP
-    WHERE id = #{id} AND deleted_at IS NULL
+    WHERE id = #{id}
   </update>
 
   <select id="selectByStudyId" resultType="User" parameterType="long">
     SELECT * FROM users WHERE study_id = #{studyId} AND deleted_at IS NULL ORDER BY id
   </select>
+
+  <select id="selectUsersForAnonymization" resultType="User" parameterType="java.time.LocalDateTime">
+    SELECT * FROM users
+    WHERE deleted_at IS NOT NULL
+      AND deleted_at &lt; #{threshold}
+      AND provider_id IS NOT NULL
+  </select>
+
+  <update id="anonymize" parameterType="long">
+    UPDATE users
+    SET username = 'Unknown User',
+        email = CONCAT('deleted_', id, '@deleted.com'),
+        provider = NULL,
+        provider_id = NULL,
+        avatar_url = NULL,
+        solvedac_handle = NULL,
+        solvedac_tier = NULL,
+        solvedac_rating = NULL,
+        solvedac_class = NULL,
+        solved_count = 0
+    WHERE id = #{id}
+  </update>
 
 </mapper>

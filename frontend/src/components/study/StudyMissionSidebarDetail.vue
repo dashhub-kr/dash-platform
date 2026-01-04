@@ -32,7 +32,8 @@
                       <div class="relative">
                         <img v-if="member.avatarUrl" :src="member.avatarUrl" class="w-8 h-8 rounded-full shadow-sm border border-slate-100" />
                         <div v-else class="w-8 h-8 rounded-full bg-slate-200 flex items-center justify-center text-[10px] text-slate-500 font-bold border border-slate-100">
-                            {{ member.username?.substring(0, 1) }}
+                            <UserX v-if="member.username === '탈퇴한 회원'" :size="16" />
+                            <span v-else>{{ member.username?.substring(0, 1) }}</span>
                         </div>
                         
                         <div v-if="member.completedCount === member.totalProblems" class="absolute -top-1 -right-1 text-rose-500 drop-shadow-sm">
@@ -151,7 +152,8 @@ import {
     Check as CheckIcon, 
     Flag as FlagIcon, 
     ExternalLink as ExternalLinkIcon,
-    Plus as PlusIcon
+    Plus as PlusIcon,
+    UserX
 } from 'lucide-vue-next';
 import axios from 'axios';
 
