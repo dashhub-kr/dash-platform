@@ -17,6 +17,7 @@ CREATE TABLE IF NOT EXISTS users (
 	username VARCHAR(100) NOT NULL,
 	email VARCHAR(255) NOT NULL,
     role VARCHAR(20) NOT NULL DEFAULT 'ROLE_USER',
+    status VARCHAR(20) NOT NULL DEFAULT 'ACTIVE',
 	solvedac_handle VARCHAR(50) UNIQUE,
 	solvedac_tier INT,
 	solvedac_rating INT,

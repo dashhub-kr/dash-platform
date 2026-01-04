@@ -16,6 +16,7 @@ public class User {
     private String username;
     private String email;
     private String role;
+    private String status = "ACTIVE";
     private LocalDateTime createdAt;
     private String provider;
     private String providerId;
@@ -46,6 +47,7 @@ public class User {
         this.username = requireText(username, "username");
         this.email = requireText(email, "email");
         this.role = "ROLE_USER";
+        this.status = "ACTIVE";
         this.createdAt = requireTimestamp(createdAt);
         this.provider = provider;
         this.providerId = providerId;
@@ -83,6 +85,10 @@ public class User {
         this.solvedacClass = classLevel;
         this.solvedCount = solvedCount;
         this.statsLastSyncedAt = LocalDateTime.now();
+    }
+
+    public void block() {
+        this.status = "BLOCKED";
     }
 
     private static String requireText(String value, String fieldName) {

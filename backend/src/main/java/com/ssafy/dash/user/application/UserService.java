@@ -79,4 +79,12 @@ public class UserService {
             throw new UserNotFoundException(id);
     }
 
+    @Transactional
+    public void blockUser(Long id) {
+        User u = userRepository.findById(id)
+                .orElseThrow(() -> new UserNotFoundException(id));
+        u.block();
+        userRepository.update(u);
+    }
+
 }

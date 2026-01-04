@@ -4,6 +4,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.core.user.OAuth2User;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -45,6 +46,24 @@ public class AdminController {
             return ResponseEntity.ok().build();
         }
         
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+    }
+
+    @Operation(summary = "회원 차단", description = "특정 회원을 차단합니다. (관리자 전용)")
+    @PostMapping("/users/{userId}/block")
+    public ResponseEntity<Void> blockUser(
+            @Parameter(hidden = true) @AuthenticationPrincipal OAuth2User principal,
+            @PathVariable Long userId) {
+
+        if (principal instanceof CustomOAuth2User customUser) {
+             var user = userService.findById(customUser.getUserId());
+             if (!"ROLE_ADMIN".equals(user.role())) {
+                 return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+             }
+             
+             userService.blockUser(userId);
+             return ResponseEntity.ok().build();
+        }
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
     }
 }

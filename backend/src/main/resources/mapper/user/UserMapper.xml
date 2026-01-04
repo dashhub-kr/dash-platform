@@ -3,8 +3,8 @@
 <mapper namespace="com.ssafy.dash.user.infrastructure.mapper.UserMapper">
 
   <insert id="insert" parameterType="User" useGeneratedKeys="true" keyProperty="id">
-    INSERT INTO users (username, email, role, created_at, provider, provider_id, avatar_url)
-    VALUES (#{username}, #{email}, #{role}, #{createdAt}, #{provider}, #{providerId}, #{avatarUrl})
+    INSERT INTO users (username, email, role, status, created_at, provider, provider_id, avatar_url)
+    VALUES (#{username}, #{email}, #{role}, #{status}, #{createdAt}, #{provider}, #{providerId}, #{avatarUrl})
   </insert>
 
   <select id="selectById" resultType="User" parameterType="long">
@@ -22,7 +22,7 @@
 
   <update id="update" parameterType="User">
     UPDATE users
-    SET username = #{username}, email = #{email}, role = #{role}, provider = #{provider}, 
+    SET username = #{username}, email = #{email}, role = #{role}, status = #{status}, provider = #{provider}, 
         provider_id = #{providerId}, avatar_url = #{avatarUrl}, study_id = #{studyId}, 
         provider_id = #{providerId}, avatar_url = #{avatarUrl}, study_id = #{studyId},
         solvedac_handle = #{solvedacHandle}, solvedac_tier = #{solvedacTier},
