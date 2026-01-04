@@ -85,7 +85,7 @@
                     <!-- 주간 미션 섹션 -->
                     <div class="mb-6">
                         <div v-if="targetMission" 
-                            class="rounded-3xl p-6 shadow-none relative overflow-hidden transition-all duration-500 bg-white border border-slate-200"
+                            class="rounded-3xl p-6 shadow-none relative transition-all duration-500 bg-white border border-slate-200"
                             :class="getMissionThemeClass(targetMission)">
                             
                             <div class="relative z-10 flex flex-col items-start gap-4">
