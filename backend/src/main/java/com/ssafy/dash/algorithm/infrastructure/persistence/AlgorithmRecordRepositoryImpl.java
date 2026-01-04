@@ -77,4 +77,13 @@ public class AlgorithmRecordRepositoryImpl implements AlgorithmRecordRepository 
         return Optional.ofNullable(mapper.selectLatestSuccessfulByUserAndProblem(userId, problemNumber));
     }
 
+    @Override
+    public void migrateStudyId(Long oldStudyId, Long newStudyId) {
+        mapper.migrateStudyId(oldStudyId, newStudyId);
+    }
+
+    @Override
+    public void migrateUserRecords(Long userId, Long oldStudyId, Long newStudyId) {
+        mapper.migrateUserRecords(userId, oldStudyId, newStudyId);
+    }
 }

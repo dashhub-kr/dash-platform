@@ -1,14 +1,26 @@
 <template>
   <div class="space-y-6" :class="{ 'h-full': isOnboarding }">
     <!-- 헤더 (온보딩 여부에 따라 표시) -->
-    <div v-if="!isOnboarding" class="mb-8">
-      <h1 class="text-2xl font-black text-slate-800 flex items-center gap-3 mb-2">
-        <div class="w-10 h-10 bg-yellow-100 rounded-xl flex items-center justify-center">
-          <Compass class="w-6 h-6 text-yellow-600" :stroke-width="2.5" />
-        </div>
-        스터디 둘러보기
-      </h1>
-      <p class="text-slate-500 ml-[52px]">함께 성장할 동료들을 찾아보세요</p>
+    <div v-if="!isOnboarding" class="mb-8 flex items-start justify-between">
+      <div>
+        <h1 class="text-2xl font-black text-slate-800 flex items-center gap-3 mb-2">
+          <div class="w-10 h-10 bg-yellow-100 rounded-xl flex items-center justify-center">
+            <Compass class="w-6 h-6 text-yellow-600" :stroke-width="2.5" />
+          </div>
+          스터디 둘러보기
+        </h1>
+        <p class="text-slate-500 ml-[52px]">함께 성장할 동료들을 찾아보세요</p>
+      </div>
+      
+      <!-- Create Study Button (Personal Study users only) -->
+      <button 
+        v-if="user?.studyType === 'PERSONAL'"
+        @click="showCreateModal = true"
+        class="px-5 py-3 bg-brand-600 hover:bg-brand-700 text-white font-bold rounded-xl shadow-lg shadow-brand-200 transition-all flex items-center gap-2 hover:-translate-y-0.5"
+      >
+        <Plus :size="18" stroke-width="3" />
+        스터디 만들기
+      </button>
     </div>
 
     <!-- 로딩 -->
@@ -23,16 +35,16 @@
            :class="{ 'mb-4': isOnboarding, 'mb-10': !isOnboarding }">
         <label class="block text-sm font-bold text-slate-500 mb-3 ml-1 flex items-center justify-between">
            <span>스터디 찾기</span>
-           <span v-if="studies.length === 1 && searchId" class="text-brand-600 cursor-pointer hover:underline" @click="resetSearch">
+           <span v-if="searchKeyword" class="text-brand-600 cursor-pointer hover:underline" @click="resetSearch">
               전체 목록 보기
            </span>
         </label>
         <div class="relative">
           <input 
-            v-model="searchId"
+            v-model="searchKeyword"
             @keyup.enter="searchStudy"
-            type="number" 
-            placeholder="스터디 번지수(ID)를 입력하세요" 
+            type="text" 
+            placeholder="스터디 이름을 검색하세요" 
             class="w-full bg-white border border-slate-200 rounded-2xl pl-12 pr-20 py-4 font-medium text-slate-800 focus:outline-none focus:border-brand-500 focus:ring-4 focus:ring-brand-500/10 transition-all shadow-sm placeholder:text-slate-400"
           />
           <Search class="w-5 h-5 text-slate-400 absolute left-4 top-1/2 -translate-y-1/2" />
@@ -118,9 +130,24 @@
                      <span class="w-2 h-2 rounded-full bg-brand-500 animate-pulse"></span>
                      참여 중
                 </div>
-                <button v-else-if="user?.studyId" disabled
+                <!-- 가입 대기 중 -->
+                <div v-else-if="pendingApp && pendingApp.studyId === study.id" class="flex gap-2">
+                     <div class="flex-1 py-3 bg-amber-50 text-amber-600 font-bold rounded-xl text-center border border-amber-100 flex items-center justify-center gap-2">
+                        <span class="w-2 h-2 rounded-full bg-amber-500 animate-pulse"></span>
+                        가입 대기중
+                     </div>
+                     <button @click="handleCancelApplication(pendingApp.id)" class="px-4 py-3 bg-slate-100 text-slate-500 font-bold rounded-xl hover:bg-slate-200 transition-colors">
+                        취소
+                     </button>
+                </div>
+                <button v-else-if="pendingApp" disabled
                         class="w-full py-3 bg-slate-100 text-slate-400 font-bold rounded-xl cursor-not-allowed border border-slate-200">
-                   가입 불가
+                   신청 진행 중
+                </button>
+                <button v-else-if="user?.studyId && user?.studyType !== 'PERSONAL'" 
+                        @click="showLeaveRequiredAlert"
+                        class="w-full py-3 bg-violet-600 hover:bg-violet-700 text-white font-bold rounded-xl shadow-md hover:shadow-lg transition-all flex items-center justify-center gap-2">
+                   가입 신청 <ArrowRight class="w-4 h-4 opacity-50" />
                 </button>
                 <button v-else 
                         @click="openApplyModal(study)"
@@ -196,10 +223,25 @@
                      참여 중
                 </div>
 
-                <!-- 가입 불가 (다른 스터디 참여 중) -->
-                <button v-else-if="user?.studyId" disabled
+                <!-- 가입 대기 중 -->
+                <div v-else-if="pendingApp && pendingApp.studyId === study.id" class="flex gap-2">
+                     <div class="flex-1 py-3 bg-amber-50 text-amber-600 font-bold rounded-xl text-center border border-amber-100 flex items-center justify-center gap-2">
+                        <span class="w-2 h-2 rounded-full bg-amber-500 animate-pulse"></span>
+                        가입 대기중
+                     </div>
+                     <button @click="handleCancelApplication(pendingApp.id)" class="px-4 py-3 bg-slate-100 text-slate-500 font-bold rounded-xl hover:bg-slate-200 transition-colors">
+                        취소
+                     </button>
+                </div>
+
+                <button v-else-if="pendingApp" disabled
                         class="w-full py-3 bg-slate-100 text-slate-400 font-bold rounded-xl cursor-not-allowed border border-slate-200">
-                   가입 불가
+                   신청 진행 중
+                </button>
+                <button v-else-if="user?.studyId && user?.studyType !== 'PERSONAL'" 
+                        @click="showLeaveRequiredAlert"
+                        class="w-full py-3 bg-brand-600 hover:bg-brand-700 text-white font-bold rounded-xl shadow-md hover:shadow-lg transition-all flex items-center justify-center gap-2">
+                   가입 신청 <ArrowRight class="w-4 h-4 opacity-50" />
                 </button>
 
                 <!-- 신청하기 -->
@@ -266,6 +308,63 @@
           </div>
         </div>
       </Teleport>
+
+      <!-- Create Study Modal -->
+      <Teleport to="body">
+        <div v-if="showCreateModal" class="fixed inset-0 z-[9999] flex items-center justify-center p-4">
+          <div class="absolute inset-0 bg-slate-900/50 backdrop-blur-sm" @click="showCreateModal = false"></div>
+          
+          <div class="relative bg-white rounded-3xl w-full max-w-lg p-8 shadow-2xl animate-in fade-in zoom-in-95 duration-200">
+            <h2 class="text-2xl font-black text-slate-800 mb-6 flex items-center gap-3">
+              <div class="w-10 h-10 bg-brand-100 rounded-xl flex items-center justify-center">
+                <Plus class="w-5 h-5 text-brand-600" stroke-width="3" />
+              </div>
+              새 스터디 만들기
+            </h2>
+            
+            <div class="space-y-5">
+              <!-- Name -->
+              <div>
+                <label class="block text-sm font-bold text-slate-600 mb-2">스터디 이름 *</label>
+                <input 
+                  v-model="newStudy.name"
+                  type="text"
+                  placeholder="예: 알고리즘 마스터즈"
+                  class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:border-brand-500 focus:ring-4 focus:ring-brand-500/10 transition-all font-medium"
+                />
+              </div>
+              
+              <!-- Description -->
+              <div>
+                <label class="block text-sm font-bold text-slate-600 mb-2">스터디 소개</label>
+                <textarea 
+                  v-model="newStudy.description"
+                  rows="3"
+                  placeholder="스터디를 소개해주세요"
+                  class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:border-brand-500 focus:ring-4 focus:ring-brand-500/10 transition-all font-medium resize-none"
+                ></textarea>
+              </div>
+            </div>
+            
+            <div class="flex gap-3 mt-8">
+              <button 
+                @click="showCreateModal = false"
+                class="flex-1 py-3.5 bg-white border border-slate-200 text-slate-600 font-bold rounded-xl hover:bg-slate-50 transition-colors"
+              >
+                취소
+              </button>
+              <button 
+                @click="handleCreateStudy"
+                :disabled="creatingStudy || !newStudy.name.trim()"
+                class="flex-1 py-3.5 bg-brand-600 text-white font-bold rounded-xl hover:bg-brand-700 transition-all shadow-lg shadow-brand-200 disabled:opacity-50 disabled:shadow-none flex items-center justify-center gap-2"
+              >
+                <div v-if="creatingStudy" class="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+                <span v-else>스터디 만들기</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </Teleport>
     </div>
   </div>
 </template>
@@ -274,8 +373,8 @@
 import { ref, onMounted, computed, defineProps, defineEmits } from 'vue';
 import axios from 'axios';
 import { useAuth } from '@/composables/useAuth';
-
-import { Trophy, Flame, Users, Search, Activity, ArrowRight, Send, Sparkles, Compass, AlertCircle } from 'lucide-vue-next';
+import { Trophy, Flame, Users, Search, Activity, ArrowRight, Send, Sparkles, Compass, AlertCircle, Plus } from 'lucide-vue-next';
+import { studyApi } from '@/api/study';
 
 const props = defineProps({
   isOnboarding: {
@@ -295,8 +394,45 @@ const applyMessage = ref('');
 
 const applying = ref(false);
 
-const searchId = ref('');
+const searchKeyword = ref('');
 const searchError = ref('');
+
+const pendingApp = ref(null);
+
+// Create Study Modal State
+const showCreateModal = ref(false);
+const creatingStudy = ref(false);
+const newStudy = ref({
+  name: '',
+  description: '',
+  visibility: 'PUBLIC'
+});
+
+const checkMyApplication = async () => {
+    try {
+        const res = await studyApi.getMyApplication();
+        if (res.data && res.data.status === 'PENDING') {
+            pendingApp.value = res.data;
+        } else {
+            pendingApp.value = null;
+        }
+    } catch (e) {
+        pendingApp.value = null;
+    }
+};
+
+const handleCancelApplication = async (appId) => {
+    if (!confirm('가입 신청을 취소하시겠습니까?')) return;
+    try {
+        await studyApi.cancelApplication(appId);
+        pendingApp.value = null;
+        alert('가입 신청이 취소되었습니다.');
+        // If onboarded, user might want to apply to others right away.
+    } catch (e) {
+        console.error(e);
+        alert('취소에 실패했습니다.');
+    }
+};
 
 const fetchAllStudies = async () => {
     loading.value = true;
@@ -312,7 +448,7 @@ const fetchAllStudies = async () => {
 };
 
 const searchStudy = async () => {
-    if (!searchId.value) {
+    if (!searchKeyword.value.trim()) {
         await fetchAllStudies();
         return;
     }
@@ -321,19 +457,22 @@ const searchStudy = async () => {
     searchError.value = '';
     
     try {
-        const res = await axios.get(`/api/studies/${searchId.value}`);
-        studies.value = [res.data];
+        const res = await axios.get('/api/studies', { params: { keyword: searchKeyword.value } });
+        studies.value = res.data;
+        if (res.data.length === 0) {
+            searchError.value = '검색 결과가 없습니다.';
+        }
     } catch (e) {
         console.error('검색 실패', e);
         studies.value = [];
-        searchError.value = '해당 번지수의 스터디를 찾을 수 없습니다.';
+        searchError.value = '검색 중 오류가 발생했습니다.';
     } finally {
         loading.value = false;
     }
 };
 
 const resetSearch = async () => {
-    searchId.value = '';
+    searchKeyword.value = '';
     await fetchAllStudies();
 };
 
@@ -353,6 +492,9 @@ const recommendedStudies = computed(() => {
 
 onMounted(() => {
   fetchAllStudies();
+  if (user.value && (!user.value.studyId || user.value.studyType === 'PERSONAL')) {
+      checkMyApplication();
+  }
 });
 
 const openApplyModal = (study) => {
@@ -366,6 +508,10 @@ const closeModal = () => {
   selectedStudy.value = null;
 };
 
+const showLeaveRequiredAlert = () => {
+  alert('현재 가입된 스터디가 있습니다.\n\n다른 스터디에 가입하려면 먼저 기존 스터디를 탈퇴해야 합니다.\n\n[프로필 > 스터디 탈퇴] 에서 탈퇴 가능합니다.');
+};
+
 const submitApplication = async () => {
   if (!selectedStudy.value) return;
   
@@ -375,6 +521,9 @@ const submitApplication = async () => {
       message: applyMessage.value
     });
     
+    // Refresh pending status immediately
+    await checkMyApplication();
+
     closeModal();
     // 온보딩 중이면 alert 대신 success 이벤트 발생
     if (props.isOnboarding) {
@@ -393,6 +542,37 @@ const submitApplication = async () => {
     }
   } finally {
     applying.value = false;
+  }
+};
+
+const { refresh } = useAuth();
+
+const handleCreateStudy = async () => {
+  if (!newStudy.value.name.trim()) return;
+  
+  creatingStudy.value = true;
+  try {
+    await axios.post('/api/studies', {
+      name: newStudy.value.name,
+      description: newStudy.value.description,
+      visibility: newStudy.value.visibility
+    });
+    
+    showCreateModal.value = false;
+    newStudy.value = { name: '', description: '', visibility: 'PUBLIC' };
+    
+    // Refresh user session to get new studyId
+    await refresh();
+    
+    alert('스터디가 생성되었습니다! 🎉');
+    
+    // Redirect to missions page
+    window.location.href = '/study/missions';
+  } catch (e) {
+    console.error('스터디 생성 실패', e);
+    alert(e.response?.data?.message || '스터디 생성 중 오류가 발생했습니다.');
+  } finally {
+    creatingStudy.value = false;
   }
 };
 </script>

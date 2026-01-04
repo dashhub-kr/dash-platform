@@ -5,6 +5,7 @@ import com.ssafy.dash.algorithm.application.dto.command.AlgorithmRecordUpdateCom
 import com.ssafy.dash.algorithm.application.dto.result.AlgorithmRecordResult;
 import com.ssafy.dash.algorithm.domain.AlgorithmRecord;
 import com.ssafy.dash.algorithm.domain.AlgorithmRecordRepository;
+import com.ssafy.dash.algorithm.domain.StudyStats;
 import com.ssafy.dash.algorithm.domain.exception.AlgorithmRecordNotFoundException;
 import com.ssafy.dash.user.domain.UserRepository;
 import com.ssafy.dash.user.domain.exception.UserNotFoundException;
@@ -13,7 +14,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
-
 
 import java.util.stream.Collectors;
 import com.ssafy.dash.defense.application.DefenseService;
@@ -128,6 +128,28 @@ public class AlgorithmRecordService {
         }
     }
 
+    /**
+     * 스터디 간 레코드 마이그레이션 (스터디 전체)
+     */
+    @Transactional
+    public void migrateStudyId(Long oldStudyId, Long newStudyId) {
+        algorithmRecordRepository.migrateStudyId(oldStudyId, newStudyId);
+    }
 
+    /**
+     * 특정 사용자의 레코드를 다른 스터디로 마이그레이션
+     */
+    @Transactional
+    public void migrateUserRecords(Long userId, Long oldStudyId, Long newStudyId) {
+        algorithmRecordRepository.migrateUserRecords(userId, oldStudyId, newStudyId);
+    }
+
+    /**
+     * 스터디 통계 조회
+     */
+    @Transactional(readOnly = true)
+    public StudyStats getStudyStats(Long studyId) {
+        return algorithmRecordRepository.countsByStudyId(studyId);
+    }
 
 }

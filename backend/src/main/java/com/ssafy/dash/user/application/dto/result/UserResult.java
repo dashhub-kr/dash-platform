@@ -20,7 +20,8 @@ public record UserResult(
         Integer solvedCount,
         String repositoryName,
         Boolean webhookConfigured,
-        Boolean isStudyLeader) {
+        Boolean isStudyLeader,
+        String studyType) {
 
     public static UserResult from(User user) {
         return from(user, null, null);
@@ -34,6 +35,7 @@ public record UserResult(
         String repoName = onboarding != null ? onboarding.getRepositoryName() : null;
         Boolean webhook = onboarding != null ? onboarding.isWebhookConfigured() : null;
         Boolean isLeader = study != null && study.getCreatorId() != null && study.getCreatorId().equals(user.getId());
+        String type = study != null && study.getStudyType() != null ? study.getStudyType().name() : null;
 
         return new UserResult(
                 user.getId(),
@@ -49,7 +51,8 @@ public record UserResult(
                 user.getSolvedCount(),
                 repoName,
                 webhook,
-                isLeader);
+                isLeader,
+                type);
     }
 
 }

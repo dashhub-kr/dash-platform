@@ -21,6 +21,8 @@ import com.ssafy.dash.user.domain.User;
 import com.ssafy.dash.user.domain.UserRepository;
 import com.ssafy.dash.study.application.dto.result.MissionWithProgressResult;
 import com.ssafy.dash.study.application.dto.result.MemberProgressResult;
+import com.ssafy.dash.notification.application.NotificationService;
+import com.ssafy.dash.notification.domain.NotificationType;
 
 import lombok.RequiredArgsConstructor;
 
@@ -37,6 +39,7 @@ public class StudyMissionService {
     private final AlgorithmRecordRepository algorithmRecordRepository;
     private final UserRepository userRepository;
     private final ObjectMapper objectMapper;
+    private final NotificationService notificationService;
 
     /**
      * 미션 생성 (직접 입력)
@@ -70,6 +73,13 @@ public class StudyMissionService {
         // 스터디 멤버들의 submission 레코드 초기화
         initializeSubmissions(mission.getId(), studyId, problemIds);
 
+        // [Notification] New Mission
+        List<User> members = userRepository.findByStudyId(studyId);
+        for (User member : members) {
+            notificationService.send(member.getId(), "새로운 미션이 등록되었습니다: " + title, "/study/missions",
+                    NotificationType.MISSION);
+        }
+
         return mission;
     }
 
@@ -100,6 +110,13 @@ public class StudyMissionService {
         missionRepository.save(mission);
 
         initializeSubmissions(mission.getId(), studyId, problemIds);
+
+        // [Notification] New Mission
+        List<User> members = userRepository.findByStudyId(studyId);
+        for (User member : members) {
+            notificationService.send(member.getId(), "AI가 새로운 미션을 추천했습니다: " + title, "/study/missions",
+                    NotificationType.MISSION);
+        }
 
         return mission;
     }
@@ -172,7 +189,7 @@ public class StudyMissionService {
 
         if (problemIds != null) {
             List<Integer> currentProblems = parseProblems(mission.getProblemIds());
-            
+
             // 1. Identify removed problems
             List<Integer> removedProblems = new ArrayList<>(currentProblems);
             removedProblems.removeAll(problemIds);
@@ -240,6 +257,24 @@ public class StudyMissionService {
 
         boolean newStatus = !Boolean.TRUE.equals(submission.getIsSos());
         submissionRepository.updateSosStatus(missionId, userId, problemId, newStatus);
+
+        // [Notification] SOS Request
+        if (newStatus) { // Only when SOS is turned ON
+            User requester = userRepository.findById(userId).orElseThrow();
+            StudyMission mission = missionRepository.findById(missionId).orElseThrow();
+            List<User> members = userRepository.findByStudyId(mission.getStudyId());
+
+            for (User member : members) {
+                if (!member.getId().equals(userId)) { // Don't notify self
+                    notificationService.send(
+                            member.getId(),
+                            String.format("%s님이 %d주차 %d번 문제에 SOS를 요청했습니다!", requester.getUsername(), mission.getWeek(),
+                                    problemId),
+                            "/study/missions",
+                            NotificationType.SOS);
+                }
+            }
+        }
     }
 
     /**
@@ -410,6 +445,58 @@ public class StudyMissionService {
 
                 // 완료 처리
                 submissionRepository.markCompleted(mission.getId(), userId, problemId);
+
+                // [Notification] Problem Solved
+                List<User> members = userRepository.findByStudyId(user.getStudyId());
+                for (User member : members) {
+                    if (!member.getId().equals(userId)) {
+                        notificationService.send(
+                                member.getId(),
+                                String.format("%s님이 %d번 문제를 해결했습니다.", user.getUsername(), problemId),
+                                "/study/missions",
+                                NotificationType.SOLVED);
+                    }
+                }
+
+                // [Notification] Mission Completed (All members solved all problems)
+                checkAndNotifyMissionCompletion(mission, members);
+            }
+        }
+    }
+
+    private void checkAndNotifyMissionCompletion(StudyMission mission, List<User> members) {
+        List<Integer> problemIds = parseProblems(mission.getProblemIds());
+        int totalProblems = problemIds.size();
+        if (totalProblems == 0)
+            return;
+
+        boolean allMembersCompleted = true;
+        for (User member : members) {
+            int completedCount = submissionRepository.countCompletedByMissionIdAndUserId(mission.getId(),
+                    member.getId());
+            if (completedCount < totalProblems) {
+                allMembersCompleted = false;
+                break;
+            }
+        }
+
+        if (allMembersCompleted) {
+            // Check if already notified or completed?
+            // Ideally we should check if it WAS NOT completed before.
+            // But checking current status is enough if we only update status once.
+            if (mission.getStatus() != MissionStatus.COMPLETED) {
+                // Update status
+                mission.setStatus(MissionStatus.COMPLETED);
+                missionRepository.update(mission);
+
+                // Notify everyone
+                for (User member : members) {
+                    notificationService.send(
+                            member.getId(),
+                            String.format("축하합니다! %d주차 미션을 팀 전원이 완수했습니다! 🎉", mission.getWeek()),
+                            "/study/missions",
+                            NotificationType.MISSION_COMPLETED);
+                }
             }
         }
     }
