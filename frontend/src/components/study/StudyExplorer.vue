@@ -422,6 +422,9 @@ const submitApplication = async () => {
       message: applyMessage.value
     });
     
+    // Refresh pending status immediately
+    await checkMyApplication();
+
     closeModal();
     // 온보딩 중이면 alert 대신 success 이벤트 발생
     if (props.isOnboarding) {
