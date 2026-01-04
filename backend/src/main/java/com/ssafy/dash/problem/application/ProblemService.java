@@ -33,9 +33,8 @@ public class ProblemService {
         }
 
         log.info("문제 데이터 초기화 시작...");
-        try {
-            File file = new ClassPathResource("data/problems_with_keys.json").getFile();
-            JsonNode rootNode = objectMapper.readTree(file);
+        try (var inputStream = new ClassPathResource("data/problems_with_keys.json").getInputStream()) {
+            JsonNode rootNode = objectMapper.readTree(inputStream);
 
             for (JsonNode node : rootNode) {
                 String problemId = node.get("problemId").asText();

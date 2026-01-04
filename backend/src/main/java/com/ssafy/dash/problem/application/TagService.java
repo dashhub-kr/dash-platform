@@ -57,9 +57,8 @@ public class TagService {
     }
 
     private void loadTagsFromJson() {
-        try {
-            File file = new ClassPathResource("list.json").getFile();
-            JsonNode root = objectMapper.readTree(file);
+        try (var inputStream = new ClassPathResource("list.json").getInputStream()) {
+            JsonNode root = objectMapper.readTree(inputStream);
             JsonNode items = root.get("items");
 
             for (JsonNode item : items) {
