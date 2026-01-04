@@ -34,6 +34,11 @@ public class StudyRepositoryImpl implements StudyRepository {
     }
 
     @Override
+    public List<Study> searchByKeyword(String keyword) {
+        return studyMapper.searchByKeyword(keyword);
+    }
+
+    @Override
     public void update(Study study) {
         studyMapper.update(study);
     }

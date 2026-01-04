@@ -11,32 +11,34 @@ import com.ssafy.dash.study.domain.StudyApplication;
 @Mapper
 public interface StudyMapper {
 
-    void save(Study study);
+        void save(Study study);
 
-    Optional<Study> findById(Long id);
+        Optional<Study> findById(Long id);
 
-    List<Study> findAll();
+        List<Study> findAll();
 
-    void update(Study study);
+        List<Study> searchByKeyword(String keyword);
 
-    int delete(Long id);
+        void update(Study study);
 
-    // Application Methods
-    void saveApplication(com.ssafy.dash.study.domain.StudyApplication application);
+        int delete(Long id);
 
-    com.ssafy.dash.study.domain.StudyApplication findApplicationById(Long id);
+        // Application Methods
+        void saveApplication(com.ssafy.dash.study.domain.StudyApplication application);
 
-    com.ssafy.dash.study.domain.StudyApplication findApplicationByStudyIdAndUserId(
-            @org.apache.ibatis.annotations.Param("studyId") Long studyId,
-            @org.apache.ibatis.annotations.Param("userId") Long userId);
+        com.ssafy.dash.study.domain.StudyApplication findApplicationById(Long id);
 
-    void updateApplicationStatus(@org.apache.ibatis.annotations.Param("id") Long id,
-            @org.apache.ibatis.annotations.Param("status") com.ssafy.dash.study.domain.StudyApplication.ApplicationStatus status);
+        com.ssafy.dash.study.domain.StudyApplication findApplicationByStudyIdAndUserId(
+                        @org.apache.ibatis.annotations.Param("studyId") Long studyId,
+                        @org.apache.ibatis.annotations.Param("userId") Long userId);
 
-    void deleteApplication(Long id);
+        void updateApplicationStatus(@org.apache.ibatis.annotations.Param("id") Long id,
+                        @org.apache.ibatis.annotations.Param("status") com.ssafy.dash.study.domain.StudyApplication.ApplicationStatus status);
 
-    List<StudyApplication> findPendingApplicationsByStudyId(Long studyId);
+        void deleteApplication(Long id);
 
-    StudyApplication findPendingApplicationByUserId(Long userId);
+        List<StudyApplication> findPendingApplicationsByStudyId(Long studyId);
+
+        StudyApplication findPendingApplicationByUserId(Long userId);
 
 }

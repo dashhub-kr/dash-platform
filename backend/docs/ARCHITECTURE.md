@@ -21,6 +21,10 @@ Algorithm, Board, User, OAuth, Onboarding, GitHub)은 동일한 규칙을 공유
 2. **도메인 순수성**: Domain은 Spring/Web/JDBC 의존성이 없고, 시간 값은 호출 측에서 주입한다.
 3. **Adapter 격리**: Controller는 인프라 구현체(`..infrastructure..`, `..mapper..`, `..persistence..`)에 직접 접근할 수 없다.
 4. **DTO 경계**: Request/Response DTO는 Presentation 전용, Command/Result DTO는 Application/Presentation만 사용한다.
+5. **도메인 간 의존성**: Application 계층에서 다른 도메인의 Repository를 직접 호출하지 않는다. 반드시 해당 도메인의 **Service**를 통해 호출한다 (예: `StudyService`에서 `AlgorithmRecordRepository` 직접 사용 ❌ → `AlgorithmRecordService` 사용 ✅).
+6. **Infrastructure 패키지 구조**: 모든 도메인의 `infrastructure` 패키지는 동일한 구조를 따른다:
+   - `infrastructure/mapper/` - MyBatis Mapper 인터페이스
+   - `infrastructure/persistence/` - Repository 구현체 (`*RepositoryImpl`)
 
 ArchUnit 실행:
 

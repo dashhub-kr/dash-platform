@@ -7,7 +7,8 @@ CREATE TABLE IF NOT EXISTS studies (
     visibility VARCHAR(20) DEFAULT 'PUBLIC',
     description TEXT,
     streak INT DEFAULT 0,
-    active_mission_title VARCHAR(255)
+    active_mission_title VARCHAR(255),
+    study_type VARCHAR(20) DEFAULT 'GROUP' COMMENT 'GROUP, PERSONAL'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 
@@ -411,4 +412,18 @@ CREATE TABLE IF NOT EXISTS study_mission_submissions (
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
     UNIQUE KEY uk_mission_user_problem (mission_id, user_id, problem_id),
     INDEX idx_mission_submissions_user (mission_id, user_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- 통합 알림 테이블
+CREATE TABLE IF NOT EXISTS notification (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    receiver_id BIGINT NOT NULL,
+    content VARCHAR(255) NOT NULL,
+    url VARCHAR(512),
+    related_id BIGINT,
+    type VARCHAR(20) NOT NULL,
+    is_read BOOLEAN DEFAULT FALSE,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (receiver_id) REFERENCES users(id) ON DELETE CASCADE,
+    INDEX idx_notification_receiver (receiver_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;

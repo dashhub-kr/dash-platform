@@ -109,5 +109,16 @@
     LIMIT 1
   </select>
 
+  <update id="migrateStudyId">
+    UPDATE algorithm_records
+    SET study_id = #{newStudyId}
+    WHERE study_id = #{oldStudyId}
+  </update>
+
+  <update id="migrateUserRecords">
+    UPDATE algorithm_records
+    SET study_id = #{newStudyId}
+    WHERE user_id = #{userId} AND study_id = #{oldStudyId}
+  </update>
 
 </mapper>

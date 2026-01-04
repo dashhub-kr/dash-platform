@@ -33,14 +33,27 @@ export const studyApi = {
     getApplications(studyId) {
         return http.get(`/studies/${studyId}/applications`);
     },
+    getApplication(applicationId) {
+        return http.get(`/studies/applications/${applicationId}`);
+    },
     approveApplication(applicationId) {
         return http.post(`/studies/applications/${applicationId}/approve`);
     },
-    rejectApplication(applicationId) {
-        return http.post(`/studies/applications/${applicationId}/reject`);
+    rejectApplication(applicationId, reason = '') {
+        return http.post(`/studies/applications/${applicationId}/reject`, { reason });
     },
     leaveStudy() {
         return http.post(`/studies/leave`);
+    },
+    deleteStudy(studyId) {
+        return http.delete(`/studies/${studyId}`);
+    },
+    // Member Management
+    getMembers(studyId) {
+        return http.get(`/studies/${studyId}/members`);
+    },
+    delegateLeader(studyId, newLeaderId) {
+        return http.post(`/studies/${studyId}/delegate`, { newLeaderId });
     },
     // User Application
     getMyApplication() {

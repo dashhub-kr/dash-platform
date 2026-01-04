@@ -17,6 +17,7 @@ export function useAuth() {
   };
 
   if (!authChecked.value && !user.value) {
+    refresh();
   }
 
   return { user, authChecked, refresh };

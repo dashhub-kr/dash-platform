@@ -8,6 +8,10 @@ import com.ssafy.dash.comment.domain.CommentRepository;
 import com.ssafy.dash.comment.domain.exception.CommentNotFoundException;
 import com.ssafy.dash.user.domain.User;
 import com.ssafy.dash.user.domain.UserRepository;
+import com.ssafy.dash.notification.application.NotificationService;
+import com.ssafy.dash.notification.domain.NotificationType;
+import com.ssafy.dash.board.domain.Board;
+import com.ssafy.dash.board.domain.BoardRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -23,10 +27,15 @@ public class CommentService {
 
     private final CommentRepository commentRepository;
     private final UserRepository userRepository;
+    private final NotificationService notificationService;
+    private final BoardRepository boardRepository;
 
-    public CommentService(CommentRepository commentRepository, UserRepository userRepository) {
+    public CommentService(CommentRepository commentRepository, UserRepository userRepository,
+            NotificationService notificationService, BoardRepository boardRepository) {
         this.commentRepository = commentRepository;
         this.userRepository = userRepository;
+        this.notificationService = notificationService;
+        this.boardRepository = boardRepository;
     }
 
     @Transactional
@@ -52,6 +61,13 @@ public class CommentService {
         commentRepository.save(comment);
 
         User user = userRepository.findById(command.userId()).orElse(null);
+        if (user != null) {
+            if (command.parentId() != null) {
+                notifyParentAuthor(user, comment, command.parentId());
+            } else {
+                notifyBoardAuthor(user, comment, command.boardId());
+            }
+        }
         String authorName = (user != null) ? user.getUsername() : "Unknown";
         String authorProfileImageUrl = (user != null) ? user.getAvatarUrl() : null;
 
@@ -139,6 +155,31 @@ public class CommentService {
                     return CommentResult.from(comment, authorName, authorProfileImageUrl, replyResults);
                 })
                 .collect(Collectors.toList());
+    }
+
+    private void notifyParentAuthor(User commenter, Comment comment, Long parentId) {
+        if (parentId == null)
+            return;
+
+        Comment parent = commentRepository.findById(parentId).orElse(null);
+        if (parent == null || parent.getUserId().equals(commenter.getId()))
+            return; // Self reply check
+
+        String message = String.format("%s님이 댓글에 답글을 남겼습니다.", commenter.getUsername());
+        String url = String.format("/boards/%d", comment.getBoardId());
+
+        notificationService.send(parent.getUserId(), message, url, NotificationType.COMMENT);
+    }
+
+    private void notifyBoardAuthor(User commenter, Comment comment, Long boardId) {
+        Board board = boardRepository.findById(boardId).orElse(null);
+        if (board == null || board.getUserId().equals(commenter.getId()))
+            return;
+
+        String message = String.format("%s님이 게시글에 댓글을 남겼습니다.", commenter.getUsername());
+        String url = String.format("/boards/%d", boardId);
+
+        notificationService.send(board.getUserId(), message, url, NotificationType.COMMENT);
     }
 
 }

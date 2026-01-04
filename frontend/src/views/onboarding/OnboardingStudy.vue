@@ -10,6 +10,7 @@ const router = useRouter();
 const { user, refresh } = useAuth();
 const newStudyName = ref('');
 const newBenefit = ref('');
+const newVisibility = ref('PUBLIC');
 const creating = ref(false);
 const pendingApplication = ref(null);
 const loading = ref(true);
@@ -108,7 +109,11 @@ const createStudy = async () => {
   
   creating.value = true;
   try {
-    const res = await axios.post('/api/studies', { name: newStudyName.value, description: newBenefit.value });
+    const res = await axios.post('/api/studies', { 
+      name: newStudyName.value, 
+      description: newBenefit.value,
+      visibility: newVisibility.value
+    });
     // 성공 시 이동
     emit('next');
   } catch (error) {

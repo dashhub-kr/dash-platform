@@ -18,7 +18,8 @@ public record UserResponse(
         Integer solvedCount,
         String repositoryName,
         Boolean webhookConfigured,
-        Boolean isStudyLeader) {
+        Boolean isStudyLeader,
+        String studyType) {
 
     public static UserResponse from(UserResult result) {
         return new UserResponse(
@@ -35,7 +36,8 @@ public record UserResponse(
                 result.solvedCount(),
                 result.repositoryName(),
                 result.webhookConfigured(),
-                result.isStudyLeader());
+                result.isStudyLeader(),
+                result.studyType());
     }
 
 }

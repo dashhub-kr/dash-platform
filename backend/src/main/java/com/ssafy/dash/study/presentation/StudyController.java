@@ -12,6 +12,7 @@ import com.ssafy.dash.study.presentation.dto.request.AddMissionProblemsRequest;
 import com.ssafy.dash.study.presentation.dto.request.UpdateMissionRequest;
 import com.ssafy.dash.study.presentation.dto.request.UpdateMissionStatusRequest;
 import com.ssafy.dash.study.presentation.dto.response.StudyListResponse;
+import com.ssafy.dash.study.presentation.dto.response.CreateStudyResponse;
 import com.ssafy.dash.study.presentation.dto.response.StudyStatsResponse;
 import com.ssafy.dash.study.application.dto.result.StudyAnalysisResult;
 import com.ssafy.dash.study.application.dto.result.TeamFamilyStatResult;
@@ -41,10 +42,14 @@ public class StudyController {
     private final StudyMissionService studyMissionService;
     private final com.ssafy.dash.acorn.application.AcornService acornService;
 
-    @Operation(summary = "스터디 목록 조회", description = "참여 가능한 스터디 목록을 조회합니다. 평균 티어, 멤버 수, 총 풀이 수 포함.")
+    @Operation(summary = "스터디 목록 조회", description = "참여 가능한 스터디 목록을 조회합니다. 평균 티어, 멤버 수, 총 풀이 수 포함. keyword로 이름 검색 가능.")
     @GetMapping
-    public ResponseEntity<List<StudyListResponse>> getStudies() {
-        List<StudyListResponse> response = studyService.findAll().stream()
+    public ResponseEntity<List<StudyListResponse>> getStudies(
+            @RequestParam(required = false) String keyword) {
+        List<Study> studies = (keyword != null && !keyword.isBlank())
+                ? studyService.searchByKeyword(keyword)
+                : studyService.findAll();
+        List<StudyListResponse> response = studies.stream()
                 .map(StudyListResponse::from)
                 .toList();
         return ResponseEntity.ok(response);
@@ -61,13 +66,13 @@ public class StudyController {
 
     @Operation(summary = "스터디 생성", description = "새로운 스터디를 생성하고 자동으로 가입합니다.")
     @PostMapping
-    public ResponseEntity<Study> createStudy(
+    public ResponseEntity<CreateStudyResponse> createStudy(
             @Parameter(hidden = true) @AuthenticationPrincipal OAuth2User principal,
             @RequestBody CreateStudyRequest request) {
         if (principal instanceof CustomOAuth2User customUser) {
             Study study = studyService.createStudy(customUser.getUserId(), request.getName(), request.getDescription(),
                     request.getVisibility());
-            return ResponseEntity.ok(study);
+            return ResponseEntity.ok(CreateStudyResponse.from(study));
         }
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
     }
@@ -101,9 +106,11 @@ public class StudyController {
     @PostMapping("/applications/{applicationId}/reject")
     public ResponseEntity<Void> rejectApplication(
             @Parameter(hidden = true) @AuthenticationPrincipal OAuth2User principal,
-            @PathVariable Long applicationId) {
+            @PathVariable Long applicationId,
+            @RequestBody(required = false) java.util.Map<String, String> payload) {
         if (principal instanceof CustomOAuth2User customUser) {
-            studyService.rejectApplication(customUser.getUserId(), applicationId);
+            String reason = payload != null ? payload.getOrDefault("reason", "") : "";
+            studyService.rejectApplication(customUser.getUserId(), applicationId, reason);
             return ResponseEntity.ok().build();
         }
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
@@ -154,8 +161,6 @@ public class StudyController {
         }
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
     }
-
-
 
     @Operation(summary = "스터디 문제 풀이 통계 조회", description = "스터디의 티어별 문제 해결 수를 조회합니다.")
     @GetMapping("/{studyId}/stats")
@@ -286,5 +291,52 @@ public class StudyController {
             studyMissionService.completeMission(missionId);
         }
         return ResponseEntity.ok().build();
+    }
+
+    @Operation(summary = "스터디 삭제", description = "스터디장이 스터디를 완전 삭제(해체)합니다.")
+    @DeleteMapping("/{studyId}")
+    public ResponseEntity<Void> deleteStudy(
+            @Parameter(hidden = true) @AuthenticationPrincipal OAuth2User principal,
+            @PathVariable Long studyId) {
+        if (principal instanceof CustomOAuth2User customUser) {
+            studyService.deleteStudy(customUser.getUserId(), studyId);
+            return ResponseEntity.ok().build();
+        }
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+    }
+
+    @Operation(summary = "스터디원 조회", description = "스터디의 모든 구성원을 조회합니다.")
+    @GetMapping("/{studyId}/members")
+    public ResponseEntity<List<com.ssafy.dash.user.presentation.dto.response.UserResponse>> getStudyMembers(
+            @PathVariable Long studyId) {
+        return ResponseEntity.ok(studyService.getStudyMembers(studyId));
+    }
+
+    @Operation(summary = "스터디장 위임", description = "스터디장 권한을 다른 멤버에게 위임합니다.")
+    @PostMapping("/{studyId}/delegate")
+    public ResponseEntity<Void> delegateLeader(
+            @Parameter(hidden = true) @AuthenticationPrincipal OAuth2User principal,
+            @PathVariable Long studyId,
+            @RequestBody java.util.Map<String, Long> payload) {
+        if (principal instanceof CustomOAuth2User customUser) {
+            Long newLeaderId = payload.get("newLeaderId");
+            if (newLeaderId == null) {
+                return ResponseEntity.badRequest().build();
+            }
+            studyService.delegateLeader(customUser.getUserId(), studyId, newLeaderId);
+            return ResponseEntity.ok().build();
+        }
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+    }
+
+    @Operation(summary = "가입 신청 상세 조회", description = "특정 가입 신청 정보를 조회합니다 (스터디장 전용).")
+    @GetMapping("/applications/{applicationId}")
+    public ResponseEntity<com.ssafy.dash.study.domain.StudyApplication> getApplication(
+            @Parameter(hidden = true) @AuthenticationPrincipal OAuth2User principal,
+            @PathVariable Long applicationId) {
+        if (principal instanceof CustomOAuth2User customUser) {
+            return ResponseEntity.ok(studyService.getApplicationDetail(customUser.getUserId(), applicationId));
+        }
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
     }
 }

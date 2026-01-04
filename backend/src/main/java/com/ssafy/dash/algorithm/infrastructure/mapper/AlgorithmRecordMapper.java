@@ -34,4 +34,7 @@ public interface AlgorithmRecordMapper {
 
     AlgorithmRecord selectLatestSuccessfulByUserAndProblem(Long userId, String problemNumber);
 
+    void migrateStudyId(Long oldStudyId, Long newStudyId);
+
+    void migrateUserRecords(Long userId, Long oldStudyId, Long newStudyId);
 }

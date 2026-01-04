@@ -11,6 +11,8 @@ public interface StudyRepository {
 
     List<Study> findAll();
 
+    List<Study> searchByKeyword(String keyword);
+
     void update(Study study);
 
     boolean delete(Long id);
