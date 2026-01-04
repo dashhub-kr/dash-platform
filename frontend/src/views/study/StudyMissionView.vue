@@ -51,87 +51,81 @@
                             COMPLETED
                         </div>
 
+                            <!-- 절대 위치: 리더 액션 버튼 (카드 우측 상단) -->
+                            <div v-if="isLeader && mission.status !== 'COMPLETED'" class="absolute top-6 right-6 flex items-center gap-1 z-10 bg-white/80 backdrop-blur-sm p-1 rounded-xl border border-slate-100 shadow-sm opacity-0 group-hover:opacity-100 transition-all duration-300 translate-y-2 group-hover:translate-y-0">
+                                <button 
+                                    @click.stop="openEditModal(mission)"
+                                    class="p-2 text-slate-400 hover:text-brand-600 hover:bg-brand-50 rounded-lg transition-colors"
+                                    title="미션 수정">
+                                    <Pencil class="w-4 h-4" />
+                                </button>
+                                <button 
+                                    @click.stop="confirmEndMission(mission.id)"
+                                    class="p-2 text-slate-400 hover:text-orange-500 hover:bg-orange-50 rounded-lg transition-colors"
+                                    title="미션 종료">
+                                    <CheckCircle2 class="w-4 h-4" />
+                                </button>
+                            </div>
+                            <div v-else-if="isLeader && mission.status === 'COMPLETED'" class="absolute top-6 right-6 z-10 opacity-0 group-hover:opacity-100 transition-opacity">
+                                <button 
+                                    @click.stop="confirmDeleteMission(mission.id)"
+                                    class="flex items-center gap-1 px-3 py-1.5 bg-red-50 text-red-500 hover:bg-red-100 rounded-lg text-xs font-bold transition-colors"
+                                    title="미션 삭제">
+                                    <Trash2 class="w-3.5 h-3.5" />
+                                    <span>기록 삭제</span>
+                                </button>
+                            </div>
+
                         <div class="flex flex-col md:flex-row gap-6">
                             <!-- 왼쪽: 정보 -->
-                            <div class="flex-1">
-                                <div class="flex items-center gap-2 mb-3">
+                            <div class="flex-1 flex flex-col">
+                                <div class="flex items-center gap-2 mb-2">
                                     <!-- 주차 뱃지 -->
-                                    <BaseIconBadge 
-                                        :icon="Calendar"
-                                        :text="`Week ${mission.week}`"
-                                        :color="mission.status === 'COMPLETED' ? 'slate' : 'yellow'"
-                                        size="sm"
-                                    />
+                                    <span class="px-2.5 py-1 rounded-lg bg-slate-100 text-slate-600 text-xs font-extrabold uppercase tracking-wide">
+                                        Week {{ mission.week }}
+                                    </span>
                                     <!-- AI 뱃지 -->
-                                    <BaseIconBadge 
-                                        v-if="mission.sourceType === 'AI_RECOMMENDED'"
-                                        :icon="Brain"
-                                        text="AI 추천"
-                                        color="brand"
-                                        size="sm"
-                                    />
+                                    <span v-if="mission.sourceType === 'AI_RECOMMENDED'" class="px-2.5 py-1 rounded-lg bg-indigo-50 text-indigo-600 text-xs font-bold flex items-center gap-1">
+                                        <Brain :size="12" /> AI 추천
+                                    </span>
                                 </div>
 
-                                <h3 class="text-2xl font-black text-slate-700 mb-2 group-hover:text-brand transition-colors">
+                                <h3 class="text-2xl font-black text-slate-800 mb-3 leading-tight group-hover:text-brand-600 transition-colors">
                                     {{ mission.title }}
                                 </h3>
                                 
-                                <div class="flex items-center gap-4 text-slate-400 text-sm font-bold mb-6">
-                                    <span>{{ formatDate(mission.deadline) }} 까지</span>
+                                <div class="flex items-center gap-3 mb-6">
+                                    <!-- 마감일 -->
+                                    <div class="flex items-center gap-1.5 text-slate-500 text-xs font-bold bg-slate-50 px-3 py-1.5 rounded-full border border-slate-100">
+                                        <Calendar :size="14" />
+                                        <span>{{ formatDate(mission.deadline) }} 마감</span>
+                                    </div>
                                     
                                     <!-- D-Day 뱃지 -->
-                                    <BaseIconBadge 
-                                        v-if="getDaysLeft(mission.deadline) >= 0"
-                                        :icon="Flame"
-                                        :text="getDaysLeft(mission.deadline) === 0 ? '오늘 마감' : `D-${getDaysLeft(mission.deadline)}`"
-                                        color="orange"
-                                        size="sm"
-                                    />
-                                    <span v-else class="text-slate-300 bg-slate-100 px-2 py-0.5 rounded-lg text-xs font-bold">
+                                    <div v-if="getDaysLeft(mission.deadline) >= 0" 
+                                         class="flex items-center gap-1 text-xs font-bold px-2.5 py-1.5 rounded-full border"
+                                         :class="getDaysLeft(mission.deadline) <= 3 
+                                            ? 'bg-orange-50 text-orange-600 border-orange-100 animate-pulse' 
+                                            : 'bg-emerald-50 text-emerald-600 border-emerald-100'">
+                                        <Flame :size="12" fill="currentColor" />
+                                        <span>{{ getDaysLeft(mission.deadline) === 0 ? '오늘 마감' : `D-${getDaysLeft(mission.deadline)}` }}</span>
+                                    </div>
+                                    <span v-else class="text-slate-400 text-xs font-bold bg-slate-100 px-2.5 py-1.5 rounded-full">
                                         종료됨
                                     </span>
                                 </div>
 
                                 <!-- 문제 칩 -->
-                                <div class="flex flex-wrap gap-2">
-                                    <div v-if="isLeader" class="flex gap-1 mb-2 w-full">
-                                      <button 
-                                        v-if="mission.status !== 'COMPLETED' && getDaysLeft(mission.deadline) >= 0"
-                                        @click.stop="openEditModal(mission)"
-                                        class="flex items-center gap-1 px-2 py-1 text-slate-400 hover:text-brand-500 hover:bg-brand-50 rounded-lg transition-all text-xs font-bold"
-                                        title="미션 수정">
-                                        <Pencil class="w-3.5 h-3.5" />
-                                        수정
-                                      </button>
-                                      
-                                      <button 
-                                        v-if="mission.status !== 'COMPLETED'"
-                                        @click.stop="confirmEndMission(mission.id)"
-                                        class="flex items-center gap-1 px-2 py-1 text-slate-400 hover:text-orange-500 hover:bg-orange-50 rounded-lg transition-all text-xs font-bold"
-                                        title="미션 종료">
-                                        <CheckCircle2 class="w-3.5 h-3.5" />
-                                        종료
-                                      </button>
-
-                                      <button 
-                                        v-if="mission.status === 'COMPLETED'"
-                                        @click.stop="confirmDeleteMission(mission.id)"
-                                        class="flex items-center gap-1 px-2 py-1 text-slate-400 hover:text-rose-500 hover:bg-rose-50 rounded-lg transition-all text-xs font-bold"
-                                        title="미션 삭제">
-                                        <Trash2 class="w-3.5 h-3.5" />
-                                        삭제
-                                      </button>
-                                    </div>
-
+                                <div class="flex flex-wrap gap-2 mt-auto">
                                     <a v-for="(problemId, idx) in mission.problemIds" :key="problemId"
                                         :href="`https://www.acmicpc.net/problem/${problemId}`" target="_blank"
-                                        class="px-3 py-1.5 rounded-xl font-bold text-sm transition-all flex items-center gap-1.5 hover:opacity-80 hover:shadow-sm"
+                                        class="px-3 py-1.5 rounded-xl font-bold text-sm transition-all flex items-center gap-2 hover:-translate-y-0.5"
                                         :class="idx < mission.solvedCount 
-                                            ? 'bg-emerald-50 text-emerald-600 border border-emerald-100' 
-                                            : 'bg-slate-50 text-slate-400 border border-slate-100'"
+                                            ? 'bg-emerald-500 text-white shadow-md shadow-emerald-200' 
+                                            : 'bg-white text-slate-500 border border-slate-200 hover:border-brand-300 hover:text-brand-600'"
                                     >
-                                    <div class="w-2 h-2 rounded-full" :class="idx < mission.solvedCount ? 'bg-emerald-500' : 'bg-slate-300'"></div>
-                                    <span>{{ problemId }}</span>
+                                        <span class="font-mono">{{ problemId }}</span>
+                                        <Check v-if="idx < mission.solvedCount" :size="14" stroke-width="3" />
                                     </a>
                                 </div>
                             </div>
@@ -313,7 +307,8 @@ import {
     Send,
     Pencil,
     Trash2,
-    CheckCircle2
+    CheckCircle2,
+    Check
 } from 'lucide-vue-next';
 
 const route = useRoute();
