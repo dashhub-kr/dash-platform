@@ -72,6 +72,7 @@
                 v-for="post in filteredPosts"
                 :key="post.id"
                 @click="$router.push(`/boards/${post.id}`)"
+                :class="{'bg-slate-50/50 hover:!bg-slate-100/50': post.authorRole === 'ROLE_ADMIN'}"
                 class="grid grid-cols-12 px-8 py-5 border-b border-slate-100 hover:bg-brand-50/30 cursor-pointer transition-colors group items-center"
               >
                 <div class="col-span-1 text-center text-slate-400 font-mono text-sm group-hover:text-brand-500 transition-colors">{{ post.id }}</div>
@@ -91,7 +92,10 @@
                   <img v-else-if="post.authorProfileImageUrl" :src="post.authorProfileImageUrl" class="w-6 h-6 rounded-full border border-slate-200" />
                   <div class="flex flex-col items-start">
                     <span v-if="post.studyName" class="text-[10px] text-brand-500 font-bold">[{{ post.studyName }}]</span>
-                    <span>{{ ['Unknown User', 'Unknown'].includes(post.authorName) ? '탈퇴한 회원' : post.authorName }}</span>
+                    <span class="flex items-center gap-1">
+                        {{ ['Unknown User', 'Unknown'].includes(post.authorName) ? '탈퇴한 회원' : post.authorName }}
+                        <span v-if="post.authorRole === 'ROLE_ADMIN'" class="px-1.5 py-0.5 rounded-md bg-slate-800 text-[10px] text-white font-bold leading-none" title="관리자">ADMIN</span>
+                    </span>
                   </div>
                 </div>
                 <div class="col-span-2 text-center text-sm text-slate-500 flex items-center justify-center gap-3">

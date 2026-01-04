@@ -308,8 +308,13 @@ public class StudyService {
         Study study = studyRepository.findById(studyId)
                 .orElseThrow(() -> new IllegalArgumentException("Study not found"));
 
-        if (!Objects.equals(study.getCreatorId(), userId)) {
-            throw new SecurityException("Only creator can delete the study");
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+
+        // 스터디장 또는 관리자만 삭제 가능
+        boolean isAdmin = "ROLE_ADMIN".equals(user.getRole());
+        if (!Objects.equals(study.getCreatorId(), userId) && !isAdmin) {
+            throw new SecurityException("Only creator or admin can delete the study");
         }
 
         // 1. 모든 멤버를 각자의 Personal 스터디로 쫓아냄

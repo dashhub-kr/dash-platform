@@ -18,6 +18,7 @@ public record BoardResponse(
         Integer likeCount,
         Integer commentCount,
         Boolean isLiked,
+        String authorRole,
         LocalDateTime createdAt,
         LocalDateTime updatedAt) {
 
@@ -36,6 +37,7 @@ public record BoardResponse(
                 result.likeCount(),
                 result.commentCount(),
                 result.isLiked(),
+                result.authorRole(),
                 result.createdAt(),
                 result.updatedAt());
     }

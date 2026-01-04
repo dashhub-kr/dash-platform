@@ -19,7 +19,8 @@ public record UserResponse(
         String repositoryName,
         Boolean webhookConfigured,
         Boolean isStudyLeader,
-        String studyType) {
+        String studyType,
+        String role) {
 
     public static UserResponse from(UserResult result) {
         return new UserResponse(
@@ -37,7 +38,8 @@ public record UserResponse(
                 result.repositoryName(),
                 result.webhookConfigured(),
                 result.isStudyLeader(),
-                result.studyType());
+                result.studyType(),
+                result.role());
     }
 
 }

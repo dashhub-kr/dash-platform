@@ -25,6 +25,7 @@ public class Board {
     // 조인 필드
     private String authorName;
     private Integer commentCount;
+    private String authorRole;
 
     private Board(Long userId, String title, String content, Long algorithmRecordId,
             String boardType, LocalDateTime createdAt, LocalDateTime updatedAt) {

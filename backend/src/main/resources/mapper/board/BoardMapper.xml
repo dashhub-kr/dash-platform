@@ -12,6 +12,7 @@
       b.id, b.title, b.content, b.user_id, b.algorithm_record_id, b.board_type, b.like_count, 
       b.created_at, b.updated_at,
       u.username as author_name,
+      u.role as author_role,
       (SELECT COUNT(*) FROM comments c WHERE c.board_id = b.id) as comment_count
     FROM boards b
     LEFT JOIN users u ON b.user_id = u.id
@@ -23,6 +24,7 @@
       b.id, b.title, b.content, b.user_id, b.algorithm_record_id, b.board_type, b.like_count, 
       b.created_at, b.updated_at,
       u.username as author_name,
+      u.role as author_role,
       (SELECT COUNT(*) FROM comments c WHERE c.board_id = b.id) as comment_count
     FROM boards b
     LEFT JOIN users u ON b.user_id = u.id
@@ -35,6 +37,7 @@
       b.id, b.title, b.content, b.user_id, b.algorithm_record_id, b.board_type, b.like_count, 
       b.created_at, b.updated_at,
       u.username as author_name,
+      u.role as author_role,
       (SELECT COUNT(*) FROM comments c WHERE c.board_id = b.id) as comment_count
     FROM boards b
     LEFT JOIN users u ON b.user_id = u.id
