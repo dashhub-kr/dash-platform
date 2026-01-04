@@ -7,6 +7,10 @@ import com.ssafy.dash.study.domain.Study;
 import com.ssafy.dash.study.domain.StudyRepository;
 import com.ssafy.dash.user.domain.User;
 import com.ssafy.dash.user.domain.UserRepository;
+import com.ssafy.dash.user.application.dto.result.UserResult;
+import com.ssafy.dash.user.presentation.dto.response.UserResponse;
+import com.ssafy.dash.notification.application.NotificationService;
+import com.ssafy.dash.notification.domain.NotificationType;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -23,6 +27,7 @@ public class StudyService {
     private final StudyRepository studyRepository;
     private final UserRepository userRepository;
     private final AlgorithmRecordRepository algorithmRecordRepository;
+    private final NotificationService notificationService;
 
     @Transactional(readOnly = true)
     public List<Study> findAll() {
@@ -72,6 +77,14 @@ public class StudyService {
 
         StudyApplication application = StudyApplication.create(studyId, userId, message);
         studyRepository.saveApplication(application);
+
+        // Notify Study Leader
+        Study study = studyRepository.findById(studyId).orElseThrow();
+        notificationService.send(
+                study.getCreatorId(),
+                String.format("%s님이 스터디 가입을 신청했습니다.", user.getUsername()),
+                "/study/missions", // Or study management page
+                NotificationType.STUDY_REQUEST);
     }
 
     @Transactional(readOnly = true)
@@ -124,6 +137,13 @@ public class StudyService {
                 .orElseThrow(() -> new IllegalArgumentException("User not found"));
         user.updateStudy(study.getId());
         userRepository.update(user);
+
+        // Notify Applicant
+        notificationService.send(
+                user.getId(),
+                String.format("'%s' 스터디 가입 신청이 승인되었습니다.", study.getName()),
+                "/study/missions",
+                NotificationType.STUDY_RESULT);
     }
 
     @Transactional
@@ -140,6 +160,13 @@ public class StudyService {
 
         // DB에서 삭제하여 재가입 가능하도록 함
         studyRepository.deleteApplication(applicationId);
+
+        // Notify Applicant
+        notificationService.send(
+                application.getUserId(),
+                String.format("'%s' 스터디 가입 신청이 거절되었습니다.", study.getName()),
+                "/",
+                NotificationType.STUDY_RESULT);
     }
 
     @Transactional
@@ -173,6 +200,66 @@ public class StudyService {
     @Transactional(readOnly = true)
     public java.util.Optional<Study> findStudyById(Long studyId) {
         return studyRepository.findById(studyId);
+    }
+
+    @Transactional
+    public void deleteStudy(Long userId, Long studyId) {
+        Study study = studyRepository.findById(studyId)
+                .orElseThrow(() -> new IllegalArgumentException("Study not found"));
+
+        if (!Objects.equals(study.getCreatorId(), userId)) {
+            throw new SecurityException("Only creator can delete the study");
+        }
+
+        // 1. Remove all members
+        List<User> members = userRepository.findByStudyId(studyId);
+        for (User member : members) {
+            member.updateStudy(null);
+            userRepository.update(member);
+        }
+
+        // 2. Delete study (Applications and Missions should be handled by DB ON DELETE
+        // CASCADE or manually if needed)
+        // For safe implementation in limited context, we rely on DB definition.
+        studyRepository.delete(studyId);
+    }
+
+    @Transactional(readOnly = true)
+    public List<UserResponse> getStudyMembers(Long studyId) {
+        Study study = studyRepository.findById(studyId)
+                .orElseThrow(() -> new IllegalArgumentException("Study not found"));
+
+        return userRepository.findByStudyId(studyId).stream()
+                .map(user -> UserResult.from(user, null, study))
+                .map(UserResponse::from)
+                .toList();
+    }
+
+    @Transactional
+    public void delegateLeader(Long currentLeaderId, Long studyId, Long newLeaderId) {
+        Study study = studyRepository.findById(studyId)
+                .orElseThrow(() -> new IllegalArgumentException("Study not found"));
+
+        if (!Objects.equals(study.getCreatorId(), currentLeaderId)) {
+            throw new SecurityException("Only creator can delegate the leader role");
+        }
+
+        User newLeader = userRepository.findById(newLeaderId)
+                .orElseThrow(() -> new IllegalArgumentException("New leader not found"));
+
+        if (!Objects.equals(newLeader.getStudyId(), studyId)) {
+            throw new IllegalArgumentException("New leader must be a member of the study");
+        }
+
+        study.setCreatorId(newLeaderId);
+        studyRepository.update(study);
+
+        // Notify new leader
+        notificationService.send(
+                newLeaderId,
+                String.format("'%s' 스터디의 스터디장으로 임명되었습니다.", study.getName()),
+                "/user/profile",
+                NotificationType.STUDY_RESULT);
     }
 
 }

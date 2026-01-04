@@ -155,8 +155,6 @@ public class StudyController {
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
     }
 
-
-
     @Operation(summary = "스터디 문제 풀이 통계 조회", description = "스터디의 티어별 문제 해결 수를 조회합니다.")
     @GetMapping("/{studyId}/stats")
     public ResponseEntity<StudyStatsResponse> getStudyStats(
@@ -286,5 +284,41 @@ public class StudyController {
             studyMissionService.completeMission(missionId);
         }
         return ResponseEntity.ok().build();
+    }
+
+    @Operation(summary = "스터디 삭제", description = "스터디장이 스터디를 완전 삭제(해체)합니다.")
+    @DeleteMapping("/{studyId}")
+    public ResponseEntity<Void> deleteStudy(
+            @Parameter(hidden = true) @AuthenticationPrincipal OAuth2User principal,
+            @PathVariable Long studyId) {
+        if (principal instanceof CustomOAuth2User customUser) {
+            studyService.deleteStudy(customUser.getUserId(), studyId);
+            return ResponseEntity.ok().build();
+        }
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+    }
+
+    @Operation(summary = "스터디원 조회", description = "스터디의 모든 구성원을 조회합니다.")
+    @GetMapping("/{studyId}/members")
+    public ResponseEntity<List<com.ssafy.dash.user.presentation.dto.response.UserResponse>> getStudyMembers(
+            @PathVariable Long studyId) {
+        return ResponseEntity.ok(studyService.getStudyMembers(studyId));
+    }
+
+    @Operation(summary = "스터디장 위임", description = "스터디장 권한을 다른 멤버에게 위임합니다.")
+    @PostMapping("/{studyId}/delegate")
+    public ResponseEntity<Void> delegateLeader(
+            @Parameter(hidden = true) @AuthenticationPrincipal OAuth2User principal,
+            @PathVariable Long studyId,
+            @RequestBody java.util.Map<String, Long> payload) {
+        if (principal instanceof CustomOAuth2User customUser) {
+            Long newLeaderId = payload.get("newLeaderId");
+            if (newLeaderId == null) {
+                return ResponseEntity.badRequest().build();
+            }
+            studyService.delegateLeader(customUser.getUserId(), studyId, newLeaderId);
+            return ResponseEntity.ok().build();
+        }
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
     }
 }

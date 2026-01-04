@@ -42,6 +42,16 @@ export const studyApi = {
     leaveStudy() {
         return http.post(`/studies/leave`);
     },
+    deleteStudy(studyId) {
+        return http.delete(`/studies/${studyId}`);
+    },
+    // Member Management
+    getMembers(studyId) {
+        return http.get(`/studies/${studyId}/members`);
+    },
+    delegateLeader(studyId, newLeaderId) {
+        return http.post(`/studies/${studyId}/delegate`, { newLeaderId });
+    },
     // User Application
     getMyApplication() {
         return http.get(`/studies/applications/me`);
