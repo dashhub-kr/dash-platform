@@ -239,19 +239,12 @@ const handleDelete = async () => {
                         <label class="block text-xs font-bold text-slate-400 mb-2 uppercase">이름</label>
                         <input 
                             v-model="userData.username" 
-                            class="w-full bg-slate-50 border-2 border-slate-200 rounded-xl px-4 py-3 font-bold text-slate-700 focus:outline-none focus:border-brand-500 focus:bg-white transition-all"
+                            readonly
+                            class="w-full bg-transparent border-none p-0 font-bold text-slate-700 focus:outline-none cursor-default"
                         />
                     </div>
                     <!-- Email Field Removed -->
-                    <div class="pt-2">
-                        <button 
-                            @click="handleUpdate"
-                            :disabled="updating"
-                            class="w-full bg-brand-500 hover:bg-brand-600 text-white font-bold py-4 rounded-xl transition-all shine-effect disabled:opacity-50"
-                        >
-                            {{ updating ? '저장 중...' : '변경사항 저장' }}
-                        </button>
-                    </div>
+
                 </div>
             </section>
 
