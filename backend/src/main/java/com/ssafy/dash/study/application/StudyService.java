@@ -65,15 +65,15 @@ public class StudyService {
 
         studyRepository.save(study);
 
-        // Store old study reference before updating user
+        // 변경 전 유저 정보를 업데이트하기 전에 기존 스터디 참조를 저장합니다.
         Long oldStudyId = user.getStudyId();
         Study oldStudy = oldStudyId != null ? studyRepository.findById(oldStudyId).orElse(null) : null;
 
-        // Creator automatically joins (update user first to avoid FK constraint)
+        // 스터디장은 자동으로 가입 처리됩니다. (FK 제약 조건을 피하기 위해 유저 정보 먼저 업데이트)
         user.updateStudy(study.getId());
         userRepository.update(user);
 
-        // Now safe to delete old PERSONAL study (user no longer references it)
+        // 이제 기존 PERSONAL 스터디는 안전하게 삭제할 수 있습니다. (유저가 더 이상 참조하지 않으므로)
         if (oldStudy != null && oldStudy.getStudyType() == StudyType.PERSONAL) {
             algorithmRecordService.migrateStudyId(oldStudy.getId(), study.getId());
             studyRepository.delete(oldStudy.getId());
@@ -116,24 +116,24 @@ public class StudyService {
             }
         }
 
-        // Check if study exists
+        // 스터디 존재 여부 확인
         if (studyRepository.findById(studyId).isEmpty()) {
             throw new IllegalArgumentException("Study not found");
         }
 
-        // Check if already applied
+        // 이미 가입 신청했는지 확인
         studyRepository.findApplicationByStudyIdAndUserId(studyId, userId).ifPresent(app -> {
             if (app.getStatus() == StudyApplication.ApplicationStatus.PENDING) {
                 throw new IllegalStateException("Already applied to this study");
             }
-            // If not pending (e.g. APPROVED but left study), delete old application record
+            // PENDING 상태가 아니라면 (예: 승인되었다가 탈퇴한 경우), 이전 신청 기록 삭제
             studyRepository.deleteApplication(app.getId());
         });
 
         StudyApplication application = StudyApplication.create(studyId, userId, message);
         studyRepository.saveApplication(application);
 
-        // Notify Study Leader
+        // 스터디장에게 알림 전송
         Study study = studyRepository.findById(studyId).orElseThrow();
         notificationService.send(
                 study.getCreatorId(),
@@ -185,15 +185,15 @@ public class StudyService {
             throw new SecurityException("Only creator can approve applications");
         }
 
-        // Add user to study
+        // 유저를 스터디에 추가
         User user = userRepository.findById(application.getUserId())
                 .orElseThrow(() -> new IllegalArgumentException("User not found"));
 
-        // Validation: Check if user already belongs to a GROUP study
+        // 유효성 검사: 유저가 이미 다른 GROUP 스터디에 소속되어 있는지 확인
         if (user.getStudyId() != null) {
             Study currentStudy = studyRepository.findById(user.getStudyId()).orElse(null);
             if (currentStudy != null && currentStudy.getStudyType() == StudyType.GROUP) {
-                // User is already in a GROUP study - reject the application
+                // 이미 GROUP 스터디에 소속된 경우 - 신청 자동 거절
                 studyRepository.deleteApplication(applicationId);
 
                 notificationService.send(
@@ -205,20 +205,29 @@ public class StudyService {
                 throw new IllegalStateException("신청자가 이미 다른 스터디에 소속되어 있어 승인할 수 없습니다.");
             }
 
-            // PERSONAL study - migrate records
+            // PERSONAL 스터디인 경우 - 기록 마이그레이션
             if (currentStudy != null && currentStudy.getStudyType() == StudyType.PERSONAL) {
                 algorithmRecordService.migrateStudyId(currentStudy.getId(), study.getId());
-                studyRepository.delete(currentStudy.getId());
+                // studyRepository.delete(currentStudy.getId()); // 유저 업데이트 이후로 이동됨
             }
         }
 
         application.approve();
         studyRepository.updateApplicationStatus(application);
 
+        Long oldStudyId = user.getStudyId();
         user.updateStudy(study.getId());
         userRepository.update(user);
 
-        // Notify Applicant
+        // 기존 Personal 스터디가 있다면 삭제
+        if (oldStudyId != null) {
+             Study oldStudy = studyRepository.findById(oldStudyId).orElse(null);
+             if (oldStudy != null && oldStudy.getStudyType() == StudyType.PERSONAL) {
+                 studyRepository.delete(oldStudyId);
+             }
+        }
+
+        // 신청자에게 알림 전송
         notificationService.send(
                 user.getId(),
                 String.format("'%s' 스터디 가입 신청이 승인되었습니다.", study.getName()),
@@ -268,19 +277,18 @@ public class StudyService {
                 .orElseThrow(() -> new IllegalArgumentException("Study not found"));
 
         if (Objects.equals(study.getCreatorId(), userId)) {
-            // Policy: Creator cannot leave the study. They must delete it or transfer
-            // ownership (not yet implemented).
+            // 정책: 스터디장은 탈퇴할 수 없음. 스터디를 해체하거나 권한을 위임해야 함. (아직 구현되지 않음)
             throw new IllegalStateException("스터디장은 탈퇴할 수 없습니다. 스터디를 해체하거나 권한을 위임해야 합니다.");
         }
 
-        // 1. Leave Group Study
+        // 1. Group 스터디 탈퇴
         user.updateStudy(null);
         userRepository.update(user);
 
-        // 2. Fallback to Personal Study
+        // 2. Personal 스터디 생성 (Fallback)
         Study personalStudy = createPersonalStudy(userId);
 
-        // 3. Migrate user's records from Group to Personal
+        // 3. 유저의 기록을 Group에서 Personal 스터디로 마이그레이션
         algorithmRecordService.migrateUserRecords(userId, oldStudyId, personalStudy.getId());
     }
 
@@ -304,22 +312,21 @@ public class StudyService {
             throw new SecurityException("Only creator can delete the study");
         }
 
-        // 1. Migrate all members to Personal Studies
+        // 1. 모든 멤버를 각자의 Personal 스터디로 쫓아냄
         List<User> members = userRepository.findByStudyId(studyId);
         for (User member : members) {
-            // Clear group study association
+            // Group 스터디 관계 끊기
             member.updateStudy(null);
             userRepository.update(member);
 
-            // Create Personal Study for each member
+            // 각 멤버를 위한 Personal 스터디 생성
             Study personalStudy = createPersonalStudy(member.getId());
 
-            // Migrate member's records from deleted group to new personal study
+            // 멤버의 기록을 삭제되는 Group 스터디에서 새로운 Personal 스터디로 이관
             algorithmRecordService.migrateUserRecords(member.getId(), studyId, personalStudy.getId());
         }
 
-        // 2. Delete study (Applications and Missions should be handled by DB ON DELETE
-        // CASCADE or manually if needed)
+        // 2. 스터디 삭제 (신청 내역이나 미션 등은 DB의 CASCADE 옵션 또는 수동 처리가 필요할 수 있음)
         studyRepository.delete(studyId);
     }
 
