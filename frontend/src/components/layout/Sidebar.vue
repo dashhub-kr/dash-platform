@@ -337,9 +337,9 @@ const navGroups = computed(() => {
   {
     title: '스터디',
     items: [
-      { label: '대시보드', path: '/dashboard', icon: LayoutGrid, color: 'bg-sky-500', locked: !hasStudy },
-      { label: '미션', path: '/study/missions', icon: Target, color: 'bg-rose-500', locked: !hasStudy },
-      { label: '분석', path: '/study/analysis', icon: PieChart, color: 'bg-emerald-500', locked: !hasStudy },
+      { label: '대시보드', path: '/dashboard', icon: LayoutGrid, color: 'bg-sky-500' },
+      { label: '미션', path: '/study/missions', icon: Target, color: 'bg-rose-500' },
+      { label: '분석', path: '/study/analysis', icon: PieChart, color: 'bg-emerald-500' },
     ]
   },
   {
