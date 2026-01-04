@@ -11,6 +11,7 @@ public record NotificationResult(
         String content,
         String url,
         NotificationType type,
+        Long relatedId,
         boolean isRead,
         LocalDateTime createdAt) {
     public static NotificationResult from(Notification notification) {
@@ -20,6 +21,7 @@ public record NotificationResult(
                 notification.getContent(),
                 notification.getUrl(),
                 notification.getType(),
+                notification.getRelatedId(),
                 notification.isRead(),
                 notification.getCreatedAt());
     }

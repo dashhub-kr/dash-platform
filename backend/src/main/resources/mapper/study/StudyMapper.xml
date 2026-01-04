@@ -64,8 +64,11 @@
     VALUES (#{studyId}, #{userId}, #{message}, #{status}, #{createdAt})
   </insert>
 
-  <select id="findApplicationById" resultType="com.ssafy.dash.study.domain.StudyApplication">
-    SELECT * FROM study_applications WHERE id = #{id}
+  <select id="findApplicationById" resultMap="StudyApplicationResult">
+    SELECT sa.*, u.id as u_id, u.username, u.avatar_url 
+    FROM study_applications sa
+    JOIN users u ON sa.user_id = u.id
+    WHERE sa.id = #{id}
   </select>
   
   <select id="findApplicationByStudyIdAndUserId" resultType="com.ssafy.dash.study.domain.StudyApplication">

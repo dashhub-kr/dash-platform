@@ -321,4 +321,15 @@ public class StudyController {
         }
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
     }
+
+    @Operation(summary = "가입 신청 상세 조회", description = "특정 가입 신청 정보를 조회합니다 (스터디장 전용).")
+    @GetMapping("/applications/{applicationId}")
+    public ResponseEntity<com.ssafy.dash.study.domain.StudyApplication> getApplication(
+            @Parameter(hidden = true) @AuthenticationPrincipal OAuth2User principal,
+            @PathVariable Long applicationId) {
+        if (principal instanceof CustomOAuth2User customUser) {
+            return ResponseEntity.ok(studyService.getApplicationDetail(customUser.getUserId(), applicationId));
+        }
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+    }
 }

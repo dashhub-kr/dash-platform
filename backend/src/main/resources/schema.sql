@@ -419,6 +419,7 @@ CREATE TABLE IF NOT EXISTS notification (
     receiver_id BIGINT NOT NULL,
     content VARCHAR(255) NOT NULL,
     url VARCHAR(512),
+    related_id BIGINT,
     type VARCHAR(20) NOT NULL,
     is_read BOOLEAN DEFAULT FALSE,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,

@@ -10,6 +10,7 @@ public record NotificationResponse(
         String content,
         String url,
         NotificationType type,
+        Long relatedId,
         boolean isRead,
         LocalDateTime createdAt) {
     public static NotificationResponse from(NotificationResult result) {
@@ -18,6 +19,7 @@ public record NotificationResponse(
                 result.content(),
                 result.url(),
                 result.type(),
+                result.relatedId(),
                 result.isRead(),
                 result.createdAt());
     }

@@ -33,6 +33,9 @@ export const studyApi = {
     getApplications(studyId) {
         return http.get(`/studies/${studyId}/applications`);
     },
+    getApplication(applicationId) {
+        return http.get(`/studies/applications/${applicationId}`);
+    },
     approveApplication(applicationId) {
         return http.post(`/studies/applications/${applicationId}/approve`);
     },

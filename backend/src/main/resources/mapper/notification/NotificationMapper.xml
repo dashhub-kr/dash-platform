@@ -18,14 +18,15 @@
     </select>
     
     <insert id="save" parameterType="com.ssafy.dash.notification.domain.Notification" useGeneratedKeys="true" keyProperty="id">
-        INSERT INTO notification (receiver_id, content, url, type, is_read, created_at)
-        VALUES (#{receiverId}, #{content}, #{url}, #{type}, #{isRead}, #{createdAt})
+        INSERT INTO notification (receiver_id, content, url, related_id, type, is_read, created_at)
+        VALUES (#{receiverId}, #{content}, #{url}, #{relatedId}, #{type}, #{isRead}, #{createdAt})
     </insert>
 
     <update id="update" parameterType="com.ssafy.dash.notification.domain.Notification">
         UPDATE notification
         SET is_read = #{isRead},
             url = #{url},
+            related_id = #{relatedId},
             content = #{content},
             type = #{type}
         WHERE id = #{id}

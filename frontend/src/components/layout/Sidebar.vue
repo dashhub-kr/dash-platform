@@ -203,20 +203,80 @@
        </nav>
    </div>
 
+
+
+   <!-- Study Application Modal -->
+    <Teleport to="body">
+        <div v-if="showApplicationModal" class="fixed inset-0 z-[9999] flex items-center justify-center p-4">
+            <div class="absolute inset-0 bg-slate-900/40 backdrop-blur-sm" @click="showApplicationModal = false"></div>
+            
+            <div class="relative bg-white rounded-3xl w-full max-w-md p-6 shadow-2xl animate-in fade-in zoom-in-95 duration-200">
+                <h3 class="text-xl font-bold text-slate-800 mb-2">스터디 가입 신청</h3>
+                
+                <div v-if="loadingApp" class="py-12 flex justify-center">
+                    <Loader2 class="animate-spin text-brand-500" :size="32"/>
+                </div>
+                
+                <template v-else-if="selectedApp">
+                    <div class="flex items-center gap-4 mb-6 p-4 bg-slate-50 rounded-2xl">
+                        <img 
+                            :src="selectedApp.applicant?.avatarUrl || '/images/profiles/default-profile.png'" 
+                            class="w-12 h-12 rounded-full border border-slate-200 bg-white object-cover"
+                        />
+                        <div>
+                            <div class="font-bold text-slate-800 text-lg">{{ selectedApp.applicant?.username || '알 수 없는 사용자' }}</div>
+                            <div class="text-xs text-slate-400">가입 인사를 확인해주세요.</div>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-8">
+                         <div class="text-xs font-bold text-slate-400 uppercase mb-2">Message</div>
+                         <div class="bg-slate-50 p-4 rounded-2xl text-slate-700 font-medium leading-relaxed whitespace-pre-wrap max-h-60 overflow-y-auto custom-scrollbar">
+                             {{ selectedApp.message }}
+                         </div>
+                    </div>
+
+                    <div class="flex gap-3">
+                        <button 
+                            @click="handleRejectApp"
+                            class="flex-1 py-3.5 rounded-xl font-bold text-rose-500 bg-rose-50 hover:bg-rose-100 transition-colors"
+                        >
+                            거절
+                        </button>
+                        <button 
+                            @click="handleApproveApp"
+                            class="flex-1 py-3.5 rounded-xl font-bold text-white bg-brand-500 hover:bg-brand-600 transition-colors shadow-lg shadow-brand-500/30"
+                        >
+                            승인
+                        </button>
+                    </div>
+                </template>
+                
+                <div v-else class="py-10 text-center text-slate-400 font-medium bg-slate-50 rounded-2xl">
+                    신청 정보를 찾을 수 없습니다.<br>
+                    <span class="text-xs mt-1 block">이미 처리되었거나 삭제된 신청입니다.</span>
+                    <button @click="showApplicationModal = false" class="mt-4 px-4 py-2 bg-white border border-slate-200 rounded-lg text-sm font-bold text-slate-600 hover:bg-slate-50">닫기</button>
+                </div>
+            </div>
+        </div>
+    </Teleport>
+
 </template>
 
 <script setup>
 import { ref, computed, onMounted, onBeforeUnmount, watch } from "vue";
 import { useRoute, useRouter } from 'vue-router';
+// Imports update
 import { 
     Github, Shield, LayoutGrid, MessageSquare, School, FileText, 
     PieChart, Target, Trophy, Bell, UserCircle, LogOut, X, Menu, Network, Compass,
-    CheckCircle2, AlertCircle, MessageCircle, HelpCircle, Star
+    CheckCircle2, AlertCircle, MessageCircle, HelpCircle, Star, Loader2
 } from "lucide-vue-next";
 
 import { useAuth } from "@/composables/useAuth";
 import { authApi } from "@/api/auth";
 import { getNotifications, markAsRead, markAllAsRead } from "@/api/notification";
+import { studyApi } from "@/api/study";
 
 const emits = defineEmits(['scroll']);
 
@@ -304,15 +364,69 @@ const fetchNotifications = async () => {
   }
 };
 
+// Study Application Modal
+const showApplicationModal = ref(false);
+const selectedApp = ref(null);
+const loadingApp = ref(false);
+
+const openApplicationModal = async (applicationId) => {
+    showApplicationModal.value = true;
+    loadingApp.value = true;
+    selectedApp.value = null;
+    try {
+        const res = await studyApi.getApplication(applicationId);
+        selectedApp.value = res.data;
+    } catch (e) {
+        console.error(e);
+        // alert("신청 정보를 불러오지 못했습니다.");
+        // showApplicationModal.value = false;
+    } finally {
+        loadingApp.value = false;
+    }
+};
+
+const handleApproveApp = async () => {
+    if (!selectedApp.value) return;
+    if (!confirm("가입 신청을 승인하시겠습니까?")) return;
+    try {
+        await studyApi.approveApplication(selectedApp.value.id);
+        alert("승인되었습니다.");
+        showApplicationModal.value = false;
+        fetchNotifications(); // Refresh notifications
+    } catch (e) {
+        console.error(e);
+        alert(e.response?.data?.message || "승인에 실패했습니다.");
+    }
+};
+
+const handleRejectApp = async () => {
+    if (!selectedApp.value) return;
+    if (!confirm("가입 신청을 거절하시겠습니까?")) return;
+    try {
+        await studyApi.rejectApplication(selectedApp.value.id);
+        alert("거절되었습니다.");
+        showApplicationModal.value = false;
+        fetchNotifications();
+    } catch (e) {
+        console.error(e);
+        alert(e.response?.data?.message || "거절에 실패했습니다.");
+    }
+};
+
 const handleNotificationClick = async (notification) => {
   if (!notification.isRead) {
     try {
       await markAsRead(notification.id);
       notification.isRead = true;
-      // notifications.value = notifications.value.map(n => n.id === notification.id ? { ...n, isRead: true } : n);
     } catch (e) {
       console.error(e);
     }
+  }
+  
+  if (notification.type === 'STUDY_REQUEST' && notification.relatedId) {
+      notificationsOpen.value = false;
+      openApplicationModal(notification.relatedId);
+      return;
   }
   
   notificationsOpen.value = false;

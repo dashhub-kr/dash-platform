@@ -21,7 +21,11 @@ public class NotificationService {
     private final NotificationRepository notificationRepository;
 
     public void send(Long receiverId, String content, String url, NotificationType type) {
-        Notification notification = Notification.create(receiverId, content, url, type);
+        send(receiverId, content, url, type, null);
+    }
+
+    public void send(Long receiverId, String content, String url, NotificationType type, Long relatedId) {
+        Notification notification = Notification.create(receiverId, content, url, type, relatedId);
         notificationRepository.save(notification);
     }
 

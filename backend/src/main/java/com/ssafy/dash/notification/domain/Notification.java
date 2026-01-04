@@ -17,16 +17,23 @@ public class Notification {
     private Long receiverId;
     private String content;
     private String url;
+    private Long relatedId;
     private NotificationType type;
     private boolean isRead;
     private LocalDateTime createdAt;
 
     public static Notification create(Long receiverId, String content, String url, NotificationType type) {
+        return create(receiverId, content, url, type, null);
+    }
+
+    public static Notification create(Long receiverId, String content, String url, NotificationType type,
+            Long relatedId) {
         return Notification.builder()
                 .receiverId(receiverId)
                 .content(content)
                 .url(url)
                 .type(type)
+                .relatedId(relatedId)
                 .isRead(false)
                 .createdAt(LocalDateTime.now())
                 .build();

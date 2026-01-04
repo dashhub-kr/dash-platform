@@ -83,8 +83,9 @@ public class StudyService {
         notificationService.send(
                 study.getCreatorId(),
                 String.format("%s님이 스터디 가입을 신청했습니다.", user.getUsername()),
-                "/study/missions", // Or study management page
-                NotificationType.STUDY_REQUEST);
+                "/study/missions",
+                NotificationType.STUDY_REQUEST,
+                application.getId());
     }
 
     @Transactional(readOnly = true)
@@ -260,6 +261,21 @@ public class StudyService {
                 String.format("'%s' 스터디의 스터디장으로 임명되었습니다.", study.getName()),
                 "/user/profile",
                 NotificationType.STUDY_RESULT);
+    }
+
+    @Transactional(readOnly = true)
+    public StudyApplication getApplicationDetail(Long userId, Long applicationId) {
+        StudyApplication app = studyRepository.findApplicationById(applicationId)
+                .orElseThrow(() -> new IllegalArgumentException("Application not found"));
+
+        Study study = studyRepository.findById(app.getStudyId())
+                .orElseThrow(() -> new IllegalArgumentException("Study not found"));
+
+        if (!Objects.equals(study.getCreatorId(), userId)) {
+            throw new SecurityException("Only creator can view application details");
+        }
+
+        return app;
     }
 
 }
