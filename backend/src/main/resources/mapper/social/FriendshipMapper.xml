@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ssafy.dash.social.domain.FriendshipRepository">
+
+    <insert id="save" parameterType="com.ssafy.dash.social.domain.Friendship" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO friendships (requester_id, receiver_id, status, created_at)
+        VALUES (#{requesterId}, #{receiverId}, #{status}, #{createdAt})
+    </insert>
+
+    <select id="findById" resultType="com.ssafy.dash.social.domain.Friendship">
+        SELECT * FROM friendships WHERE id = #{id}
+    </select>
+
+    <select id="findByRequesterIdAndReceiverId" resultType="com.ssafy.dash.social.domain.Friendship">
+        SELECT * FROM friendships 
+        WHERE (requester_id = #{requesterId} AND receiver_id = #{receiverId})
+           OR (requester_id = #{receiverId} AND receiver_id = #{requesterId})
+    </select>
+
+    <select id="findByUserId" resultType="com.ssafy.dash.social.domain.Friendship">
+        SELECT * FROM friendships 
+        WHERE requester_id = #{userId} OR receiver_id = #{userId}
+    </select>
+    
+    <select id="findByReceiverIdAndStatus" resultType="com.ssafy.dash.social.domain.Friendship">
+        SELECT * FROM friendships 
+        WHERE receiver_id = #{receiverId} AND status = #{status}
+    </select>
+
+    <update id="update" parameterType="com.ssafy.dash.social.domain.Friendship">
+        UPDATE friendships SET status = #{status} WHERE id = #{id}
+    </update>
+
+    <delete id="delete">
+        DELETE FROM friendships WHERE id = #{id}
+    </delete>
+
+</mapper>

@@ -8,5 +8,7 @@ public enum NotificationType {
     SOS,
     SOLVED,
     MISSION_COMPLETED,
-    SYSTEM
+    SYSTEM,
+    FRIEND_REQUEST,
+    DIRECT_MESSAGE
 }

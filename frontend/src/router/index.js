@@ -140,6 +140,12 @@ const routes = [
     props: (route) => ({ studyId: Number(route.params.id) }),
     meta: { requiresAuth: true, requiresAdmin: true }
   },
+  {
+    path: "/social",
+    name: "SocialView",
+    component: () => import("../views/social/SocialView.vue"),
+    meta: { requiresAuth: true }
+  },
 ];
 
 const router = createRouter({

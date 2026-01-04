@@ -361,6 +361,7 @@ const navGroups = computed(() => {
     items: [
       { label: '둘러보기', path: '/study/ranking', icon: Compass, color: 'bg-yellow-500' },
       { label: '게시판', path: '/boards', icon: MessageSquare, color: 'bg-violet-500' },
+      { label: '소셜', path: '/social', icon: Users, color: 'bg-pink-500' },
     ]
   }
 ]});
@@ -435,6 +436,10 @@ const fetchNotifications = async () => {
     isFirstLoad.value = false;
   } catch (e) {
     console.error('Failed to fetch notifications', e);
+    // 401 에러(인증 만료) 시 폴링 중단하여 불필요한 호출 방지
+    if (e.response && e.response.status === 401) {
+        stopPolling();
+    }
   }
 };
 
