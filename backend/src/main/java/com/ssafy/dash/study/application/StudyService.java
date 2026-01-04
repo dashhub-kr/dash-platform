@@ -1,6 +1,6 @@
 package com.ssafy.dash.study.application;
 
-import com.ssafy.dash.algorithm.domain.AlgorithmRecordRepository;
+import com.ssafy.dash.algorithm.application.AlgorithmRecordService;
 import com.ssafy.dash.algorithm.domain.StudyStats;
 import com.ssafy.dash.study.application.dto.result.StudyStatsResult;
 import com.ssafy.dash.study.domain.Study;
@@ -27,7 +27,7 @@ public class StudyService {
 
     private final StudyRepository studyRepository;
     private final UserRepository userRepository;
-    private final AlgorithmRecordRepository algorithmRecordRepository;
+    private final AlgorithmRecordService algorithmRecordService;
     private final NotificationService notificationService;
 
     @Transactional(readOnly = true)
@@ -75,7 +75,7 @@ public class StudyService {
 
         // Now safe to delete old PERSONAL study (user no longer references it)
         if (oldStudy != null && oldStudy.getStudyType() == StudyType.PERSONAL) {
-            algorithmRecordRepository.migrateStudyId(oldStudy.getId(), study.getId());
+            algorithmRecordService.migrateStudyId(oldStudy.getId(), study.getId());
             studyRepository.delete(oldStudy.getId());
         }
 
@@ -207,7 +207,7 @@ public class StudyService {
 
             // PERSONAL study - migrate records
             if (currentStudy != null && currentStudy.getStudyType() == StudyType.PERSONAL) {
-                algorithmRecordRepository.migrateStudyId(currentStudy.getId(), study.getId());
+                algorithmRecordService.migrateStudyId(currentStudy.getId(), study.getId());
                 studyRepository.delete(currentStudy.getId());
             }
         }
@@ -281,12 +281,12 @@ public class StudyService {
         Study personalStudy = createPersonalStudy(userId);
 
         // 3. Migrate user's records from Group to Personal
-        algorithmRecordRepository.migrateUserRecords(userId, oldStudyId, personalStudy.getId());
+        algorithmRecordService.migrateUserRecords(userId, oldStudyId, personalStudy.getId());
     }
 
     @Transactional(readOnly = true)
     public StudyStatsResult getStudyStats(Long studyId) {
-        StudyStats stats = algorithmRecordRepository.countsByStudyId(studyId);
+        StudyStats stats = algorithmRecordService.getStudyStats(studyId);
         return new StudyStatsResult(stats.bronze(), stats.silver(), stats.gold(), stats.platinum());
     }
 
@@ -315,7 +315,7 @@ public class StudyService {
             Study personalStudy = createPersonalStudy(member.getId());
 
             // Migrate member's records from deleted group to new personal study
-            algorithmRecordRepository.migrateUserRecords(member.getId(), studyId, personalStudy.getId());
+            algorithmRecordService.migrateUserRecords(member.getId(), studyId, personalStudy.getId());
         }
 
         // 2. Delete study (Applications and Missions should be handled by DB ON DELETE
