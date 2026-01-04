@@ -5,15 +5,16 @@ import { userApi } from '@/api/user';
 import { studyApi } from '@/api/study';
 import { useAuth } from '@/composables/useAuth';
 import { onboardingApi } from '@/api/onboarding';
-import { Settings, LogOut, Github, Award, Users, Crown, RotateCcw, Loader2, HelpCircle, Zap as ZapIcon, Copy, Trash2, UserCheck } from 'lucide-vue-next';
+import { Settings, LogOut, Github, Award, Users, Crown, RotateCcw, Loader2, HelpCircle, Zap as ZapIcon, Copy, Trash2, UserCheck, MoreVertical } from 'lucide-vue-next';
 import BaseIconBadge from '@/components/common/BaseIconBadge.vue';
 
 const router = useRouter();
 const { refresh, user } = useAuth();
 
-// ... (existing code)
+// 스터디 메뉴 상태
+const showStudyMenu = ref(false);
 
-// Delegation State
+// 위임 모달 상태
 const showDelegateModal = ref(false);
 const memberList = ref([]);
 const loadingMembers = ref(false);
@@ -49,7 +50,7 @@ const handleDelegate = async () => {
     }
 };
 
-// Delete Modal State
+// 삭제 모달 상태
 const showDeleteConfirmModal = ref(false);
 const deleteInput = ref('');
 
@@ -189,13 +190,13 @@ const copyVerificationCode = () => {
 const handleRedetect = async () => {
     syncingRepo.value = true;
     
-    // 1. 요청 발송 (Request Extension Data)
+    // 1. 요청 발송 (익스텐션 데이터 요청)
     window.dispatchEvent(new CustomEvent('DashHub-dash-request'));
     
-    // 2. 잠시 대기 (Wait for Bridge)
+    // 2. 잠시 대기 (브릿지 연결 대기)
     await new Promise(resolve => setTimeout(resolve, 500));
     
-    // 3. DOM 확인 (Check DOM)
+    // 3. DOM 확인
     const dataEl = document.getElementById('DashHub-dash-data');
     const hook = dataEl?.getAttribute('data-hook');
     const repo = dataEl?.getAttribute('data-repo');
@@ -277,9 +278,9 @@ const showFaq = ref(false);
       
       <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
         
-        <!-- LEFT COLUMN: Profile Summary & Stats -->
+        <!-- 좌측 컬럼: 프로필 요약 및 통계 -->
         <div class="lg:col-span-4 space-y-6">
-            <!-- Profile Card -->
+            <!-- 프로필 카드 -->
             <div class="bg-white rounded-3xl p-6 text-center shadow-sm">
                 <div class="relative inline-block mx-auto mb-4">
                     <img :src="userProfileImage" class="w-32 h-32 rounded-3xl object-cover bg-slate-50 mx-auto shadow-sm" />
@@ -291,9 +292,9 @@ const showFaq = ref(false);
                 <div class="text-xs text-slate-300 font-bold uppercase tracking-wider">Joined Dec 2024</div>
             </div>
 
-            <!-- Real Stats -->
+            <!-- 실제 통계 정보 -->
             <div class="space-y-4">
-                <!-- Tier Card -->
+                <!-- 티어 카드 -->
                 <div class="bg-white rounded-3xl p-5 flex items-center gap-5 transition-colors shadow-sm">
                     <BaseIconBadge 
                         :icon="Award" 
@@ -308,8 +309,7 @@ const showFaq = ref(false);
                     </div>
                 </div>
 
-                <!-- Study Card -->
-                <!-- Study Card -->
+                <!-- 스터디 카드 -->
                 <div class="bg-white rounded-3xl p-5 flex items-center justify-between transition-colors relative overflow-hidden shadow-sm">
                     <div class="flex items-center gap-5">
                          <BaseIconBadge 
@@ -324,7 +324,7 @@ const showFaq = ref(false);
                                 <span v-else class="text-slate-400 text-base">스터디 없음</span>
                                 
                                 <div v-if="userData.isStudyLeader" class="inline-flex">
-                                    <BaseIconBadge :icon="Crown" text="LEADER" color="fox" size="sm" />
+                                    <BaseIconBadge :icon="Crown" color="fox" size="sm" />
                                 </div>
                             </div>
                             <div class="text-xs font-bold text-slate-400 uppercase mt-0.5">
@@ -333,45 +333,56 @@ const showFaq = ref(false);
                         </div>
                     </div>
 
-                    <!-- 스터디 탈퇴 버튼 (리더가 아니고 스터디가 있을 때) -->
-                    <button 
-                        v-if="userData.studyId && !userData.isStudyLeader"
-                        @click="handleLeaveStudy"
-                        class="p-2 text-slate-400 hover:text-rose-500 hover:bg-rose-50 rounded-xl transition-all"
-                        title="스터디 탈퇴"
-                    >
-                        <LogOut :size="20" />
-                    </button>
-                    <!-- 리더 액션 버튼 그룹 -->
-                    <div v-if="userData.studyId && userData.isStudyLeader" class="flex items-center gap-2">
-                        <!-- 위임 버튼 -->
+                    <!-- 액션 메뉴 (드롭다운) -->
+                    <div class="relative" v-if="userData.studyId">
                         <button 
-                            @click="openDelegateModal"
-                            class="p-2 text-slate-400 hover:text-brand-500 hover:bg-brand-50 rounded-xl transition-all"
-                            title="스터디장 위임"
+                            @click="showStudyMenu = !showStudyMenu"
+                            class="p-2 text-slate-300 hover:text-slate-600 hover:bg-slate-100 rounded-xl transition-all"
                         >
-                            <UserCheck :size="20" />
+                            <MoreVertical :size="20" />
                         </button>
-                        <!-- 해체 버튼 -->
-                        <button 
-                            @click="openDeleteModal"
-                            class="p-2 text-slate-400 hover:text-rose-500 hover:bg-rose-50 rounded-xl transition-all"
-                            title="스터디 해체 (삭제)"
-                        >
-                            <Trash2 :size="20" />
-                        </button>
+
+                        <!-- 백드롭 -->
+                        <div v-if="showStudyMenu" @click="showStudyMenu = false" class="fixed inset-0 z-10 cursor-default bg-transparent"></div>
+
+                        <!-- 메뉴 -->
+                        <div v-if="showStudyMenu" class="absolute right-0 top-full mt-2 w-48 bg-white rounded-xl shadow-xl border border-slate-100 p-1.5 z-20 animate-in fade-in zoom-in-95 duration-200 origin-top-right flex flex-col gap-1">
+                            
+                            <!-- 스터디장 전용 -->
+                            <template v-if="userData.isStudyLeader">
+                                <button 
+                                    @click="openDelegateModal(); showStudyMenu = false"
+                                    class="w-full text-left px-3 py-2.5 text-sm font-bold text-slate-600 hover:bg-slate-50 hover:text-slate-800 rounded-lg transition-colors flex items-center gap-2"
+                                >
+                                    <UserCheck :size="16" />
+                                    스터디장 위임
+                                </button>
+                                <button 
+                                    @click="openDeleteModal(); showStudyMenu = false"
+                                    class="w-full text-left px-3 py-2.5 text-sm font-bold text-rose-500 hover:bg-rose-50 rounded-lg transition-colors flex items-center gap-2"
+                                >
+                                    <Trash2 :size="16" />
+                                    스터디 해체
+                                </button>
+                            </template>
+
+                            <!-- 스터디원 전용 -->
+                            <template v-else>
+                                <button 
+                                    @click="handleLeaveStudy(); showStudyMenu = false"
+                                    class="w-full text-left px-3 py-2.5 text-sm font-bold text-rose-500 hover:bg-rose-50 rounded-lg transition-colors flex items-center gap-2"
+                                >
+                                    <LogOut :size="16" />
+                                    스터디 탈퇴
+                                </button>
+                            </template>
+
+                        </div>
                     </div>
                 </div>
             </div>
             
-            <!-- Danger Zone (Mobile only) -->
-             <button 
-                @click="handleDelete"
-                class="lg:hidden w-full py-4 rounded-2xl bg-rose-50 text-rose-500 font-bold hover:bg-rose-100 transition-colors flex items-center justify-center gap-2"
-            >
-                <LogOut :size="18" />
-                회원 탈퇴
-            </button>
+            <!-- 위험 구역 (모바일 전용) -->
         </div>
 
         <!-- RIGHT COLUMN: Settings Forms -->
@@ -476,10 +487,10 @@ const showFaq = ref(false);
         </Teleport>
 
 
-        <!-- RIGHT COLUMN: Settings Forms -->
+        <!-- 우측 컬럼: 설정 폼 -->
         <div class="lg:col-span-8 space-y-8">
             
-            <!-- Edit Profile -->
+            <!-- 프로필 수정 -->
             <section class="bg-white rounded-3xl p-6 md:p-8 shadow-sm">
                 <div class="flex items-center justify-between mb-6">
                     <h2 class="text-xl font-bold text-slate-800 flex items-center gap-2">
@@ -502,7 +513,7 @@ const showFaq = ref(false);
                 </div>
             </section>
 
-             <!-- Repository Sync -->
+             <!-- 저장소 연동 -->
             <section class="bg-white rounded-3xl p-6 md:p-8 shadow-sm">
                 <div class="flex items-center justify-between mb-6">
                     <h2 class="text-xl font-bold text-slate-800 flex items-center gap-2">
@@ -538,7 +549,7 @@ const showFaq = ref(false);
                                 {{ syncingSolvedac ? '...' : '연동' }}
                             </button>
                         </div>
-                        <!-- Verification Guide -->
+                        <!-- 인증 가이드 -->
                         <div class="mt-3 p-4 bg-slate-50 rounded-xl border border-slate-200">
                             <h4 class="text-xs font-bold text-slate-500 mb-2 flex items-center gap-1.5">
                                 <span class="w-1.5 h-1.5 rounded-full bg-slate-400"></span>
@@ -598,20 +609,28 @@ const showFaq = ref(false);
                 </div>
             </section>
             
+            <!-- Danger Zone (Mobile only) - Moved to bottom -->
+             <button 
+                @click="handleDelete"
+                class="lg:hidden w-full py-4 rounded-2xl bg-rose-50 text-rose-500 font-bold hover:bg-rose-100 transition-colors flex items-center justify-center gap-2 mt-8"
+            >
+                <LogOut :size="18" />
+                회원 탈퇴
+            </button>
             <div class="flex justify-end lg:block hidden">
                  <button 
                     @click="handleDelete"
                     class="text-rose-400 hover:text-rose-600 font-bold text-sm flex items-center gap-2 px-4 py-2 hover:bg-rose-50 rounded-lg transition-colors"
                 >
                     <LogOut :size="16" />
-                    계정 탈퇴하기
+                    회원 탈퇴
                 </button>
             </div>
         </div>
       </div>
 
 
-    <!-- Global Modals -->
+    <!-- 전역 모달 -->
     <TroubleshootingModal :isOpen="showFaq" @close="showFaq = false" />
     </main>
   </div>
