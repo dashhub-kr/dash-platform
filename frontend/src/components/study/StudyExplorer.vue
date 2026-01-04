@@ -115,9 +115,19 @@
                      <span class="w-2 h-2 rounded-full bg-brand-500 animate-pulse"></span>
                      참여 중
                 </div>
-                <button v-else-if="user?.studyId" disabled
+                <!-- 가입 대기 중 -->
+                <div v-else-if="pendingApp && pendingApp.studyId === study.id" class="flex gap-2">
+                     <div class="flex-1 py-3 bg-amber-50 text-amber-600 font-bold rounded-xl text-center border border-amber-100 flex items-center justify-center gap-2">
+                        <span class="w-2 h-2 rounded-full bg-amber-500 animate-pulse"></span>
+                        가입 대기중
+                     </div>
+                     <button @click="handleCancelApplication(pendingApp.id)" class="px-4 py-3 bg-slate-100 text-slate-500 font-bold rounded-xl hover:bg-slate-200 transition-colors">
+                        취소
+                     </button>
+                </div>
+                <button v-else-if="user?.studyId || pendingApp" disabled
                         class="w-full py-3 bg-slate-100 text-slate-400 font-bold rounded-xl cursor-not-allowed border border-slate-200">
-                   가입 불가
+                   {{ user?.studyId ? '가입 불가' : '신청 진행 중' }}
                 </button>
                 <button v-else 
                         @click="openApplyModal(study)"
@@ -193,10 +203,21 @@
                      참여 중
                 </div>
 
-                <!-- 가입 불가 (다른 스터디 참여 중) -->
-                <button v-else-if="user?.studyId" disabled
+                <!-- 가입 대기 중 -->
+                <div v-else-if="pendingApp && pendingApp.studyId === study.id" class="flex gap-2">
+                     <div class="flex-1 py-3 bg-amber-50 text-amber-600 font-bold rounded-xl text-center border border-amber-100 flex items-center justify-center gap-2">
+                        <span class="w-2 h-2 rounded-full bg-amber-500 animate-pulse"></span>
+                        가입 대기중
+                     </div>
+                     <button @click="handleCancelApplication(pendingApp.id)" class="px-4 py-3 bg-slate-100 text-slate-500 font-bold rounded-xl hover:bg-slate-200 transition-colors">
+                        취소
+                     </button>
+                </div>
+
+                <!-- 가입 불가 (다른 스터디 참여 중 혹은 가입 대기 중) -->
+                <button v-else-if="user?.studyId || pendingApp" disabled
                         class="w-full py-3 bg-slate-100 text-slate-400 font-bold rounded-xl cursor-not-allowed border border-slate-200">
-                   가입 불가
+                   {{ user?.studyId ? '가입 불가' : '신청 진행 중' }}
                 </button>
 
                 <!-- 신청하기 -->
@@ -269,8 +290,8 @@
 import { ref, onMounted, computed, defineProps, defineEmits } from 'vue';
 import axios from 'axios';
 import { useAuth } from '@/composables/useAuth';
-
 import { Trophy, Flame, Users, Search, Activity, ArrowRight, Send, Sparkles, Compass, AlertCircle } from 'lucide-vue-next';
+import { studyApi } from '@/api/study';
 
 const props = defineProps({
   isOnboarding: {
@@ -292,6 +313,34 @@ const applying = ref(false);
 
 const searchId = ref('');
 const searchError = ref('');
+
+const pendingApp = ref(null);
+
+const checkMyApplication = async () => {
+    try {
+        const res = await studyApi.getMyApplication();
+        if (res.data && res.data.status === 'PENDING') {
+            pendingApp.value = res.data;
+        } else {
+            pendingApp.value = null;
+        }
+    } catch (e) {
+        pendingApp.value = null;
+    }
+};
+
+const handleCancelApplication = async (appId) => {
+    if (!confirm('가입 신청을 취소하시겠습니까?')) return;
+    try {
+        await studyApi.cancelApplication(appId);
+        pendingApp.value = null;
+        alert('가입 신청이 취소되었습니다.');
+        // If onboarded, user might want to apply to others right away.
+    } catch (e) {
+        console.error(e);
+        alert('취소에 실패했습니다.');
+    }
+};
 
 const fetchAllStudies = async () => {
     loading.value = true;
@@ -348,6 +397,9 @@ const recommendedStudies = computed(() => {
 
 onMounted(() => {
   fetchAllStudies();
+  if (user.value && !user.value.studyId) {
+      checkMyApplication();
+  }
 });
 
 const openApplyModal = (study) => {

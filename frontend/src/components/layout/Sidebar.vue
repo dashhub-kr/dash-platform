@@ -23,16 +23,23 @@
           <h3 class="px-4 mb-1 text-xs font-black text-slate-400 uppercase tracking-wider">{{ group.title }}</h3>
           
           <div class="space-y-1">
-            <router-link
+            <component
+              :is="item.locked ? 'div' : 'router-link'"
               v-for="item in group.items"
               :key="item.path"
-              :to="item.path"
-              class="flex items-center gap-3 px-4 py-2 rounded-xl text-sm font-bold text-slate-500 hover:bg-slate-50 transition-all group"
-              :class="isActiveRoute(item.path) ? 'bg-slate-100' : ''"
+              :to="!item.locked ? item.path : undefined"
+              class="flex items-center gap-3 px-4 py-2 rounded-xl text-sm font-bold transition-all group relative overflow-hidden"
+              :class="[
+                  isActiveRoute(item.path) ? 'bg-slate-100' : 'hover:bg-slate-50',
+                  item.locked ? 'opacity-50 cursor-not-allowed text-slate-400' : 'text-slate-500'
+              ]"
             >
               <div 
-                class="w-8 h-8 rounded-lg flex items-center justify-center shadow-sm transition-transform group-hover:scale-110"
-                :class="item.color"
+                class="w-8 h-8 rounded-lg flex items-center justify-center shadow-sm transition-transform"
+                :class="[
+                    item.color,
+                    item.locked ? 'grayscale opacity-70' : 'group-hover:scale-110'
+                ]"
               >
                 <component 
                   :is="item.icon" 
@@ -41,8 +48,13 @@
                   :stroke-width="2.5"
                 />
               </div>
-              <span class="tracking-wide text-sm font-bold text-slate-600" :class="{ 'text-slate-900': isActiveRoute(item.path) }">{{ item.label }}</span>
-            </router-link>
+              <span class="tracking-wide text-sm font-bold" :class="{ 'text-slate-900': isActiveRoute(item.path) && !item.locked }">{{ item.label }}</span>
+              
+              <!-- Lock Overlay -->
+              <div v-if="item.locked" class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400">
+                  <Lock :size="14" />
+              </div>
+            </component>
           </div>
         </div>
       </template>
@@ -297,7 +309,7 @@ import { useRoute, useRouter } from 'vue-router';
 import { 
     Github, Shield, LayoutGrid, MessageSquare, School, FileText, 
     PieChart, Target, Trophy, Bell, UserCircle, LogOut, X, Menu, Network, Compass,
-    CheckCircle2, AlertCircle, MessageCircle, HelpCircle, Star, Loader2
+    CheckCircle2, AlertCircle, MessageCircle, HelpCircle, Star, Loader2, Lock
 } from "lucide-vue-next";
 
 import { useAuth } from "@/composables/useAuth";
@@ -319,13 +331,15 @@ const visible = computed(() => {
   return true;
 });
 
-const navGroups = [
+const navGroups = computed(() => {
+    const hasStudy = user.value && user.value.studyId;
+    return [
   {
     title: '스터디',
     items: [
-      { label: '대시보드', path: '/dashboard', icon: LayoutGrid, color: 'bg-sky-500' },
-      { label: '미션', path: '/study/missions', icon: Target, color: 'bg-rose-500' },
-      { label: '분석', path: '/study/analysis', icon: PieChart, color: 'bg-emerald-500' },
+      { label: '대시보드', path: '/dashboard', icon: LayoutGrid, color: 'bg-sky-500', locked: !hasStudy },
+      { label: '미션', path: '/study/missions', icon: Target, color: 'bg-rose-500', locked: !hasStudy },
+      { label: '분석', path: '/study/analysis', icon: PieChart, color: 'bg-emerald-500', locked: !hasStudy },
     ]
   },
   {
@@ -349,9 +363,9 @@ const navGroups = [
       { label: '게시판', path: '/boards', icon: MessageSquare, color: 'bg-violet-500' },
     ]
   }
-];
+]});
 
-const navItems = computed(() => navGroups.flatMap(g => g.items));
+const navItems = computed(() => navGroups.value.flatMap(g => g.items));
 
 const isActiveRoute = (itemPath) => {
   const currentPath = route.path;
