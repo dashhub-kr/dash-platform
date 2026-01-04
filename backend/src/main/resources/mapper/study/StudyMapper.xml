@@ -3,8 +3,8 @@
 <mapper namespace="com.ssafy.dash.study.infrastructure.mapper.StudyMapper">
 
   <insert id="save" parameterType="Study" useGeneratedKeys="true" keyProperty="id">
-    INSERT INTO studies (name, creator_id, created_at, acorn_count, visibility, description, streak)
-    VALUES (#{name}, #{creatorId}, #{createdAt}, #{acornCount}, #{visibility}, #{description}, #{streak})
+    INSERT INTO studies (name, creator_id, created_at, acorn_count, visibility, description, streak, study_type)
+    VALUES (#{name}, #{creatorId}, #{createdAt}, #{acornCount}, #{visibility}, #{description}, #{streak}, #{studyType})
   </insert>
 
   <select id="findById" resultType="Study" parameterType="long">
@@ -45,12 +45,13 @@
             AND ar3.created_at >= DATE_SUB(NOW(), INTERVAL 7 DAY)) / 
            NULLIF((SELECT COUNT(*) FROM users u4 WHERE u4.study_id = s.id), 0) as average_submission_rate
     FROM studies s 
+    WHERE s.study_type = 'GROUP'
     ORDER BY total_solved DESC, s.id
   </select>
 
   <update id="update" parameterType="Study">
     UPDATE studies SET name = #{name}, acorn_count = #{acornCount}, 
-    visibility = #{visibility}, description = #{description}, streak = #{streak}
+    visibility = #{visibility}, description = #{description}, streak = #{streak}, study_type = #{studyType}
     WHERE id = #{id}
   </update>
 

@@ -7,7 +7,8 @@ CREATE TABLE IF NOT EXISTS studies (
     visibility VARCHAR(20) DEFAULT 'PUBLIC',
     description TEXT,
     streak INT DEFAULT 0,
-    active_mission_title VARCHAR(255)
+    active_mission_title VARCHAR(255),
+    study_type VARCHAR(20) DEFAULT 'GROUP' COMMENT 'GROUP, PERSONAL'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 

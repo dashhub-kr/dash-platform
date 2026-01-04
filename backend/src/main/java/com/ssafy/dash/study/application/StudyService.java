@@ -11,6 +11,7 @@ import com.ssafy.dash.user.application.dto.result.UserResult;
 import com.ssafy.dash.user.presentation.dto.response.UserResponse;
 import com.ssafy.dash.notification.application.NotificationService;
 import com.ssafy.dash.notification.domain.NotificationType;
+import com.ssafy.dash.study.domain.Study.StudyType;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -40,19 +41,68 @@ public class StudyService {
                 .orElseThrow(() -> new IllegalArgumentException("User not found"));
 
         if (user.getStudyId() != null) {
-            throw new IllegalStateException("User already belongs to a study");
+            Study currentStudy = studyRepository.findById(user.getStudyId()).orElse(null);
+            // PERSONAL 타입이 아니면 중복 가입 불가 (비정상 상태 방지)
+            if (currentStudy != null && currentStudy.getStudyType() == StudyType.GROUP) {
+                throw new IllegalStateException("User already belongs to a study");
+            }
+            // PERSONAL 타입이면 아래에서 덮어쓰거나 처리?
+            // createStudy는 새로운 GROUP 스터디를 만드는 것이므로,
+            // PERSONAL 스터디를 가진 상태에서 새 스터디를 만들면 -> PERSONAL 스터디를 "삭제"하고 새 스터디로 이동?
+            // 혹은 새 스터디 만들기를 허용하지 않을 수도 있음. (규칙: 스터디장은 탈퇴불가)
+            // 여기서는 일단 기존 GROUP 스터디가 있으면 막는 것으로 유지.
+            // PERSONAL 스터디가 있으면? 새 스터디 만들면 PERSONAL 스터디는 사라져야 함.
+            if (currentStudy != null && currentStudy.getStudyType() == StudyType.PERSONAL) {
+                // 개인 연구실 정리 후 생성 진행
+                algorithmRecordRepository.migrateStudyId(currentStudy.getId(), null); // 임시로 null? 아니면 새 ID?
+                // 새 ID는 save된 후에 나옴.
+                // 따라서 createStudy 로직 중간에 마이그레이션이 필요함.
+                // save 후에 처리해야 함.
+            }
         }
 
         Study study = Study.create(name, userId);
         study.setDescription(description);
         study.setVisibility(visibility != null ? visibility : StudyVisibility.PUBLIC);
+        study.setStudyType(StudyType.GROUP); // 기본은 GROUP
 
         studyRepository.save(study);
 
-        // Creator automatically joins
+        // Store old study reference before updating user
+        Long oldStudyId = user.getStudyId();
+        Study oldStudy = oldStudyId != null ? studyRepository.findById(oldStudyId).orElse(null) : null;
+
+        // Creator automatically joins (update user first to avoid FK constraint)
         user.updateStudy(study.getId());
         userRepository.update(user);
 
+        // Now safe to delete old PERSONAL study (user no longer references it)
+        if (oldStudy != null && oldStudy.getStudyType() == StudyType.PERSONAL) {
+            algorithmRecordRepository.migrateStudyId(oldStudy.getId(), study.getId());
+            studyRepository.delete(oldStudy.getId());
+        }
+
+        return study;
+    }
+
+    @Transactional
+    public Study createPersonalStudy(Long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+
+        if (user.getStudyId() != null) {
+            return studyRepository.findById(user.getStudyId()).orElse(null);
+        }
+
+        Study study = Study.create(user.getUsername() + "의 연구실", userId);
+        study.setStudyType(StudyType.PERSONAL);
+        study.setVisibility(StudyVisibility.PRIVATE);
+        study.setDescription("개인 학습을 위한 공간입니다.");
+
+        studyRepository.save(study);
+
+        user.updateStudy(study.getId());
+        userRepository.update(user);
         return study;
     }
 
@@ -62,7 +112,11 @@ public class StudyService {
                 .orElseThrow(() -> new IllegalArgumentException("User not found"));
 
         if (user.getStudyId() != null) {
-            throw new IllegalStateException("User already belongs to a study");
+            Study currentStudy = studyRepository.findById(user.getStudyId()).orElse(null);
+            // PERSONAL 타입이면 지원 허용
+            if (currentStudy != null && currentStudy.getStudyType() == StudyType.GROUP) {
+                throw new IllegalStateException("User already belongs to a study");
+            }
         }
 
         // Check if study exists
@@ -140,6 +194,18 @@ public class StudyService {
         // Add user to study
         User user = userRepository.findById(application.getUserId())
                 .orElseThrow(() -> new IllegalArgumentException("User not found"));
+
+        // Migration Check
+        if (user.getStudyId() != null) {
+            Study oldStudy = studyRepository.findById(user.getStudyId()).orElse(null);
+            if (oldStudy != null && oldStudy.getStudyType() == StudyType.PERSONAL) {
+                // Migrate records
+                algorithmRecordRepository.migrateStudyId(oldStudy.getId(), study.getId());
+                // Delete old study
+                studyRepository.delete(oldStudy.getId());
+            }
+        }
+
         user.updateStudy(study.getId());
         userRepository.update(user);
 
@@ -188,7 +254,8 @@ public class StudyService {
             throw new IllegalStateException("User is not in a study");
         }
 
-        Study study = studyRepository.findById(user.getStudyId())
+        Long oldStudyId = user.getStudyId();
+        Study study = studyRepository.findById(oldStudyId)
                 .orElseThrow(() -> new IllegalArgumentException("Study not found"));
 
         if (Objects.equals(study.getCreatorId(), userId)) {
@@ -197,8 +264,15 @@ public class StudyService {
             throw new IllegalStateException("스터디장은 탈퇴할 수 없습니다. 스터디를 해체하거나 권한을 위임해야 합니다.");
         }
 
+        // 1. Leave Group Study
         user.updateStudy(null);
         userRepository.update(user);
+
+        // 2. Fallback to Personal Study
+        Study personalStudy = createPersonalStudy(userId);
+
+        // 3. Migrate user's records from Group to Personal
+        algorithmRecordRepository.migrateUserRecords(userId, oldStudyId, personalStudy.getId());
     }
 
     @Transactional(readOnly = true)
@@ -221,16 +295,22 @@ public class StudyService {
             throw new SecurityException("Only creator can delete the study");
         }
 
-        // 1. Remove all members
+        // 1. Migrate all members to Personal Studies
         List<User> members = userRepository.findByStudyId(studyId);
         for (User member : members) {
+            // Clear group study association
             member.updateStudy(null);
             userRepository.update(member);
+
+            // Create Personal Study for each member
+            Study personalStudy = createPersonalStudy(member.getId());
+
+            // Migrate member's records from deleted group to new personal study
+            algorithmRecordRepository.migrateUserRecords(member.getId(), studyId, personalStudy.getId());
         }
 
         // 2. Delete study (Applications and Missions should be handled by DB ON DELETE
         // CASCADE or manually if needed)
-        // For safe implementation in limited context, we rely on DB definition.
         studyRepository.delete(studyId);
     }
 

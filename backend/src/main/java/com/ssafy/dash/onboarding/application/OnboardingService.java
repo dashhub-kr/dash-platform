@@ -10,6 +10,7 @@ import com.ssafy.dash.onboarding.application.dto.result.RepositorySetupResult;
 import com.ssafy.dash.onboarding.domain.Onboarding;
 import com.ssafy.dash.onboarding.domain.OnboardingRepository;
 import com.ssafy.dash.onboarding.domain.exception.WebhookRegistrationException;
+import com.ssafy.dash.study.application.StudyService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -21,11 +22,14 @@ public class OnboardingService {
     private final OnboardingRepository onboardingRepository;
     private final GitHubWebhookService gitHubWebhookService;
     private final OAuthTokenService oauthTokenService;
+    private final StudyService studyService;
 
-    public OnboardingService(OnboardingRepository onboardingRepository, GitHubWebhookService gitHubWebhookService, OAuthTokenService oauthTokenService) {
+    public OnboardingService(OnboardingRepository onboardingRepository, GitHubWebhookService gitHubWebhookService,
+            OAuthTokenService oauthTokenService, StudyService studyService) {
         this.onboardingRepository = onboardingRepository;
         this.gitHubWebhookService = gitHubWebhookService;
         this.oauthTokenService = oauthTokenService;
+        this.studyService = studyService;
     }
 
     @Transactional
@@ -56,6 +60,9 @@ public class OnboardingService {
             onboardingRepository.save(repository);
             throw new WebhookRegistrationException(ex.getMessage(), ex);
         }
+
+        // Auto-create Personal Study (Personal Lab) for the user
+        studyService.createPersonalStudy(userId);
 
         return new RepositorySetupResult(userId, repository.getRepositoryName(), repository.isWebhookConfigured());
     }
