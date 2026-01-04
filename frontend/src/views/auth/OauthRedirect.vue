@@ -66,17 +66,33 @@ onMounted(async () => {
   try {
     const res = await authApi.getSession();
     const data = res.data;
-    flowType.value = data.flowType;
+    
+    // API 응답 구조에 따라 user 객체 확인
+    // data 자체가 user 정보를 담고 있다고 가정하거나 data.user 사용
+    // 기존 코드는 data.flowType을 사용했음. getSession의 정확한 응답 구조가 중요함.
+    // useAuth.js를 보면 getSession 응답이 user 객체(또는 user를 포함)라고 유추됨.
+    
+    // 안전하게 데이터 확보
+    const user = data.user || data; 
+
+    // 온보딩 완료 여부 확인 로직 (Router Guard와 동일한 기준 적용)
+    const isOnboardingComplete = user && 
+                               (user.solvedacId || user.solvedacHandle) && 
+                               user.studyId && 
+                               user.repositoryName;
 
     setTimeout(() => {
-        if (data.flowType === "SIGN_UP") {
-            router.push("/onboarding");
+        if (!isOnboardingComplete) {
+            // 미완료 사용자는 무조건 온보딩으로
+            router.replace("/onboarding");
         } else {
-            window.location.href = "/";
+            // 완료된 사용자만 대시보드로
+            router.replace("/dashboard");
         }
-    }, 1500); // 애니메이션을 보여주기 위해 약간 더 지연
+    }, 1500);
     
   } catch (err) {
+    console.error(err);
     error.value = err.message || "로그인 처리 중 오류가 발생했습니다.";
   }
 });

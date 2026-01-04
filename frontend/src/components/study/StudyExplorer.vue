@@ -274,7 +274,8 @@
 import { ref, onMounted, computed, defineProps, defineEmits } from 'vue';
 import axios from 'axios';
 import { useAuth } from '@/composables/useAuth';
-import { Trophy, Flame, Users, Search, Activity, ArrowRight, Send, Sparkles, Compass } from 'lucide-vue-next';
+
+import { Trophy, Flame, Users, Search, Activity, ArrowRight, Send, Sparkles, Compass, AlertCircle } from 'lucide-vue-next';
 
 const props = defineProps({
   isOnboarding: {
@@ -291,7 +292,50 @@ const studies = ref([]);
 const showModal = ref(false);
 const selectedStudy = ref(null);
 const applyMessage = ref('');
+
 const applying = ref(false);
+
+const searchId = ref('');
+const searchError = ref('');
+
+const fetchAllStudies = async () => {
+    loading.value = true;
+    searchError.value = '';
+    try {
+        const res = await axios.get('/api/studies');
+        studies.value = res.data;
+    } catch (e) {
+        console.error('스터디 목록 로드 실패', e);
+    } finally {
+        loading.value = false;
+    }
+};
+
+const searchStudy = async () => {
+    if (!searchId.value) {
+        await fetchAllStudies();
+        return;
+    }
+    
+    loading.value = true;
+    searchError.value = '';
+    
+    try {
+        const res = await axios.get(`/api/studies/${searchId.value}`);
+        studies.value = [res.data];
+    } catch (e) {
+        console.error('검색 실패', e);
+        studies.value = [];
+        searchError.value = '해당 번지수의 스터디를 찾을 수 없습니다.';
+    } finally {
+        loading.value = false;
+    }
+};
+
+const resetSearch = async () => {
+    searchId.value = '';
+    await fetchAllStudies();
+};
 
 const recommendedStudies = computed(() => {
   if (!user.value || !user.value.solvedacTier) return [];
@@ -307,15 +351,8 @@ const recommendedStudies = computed(() => {
   });
 });
 
-onMounted(async () => {
-  try {
-    const res = await axios.get('/api/studies');
-    studies.value = res.data;
-  } catch (e) {
-    console.error('스터디 목록 로드 실패', e);
-  } finally {
-    loading.value = false;
-  }
+onMounted(() => {
+  fetchAllStudies();
 });
 
 const openApplyModal = (study) => {

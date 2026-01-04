@@ -52,8 +52,11 @@ public class StudyController {
 
     @Operation(summary = "스터디 상세 조회", description = "특정 스터디의 정보를 조회합니다.")
     @GetMapping("/{studyId}")
-    public ResponseEntity<Study> getStudy(@PathVariable Long studyId) {
-        return ResponseEntity.of(studyService.findStudyById(studyId));
+    public ResponseEntity<StudyListResponse> getStudy(@PathVariable Long studyId) {
+        return studyService.findStudyById(studyId)
+                .map(StudyListResponse::from)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
     }
 
     @Operation(summary = "스터디 생성", description = "새로운 스터디를 생성하고 자동으로 가입합니다.")

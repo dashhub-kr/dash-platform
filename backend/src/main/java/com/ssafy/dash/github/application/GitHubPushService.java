@@ -51,6 +51,14 @@ public class GitHubPushService {
             JsonNode root = objectMapper.readTree(payload);
             
             // 이벤트 생성을 위한 정보 추출
+            JsonNode headCommit = root.path("head_commit");
+            String message = headCommit.path("message").asText("");
+            
+            if (!message.endsWith(" - DashHub")) {
+                log.info("Ignoring non-DashHub commit. DeliveryId: {}", deliveryId);
+                return;
+            }
+
             String repositoryName = root.path("repository").path("full_name").asText("unknown/unknown");
             List<PushFileMetadata> files = collectTargetFiles(root.path("commits"));
             

@@ -1,5 +1,7 @@
 package com.ssafy.dash.analytics.presentation;
 
+import com.ssafy.dash.common.ratelimit.RateLimit;
+
 import com.ssafy.dash.analytics.application.SolvedacSyncService;
 import com.ssafy.dash.analytics.application.dto.request.RegisterHandleRequest;
 import com.ssafy.dash.analytics.domain.UserClassStat;
@@ -34,6 +36,7 @@ public class SolvedacStatsController {
      * Solved.ac 핸들 등록 및 초기 데이터 동기화
      */
     @Operation(summary = "Solved.ac 핸들 등록", description = "사용자의 Solved.ac 핸들을 등록하고 통계 데이터를 동기화합니다")
+    @RateLimit(capacity = 5, refillTokens = 5, refillDurationSeconds = 60)
     @PostMapping
     public ResponseEntity<Map<String, String>> registerHandle(
             @PathVariable Long userId,
@@ -82,6 +85,7 @@ public class SolvedacStatsController {
      * 통계 재동기화
      */
     @Operation(summary = "통계 재동기화", description = "사용자의 Solved.ac 통계를 최신 데이터로 재동기화합니다")
+    @RateLimit(capacity = 3, refillTokens = 3, refillDurationSeconds = 60)
     @PostMapping("/sync")
     public ResponseEntity<Map<String, String>> resyncStats(@PathVariable Long userId) {
         syncService.resyncAllStats(userId);

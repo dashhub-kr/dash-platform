@@ -32,4 +32,9 @@
         WHERE user_id = #{userId}
     </update>
 
+
+    <delete id="deleteByUserId">
+        DELETE FROM learning_path_cache
+        WHERE user_id = #{userId}
+    </delete>
 </mapper>

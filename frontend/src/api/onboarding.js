@@ -17,4 +17,8 @@ export const onboardingApi = {
     registerSolvedac(handle, profileImageUrl) {
         return http.post('/onboarding/solvedac', { handle, profileImageUrl });
     },
+    // Raw register for Profile view (no image)
+    registerSolvedacRaw(handle) {
+        return http.post('/onboarding/solvedac', { handle });
+    },
 };

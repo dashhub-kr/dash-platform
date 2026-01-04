@@ -1,5 +1,7 @@
 # 7. System Architecture (시스템 아키텍처 및 참고 문서)
 
+> **참고**: [인증 및 보안 전략](./20260104_AUTH_AND_SECURITY.md), [API Rate Limiting](./RATE_LIMITING.md), [ADR: 인증 방식 의사결정](./DECISION_LOG_AUTH_STRATEGY.md)
+
 ## 7.1 시스템 아키텍처 다이어그램
 
 ```mermaid
