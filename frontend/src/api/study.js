@@ -39,8 +39,8 @@ export const studyApi = {
     approveApplication(applicationId) {
         return http.post(`/studies/applications/${applicationId}/approve`);
     },
-    rejectApplication(applicationId) {
-        return http.post(`/studies/applications/${applicationId}/reject`);
+    rejectApplication(applicationId, reason = '') {
+        return http.post(`/studies/applications/${applicationId}/reject`, { reason });
     },
     leaveStudy() {
         return http.post(`/studies/leave`);

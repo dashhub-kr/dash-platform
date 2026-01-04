@@ -229,26 +229,53 @@
                         </div>
                     </div>
                     
-                    <div class="mb-8">
-                         <div class="text-xs font-bold text-slate-400 uppercase mb-2">Message</div>
-                         <div class="bg-slate-50 p-4 rounded-2xl text-slate-700 font-medium leading-relaxed whitespace-pre-wrap max-h-60 overflow-y-auto custom-scrollbar">
-                             {{ selectedApp.message }}
-                         </div>
+                    <div v-if="!isRejecting">
+                         <div class="mb-8">
+                             <div class="text-xs font-bold text-slate-400 uppercase mb-2">Message</div>
+                             <div class="bg-slate-50 p-4 rounded-2xl text-slate-700 font-medium leading-relaxed whitespace-pre-wrap max-h-60 overflow-y-auto custom-scrollbar">
+                                 {{ selectedApp.message }}
+                             </div>
+                        </div>
+
+                        <div class="flex gap-3">
+                            <button 
+                                @click="handleApproveApp"
+                                class="flex-1 py-3.5 rounded-xl font-bold text-white bg-brand-500 hover:bg-brand-600 transition-colors shadow-lg shadow-brand-500/30"
+                            >
+                                승인
+                            </button>
+                            <button 
+                                @click="handleRejectClick"
+                                class="flex-1 py-3.5 rounded-xl font-bold text-rose-500 bg-rose-50 hover:bg-rose-100 transition-colors"
+                            >
+                                거절
+                            </button>
+                        </div>
                     </div>
 
-                    <div class="flex gap-3">
-                        <button 
-                            @click="handleRejectApp"
-                            class="flex-1 py-3.5 rounded-xl font-bold text-rose-500 bg-rose-50 hover:bg-rose-100 transition-colors"
-                        >
-                            거절
-                        </button>
-                        <button 
-                            @click="handleApproveApp"
-                            class="flex-1 py-3.5 rounded-xl font-bold text-white bg-brand-500 hover:bg-brand-600 transition-colors shadow-lg shadow-brand-500/30"
-                        >
-                            승인
-                        </button>
+                    <div v-else class="animate-fade-in">
+                        <div class="mb-6">
+                            <label class="text-xs font-bold text-slate-400 uppercase mb-2 block">거절 사유</label>
+                            <textarea
+                                v-model="rejectReason"
+                                class="w-full h-32 p-4 bg-slate-50 border-2 border-slate-100 rounded-xl focus:border-rose-500 focus:ring-0 transition-all font-medium text-slate-700 resize-none"
+                                placeholder="거절 사유를 입력해주세요 (선택사항)"
+                            ></textarea>
+                        </div>
+                        <div class="flex gap-3">
+                            <button 
+                                @click="handleCancelReject"
+                                class="flex-1 py-3.5 rounded-xl font-bold text-slate-500 hover:bg-slate-100 transition-colors"
+                            >
+                                취소
+                            </button>
+                            <button 
+                                @click="confirmReject"
+                                class="flex-1 py-3.5 rounded-xl font-bold text-white bg-rose-500 hover:bg-rose-600 transition-colors shadow-lg shadow-rose-500/30"
+                            >
+                                거절하기
+                            </button>
+                        </div>
                     </div>
                 </template>
                 
@@ -369,10 +396,15 @@ const showApplicationModal = ref(false);
 const selectedApp = ref(null);
 const loadingApp = ref(false);
 
+const isRejecting = ref(false);
+const rejectReason = ref('');
+
 const openApplicationModal = async (applicationId) => {
     showApplicationModal.value = true;
     loadingApp.value = true;
     selectedApp.value = null;
+    isRejecting.value = false;
+    rejectReason.value = '';
     try {
         const res = await studyApi.getApplication(applicationId);
         selectedApp.value = res.data;
@@ -411,11 +443,19 @@ const handleApproveApp = async () => {
     }
 };
 
-const handleRejectApp = async () => {
+const handleRejectClick = () => {
+    isRejecting.value = true;
+};
+
+const handleCancelReject = () => {
+    isRejecting.value = false;
+    rejectReason.value = '';
+};
+
+const confirmReject = async () => {
     if (!selectedApp.value) return;
-    if (!confirm("가입 신청을 거절하시겠습니까?")) return;
     try {
-        await studyApi.rejectApplication(selectedApp.value.id);
+        await studyApi.rejectApplication(selectedApp.value.id, rejectReason.value);
         alert("거절되었습니다.");
         
         // Find corresponding notification to update

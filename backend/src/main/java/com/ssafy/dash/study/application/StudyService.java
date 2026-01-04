@@ -148,7 +148,7 @@ public class StudyService {
     }
 
     @Transactional
-    public void rejectApplication(Long leaderId, Long applicationId) {
+    public void rejectApplication(Long leaderId, Long applicationId, String reason) {
         StudyApplication application = studyRepository.findApplicationById(applicationId)
                 .orElseThrow(() -> new IllegalArgumentException("Application not found"));
 
@@ -162,10 +162,15 @@ public class StudyService {
         // DB에서 삭제하여 재가입 가능하도록 함
         studyRepository.deleteApplication(applicationId);
 
+        String message = String.format("'%s' 스터디 가입 신청이 거절되었습니다.", study.getName());
+        if (reason != null && !reason.isBlank()) {
+            message += "\n사유: " + reason;
+        }
+
         // Notify Applicant
         notificationService.send(
                 application.getUserId(),
-                String.format("'%s' 스터디 가입 신청이 거절되었습니다.", study.getName()),
+                message,
                 "/",
                 NotificationType.STUDY_RESULT);
     }
