@@ -48,6 +48,16 @@ public class UserRepositoryImpl implements UserRepository {
     }
 
     @Override
+    public List<User> findUsersForAnonymization(java.time.LocalDateTime threshold) {
+        return userMapper.selectUsersForAnonymization(threshold);
+    }
+
+    @Override
+    public void anonymize(Long id) {
+        userMapper.anonymize(id);
+    }
+
+    @Override
     public List<User> findByStudyId(Long studyId) {
         return userMapper.selectByStudyId(studyId);
     }

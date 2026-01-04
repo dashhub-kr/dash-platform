@@ -123,7 +123,7 @@
                </button>
             </div>
             
-            <div class="bg-white/80 backdrop-blur-xl border border-white/60 rounded-3xl p-6 shadow-2xl overflow-hidden flex-1 relative">
+            <div class="bg-white/80 backdrop-blur-xl border border-white/60 rounded-3xl p-6 shadow-2xl overflow-hidden flex-1 min-h-0 relative">
                 <!-- Use existing StudyExplorer but customized if needed via props -->
                 <StudyExplorer :is-onboarding="true" @apply-success="onStudyJoined" />
             </div>

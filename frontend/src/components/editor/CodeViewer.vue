@@ -69,7 +69,8 @@
                       <div v-else
                            class="w-5 h-5 rounded-full bg-brand-100 border-2 border-white flex items-center justify-center text-[8px] font-bold text-brand-600 shadow-sm"
                            :title="comment.authorName">
-                        {{ comment.authorName?.charAt(0).toUpperCase() || 'U' }}
+                        <UserX v-if="comment.authorName === '탈퇴한 회원'" :size="12" />
+                        <span v-else>{{ comment.authorName?.charAt(0).toUpperCase() || 'U' }}</span>
                       </div>
                     </template>
                     <div v-if="filteredCommentsByLine[index + 1].length > 2" 
@@ -114,7 +115,8 @@
                          :src="comment.authorProfileImageUrl" 
                          class="w-5 h-5 rounded-full flex-shrink-0 border border-brand-200 object-cover" />
                     <div v-else class="w-5 h-5 rounded-full bg-brand-100 flex-shrink-0 flex items-center justify-center text-brand-600 text-[9px] font-bold border border-brand-200">
-                       {{ comment.authorName?.charAt(0).toUpperCase() || 'U' }}
+                       <UserX v-if="comment.authorName === '탈퇴한 회원'" :size="12" />
+                       <span v-else>{{ comment.authorName?.charAt(0).toUpperCase() || 'U' }}</span>
                     </div>
                     <div class="flex-1 min-w-0">
                        <div class="flex items-center gap-2">
@@ -185,7 +187,7 @@
 
 <script setup>
 import { ref, computed } from 'vue';
-import { Copy, MessageSquare } from 'lucide-vue-next';
+import { Copy, MessageSquare, UserX } from 'lucide-vue-next';
 import hljs from 'highlight.js';
 import 'highlight.js/styles/github.css';
 

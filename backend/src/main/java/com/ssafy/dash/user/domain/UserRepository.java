@@ -17,6 +17,10 @@ public interface UserRepository {
 
     boolean delete(Long id);
 
+    List<User> findUsersForAnonymization(java.time.LocalDateTime threshold);
+
+    void anonymize(Long id);
+
     List<User> findByStudyId(Long studyId);
 
 }

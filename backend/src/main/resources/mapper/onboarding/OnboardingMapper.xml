@@ -21,4 +21,8 @@
     WHERE id = #{id}
   </update>
 
+  <delete id="deleteByUserId" parameterType="long">
+    DELETE FROM user_repositories WHERE user_id = #{userId}
+  </delete>
+
 </mapper>

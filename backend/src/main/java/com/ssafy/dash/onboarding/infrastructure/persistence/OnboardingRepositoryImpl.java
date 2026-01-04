@@ -36,4 +36,9 @@ public class OnboardingRepositoryImpl implements OnboardingRepository {
         }
     }
 
+    @Override
+    public void deleteByUserId(Long userId) {
+        mapper.deleteByUserId(userId);
+    }
+
 }

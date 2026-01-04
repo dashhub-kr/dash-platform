@@ -20,16 +20,20 @@ import java.util.Collections;
 @EnableWebSecurity
 public class SecurityConfig {
 
-        private final CustomOAuth2UserService customOAuth2UserService;
+    private final CustomOAuth2UserService customOAuth2UserService;
+    private final com.ssafy.dash.common.ratelimit.GlobalRateLimitFilter globalRateLimitFilter;
 
-        public SecurityConfig(CustomOAuth2UserService customOAuth2UserService) {
-                this.customOAuth2UserService = customOAuth2UserService;
-        }
+    public SecurityConfig(CustomOAuth2UserService customOAuth2UserService,
+                          com.ssafy.dash.common.ratelimit.GlobalRateLimitFilter globalRateLimitFilter) {
+        this.customOAuth2UserService = customOAuth2UserService;
+        this.globalRateLimitFilter = globalRateLimitFilter;
+    }
 
-        @Bean
-        public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-                http
-                                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+    @Bean
+    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+        http
+                .addFilterBefore(globalRateLimitFilter, org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter.class)
+                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                                 .csrf(AbstractHttpConfigurer::disable)
                                 .authorizeHttpRequests(auth -> auth
                                                 .requestMatchers(

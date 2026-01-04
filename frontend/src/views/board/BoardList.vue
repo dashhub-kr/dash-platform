@@ -87,10 +87,11 @@
                   </h3>
                 </div>
                 <div class="col-span-2 text-center text-sm font-medium text-slate-600 flex items-center justify-center gap-2">
-                  <img v-if="post.authorProfileImageUrl" :src="post.authorProfileImageUrl" class="w-6 h-6 rounded-full border border-slate-200" />
+                  <UserX v-if="['Unknown User', 'Unknown'].includes(post.authorName)" :size="16" class="w-6 h-6 rounded-full border border-slate-200 bg-slate-50 p-1 text-slate-400" />
+                  <img v-else-if="post.authorProfileImageUrl" :src="post.authorProfileImageUrl" class="w-6 h-6 rounded-full border border-slate-200" />
                   <div class="flex flex-col items-start">
                     <span v-if="post.studyName" class="text-[10px] text-brand-500 font-bold">[{{ post.studyName }}]</span>
-                    <span>{{ post.authorName || '익명' }}</span>
+                    <span>{{ ['Unknown User', 'Unknown'].includes(post.authorName) ? '탈퇴한 회원' : post.authorName }}</span>
                   </div>
                 </div>
                 <div class="col-span-2 text-center text-sm text-slate-500 flex items-center justify-center gap-3">
@@ -143,9 +144,9 @@
                 </div>
                 <h3 class="font-bold text-slate-800 truncate mb-1">{{ post.title }}</h3>
                 <div class="flex items-center gap-2 text-xs text-slate-500">
-                  <img v-if="post.authorProfileImageUrl" :src="post.authorProfileImageUrl" class="w-5 h-5 rounded-full border border-orange-200" />
+                  <UserX v-if="['Unknown User', 'Unknown'].includes(post.authorName)" :size="14" class="w-5 h-5 rounded-full border border-orange-200 bg-orange-50 p-1 text-orange-400" />
                   <span v-if="post.studyName" class="text-brand-600 font-bold">[{{ post.studyName }}]</span>
-                  <span>{{ post.authorName }}</span>
+                  <span>{{ ['Unknown User', 'Unknown'].includes(post.authorName) ? '탈퇴한 회원' : post.authorName }}</span>
                 </div>
               </div>
             </div>
@@ -173,7 +174,7 @@
 <script setup>
 import { ref, computed, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
-import { PenSquare, Inbox, ThumbsUp, MessageCircle, Search, Flame, Lightbulb, Code2 } from 'lucide-vue-next';
+import { PenSquare, Inbox, ThumbsUp, MessageCircle, Search, Flame, Lightbulb, Code2, UserX } from 'lucide-vue-next';
 import { boardApi } from '@/api/board';
 
 const router = useRouter();

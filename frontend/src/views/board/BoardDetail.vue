@@ -25,10 +25,13 @@
               <img v-if="post.authorProfileImageUrl" 
                    :src="post.authorProfileImageUrl" 
                    class="w-8 h-8 rounded-full object-cover border border-brand-100" />
+              <UserX v-if="['탈퇴한 회원', 'Unknown', 'Unknown User', null, undefined].includes(post.authorName)" :size="20" class="w-8 h-8 rounded-full border border-brand-100 bg-brand-50 p-1.5 text-brand-400" />
               <div v-else class="w-8 h-8 rounded-full bg-brand-50 flex items-center justify-center text-brand-600 font-bold border border-brand-100">
                  {{ post.authorName?.charAt(0).toUpperCase() || 'U' }}
               </div>
-              <span class="text-slate-700 font-medium">{{ post.authorName || '익명' }}</span>
+              <span class="text-slate-700 font-medium">
+                {{ post.authorName && !['Unknown', 'Unknown User'].includes(post.authorName) ? post.authorName : '탈퇴한 회원' }}
+              </span>
             </div>
             <span class="w-1 h-1 rounded-full bg-slate-300"></span>
             <span>{{ formatDate(post.createdAt) }}</span>
@@ -128,10 +131,13 @@
                 <img v-if="comment.authorProfileImageUrl" 
                      :src="comment.authorProfileImageUrl" 
                      class="w-8 h-8 rounded-full object-cover shadow-sm border border-slate-100" />
+                <UserX v-if="['탈퇴한 회원', 'Unknown', 'Unknown User', null, undefined].includes(comment.authorName)" :size="20" class="w-8 h-8 rounded-full border border-slate-100 bg-white p-1.5 text-slate-400" />
                 <div v-else class="w-8 h-8 rounded-full bg-white shadow-sm border border-slate-100 flex items-center justify-center text-slate-500 font-bold text-sm">
                   {{ comment.authorName?.charAt(0).toUpperCase() || 'U' }}
                 </div>
-                <span class="font-medium text-slate-700">{{ comment.authorName }}</span>
+                <span class="font-medium text-slate-700">
+                    {{ comment.authorName && !['Unknown', 'Unknown User'].includes(comment.authorName) ? comment.authorName : '탈퇴한 회원' }}
+                </span>
                 <span class="text-xs text-slate-400">{{ formatDate(comment.createdAt) }}</span>
               </div>
               <button 
@@ -196,10 +202,13 @@
                   <img v-if="reply.authorProfileImageUrl" 
                        :src="reply.authorProfileImageUrl" 
                        class="w-6 h-6 rounded-full object-cover border border-slate-100" />
+                  <UserX v-if="['탈퇴한 회원', 'Unknown', 'Unknown User', null, undefined].includes(reply.authorName)" :size="16" class="w-6 h-6 rounded-full border border-slate-100 bg-slate-50 p-1 text-slate-400" />
                   <div v-else class="w-6 h-6 rounded-full bg-slate-50 border border-slate-100 flex items-center justify-center text-slate-400 font-bold text-[10px]">
                     {{ reply.authorName?.charAt(0).toUpperCase() || 'U' }}
                   </div>
-                  <span class="font-medium text-slate-700 text-sm">{{ reply.authorName }}</span>
+                  <span class="font-medium text-slate-700 text-sm">
+                    {{ reply.authorName && !['Unknown', 'Unknown User'].includes(reply.authorName) ? reply.authorName : '탈퇴한 회원' }}
+                  </span>
                   <span class="text-xs text-slate-400">{{ formatDate(reply.createdAt) }}</span>
                 </div>
                 
@@ -272,7 +281,7 @@
 <script setup>
 import { ref, onMounted, computed } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
-import { ArrowLeft, ThumbsUp, MessageCircle, Code2, Pencil, Trash2, X, Check } from 'lucide-vue-next';
+import { ArrowLeft, ThumbsUp, MessageCircle, Code2, Pencil, Trash2, X, Check, UserX } from 'lucide-vue-next';
 import { boardApi, commentApi } from '@/api/board';
 import { algorithmApi } from '@/api/algorithm';
 import { useAuth } from '@/composables/useAuth';
@@ -292,8 +301,7 @@ const algorithmRecord = ref(null);
 
 const isAuthor = computed(() => {
     if (!post.value || !user.value) return false;
-    return true; 
-    return true; 
+    return post.value.userId === user.value.id;
 });
 
 // 일반 댓글 (줄 번호 없음)
