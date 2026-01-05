@@ -78,18 +78,18 @@
 
             <!-- Tab: Search -->
             <div v-if="activeTab === 'search'" class="space-y-6">
-                <div class="relative">
-                    <Search :size="20" class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"/>
+                <div class="relative sticky top-2 z-10 bg-white/90 backdrop-blur-sm p-1 rounded-2xl shadow-sm">
+                    <Search :size="20" class="absolute left-6 top-1/2 -translate-y-1/2 text-slate-400" />
                     <input 
                         v-model="searchQuery" 
                         @keyup.enter="handleSearch"
                         type="text" 
                         placeholder="이메일 또는 닉네임으로 검색하세요" 
-                        class="w-full pl-12 pr-4 py-4 rounded-2xl border-2 border-slate-100 focus:border-brand-500 focus:ring-0 transition-all font-bold text-slate-700 bg-slate-50 focus:bg-white"
+                        class="w-full pl-14 pr-24 py-4 rounded-2xl border-2 border-slate-100 focus:border-brand-500 focus:ring-0 transition-all font-bold text-slate-700 bg-slate-50 focus:bg-white"
                     />
                     <button 
                         @click="handleSearch"
-                        class="absolute right-2 top-2 bottom-2 px-6 bg-brand-500 text-white rounded-xl font-bold hover:bg-brand-600 transition-colors"
+                        class="absolute right-3 top-2 bottom-2 px-6 bg-brand-500 text-white rounded-xl font-bold hover:bg-brand-600 transition-colors"
                     >
                         검색
                     </button>
