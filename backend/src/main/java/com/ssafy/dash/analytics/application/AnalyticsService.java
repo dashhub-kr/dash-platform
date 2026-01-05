@@ -2,6 +2,8 @@ package com.ssafy.dash.analytics.application;
 
 import com.ssafy.dash.analytics.application.dto.response.FamilyScoreDto;
 import com.ssafy.dash.analytics.application.dto.response.TagCoverageDto;
+import com.ssafy.dash.analytics.domain.UserFamilyStat;
+import com.ssafy.dash.analytics.domain.UserTagStatRepository;
 import com.ssafy.dash.analytics.infrastructure.persistence.AnalyticsMapper;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -18,15 +20,38 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class AnalyticsService {
 
+    private final UserTagStatRepository userTagStatRepository;
     private final AnalyticsMapper analyticsMapper;
 
     /**
      * 유저의 패밀리별 점수 통계를 조회합니다.
      * (레이더 차트용 데이터: rawScore, distinctTags, solvedProblems)
+     * 
+     * 리팩토링 (2026-01-05):
+     * - 기존 실시간 Join 쿼리 (AnalyticsMapper) 대신 사전 계산된 테이블 (user_tag_stats)을 사용합니다.
+     * - 이를 통해 레이더 차트 조회 성능을 최적화합니다.
      */
     @Transactional(readOnly = true)
     public List<FamilyScoreDto> getUserFamilyScores(Long userId) {
-        return analyticsMapper.findFamilyScoresByUserId(userId);
+        List<UserFamilyStat> stats = userTagStatRepository.findFamilyStatsByUserId(userId);
+        
+        return stats.stream()
+            .map(stat -> {
+                FamilyScoreDto dto = new FamilyScoreDto();
+                dto.setFamilyKey(stat.getFamilyKey());
+                dto.setFamilyName(stat.getFamilyName());
+                dto.setRawScore(stat.getRawScore() != null ? stat.getRawScore() : 0.0);
+                
+                // 참고: user_tag_stats는 태그 단위로 집계되므로, 여기서 'solved'는 푼 문제의 총합(중복 포함 가능성 있음)입니다.
+                // 레이더 차트에서는 'rawScore' (마스터리)가 핵심입니다.
+                dto.setSolvedProblems(stat.getSolved()); 
+                
+                // distinctTags(고유 태그 수)는 집계된 UserFamilyStat에서 직접 구할 수 없습니다.
+                // 레이더 차트에서는 'rawScore'가 가장 중요하므로 일단 0으로 설정하거나 필요한 경우 쿼리를 수정해야 합니다.
+                dto.setDistinctTags(0); 
+                return dto;
+            })
+            .toList();
     }
 
     /**

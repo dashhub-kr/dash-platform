@@ -27,7 +27,8 @@
             CAST(SUM(uts.total) AS UNSIGNED) as total,
             CAST(SUM(uts.solved) AS UNSIGNED) as solved,
             CAST(SUM(uts.partial) AS UNSIGNED) as partial,
-            CAST(SUM(uts.tried) AS UNSIGNED) as tried
+            CAST(SUM(uts.tried) AS UNSIGNED) as tried,
+            SUM(uts.solved * t.weight) as rawScore
         FROM user_tag_stats uts
         JOIN tags t ON uts.tag_key = t.tag_key
         JOIN tag_families tf ON t.family_id = tf.id

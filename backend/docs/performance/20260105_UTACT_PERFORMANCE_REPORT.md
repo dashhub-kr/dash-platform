@@ -1,7 +1,7 @@
 # 성능 최적화 통합 보고서 (Performance Optimization Report)
 **작성자**: utact
 **작성일**: 2026-01-05
-**버전**: 1.0
+**버전**: 1.1 (Architecture Decision Added)
 
 ---
 
@@ -51,6 +51,20 @@
 -   **메모리 효율**: 대시보드 조회 시 불필요한 엔티티 로딩 제거.
 -   **코드 단순화**: 복잡한 스트림 집계 로직을 SQL로 위임하여 유지보수성 향상.
 
-### 3.3. 향후 계획
--   운영 환경 모니터링을 통해 실제 부하 상황에서의 안정성 검증.
--   분석 서비스의 복잡한 조인 쿼리 지속 모니터링 (필요 시 캐싱 도입).
+---
+
+## 4. 아키텍처 의사결정 (Architecture Decision)
+
+### 4.1. Analytics 캐싱 전략
+-   **현황**: `AnalyticsService`가 실시간 Heavy Join (`algorithm_records` -> `tags`) 수행. `user_tag_stats` (Solved.ac 동기화 데이터) 테이블 존재.
+-   **결정**: **Long-term Optimization** 채택.
+    -   실시간 쿼리 대신 **Pre-calculated Table (`user_tag_stats`)** 을 사용하여 조회 성능 극대화.
+    -   데이터 정합성은 `SolvedacSyncService`를 통해 관리.
+
+### 4.2. NoSQL 도입 여부
+-   **Opinion**: **RDBMS 유지**.
+-   **근거**:
+    1.  **MySQL 8.0 JSON 지원**: AI 분석 결과 등 비정형 데이터 처리에 충분한 성능 제공.
+    2.  **트랜잭션 일관성**: 문제 풀이와 점수 갱신의 원자성(Atomicity) 보장이 중요. 분산 트랜잭션 불필요.
+    3.  **운영 효율성**: 단일 데이터베이스로 관리 복잡도 최소화.
+
