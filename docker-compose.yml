@@ -59,6 +59,17 @@ services:
     command: --interval 30 --cleanup
     networks:
       - dash-network
+
+  cloudflare-ddns:
+    image: favonia/cloudflare-ddns:latest
+    container_name: dash-ddns
+    restart: always
+    environment:
+      - CF_API_TOKEN=${CF_API_TOKEN}
+      - DOMAINS=${DOMAINS}
+      - PROXIED=true
+    networks:
+      - dash-network
   
   frontend:
     image: ghcr.io/${GITHUB_REPOSITORY}/frontend:latest
