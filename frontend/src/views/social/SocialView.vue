@@ -41,7 +41,7 @@
                             </div>
                         </div>
                         <div class="mt-4 flex gap-2">
-                             <button @click="openDM(item.friend.id, item.friend.username)" class="flex-1 py-2 bg-brand-500 text-white rounded-xl text-sm font-bold hover:bg-brand-600 transition-colors flex items-center justify-center gap-2">
+                             <button @click="openDM(item.friend.id, item.friend.username, item.friend.avatarUrl)" class="flex-1 py-2 bg-brand-500 text-white rounded-xl text-sm font-bold hover:bg-brand-600 transition-colors flex items-center justify-center gap-2">
                                 <MessageCircle :size="16"/> 쪽지
                              </button>
                              <button @click="deleteFriend(item.friend.id)" class="px-3 py-2 bg-slate-200 text-slate-500 rounded-xl hover:bg-rose-100 hover:text-rose-500 transition-colors">
@@ -100,7 +100,7 @@
                      <div v-if="searchResults.length === 0" class="text-center py-10 text-slate-400">
                         검색 결과가 없습니다.
                      </div>
-                     <div v-else class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div v-else class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div v-for="user in searchResults" :key="user.id" class="flex items-center justify-between p-4 rounded-2xl border border-slate-100 hover:bg-slate-50 transition-colors">
                             <div class="flex items-center gap-3">
                                 <img :src="user.avatarUrl || '/images/profiles/default-profile.png'" class="w-10 h-10 rounded-full border border-slate-200 bg-white object-cover"/>
@@ -109,8 +109,19 @@
                                     <div class="text-xs text-slate-400">{{ user.email }}</div>
                                 </div>
                             </div>
+                            <div v-if="user.friendshipStatus === 'ACCEPTED'" class="px-3 py-1.5 bg-slate-100 text-slate-400 text-xs font-bold rounded-lg flex items-center gap-1 cursor-default">
+                                <Users :size="14"/> 친구
+                            </div>
+                            <button
+                                v-else-if="user.friendshipStatus === 'PENDING' || user.requested"
+                                disabled
+                                class="px-3 py-1.5 bg-slate-200 text-slate-500 text-xs font-bold rounded-lg cursor-not-allowed flex items-center gap-1"
+                            >
+                                <CheckCircle2 :size="14"/> 요청됨
+                            </button>
                             <button 
-                                @click="sendRequest(user.id)" 
+                                v-else
+                                @click="sendRequest(user)" 
                                 class="px-3 py-1.5 bg-slate-900 text-white text-xs font-bold rounded-lg hover:bg-brand-600 transition-colors flex items-center gap-1"
                             >
                                 <UserPlus :size="14"/> 친구 신청
@@ -127,6 +138,7 @@
             v-if="showDMModal" 
             :partner-id="dmPartnerId" 
             :partner-name="dmPartnerName"
+            :partner-avatar="dmPartnerAvatar"
             @close="showDMModal = false"
         />
 
@@ -137,7 +149,7 @@
 import { ref, watch, onMounted } from 'vue';
 import { useRoute } from 'vue-router';
 import { socialApi } from '@/api/social';
-import { Loader2, Users, Bell, Search, UserPlus, MessageCircle, UserMinus } from 'lucide-vue-next';
+import { Loader2, Users, Bell, Search, UserPlus, MessageCircle, UserMinus, CheckCircle2 } from 'lucide-vue-next';
 import DirectMessageModal from '@/components/social/DirectMessageModal.vue';
 
 const route = useRoute();
@@ -161,6 +173,7 @@ const searchResults = ref(null);
 const showDMModal = ref(false);
 const dmPartnerId = ref(null);
 const dmPartnerName = ref('');
+const dmPartnerAvatar = ref('');
 
 const loadData = async () => {
     loading.value = true;
@@ -195,10 +208,15 @@ const handleSearch = async () => {
     }
 };
 
-const sendRequest = async (userId) => {
+const isMyFriend = (userId) => {
+    return friends.value.some(f => f.friend.id === userId);
+};
+
+const sendRequest = async (user) => {
     if (!confirm('친구 신청을 보내시겠습니까?')) return;
     try {
-        await socialApi.sendFriendRequest(userId);
+        await socialApi.sendFriendRequest(user.id);
+        user.requested = true;
         alert('친구 신청을 보냈습니다.');
     } catch(e) {
         alert(e.response?.data?.message || '실패했습니다.');
@@ -234,9 +252,10 @@ const deleteFriend = async (friendId) => {
     }
 };
 
-const openDM = (id, name) => {
+const openDM = (id, name, avatar) => {
     dmPartnerId.value = id;
     dmPartnerName.value = name;
+    dmPartnerAvatar.value = avatar;
     showDMModal.value = true;
 };
 
@@ -252,6 +271,7 @@ watch(() => route.query.partnerId, (val) => {
         // 로드된 친구 목록에서 이름 찾기 시도
         const friend = friends.value.find(f => f.friend.id === parseInt(val));
         dmPartnerName.value = friend ? friend.friend.username : 'Friend'; 
+        dmPartnerAvatar.value = friend ? friend.friend.avatarUrl : '';
         showDMModal.value = true;
     }
 }, { immediate: true });

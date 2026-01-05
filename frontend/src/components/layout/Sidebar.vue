@@ -545,12 +545,23 @@ const handleNotificationClick = async (notification) => {
       return;
   }
   
+  if (notification.type === 'FRIEND_REQUEST') {
+      notificationsOpen.value = false;
+      router.push('/social?tab=requests');
+      return;
+  }
+
   notificationsOpen.value = false;
   
   if (notification.type === 'STUDY_RESULT') {
       try {
           await refresh(); // 스터디 정보 업데이트 (가입 승인 시 user.studyId 갱신)
       } catch (e) { console.error('세션 갱신 실패', e); }
+  }
+
+  if (notification.type === 'FRIEND_ACCEPTED') {
+      router.push('/social?tab=friends');
+      return;
   }
 
   if (notification.url) {

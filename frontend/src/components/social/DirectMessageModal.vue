@@ -6,9 +6,11 @@
             <!-- Header -->
             <div class="px-6 py-4 bg-slate-50 border-b border-slate-100 flex items-center justify-between shrink-0">
                 <div class="flex items-center gap-3">
-                    <div class="w-10 h-10 rounded-full bg-brand-100 flex items-center justify-center text-brand-600 font-bold text-lg">
-                        {{ partnerName.substring(0,1) }}
-                    </div>
+                    <img 
+                        :src="partnerAvatar || '/images/profiles/default-profile.png'" 
+                        class="w-10 h-10 rounded-full border border-brand-100 object-cover bg-white"
+                        :alt="partnerName"
+                    />
                     <div>
                         <h3 class="font-bold text-slate-800">{{ partnerName }}</h3>
                         <p class="text-xs text-brand-500 font-bold">Online</p>
@@ -71,7 +73,8 @@ import { X, Send, Loader2 } from 'lucide-vue-next';
 
 const props = defineProps({
     partnerId: Number,
-    partnerName: String
+    partnerName: String,
+    partnerAvatar: String
 });
 
 const emit = defineEmits(['close']);

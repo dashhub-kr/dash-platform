@@ -23,7 +23,8 @@ public record UserResult(
         Boolean isStudyLeader,
         String studyType,
         String role,
-        String pendingStudyName) {
+        String pendingStudyName,
+        String friendshipStatus) {
 
     public static UserResult from(User user) {
         return from(user, null, null, null);
@@ -37,7 +38,8 @@ public record UserResult(
         return from(user, onboarding, study, null);
     }
 
-    public static UserResult from(User user, com.ssafy.dash.onboarding.domain.Onboarding onboarding, Study study, String pendingStudyName) {
+    public static UserResult from(User user, com.ssafy.dash.onboarding.domain.Onboarding onboarding, Study study,
+            String pendingStudyName) {
         String repoName = onboarding != null ? onboarding.getRepositoryName() : null;
         Boolean webhook = onboarding != null ? onboarding.isWebhookConfigured() : null;
         Boolean isLeader = study != null && study.getCreatorId() != null && study.getCreatorId().equals(user.getId());
@@ -60,7 +62,30 @@ public record UserResult(
                 isLeader,
                 type,
                 user.getRole(),
-                pendingStudyName);
+                pendingStudyName,
+                null);
+    }
+
+    public static UserResult from(User user, String friendshipStatus) {
+        return new UserResult(
+                user.getId(),
+                user.getUsername(),
+                user.getEmail(),
+                user.getCreatedAt(),
+                user.getProvider(),
+                user.getProviderId(),
+                user.getAvatarUrl(),
+                user.getStudyId(),
+                user.getSolvedacHandle(),
+                user.getSolvedacTier(),
+                user.getSolvedCount(),
+                null,
+                null,
+                null,
+                null,
+                user.getRole(),
+                null,
+                friendshipStatus);
     }
 
 }

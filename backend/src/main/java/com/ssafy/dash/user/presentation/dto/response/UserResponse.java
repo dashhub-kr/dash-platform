@@ -21,7 +21,8 @@ public record UserResponse(
         Boolean isStudyLeader,
         String studyType,
         String role,
-        String pendingStudyName) {
+        String pendingStudyName,
+        String friendshipStatus) {
 
     public static UserResponse from(UserResult result) {
         return new UserResponse(
@@ -41,7 +42,8 @@ public record UserResponse(
                 result.isStudyLeader(),
                 result.studyType(),
                 result.role(),
-                result.pendingStudyName());
+                result.pendingStudyName(),
+                result.friendshipStatus());
     }
 
 }

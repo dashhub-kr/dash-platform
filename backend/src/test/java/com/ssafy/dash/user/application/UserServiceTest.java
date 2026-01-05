@@ -30,6 +30,12 @@ class UserServiceTest {
     @Mock
     private UserRepository userRepository;
 
+    @Mock
+    private com.ssafy.dash.onboarding.domain.OnboardingRepository onboardingRepository;
+
+    @Mock
+    private com.ssafy.dash.study.domain.StudyRepository studyRepository;
+
     @InjectMocks
     private UserService userService;
 
@@ -112,16 +118,13 @@ class UserServiceTest {
         assertThatThrownBy(() -> userService.delete(TestFixtures.TEST_USER_ID))
                 .isInstanceOf(UserNotFoundException.class);
     }
-    
-    @Mock
-    private com.ssafy.dash.onboarding.domain.OnboardingRepository onboardingRepository;
 
     @Test
     @DisplayName("ID로 조회 시 온보딩 정보가 있으면 함께 반환한다")
     void findByIdReturnsResultWithOnboarding() {
         User user = TestFixtures.createUser();
         com.ssafy.dash.onboarding.domain.Onboarding onboarding = TestFixtures.createOnboarding(user.getId(), true);
-        
+
         given(userRepository.findById(user.getId())).willReturn(Optional.of(user));
         given(onboardingRepository.findByUserId(user.getId())).willReturn(Optional.of(onboarding));
 
@@ -131,5 +134,5 @@ class UserServiceTest {
         assertThat(result.repositoryName()).isEqualTo(onboarding.getRepositoryName());
         assertThat(result.webhookConfigured()).isTrue();
     }
-    
+
 }
