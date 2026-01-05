@@ -31,7 +31,7 @@ public class NotificationService {
 
     @Transactional(readOnly = true)
     public List<NotificationResult> getNotifications(Long receiverId) {
-        return notificationRepository.findByReceiverIdOrderByCreatedAtDesc(receiverId).stream()
+        return notificationRepository.findTop50ByReceiverIdOrderByCreatedAtDesc(receiverId).stream()
                 .map(NotificationResult::from)
                 .collect(Collectors.toList());
     }

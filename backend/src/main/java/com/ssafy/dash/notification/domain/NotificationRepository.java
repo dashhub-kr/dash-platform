@@ -12,6 +12,8 @@ public interface NotificationRepository {
 
     List<Notification> findByReceiverIdOrderByCreatedAtDesc(Long receiverId);
 
+    List<Notification> findTop50ByReceiverIdOrderByCreatedAtDesc(Long receiverId);
+
     void markAllAsRead(Long receiverId);
 
     void deleteReadBefore(java.time.LocalDateTime before);

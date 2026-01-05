@@ -16,6 +16,14 @@
         WHERE receiver_id = #{receiverId}
         ORDER BY created_at DESC
     </select>
+
+    <select id="findTop50ByReceiverIdOrderByCreatedAtDesc" resultType="com.ssafy.dash.notification.domain.Notification">
+        SELECT *
+        FROM notification
+        WHERE receiver_id = #{receiverId}
+        ORDER BY created_at DESC
+        LIMIT 50
+    </select>
     
     <insert id="save" parameterType="com.ssafy.dash.notification.domain.Notification" useGeneratedKeys="true" keyProperty="id">
         INSERT INTO notification (receiver_id, content, url, related_id, type, is_read, created_at)
