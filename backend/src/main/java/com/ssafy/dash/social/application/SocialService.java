@@ -67,7 +67,7 @@ public class SocialService {
                 friendship.getRequesterId(),
                 receiver.getUsername() + "님이 친구 신청을 수락했습니다.",
                 "/social/friends",
-                NotificationType.FRIEND_REQUEST,
+                NotificationType.FRIEND_ACCEPTED,
                 friendship.getId());
     }
 

@@ -10,5 +10,6 @@ public enum NotificationType {
     MISSION_COMPLETED,
     SYSTEM,
     FRIEND_REQUEST,
+    FRIEND_ACCEPTED,
     DIRECT_MESSAGE
 }

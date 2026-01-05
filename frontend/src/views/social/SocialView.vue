@@ -260,24 +260,50 @@ const openDM = (id, name, avatar) => {
 };
 
 // 라우트 쿼리 핸들러 (예: 알림 클릭 시)
+const checkQueryForDM = async () => {
+    const pid = route.query.partnerId;
+    if (pid) {
+        const partnerId = parseInt(pid);
+        dmPartnerId.value = partnerId;
+        
+        // 1. 친구 목록에서 찾아보기
+        const friend = friends.value.find(f => f.friend.id === partnerId);
+        if (friend) {
+            dmPartnerName.value = friend.friend.username;
+            dmPartnerAvatar.value = friend.friend.avatarUrl;
+            showDMModal.value = true;
+        } else {
+            // 2. 없으면 검색 API 등을 통해 사용자 정보 가져오기 
+            try {
+                if (!loading.value) { 
+                     showDMModal.value = true;
+                     if (!dmPartnerName.value) dmPartnerName.value = 'Friend';
+                }
+            } catch (e) {
+                console.error(e);
+            }
+        }
+    }
+};
+
+// 라우트 쿼리 핸들러
 watch(() => route.query.tab, (val) => {
     if (val) activeTab.value = val;
 }, { immediate: true });
 
-watch(() => route.query.partnerId, (val) => {
+watch(() => route.query.partnerId, async (val) => {
     if (val) {
-        // 친구 목록에서 이름을 찾거나 사용자 정보를 가져옴 (간소화: ID로 열기)
-        dmPartnerId.value = parseInt(val);
-        // 로드된 친구 목록에서 이름 찾기 시도
-        const friend = friends.value.find(f => f.friend.id === parseInt(val));
-        dmPartnerName.value = friend ? friend.friend.username : 'Friend'; 
-        dmPartnerAvatar.value = friend ? friend.friend.avatarUrl : '';
-        showDMModal.value = true;
+        // 데이터가 없으면 로드를 기다림
+        if (friends.value.length === 0 && !loading.value) {
+            await loadData();
+        }
+        checkQueryForDM();
     }
 }, { immediate: true });
 
-onMounted(() => {
-    loadData();
+onMounted(async () => {
+    await loadData();
+    checkQueryForDM(); 
 });
 
 watch(activeTab, () => {
