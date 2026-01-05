@@ -23,7 +23,6 @@
   <update id="update" parameterType="User">
     UPDATE users
     SET username = #{username}, email = #{email}, role = #{role}, status = #{status}, provider = #{provider}, 
-        provider_id = #{providerId}, avatar_url = #{avatarUrl}, study_id = #{studyId}, 
         provider_id = #{providerId}, avatar_url = #{avatarUrl}, study_id = #{studyId},
         solvedac_handle = #{solvedacHandle}, solvedac_tier = #{solvedacTier},
         solvedac_rating = #{solvedacRating}, solvedac_class = #{solvedacClass},

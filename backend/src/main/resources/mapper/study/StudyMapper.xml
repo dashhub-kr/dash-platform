@@ -3,8 +3,8 @@
 <mapper namespace="com.ssafy.dash.study.infrastructure.mapper.StudyMapper">
 
   <insert id="save" parameterType="Study" useGeneratedKeys="true" keyProperty="id">
-    INSERT INTO studies (name, creator_id, created_at, acorn_count, visibility, description, streak, study_type)
-    VALUES (#{name}, #{creatorId}, #{createdAt}, #{acornCount}, #{visibility}, #{description}, #{streak}, #{studyType})
+    INSERT INTO studies (name, creator_id, created_at, acorn_count, visibility, description, streak, active_mission_title, active_mission_progress, study_type)
+    VALUES (#{name}, #{creatorId}, #{createdAt}, #{acornCount}, #{visibility}, #{description}, #{streak}, #{activeMissionTitle}, #{activeMissionProgress}, #{studyType})
   </insert>
 
   <select id="findById" resultType="Study" parameterType="long">
@@ -73,7 +73,9 @@
 
   <update id="update" parameterType="Study">
     UPDATE studies SET name = #{name}, acorn_count = #{acornCount}, 
-    visibility = #{visibility}, description = #{description}, streak = #{streak}, study_type = #{studyType}
+    visibility = #{visibility}, description = #{description}, streak = #{streak}, 
+    active_mission_title = #{activeMissionTitle}, active_mission_progress = #{activeMissionProgress},
+    study_type = #{studyType}
     WHERE id = #{id}
   </update>
 
