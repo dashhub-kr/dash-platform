@@ -207,9 +207,10 @@ public class GitHubPushEventWorker {
                 now);
 
         LocalDateTime committedAt = metadataExtractor.parseCommittedAt(file.committedAt());
-        if (committedAt != null) {
-            committedAt = committedAt.plusHours(9);
-        }
+        // Docker 타임존이 Asia/Seoul로 설정되어 있으므로 수동 오프셋이 필요하지 않음
+        // if (committedAt != null) {
+        //     committedAt = committedAt.plusHours(9);
+        // }
 
         record.enrichMetadata(
                 metadata.platform(),
@@ -222,7 +223,7 @@ public class GitHubPushEventWorker {
                 file.commitMessage(),
                 committedAt);
 
-        // --- Tagging Logic ---
+        // --- 태그 로직 ---
         String problemIdStr = metadata.problemNumber();
         Integer problemId = null;
         try {
@@ -233,16 +234,16 @@ public class GitHubPushEventWorker {
         String tag = "GENERAL";
 
         if (problemId != null) {
-            // 1. Mission Check
+            // 1. 미션 체크
             if (user.getStudyId() != null
                     && studyMissionService.isActiveMissionProblem(user.getStudyId(), problemId, now)) {
                 tag = "MISSION";
             }
-            // 2. Mock Exam Check
+            // 2. 모의고사 체크
             else if (mockExamService.isActiveProblem(userId, problemId)) {
                 tag = "MOCK_EXAM";
             }
-            // 3. Random Defense Check (Check defenseProblemId)
+            // 3. 랜덤 디펜스 체크 (defenseProblemId 확인)
             else if (user.getDefenseType() != null && user.getDefenseProblemId() != null
                     && user.getDefenseProblemId().equals(problemId)) {
                 tag = "DEFENSE";
@@ -264,7 +265,7 @@ public class GitHubPushEventWorker {
             mockExamService.verifyExam(userId, problemId);
         }
 
-        // Acorn Accumulation Logic
+        // 도토리 적립 로직
         if (record.getStudyId() != null
                 && metadata.runtimeMs() != null && metadata.runtimeMs() > 0
                 && metadata.memoryKb() != null && metadata.memoryKb() > 0) {
