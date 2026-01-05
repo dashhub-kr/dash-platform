@@ -560,6 +560,16 @@ const handleNotificationClick = async (notification) => {
 
   notificationsOpen.value = false;
   
+  if (notification.type === 'DIRECT_MESSAGE') {
+      notificationsOpen.value = false;
+      if (notification.relatedId) {
+          router.push(`/social?tab=friends&partnerId=${notification.relatedId}`);
+      } else if (notification.url) {
+          router.push(notification.url.replace('/social/messages', '/social').replace('?partnerId=', '?tab=friends&partnerId='));
+      }
+      return;
+  }
+  
   if (notification.type === 'STUDY_RESULT') {
       try {
           await refresh(); // 스터디 정보 업데이트 (가입 승인 시 user.studyId 갱신)
