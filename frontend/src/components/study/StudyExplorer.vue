@@ -125,7 +125,12 @@
 
              <!-- 하단 버튼 -->
              <div class="mt-auto relative z-10">
-                <div v-if="user?.studyId === study.id" 
+                <button v-if="isAdmin" 
+                        @click.stop="observeStudy(study.id)"
+                        class="w-full py-3 bg-slate-800 text-white font-bold rounded-xl hover:bg-slate-700 transition-colors flex items-center justify-center gap-2">
+                   <Eye :size="18" /> 관전하기
+                </button>
+                <div v-else-if="userData?.studyId === study.id" 
                      class="w-full py-3 bg-brand-50 text-brand-600 font-bold rounded-xl text-center border border-brand-100 flex items-center justify-center gap-2">
                      <span class="w-2 h-2 rounded-full bg-brand-500 animate-pulse"></span>
                      참여 중
@@ -217,7 +222,12 @@
              <!-- 하단 버튼 -->
              <div class="mt-auto relative z-10">
                 <!-- 내 스터디 -->
-                <div v-if="user?.studyId === study.id" 
+                <button v-if="isAdmin" 
+                        @click.stop="observeStudy(study.id)"
+                        class="w-full py-3 bg-slate-800 text-white font-bold rounded-xl hover:bg-slate-700 transition-colors flex items-center justify-center gap-2">
+                   <Eye :size="18" /> 관전하기
+                </button>
+                <div v-else-if="user?.studyId === study.id" 
                      class="w-full py-3 bg-brand-50 text-brand-600 font-bold rounded-xl text-center border border-brand-100 flex items-center justify-center gap-2">
                      <span class="w-2 h-2 rounded-full bg-brand-500 animate-pulse"></span>
                      참여 중
@@ -371,9 +381,10 @@
 
 <script setup>
 import { ref, onMounted, computed, defineProps, defineEmits } from 'vue';
+import { useRouter } from 'vue-router';
 import axios from 'axios';
 import { useAuth } from '@/composables/useAuth';
-import { Trophy, Flame, Users, Search, Activity, ArrowRight, Send, Sparkles, Compass, AlertCircle, Plus } from 'lucide-vue-next';
+import { Trophy, Flame, Users, Search, Activity, ArrowRight, Send, Sparkles, Compass, AlertCircle, Plus, Eye } from 'lucide-vue-next';
 import { studyApi } from '@/api/study';
 
 const props = defineProps({
@@ -386,6 +397,7 @@ const props = defineProps({
 const emit = defineEmits(['apply-success']);
 
 const { user } = useAuth();
+const router = useRouter();
 const loading = ref(true);
 const studies = ref([]);
 const showModal = ref(false);
@@ -398,6 +410,14 @@ const searchKeyword = ref('');
 const searchError = ref('');
 
 const pendingApp = ref(null);
+
+const isAdmin = computed(() => {
+    return user.value?.role === 'ROLE_ADMIN' || user.value?.role === 'ADMIN'; 
+});
+
+const observeStudy = (studyId) => {
+    router.push(`/admin/study/${studyId}/dashboard`);
+};
 
 // Create Study Modal State
 const showCreateModal = ref(false);

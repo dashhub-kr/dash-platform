@@ -38,6 +38,11 @@ public class NotificationRepositoryImpl implements NotificationRepository {
     }
 
     @Override
+    public List<Notification> findTop50ByReceiverIdOrderByCreatedAtDesc(Long receiverId) {
+        return mapper.findTop50ByReceiverIdOrderByCreatedAtDesc(receiverId);
+    }
+
+    @Override
     public void markAllAsRead(Long receiverId) {
         mapper.markAllAsRead(receiverId);
     }

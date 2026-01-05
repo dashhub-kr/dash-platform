@@ -479,6 +479,10 @@ const exitObservation = () => {
     router.push('/study/ranking');
 };
 
+const goToPlayground = () => {
+    router.push('/playground');
+};
+
 // 히트맵 툴팁 상태
 const heatmapTooltip = ref({
     visible: false,
