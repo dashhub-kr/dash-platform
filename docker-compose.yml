@@ -87,7 +87,6 @@ services:
 volumes:
   mysql_data:
 
-
 networks:
   dash-network:
     driver: bridge
