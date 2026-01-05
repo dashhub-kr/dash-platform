@@ -63,9 +63,17 @@
         
         <!-- 문제 번호 (동적 추가 방식) -->
         <div>
-          <label class="block text-xs font-bold text-slate-500 mb-2 uppercase tracking-wider">
-              {{ creationMode === 'EDIT' ? '📝 문제 번호 수정' : '📝 추가할 문제 번호' }}
-          </label>
+          <div class="flex items-center justify-between mb-2">
+              <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider">
+                  {{ creationMode === 'EDIT' ? '📝 문제 번호 수정' : '📝 추가할 문제 번호' }}
+                  <span class="ml-1 text-brand-600 font-black tracking-normal normal-case opacity-80">(백준 온라인 저지 기준)</span>
+              </label>
+              
+              <router-link to="/study/analysis" @click="closeModal" class="text-[11px] font-bold text-slate-400 hover:text-brand-600 flex items-center gap-1 transition-colors">
+                  <span class="bg-indigo-50 text-indigo-600 px-1.5 py-0.5 rounded ml-1">TIP</span>
+                  어떤 문제를 낼지 고민되시나요?
+              </router-link>
+          </div>
           
           <div class="space-y-3">
              <div v-for="(input, index) in problemInputs" :key="index" class="flex gap-2 animate-in fade-in slide-in-from-left-2 duration-200">
@@ -75,8 +83,8 @@
                    </div>
                    <input v-model="input.value" type="text"
                           :readonly="!!initialProblemIds"
-                          class="w-full pl-8 pr-4 py-3 bg-slate-50 border-2 border-slate-200 rounded-xl focus:ring-2 focus:ring-brand-500 focus:border-brand-500 transition-all read-only:bg-slate-100 read-only:text-slate-500"
-                          placeholder="문제 번호 입력 (예: 1000)"
+                          class="w-full pl-8 pr-4 py-3 bg-slate-50 border-2 border-slate-200 rounded-xl focus:ring-2 focus:ring-brand-500 focus:border-brand-500 transition-all read-only:bg-slate-100 read-only:text-slate-500 placeholder:text-slate-400"
+                          placeholder="백준 문제 번호를 입력하세요 (예: 1000)"
                           @keydown.enter.prevent="addProblemInput" />
                 </div>
                 
