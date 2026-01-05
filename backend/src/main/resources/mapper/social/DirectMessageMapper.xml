@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.ssafy.dash.social.domain.DirectMessageRepository">
+<mapper namespace="com.ssafy.dash.social.infrastructure.mapper.DirectMessageMapper">
 
     <insert id="save" parameterType="com.ssafy.dash.social.domain.DirectMessage" useGeneratedKeys="true" keyProperty="id">
         INSERT INTO direct_messages (sender_id, receiver_id, content, is_read, created_at)
