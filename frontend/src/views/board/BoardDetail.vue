@@ -310,7 +310,7 @@ const algorithmRecord = ref(null);
 
 const isAuthor = computed(() => {
     if (!post.value || !user.value) return false;
-    return post.value.userId === user.value.id;
+    return post.value.userId === user.value.id || isAdmin.value;
 });
 
 // 일반 댓글 (줄 번호 없음)

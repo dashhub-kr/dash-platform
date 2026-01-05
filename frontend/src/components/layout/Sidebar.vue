@@ -363,7 +363,14 @@ const navGroups = computed(() => {
       { label: '게시판', path: '/boards', icon: MessageSquare, color: 'bg-violet-500' },
       { label: '소셜', path: '/social', icon: Users, color: 'bg-pink-500' },
     ]
-  }
+  },
+  ...(user.value?.role === 'ROLE_ADMIN' ? [{
+    title: '관리자',
+    items: [
+       { label: '대시보드', path: '/admin', icon: Shield, color: 'bg-slate-900' },
+       { label: '스터디 관전', path: '/study/ranking', icon: UserCircle, color: 'bg-slate-700' }
+    ]
+  }] : [])
 ]});
 
 const navItems = computed(() => navGroups.value.flatMap(g => g.items));

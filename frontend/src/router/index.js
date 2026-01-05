@@ -146,6 +146,12 @@ const routes = [
     component: () => import("../views/social/SocialView.vue"),
     meta: { requiresAuth: true }
   },
+  {
+    path: "/admin",
+    name: "AdminView",
+    component: () => import("../views/admin/AdminView.vue"),
+    meta: { requiresAuth: true, requiresAdmin: true }
+  },
 ];
 
 const router = createRouter({
@@ -193,6 +199,12 @@ router.beforeEach(async (to, from, next) => {
   // Prevent re-entry to Onboarding
   if (to.path === '/onboarding') {
     return next(user.value.studyId ? '/dashboard' : '/training/roadmap');
+  }
+
+  // Admin Check
+  if (to.meta.requiresAdmin && user.value.role !== 'ROLE_ADMIN') {
+      alert("관리자 권한이 필요합니다.");
+      return next('/');
   }
 
   // Check Study Membership for specific routes
