@@ -17,9 +17,10 @@ public class UserFamilyStat {
     private Integer solved; // 푼 문제 수
     private Integer partial;
     private Integer tried;
+    private Double rawScore; // 가중치 점수 (solved * weight)
 
     public static UserFamilyStat create(String familyKey, String familyName, Integer total, Integer solved,
-            Integer partial, Integer tried) {
+            Integer partial, Integer tried, Double rawScore) {
         UserFamilyStat stat = new UserFamilyStat();
         stat.familyKey = familyKey;
         stat.familyName = familyName;
@@ -27,6 +28,7 @@ public class UserFamilyStat {
         stat.solved = solved;
         stat.partial = partial;
         stat.tried = tried;
+        stat.rawScore = rawScore;
         return stat;
     }
 

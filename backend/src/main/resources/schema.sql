@@ -111,7 +111,9 @@ CREATE TABLE IF NOT EXISTS algorithm_records (
     elapsed_time_seconds BIGINT NULL COMMENT '풀이 시간 (초), DEFENSE/MOCK_EXAM 태그일 때 사용',
     FOREIGN KEY (user_id) REFERENCES users(id),
     INDEX idx_algorithm_records_record_type (record_type),
-    INDEX idx_algorithm_records_tag (tag)
+    INDEX idx_algorithm_records_tag (tag),
+    INDEX idx_algorithm_records_study_committed (study_id, committed_at),
+    INDEX idx_algorithm_records_user_committed (user_id, committed_at)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 
@@ -232,7 +234,8 @@ CREATE TABLE IF NOT EXISTS problem_tags (
     tag_key VARCHAR(50) NOT NULL,
     FOREIGN KEY (problem_number) REFERENCES problems(problem_number) ON DELETE CASCADE,
     FOREIGN KEY (tag_key) REFERENCES tags(tag_key),
-    UNIQUE KEY uk_problem_tag (problem_number, tag_key)
+    UNIQUE KEY uk_problem_tag (problem_number, tag_key),
+    INDEX idx_problem_tags_tag (tag_key)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 
@@ -422,7 +425,8 @@ CREATE TABLE IF NOT EXISTS study_mission_submissions (
     FOREIGN KEY (mission_id) REFERENCES study_missions(id) ON DELETE CASCADE,
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
     UNIQUE KEY uk_mission_user_problem (mission_id, user_id, problem_id),
-    INDEX idx_mission_submissions_user (mission_id, user_id)
+    INDEX idx_mission_submissions_user (mission_id, user_id),
+    INDEX idx_mission_submissions_mission (mission_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 

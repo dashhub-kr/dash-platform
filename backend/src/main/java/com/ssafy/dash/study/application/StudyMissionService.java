@@ -278,37 +278,65 @@ public class StudyMissionService {
     }
 
     /**
-     * 스터디의 미션 목록 조회
-     */
-    /**
-     * 스터디의 미션 목록 조회
-     */
-    /**
      * 스터디의 미션 목록 조회 (algorithm_records와 자동 동기화)
+     * 최적화: N+1 쿼리를 방지하기 위해 배치 페칭(Batch Fetching) 적용.
      */
     public List<MissionWithProgressResult> getMissions(Long studyId, Long requestUserId) {
         List<StudyMission> missions = missionRepository.findByStudyIdOrderByWeekDesc(studyId);
+        if (missions.isEmpty()) {
+            return new ArrayList<>();
+        }
+
         List<User> members = userRepository.findByStudyId(studyId);
+        List<Long> missionIds = missions.stream().map(StudyMission::getId).collect(java.util.stream.Collectors.toList());
+
+        // 모든 제출 내역을 한 번에 가져오기 (Batch Fetch)
+        List<StudyMissionSubmission> allSubmissions = submissionRepository.findByMissionIds(missionIds);
+        
+        // MissionID -> UserID -> List<Submission> (또는 Map<ProblemId, Submission>) 형태로 그룹화
+        // Map<MissionId, Map<UserId, List<Submission>>>
+        java.util.Map<Long, java.util.Map<Long, List<StudyMissionSubmission>>> submissionMap = allSubmissions.stream()
+                .collect(java.util.stream.Collectors.groupingBy(
+                        StudyMissionSubmission::getMissionId,
+                        java.util.stream.Collectors.groupingBy(StudyMissionSubmission::getUserId)
+                ));
+
         List<MissionWithProgressResult> result = new ArrayList<>();
 
         for (StudyMission mission : missions) {
             List<Integer> problemIds = parseProblems(mission.getProblemIds());
             int totalProblems = problemIds.size();
+            
+            // 현재 미션에 대한 제출 내역 가져오기
+            java.util.Map<Long, List<StudyMissionSubmission>> missionSubmissions = submissionMap.getOrDefault(mission.getId(), new java.util.HashMap<>());
 
-            // 조회 시점에 algorithm_records와 동기화 (누락된 완료 상태 업데이트)
+            // algorithm_records와 동기화 (누락된 완료 상태 업데이트)
             syncSubmissionsWithRecords(mission.getId(), members, problemIds);
 
-            // Calculate progress for requesting user (legacy field support if needed)
-            int solvedCount = submissionRepository.countCompletedByMissionIdAndUserId(mission.getId(), requestUserId);
 
-            // Calculate progress for ALL members
+
+
+            List<StudyMissionSubmission> mySubmissions = missionSubmissions.getOrDefault(requestUserId, new ArrayList<>());
+            int solvedCount = (int) mySubmissions.stream().filter(s -> Boolean.TRUE.equals(s.getCompleted())).count();
+
+            // 모든 멤버의 진행률 계산
             List<MemberProgressResult> memberProgressList = new ArrayList<>();
             for (User member : members) {
-                int memberCompleted = submissionRepository.countCompletedByMissionIdAndUserId(mission.getId(),
-                        member.getId());
-                List<Integer> solvedProblemIds = submissionRepository.findCompletedProblemIds(mission.getId(),
-                        member.getId());
-                List<Integer> sosProblemIds = submissionRepository.findSosProblemIds(mission.getId(), member.getId());
+
+
+                List<StudyMissionSubmission> userSubmissions = missionSubmissions.getOrDefault(member.getId(), new ArrayList<>());
+                
+                int memberCompleted = (int) userSubmissions.stream().filter(s -> Boolean.TRUE.equals(s.getCompleted())).count();
+                
+                List<Integer> solvedProblemIds = userSubmissions.stream()
+                        .filter(s -> Boolean.TRUE.equals(s.getCompleted()))
+                        .map(StudyMissionSubmission::getProblemId)
+                        .collect(java.util.stream.Collectors.toList());
+                        
+                List<Integer> sosProblemIds = userSubmissions.stream()
+                        .filter(s -> Boolean.TRUE.equals(s.getIsSos()))
+                        .map(StudyMissionSubmission::getProblemId)
+                        .collect(java.util.stream.Collectors.toList());
 
                 memberProgressList.add(new MemberProgressResult(
                         member.getId(),
@@ -321,26 +349,9 @@ public class StudyMissionService {
                         sosProblemIds));
             }
 
-            // 미션 완료 여부 판단 (DB 상태 우선, 그 외엔 전원 완료 or 데드라인)
-            // 전원 완료 체크 로직은 기존 유지
-            // Note: 모든 멤버 완료 여부는 memberProgressList의 allCompleted 필드로 FE에서 확인 가능
-
-            // Status가 null이면 IN_PROGRESS로 취급
             MissionStatus status = mission.getStatus();
             if (status == null)
                 status = MissionStatus.IN_PROGRESS;
-
-            // 자동 완료 조건: 모든 멤버가 다 풀었거나(Optional), 데드라인이 지났으면서 모두 풀었나?
-            // 일단 DB status를 그대로 반환하고, FE에서 처리하거나, 여기서 자동 완료 처리 로직을 넣을 수도 있음.
-            // 요구사항: "모든 팀원이 다 풀었거나 or 스터디장이 강제 완료 했거나"
-            // 여기서는 보여주기용 Status를 계산해서 DTO에 담을지, DB값을 그대로 줄지 결정.
-            // -> DB 값을 그대로 주고, 계산된 '완료 여부'도 같이 주자.
-
-            // 만약 DB상으론 진행중인데 모든 멤버가 다 풀었다면? -> 자동으로 완료 상태로 간주 (시스템적 완료)
-            // 하지만 DB 업데이트는 하지 않고 API 응답에서만 처리할 수도 있고, checkAndMarkCompleted 등에서 업데이트 해줄 수도
-            // 있음.
-            // 여기서는 일단 DB 상태값을 그대로 반환. (FE에서 status == COMPLETED || allMembersCompleted 로직
-            // 처리)
 
             result.add(new MissionWithProgressResult(
                     mission.getId(),
@@ -481,15 +492,13 @@ public class StudyMissionService {
         }
 
         if (allMembersCompleted) {
-            // Check if already notified or completed?
-            // Ideally we should check if it WAS NOT completed before.
-            // But checking current status is enough if we only update status once.
+
             if (mission.getStatus() != MissionStatus.COMPLETED) {
                 // Update status
                 mission.setStatus(MissionStatus.COMPLETED);
                 missionRepository.update(mission);
 
-                // Notify everyone
+                // 전체 알림 전송
                 for (User member : members) {
                     notificationService.send(
                             member.getId(),
@@ -513,7 +522,7 @@ public class StudyMissionService {
 
                 StudyMissionSubmission submission = StudyMissionSubmission.create(missionId, member.getId(), problemId);
 
-                // Check if already solved
+                // 이미 해결했는지 확인
                 if (algorithmRecordRepository.existsSuccessfulSubmission(member.getId(), String.valueOf(problemId))) {
                     submission.markCompleted();
                 }
@@ -530,9 +539,8 @@ public class StudyMissionService {
     public boolean isActiveMissionProblem(Long studyId, Integer problemId, java.time.LocalDateTime now) {
         List<StudyMission> missions = missionRepository.findByStudyId(studyId);
         for (StudyMission mission : missions) {
-            // Check deadline (assuming mission is active if before deadline or within same
-            // week? Logic: Deadline is date.)
-            // Logic: If now is before deadline + 1 day (end of deadline day).
+            // 마감일 확인 (마감일 이전이거나 같은 주 내라면 활성 상태로 가정? 로직: 마감일은 날짜임.)
+            // 로직: 현재 시각이 마감일 + 1일(마감일의 끝) 이전인 경우.
             if (mission.getDeadline() != null && now.toLocalDate().isAfter(mission.getDeadline())) {
                 continue;
             }

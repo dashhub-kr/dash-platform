@@ -53,4 +53,12 @@
     WHERE mission_id = #{missionId} AND user_id = #{userId} AND is_sos = true
   </select>
 
+  <select id="selectByMissionIds" resultType="StudyMissionSubmission">
+    SELECT * FROM study_mission_submissions
+    WHERE mission_id IN
+    <foreach item="id" collection="missionIds" open="(" separator="," close=")">
+      #{id}
+    </foreach>
+  </select>
+
 </mapper>

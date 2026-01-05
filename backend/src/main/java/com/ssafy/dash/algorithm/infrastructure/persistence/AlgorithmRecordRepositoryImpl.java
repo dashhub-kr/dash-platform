@@ -86,4 +86,14 @@ public class AlgorithmRecordRepositoryImpl implements AlgorithmRecordRepository 
     public void migrateUserRecords(Long userId, Long oldStudyId, Long newStudyId) {
         mapper.migrateUserRecords(userId, oldStudyId, newStudyId);
     }
+
+    @Override
+    public List<com.ssafy.dash.dashboard.application.dto.response.HeatmapRawData> findHeatmapDataByStudyId(Long studyId) {
+        return mapper.selectHeatmapDataByStudyId(studyId);
+    }
+
+    @Override
+    public List<com.ssafy.dash.dashboard.application.dto.response.HeatmapRawData> findHeatmapDataByUserId(Long userId) {
+        return mapper.selectHeatmapDataByUserId(userId);
+    }
 }

@@ -50,4 +50,6 @@ public interface StudyMissionSubmissionMapper {
         List<Integer> selectSosProblemIds(
                         @Param("missionId") Long missionId,
                         @Param("userId") Long userId);
+
+        List<StudyMissionSubmission> selectByMissionIds(@Param("missionIds") List<Long> missionIds);
 }

@@ -26,4 +26,6 @@ public interface StudyMissionSubmissionRepository {
     void updateSosStatus(Long missionId, Long userId, Integer problemId, boolean isSos);
 
     List<Integer> findSosProblemIds(Long missionId, Long userId);
+
+    List<StudyMissionSubmission> findByMissionIds(List<Long> missionIds);
 }

@@ -65,4 +65,9 @@ public class StudyMissionSubmissionRepositoryImpl implements StudyMissionSubmiss
     public List<Integer> findSosProblemIds(Long missionId, Long userId) {
         return mapper.selectSosProblemIds(missionId, userId);
     }
+
+    @Override
+    public List<StudyMissionSubmission> findByMissionIds(List<Long> missionIds) {
+        return mapper.selectByMissionIds(missionIds);
+    }
 }

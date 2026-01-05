@@ -31,4 +31,8 @@ public interface AlgorithmRecordRepository {
     void migrateStudyId(Long oldStudyId, Long newStudyId);
 
     void migrateUserRecords(Long userId, Long oldStudyId, Long newStudyId);
+
+    List<com.ssafy.dash.dashboard.application.dto.response.HeatmapRawData> findHeatmapDataByStudyId(Long studyId);
+
+    List<com.ssafy.dash.dashboard.application.dto.response.HeatmapRawData> findHeatmapDataByUserId(Long userId);
 }

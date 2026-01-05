@@ -9,7 +9,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -47,46 +46,39 @@ public class DashboardService {
 
     @Transactional(readOnly = true)
     public List<HeatmapItem> getHeatmap(Long userId, Long studyId) {
-        List<AlgorithmRecord> records;
+        List<com.ssafy.dash.dashboard.application.dto.response.HeatmapRawData> rawData;
         if (studyId != null) {
-            records = algorithmRecordRepository.findByStudyId(studyId);
+            rawData = algorithmRecordRepository.findHeatmapDataByStudyId(studyId);
         } else {
-            records = algorithmRecordRepository.findByUserId(userId);
+            rawData = algorithmRecordRepository.findHeatmapDataByUserId(userId);
         }
 
-        // Get user info map for avatarUrl
-        Map<Long, User> userMap = new HashMap<>();
-        records.stream()
-                .map(AlgorithmRecord::getUserId)
-                .distinct()
-                .forEach(uid -> userRepository.findById(uid).ifPresent(u -> userMap.put(uid, u)));
-
-        // Group by Date (YYYY-MM-DD)
-        Map<String, List<AlgorithmRecord>> groupedByDate = records.stream()
-                .collect(Collectors.groupingBy(record -> record.getCommittedAt().toLocalDate().toString()));
+        // 날짜별 그룹화
+        Map<String, List<com.ssafy.dash.dashboard.application.dto.response.HeatmapRawData>> groupedByDate = rawData.stream()
+                .collect(Collectors.groupingBy(com.ssafy.dash.dashboard.application.dto.response.HeatmapRawData::getDate));
 
         return groupedByDate.entrySet().stream()
                 .map(entry -> {
                     String date = entry.getKey();
-                    List<AlgorithmRecord> dailyRecords = entry.getValue();
-                    Long count = (long) dailyRecords.size();
+                    List<com.ssafy.dash.dashboard.application.dto.response.HeatmapRawData> dailyLogs = entry.getValue();
+                    
+                    // 해당 날짜의 총 제출 수 계산
+                    long totalCount = dailyLogs.stream()
+                            .mapToLong(com.ssafy.dash.dashboard.application.dto.response.HeatmapRawData::getDailyCount)
+                            .sum();
 
-                    // Group by userId and count submissions per user
-                    List<HeatmapItem.ContributorInfo> contributors = dailyRecords.stream()
-                            .collect(Collectors.groupingBy(AlgorithmRecord::getUserId, Collectors.counting()))
-                            .entrySet().stream()
-                            .map(e -> {
-                                Long uid = e.getKey();
-                                Long submitCount = e.getValue();
-                                User user = userMap.get(uid);
-                                String username = user != null ? user.getUsername() : "Unknown";
-                                String avatarUrl = user != null ? user.getAvatarUrl() : null;
-                                return HeatmapItem.ContributorInfo.of(uid, username, avatarUrl, submitCount);
-                            })
-                            .sorted((a, b) -> Long.compare(b.getCount(), a.getCount())) // Sort by count desc
+                    // 기여자 정보 매핑
+                    List<HeatmapItem.ContributorInfo> contributors = dailyLogs.stream()
+                            .map(log -> HeatmapItem.ContributorInfo.of(
+                                    log.getUserId(),
+                                    log.getUsername(),
+                                    log.getAvatarUrl(),
+                                    log.getDailyCount()
+                            ))
+                            .sorted((a, b) -> Long.compare(b.getCount(), a.getCount()))
                             .collect(Collectors.toList());
 
-                    return HeatmapItem.of(date, count, contributors);
+                    return HeatmapItem.of(date, totalCount, contributors);
                 })
                 .sorted((a, b) -> a.getDate().compareTo(b.getDate()))
                 .collect(Collectors.toList());

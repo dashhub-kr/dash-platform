@@ -121,4 +121,32 @@
     WHERE user_id = #{userId} AND study_id = #{oldStudyId}
   </update>
 
+  <select id="selectHeatmapDataByStudyId" resultType="com.ssafy.dash.dashboard.application.dto.response.HeatmapRawData">
+    SELECT
+      DATE_FORMAT(r.committed_at, '%Y-%m-%d') as date,
+      u.id as userId,
+      u.username,
+      u.avatar_url as avatarUrl,
+      COUNT(*) as dailyCount
+    FROM algorithm_records r
+    JOIN users u ON r.user_id = u.id
+    WHERE r.study_id = #{studyId} AND r.record_type = 'USER_SOLUTION'
+    GROUP BY DATE_FORMAT(r.committed_at, '%Y-%m-%d'), u.id
+    ORDER BY date ASC
+  </select>
+
+  <select id="selectHeatmapDataByUserId" resultType="com.ssafy.dash.dashboard.application.dto.response.HeatmapRawData">
+    SELECT
+      DATE_FORMAT(r.committed_at, '%Y-%m-%d') as date,
+      u.id as userId,
+      u.username,
+      u.avatar_url as avatarUrl,
+      COUNT(*) as dailyCount
+    FROM algorithm_records r
+    JOIN users u ON r.user_id = u.id
+    WHERE r.user_id = #{userId} AND r.record_type = 'USER_SOLUTION'
+    GROUP BY DATE_FORMAT(r.committed_at, '%Y-%m-%d'), u.id
+    ORDER BY date ASC
+  </select>
+
 </mapper>
