@@ -310,31 +310,19 @@ public class StudyMissionService {
             // 현재 미션에 대한 제출 내역 가져오기
             java.util.Map<Long, List<StudyMissionSubmission>> missionSubmissions = submissionMap.getOrDefault(mission.getId(), new java.util.HashMap<>());
 
-            // 조회 시점에 algorithm_records와 동기화 (누락된 완료 상태 업데이트)
-            // 주의: 동기화 로직은 무겁습니다. 이상적으로는 비동기 또는 요청 시 수행되어야 합니다.
-            // 현재는 여기에 유지하지만, 'existsSuccessfulSubmission'에 대해 여전히 N+1 쿼리를 발생시킵니다.
-            // 최적화: 필요하다면 알고리즘 기록도 배치로 가져올 수 있으나, 'syncSubmissionsWithRecords' 로직이 복잡합니다.
-            // syncSubmissionsWithRecords는 "보정" 로직이므로 당장은 변경하지 않습니다. 이상적으로는 최적화되어야 합니다.
-            // 하지만 일반적인 경우는 이미 동기화되어 있습니다. 
+            // algorithm_records와 동기화 (누락된 완료 상태 업데이트)
             syncSubmissionsWithRecords(mission.getId(), members, problemIds);
 
-            // 동기화 후 새 제출 내역이 추가되었을 수 있으므로 다시 가져와야 할까요?
-            // DB에 반영되므로 'allSubmissions' 리스트는 만약 동기화로 인해 행이 추가되었다면 오래된 데이터입니다.
-            // 하지만: 빈번한 동기화는 드뭅니다. 읽을 때는 'missionSubmissions'에 의존하고, 동기화는 백그라운드에서 일어납니다.
-            // 사실 동기화 후 정확한 데이터를 표시하려면 인메모리 맵을 업데이트하거나 다시 읽어야 합니다.
-            // 동기화 최적화는 미룹니다. 주요 병목은 'countCompletedBy...' 호출이었습니다.
 
-            // 요청한 사용자의 진행률 계산
-            // 인메모리 방식으로 대체됨:
+
+
             List<StudyMissionSubmission> mySubmissions = missionSubmissions.getOrDefault(requestUserId, new ArrayList<>());
             int solvedCount = (int) mySubmissions.stream().filter(s -> Boolean.TRUE.equals(s.getCompleted())).count();
 
             // 모든 멤버의 진행률 계산
             List<MemberProgressResult> memberProgressList = new ArrayList<>();
             for (User member : members) {
-                // int memberCompleted = submissionRepository.countCompletedByMissionIdAndUserId(mission.getId(), member.getId());
-                // List<Integer> solvedProblemIds = submissionRepository.findCompletedProblemIds(mission.getId(), member.getId());
-                // List<Integer> sosProblemIds = submissionRepository.findSosProblemIds(mission.getId(), member.getId());
+
 
                 List<StudyMissionSubmission> userSubmissions = missionSubmissions.getOrDefault(member.getId(), new ArrayList<>());
                 
@@ -504,9 +492,7 @@ public class StudyMissionService {
         }
 
         if (allMembersCompleted) {
-            // 이미 알림을 보냈거나 완료되었는지 확인?
-            // 이상적으로는 이전에 완료되지 않았었는지 확인해야 합니다.
-            // 하지만 상태를 한 번만 업데이트한다면 현재 상태 확인으로 충분합니다.
+
             if (mission.getStatus() != MissionStatus.COMPLETED) {
                 // Update status
                 mission.setStatus(MissionStatus.COMPLETED);
