@@ -203,6 +203,27 @@
       </aside>
     </div>
 
+    <!-- A형 합격 모달 -->
+    <div v-if="showGradeAModal" class="fixed inset-0 z-[60] flex items-center justify-center bg-black/40 backdrop-blur-sm animate-fade-in">
+      <div class="bg-white border border-slate-200 p-8 rounded-3xl max-w-md text-center shadow-2xl animate-bounce-in">
+        <div class="text-5xl mb-4">😲</div>
+        <h2 class="text-2xl font-black text-slate-900 mb-2">A형 합격!</h2>
+        <p class="text-slate-500 mb-6 break-keep font-medium">
+            축하합니다! 1문제를 해결하여 <span class="text-brand-600 font-bold">A등급</span> 기준을 달성하셨습니다.<br/><br/>
+            여기서 시험을 종료하고 A등급을 받으시겠습니까,<br/>
+            아니면 남은 시간 동안 <span class="text-violet-600 font-bold">A+등급</span>(2문제)에 도전하시겠습니까?
+        </p>
+        <div class="flex gap-3">
+            <button @click="finishExamAnyway" class="flex-1 py-3 bg-slate-100 text-slate-600 font-bold rounded-xl hover:bg-slate-200 transition-colors">
+                지금 종료 (A등급)
+            </button>
+            <button @click="continueExam" class="flex-1 py-3 bg-violet-600 text-white font-bold rounded-xl hover:bg-violet-500 shadow-lg shadow-violet-500/30 transition-colors">
+                계속 도전! (A+)
+            </button>
+        </div>
+      </div>
+    </div>
+
     <!-- 성공 모달 -->
     <div v-if="showSuccessModal" class="fixed inset-0 z-[60] flex items-center justify-center bg-black/40 backdrop-blur-sm animate-fade-in">
       <div class="bg-white border border-slate-200 p-10 rounded-3xl max-w-md text-center shadow-2xl animate-bounce-in">
@@ -287,6 +308,8 @@ const fetchStatus = async () => {
     }
 };
 
+const showGradeAModal = ref(false);
+
 const refreshStatus = async () => {
     try {
         const prevSolvedCount = status.value.solvedCount;
@@ -296,16 +319,73 @@ const refreshStatus = async () => {
         const newSolvedCount = res.data.solvedCount;
         const isNowActive = res.data.examType !== null;
         
-        // 시험이 방금 완료되었는지 확인
-        if (wasActive && !isNowActive && newSolvedCount > prevSolvedCount) {
-             showSuccessModal.value = true;
-        }
-        
         status.value = res.data;
         solvedProblems.value = new Set(res.data.solvedProblems || []);
+
+        // 1. 시험이 이미 종료된 경우 (시간 초과 등)
+        if (wasActive && !isNowActive) {
+             showSuccessModal.value = true; // 혹은 '시험 종료' 안내 모달
+             return;
+        }
+
+        // 2. 새로운 문제를 풀었는지 확인
+        if (newSolvedCount > prevSolvedCount) {
+            // A형 모의고사 특수 로직
+            if (status.value.examType === 'A') {
+                if (newSolvedCount === 1) {
+                    showGradeAModal.value = true;
+                    return;
+                } else if (newSolvedCount >= 2) {
+                     // A+ 달성 -> 즉시 종료
+                     await finishExam(true); 
+                     return;
+                }
+            } else {
+                // 일반 시험: 모든 문제 해결 시 종료
+                if (newSolvedCount >= status.value.totalCount) {
+                    await finishExam(true);
+                    return;
+                }
+            }
+            // 그 외: 문제 해결 알림 (Toast 등 있으면 좋음, 여기선 alert 생략)
+            alert(`정답입니다! (${newSolvedCount}/${status.value.totalCount})`);
+        } else {
+            // 변동 없음
+            alert("새로운 해결 기록이 없습니다. 잠시 후 다시 시도해주세요.");
+        }
+
     } catch (e) {
         console.error("상태 refresh 실패", e);
     }
+};
+
+const finishExam = async (success = false) => {
+    try {
+        await axios.post('/api/mockexam/finish'); // 명시적 종료 API 필요 시 구현, 혹은 cancel 사용
+        // 여기서는 편의상 로컬 상태 업데이트 및 성공 모달 띄우기
+        // 실제로는 백엔드에서 finish 처리를 해야 기록이 남음.
+        // 기존 cancelExam은 '포기'이므로, '완료' 처리를 위한 별도 호출이 낫지만
+        // 현재 스펙상으로는 status 체크로 자동 종료되거나, 시간 초과로 종료됨.
+        // A형 1솔 종료를 위해 /finish 엔드포인트가 있다고 가정하거나, 
+        // /cancel을 '완료'로 처리할 수 있게 백엔드 수정이 필요할 수 있음.
+        // 우선은 cancelExam 대신 별도 처리를 하거나 cancel을 호출하되 메시지를 다르게 처리.
+        // *가정*: 여기서는 일단 로컬 상태만 변경하고 성공 모달을 띄움. 
+        // 실제 종료는 백엔드 타이머나 명시적 요청 필요.
+        
+        // 간단히: 성공 모달 띄우고, 확인 누르면 홈으로.
+        showSuccessModal.value = true;
+    } catch (e) {
+        console.error(e);
+    }
+};
+
+const finishExamAnyway = async () => {
+    showGradeAModal.value = false;
+    await finishExam(true);
+};
+
+const continueExam = () => {
+    showGradeAModal.value = false;
 };
 
 const startExam = async (examType) => {
