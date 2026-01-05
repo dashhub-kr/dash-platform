@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/social")
+@RequestMapping("/api/social")
 @RequiredArgsConstructor
 public class SocialController {
 
@@ -26,7 +26,8 @@ public class SocialController {
     }
 
     @GetMapping("/friends/requests")
-    public ResponseEntity<List<FriendResult>> getFriendRequests(@AuthenticationPrincipal CustomOAuth2User userPrincipal) {
+    public ResponseEntity<List<FriendResult>> getFriendRequests(
+            @AuthenticationPrincipal CustomOAuth2User userPrincipal) {
         return ResponseEntity.ok(socialService.getReceivedRequests(userPrincipal.getUserId()));
     }
 
@@ -46,7 +47,7 @@ public class SocialController {
         socialService.acceptFriendRequest(userPrincipal.getUserId(), requestId);
         return ResponseEntity.ok().build();
     }
-    
+
     @PostMapping("/friends/reject/{requestId}")
     public ResponseEntity<Void> rejectFriendRequest(
             @AuthenticationPrincipal CustomOAuth2User userPrincipal,
