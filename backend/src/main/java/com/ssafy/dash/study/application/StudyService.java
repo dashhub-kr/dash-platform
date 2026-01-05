@@ -31,6 +31,34 @@ public class StudyService {
     private final NotificationService notificationService;
 
     @Transactional(readOnly = true)
+    public List<Study> getStudies(Long userId, String keyword) {
+        // 1. 모든 스터디 조회 (또는 검색)
+        List<Study> studies = (keyword != null && !keyword.isBlank())
+                ? studyRepository.searchByKeyword(keyword)
+                : studyRepository.findAll();
+
+        // 2. 로그인하지 않은 유저라면 전체 목록 반환
+        if (userId == null) {
+            return studies;
+        }
+
+        // 3. 유저 정보 조회
+        User user = userRepository.findById(userId).orElse(null);
+        if (user == null) {
+            return studies;
+        }
+
+        // 4. 유저가 소속된 스터디가 있다면 목록에서 제외
+        if (user.getStudyId() != null) {
+            return studies.stream()
+                    .filter(study -> !study.getId().equals(user.getStudyId()))
+                    .toList();
+        }
+
+        return studies;
+    }
+
+    @Transactional(readOnly = true)
     public List<Study> findAll() {
         return studyRepository.findAll();
     }

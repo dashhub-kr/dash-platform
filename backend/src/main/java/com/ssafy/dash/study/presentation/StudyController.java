@@ -45,10 +45,16 @@ public class StudyController {
     @Operation(summary = "스터디 목록 조회", description = "참여 가능한 스터디 목록을 조회합니다. 평균 티어, 멤버 수, 총 풀이 수 포함. keyword로 이름 검색 가능.")
     @GetMapping
     public ResponseEntity<List<StudyListResponse>> getStudies(
+            @Parameter(hidden = true) @AuthenticationPrincipal OAuth2User principal,
             @RequestParam(required = false) String keyword) {
-        List<Study> studies = (keyword != null && !keyword.isBlank())
-                ? studyService.searchByKeyword(keyword)
-                : studyService.findAll();
+        
+        Long userId = null;
+        if (principal instanceof CustomOAuth2User customUser) {
+            userId = customUser.getUserId();
+        }
+
+        List<Study> studies = studyService.getStudies(userId, keyword);
+        
         List<StudyListResponse> response = studies.stream()
                 .map(StudyListResponse::from)
                 .toList();

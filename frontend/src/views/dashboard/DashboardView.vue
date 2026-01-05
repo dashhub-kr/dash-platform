@@ -860,7 +860,7 @@ onMounted(async () => {
   try {
       // 1. 사용자 기록 가져오기
       try {
-          const recordsRes = await dashboardApi.getRecords();
+          const recordsRes = await dashboardApi.getRecords(currentStudyId.value);
           records.value = recordsRes.data;
       } catch(e) {
           console.error('Records Load Error:', e);

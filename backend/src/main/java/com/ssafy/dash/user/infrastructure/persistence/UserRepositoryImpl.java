@@ -33,6 +33,11 @@ public class UserRepositoryImpl implements UserRepository {
     }
 
     @Override
+    public List<User> searchByKeyword(String keyword) {
+        return userMapper.selectByKeyword(keyword);
+    }
+
+    @Override
     public Optional<User> findByProviderAndProviderId(String provider, String providerId) {
         return Optional.ofNullable(userMapper.selectByProviderAndProviderId(provider, providerId));
     }

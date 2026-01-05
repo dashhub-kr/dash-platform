@@ -11,6 +11,8 @@ public interface UserRepository {
 
     List<User> findAll();
 
+    List<User> searchByKeyword(String keyword);
+
     Optional<User> findByProviderAndProviderId(String provider, String providerId);
 
     void update(User user);

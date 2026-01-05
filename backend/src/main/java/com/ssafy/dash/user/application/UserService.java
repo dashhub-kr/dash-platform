@@ -71,6 +71,13 @@ public class UserService {
                 .collect(Collectors.toList());
     }
 
+    @Transactional(readOnly = true)
+    public List<UserResult> searchByKeyword(String keyword) {
+        return userRepository.searchByKeyword(keyword).stream()
+                .map(UserResult::from)
+                .collect(Collectors.toList());
+    }
+
     @Transactional
     public UserResult update(Long id, UserUpdateCommand command) {
         User u = userRepository.findById(id)
