@@ -49,6 +49,16 @@ services:
       - "8000:8000"
     networks:
       - dash-network
+
+  watchtower:
+    image: containrrr/watchtower
+    container_name: dash-watchtower
+    restart: always
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    command: --interval 30 --cleanup
+    networks:
+      - dash-network
   
   frontend:
     image: ghcr.io/${GITHUB_REPOSITORY}/frontend:latest
