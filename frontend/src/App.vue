@@ -1,18 +1,38 @@
 <template>
-  <Sidebar @scroll="scrollToSection" />
-  <div class="bg-slate-50 min-h-screen transition-all duration-300" :class="{ 'md:ml-64': isSidebarVisible }">
-      <router-view />
-  </div>
+  <MobileRestrictionView v-if="isMobile" />
+  <template v-else>
+    <Sidebar @scroll="scrollToSection" />
+    <div class="bg-slate-50 min-h-screen transition-all duration-300" :class="{ 'md:ml-64': isSidebarVisible }">
+        <router-view />
+    </div>
+  </template>
 </template>
 
 <script setup>
-import { computed } from "vue";
+import { computed, ref, onMounted, onUnmounted } from "vue";
 import { useRoute } from "vue-router";
 import { useAuth } from "@/composables/useAuth";
 import Sidebar from "./components/layout/Sidebar.vue";
+import MobileRestrictionView from "@/views/MobileRestrictionView.vue";
 
 const route = useRoute();
 const { user } = useAuth();
+const isMobile = ref(false);
+
+const checkMobile = () => {
+  if (typeof window !== "undefined") {
+    isMobile.value = window.innerWidth < 768;
+  }
+};
+
+onMounted(() => {
+  checkMobile();
+  window.addEventListener('resize', checkMobile);
+});
+
+onUnmounted(() => {
+  window.removeEventListener('resize', checkMobile);
+});
 
 const isSidebarVisible = computed(() => {
   if (typeof window === "undefined") return false;
