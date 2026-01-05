@@ -320,7 +320,7 @@ const showFaq = ref(false);
                 </div>
 
                 <!-- 스터디 카드 -->
-                <div class="bg-white rounded-3xl p-5 flex items-center justify-between transition-colors relative overflow-hidden shadow-sm">
+                <div class="bg-white rounded-3xl p-5 flex items-center justify-between transition-colors relative shadow-sm">
                     <div class="flex items-center gap-5">
                          <BaseIconBadge 
                             :icon="Users" 
