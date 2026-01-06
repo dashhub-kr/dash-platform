@@ -342,7 +342,7 @@ const showFaq = ref(false);
                                 <span v-else class="text-slate-400 text-base">스터디 없음</span>
                                 
                                 <div v-if="userData.isStudyLeader" class="inline-flex">
-                                    <BaseIconBadge :icon="Crown" color="fox" size="sm" />
+                                    <BaseIconBadge :icon="Crown" color="orange" size="sm" />
                                 </div>
                             </div>
                             <div class="text-xs font-bold text-slate-400 uppercase mt-0.5">
