@@ -91,17 +91,15 @@
                   <UserX v-if="['Unknown User', 'Unknown'].includes(post.authorName)" :size="16" class="w-6 h-6 rounded-full border border-slate-200 bg-slate-50 p-1 text-slate-400" />
                   <img v-else-if="post.authorProfileImageUrl" :src="post.authorProfileImageUrl" class="w-6 h-6 rounded-full border border-slate-200" />
                   <div class="flex flex-col items-start">
-                    <template v-else>
-                         <span v-if="post.studyName" class="text-[10px] text-brand-500 font-bold hidden sm:inline">[{{ post.studyName }}]</span>
-                         <span class="flex items-center gap-1 min-w-0 max-w-[120px]">
-                            <span 
-                                class="truncate block max-w-[80px] sm:max-w-[100px]"
-                                :class="{ 'admin-shining-text': post.authorRole === 'ROLE_ADMIN' }"
-                            >
-                                {{ ['Unknown User', 'Unknown'].includes(post.authorName) ? '탈퇴한 회원' : post.authorName }}
-                            </span>
-                         </span>
-                    </template>
+                       <span v-if="post.studyName" class="text-[10px] text-brand-500 font-bold hidden sm:inline">[{{ post.studyName }}]</span>
+                       <span class="flex items-center gap-1 min-w-0 max-w-[120px]">
+                          <span 
+                              class="truncate block max-w-[80px] sm:max-w-[100px]"
+                              :class="{ 'admin-shining-text': post.authorRole === 'ROLE_ADMIN' }"
+                          >
+                              {{ ['Unknown User', 'Unknown'].includes(post.authorName) ? '탈퇴한 회원' : post.authorName }}
+                          </span>
+                       </span>
                   </div>
                 </div>
                 <div class="col-span-2 text-center text-sm text-slate-500 flex items-center justify-center gap-3">
