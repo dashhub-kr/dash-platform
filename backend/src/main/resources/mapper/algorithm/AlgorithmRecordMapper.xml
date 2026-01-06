@@ -15,7 +15,15 @@
   </insert>
 
   <select id="selectById" resultType="AlgorithmRecord" parameterType="long">
-    SELECT * FROM algorithm_records WHERE id = #{id}
+    SELECT r.*, u.username,
+           car.score, car.time_complexity, car.space_complexity, car.complexity_explanation, 
+           car.patterns, car.algorithm_intuition, car.pitfalls, car.key_blocks, 
+           car.refactor_provided, car.refactor_code, car.refactor_explanation, car.full_response,
+           car.counter_example_input, car.counter_example_expected, car.counter_example_predicted, car.counter_example_reason
+    FROM algorithm_records r
+    LEFT JOIN users u ON r.user_id = u.id
+    LEFT JOIN code_analysis_results car ON r.id = car.algorithm_record_id
+    WHERE r.id = #{id}
   </select>
 
   <select id="selectAll" resultType="AlgorithmRecord">

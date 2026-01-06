@@ -16,24 +16,9 @@
       <!-- 구분선 -->
       <div class="h-3 w-px bg-current opacity-20 mx-1"></div>
 
-      <!-- 2. 유형 배지 (이제 색상이 아닌 아이콘과 라벨로 구분) -->
+      <!-- 2. 유형 배지 (TaskBadge 컴포넌트 사용) -->
       <div class="flex items-center gap-2">
-          <!-- 과제 -->
-          <span v-if="props.record.tag === 'MISSION'" class="flex items-center gap-1 text-brand-700 bg-brand-100 px-2 py-0.5 rounded-lg text-xs">
-              <BookOpen :size="12" /> 과제
-          </span>
-          <!-- 디펜스 -->
-          <span v-else-if="props.record.tag === 'DEFENSE'" class="flex items-center gap-1 text-indigo-600 bg-indigo-50 px-2 py-0.5 rounded-lg text-xs">
-              <Shield :size="12" /> 디펜스
-          </span>
-          <!-- 모의고사 -->
-          <span v-else-if="props.record.tag === 'MOCK_EXAM'" class="flex items-center gap-1 text-orange-600 bg-orange-50 px-2 py-0.5 rounded-lg text-xs">
-              <Clock :size="12" /> 모의고사
-          </span>
-          <!-- 일반 -->
-          <span v-else class="flex items-center gap-1 text-slate-500 bg-slate-100 px-2 py-0.5 rounded-lg text-xs">
-              <Code2 :size="12" /> 자유
-          </span>
+          <TaskBadge :type="props.record.tag" />
       </div>
 
       <!-- 3. 메타 정보 (고정 위치) -->
@@ -52,6 +37,12 @@
       
       <!-- 오른쪽: 이름/날짜 -->
       <div class="ml-auto flex items-center gap-3">
+          <!-- 작성자 표시 -->
+          <div v-if="record.username" class="flex items-center gap-1.5 text-xs font-medium text-slate-600 bg-slate-50 px-2 py-1 rounded-full border border-slate-100">
+              <User :size="12" />
+              <span>{{ record.username }}</span>
+          </div>
+
           <div class="flex items-center gap-2 text-xs opacity-60 font-medium">
               <span>{{ formatDate(record.committedAt) }}</span>
           </div>
@@ -79,7 +70,9 @@
                     </span>
                     
                     <!-- 플랫폼 뱃지 (제목 옆에서 이동) -->
-                    <span v-if="platformBadge" class="px-2.5 py-1 rounded-lg text-[10px] font-bold bg-slate-50 text-slate-500 border border-slate-200">
+                    <span v-if="platformBadge" 
+                          class="px-2.5 py-1 rounded-lg text-[10px] font-bold border"
+                          :class="platformBadgeClass">
                         {{ platformBadge }}
                     </span>
                   </div>
@@ -120,8 +113,9 @@
 
 <script setup>
 import { ref, watch, computed, nextTick } from 'vue';
-import { ExternalLink, ChevronDown, ChevronUp, Bot, Bug, Send, Loader2, Activity, LayoutList, Lightbulb, Tag, MessageSquare, Wand2, CheckCircle2, BookOpen, Footprints, HelpCircle, Trophy, Clock, X, Shield, Package, Key, Flame, Sparkles, MessageCircle, Copy } from 'lucide-vue-next';
+import { ExternalLink, ChevronDown, ChevronUp, Bot, Bug, Send, Loader2, Activity, LayoutList, Lightbulb, Tag, MessageSquare, Wand2, CheckCircle2, BookOpen, Footprints, HelpCircle, Trophy, Clock, X, Shield, Package, Key, Flame, Sparkles, MessageCircle, Copy, User, Code2 } from 'lucide-vue-next';
 import CodeViewer from '@/components/editor/CodeViewer.vue';
+import TaskBadge from '@/components/common/TaskBadge.vue';
 import { boardApi, commentApi } from '@/api/board';
 import { aiApi } from '@/api/ai'; 
 import { useAuth } from '@/composables/useAuth';
@@ -449,11 +443,19 @@ const taskTypeLabel = computed(() => ({'MISSION':'과제','MOCK_EXAM':'모의고
 const defenseStreak = computed(() => props.record.defenseStreak || 0);
 
 const platformBadge = computed(() => {
-    const p = props.record.platform?.toUpperCase();
-    if (p === 'BAEKJOON') return 'BOJ';
-    if (p === 'SWEA') return 'SWEA';
-    if (p === 'PROGRAMMERS') return 'PGS';
+    const p = props.record.platform?.toLowerCase();
+    if (p === 'baekjoon' || p === 'boj') return 'BOJ';
+    if (p === 'swea') return 'SWEA';
+    if (p === 'programmers' || p === 'pgs') return 'PGS';
     return null;
+});
+
+const platformBadgeClass = computed(() => {
+    const p = platformBadge.value;
+    if (p === 'BOJ') return 'bg-blue-50 text-blue-600 border-blue-100';
+    if (p === 'SWEA') return 'bg-cyan-50 text-cyan-600 border-cyan-100';
+    if (p === 'PGS') return 'bg-slate-800 text-white border-slate-700'; 
+    return 'bg-slate-50 text-slate-500 border-slate-200';
 });
 
 const statusHeaderClass = computed(() => {
