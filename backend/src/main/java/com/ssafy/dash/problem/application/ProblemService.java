@@ -25,15 +25,17 @@ public class ProblemService {
 
     @Transactional
     public void initializeProblems() {
-        // 이미 문제 데이터가 있으면 스킵
-        if (problemMapper.findProblemByNumber("1000") != null) {
-            log.info("문제 데이터가 이미 존재합니다. 초기화를 건너뜁니다.");
-            return;
-        }
-
-        log.info("문제 데이터 초기화 시작...");
         try (var inputStream = new ClassPathResource("data/problems_with_keys.json").getInputStream()) {
             JsonNode rootNode = objectMapper.readTree(inputStream);
+            int jsonCount = rootNode.size();
+            int dbCount = problemMapper.countProblems();
+
+            if (dbCount >= jsonCount) {
+                log.info("문제 데이터가 이미 최신 상태입니다 (DB: {}, JSON: {}). 초기화를 건너뜁니다.", dbCount, jsonCount);
+                return;
+            }
+
+            log.info("문제 데이터 초기화 시작... (DB: {}, JSON: {})", dbCount, jsonCount);
 
             for (JsonNode node : rootNode) {
                 String problemId = node.get("problemId").asText();
