@@ -29,6 +29,7 @@ public class StudyService {
     private final UserRepository userRepository;
     private final AlgorithmRecordService algorithmRecordService;
     private final NotificationService notificationService;
+    private final com.ssafy.dash.acorn.domain.AcornLogRepository acornLogRepository;
 
     @Transactional(readOnly = true)
     public List<Study> getStudies(Long userId, String keyword) {
@@ -364,7 +365,10 @@ public class StudyService {
             algorithmRecordService.migrateUserRecords(member.getId(), studyId, personalStudy.getId());
         }
 
-        // 2. 스터디 삭제 (신청 내역이나 미션 등은 DB의 CASCADE 옵션 또는 수동 처리가 필요할 수 있음)
+        // 2. Acorn Log 삭제 (FK 제약조건 해결)
+        acornLogRepository.deleteByStudyId(studyId);
+
+        // 3. 스터디 삭제 (신청 내역이나 미션 등은 DB의 CASCADE 옵션 또는 수동 처리가 필요할 수 있음)
         studyRepository.delete(studyId);
     }
 

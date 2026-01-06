@@ -10,4 +10,5 @@ import com.ssafy.dash.acorn.domain.AcornLog;
 public interface AcornLogMapper {
     void insert(AcornLog log);
     List<AcornLog> selectByStudyId(Long studyId);
+    void deleteByStudyId(Long studyId);
 }
