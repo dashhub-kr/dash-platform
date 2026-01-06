@@ -27,7 +27,7 @@ public class DashboardController {
         
         if (studyId != null) {
              boolean isAdmin = oauthUser.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
-             Long userStudyId = oauthUser.getStudyId();
+             Long userStudyId = oauthUser.getUser().getStudyId();
 
              // Study ID가 같으면 허용, 다르면 관리자만 허용
              if (!isAdmin && (userStudyId == null || !userStudyId.equals(studyId))) {
@@ -46,7 +46,7 @@ public class DashboardController {
         
         if (studyId != null) {
              boolean isAdmin = oauthUser.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
-             Long userStudyId = oauthUser.getStudyId();
+             Long userStudyId = oauthUser.getUser().getStudyId();
 
              if (!isAdmin && (userStudyId == null || !userStudyId.equals(studyId))) {
                  return ResponseEntity.status(403).build();
