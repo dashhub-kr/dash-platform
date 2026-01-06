@@ -22,11 +22,6 @@
           <h1 class="text-3xl font-extrabold text-slate-900 mb-4 leading-tight">{{ post.title }}</h1>
           <div class="flex flex-wrap items-center gap-4 text-sm text-slate-500">
             <div class="flex items-center gap-2">
-              <template v-if="post.authorRole === 'ROLE_ADMIN'">
-                  <div class="px-3 py-1 bg-slate-900 rounded-full text-white shadow-sm border border-slate-700">
-                      <span class="text-xs font-black tracking-widest">ADMIN</span>
-                  </div>
-              </template>
               <template v-else>
                   <img v-if="post.authorProfileImageUrl" 
                        :src="post.authorProfileImageUrl" 
@@ -34,7 +29,10 @@
                   <div v-else class="w-8 h-8 rounded-full bg-brand-50 flex items-center justify-center text-brand-600 font-bold border border-brand-100">
                      {{ post.authorName?.charAt(0).toUpperCase() || 'U' }}
                   </div>
-                  <span class="text-slate-700 font-medium">
+                  <span 
+                    class="text-slate-700 font-medium" 
+                    :class="{ 'admin-shining-text': post.authorRole === 'ROLE_ADMIN' }"
+                  >
                     {{ post.authorName && !['Unknown', 'Unknown User'].includes(post.authorName) ? post.authorName : '탈퇴한 회원' }}
                   </span>
               </template>
@@ -142,7 +140,10 @@
                 <div v-else class="w-8 h-8 rounded-full bg-white shadow-sm border border-slate-100 flex items-center justify-center text-slate-500 font-bold text-sm">
                   {{ comment.authorName?.charAt(0).toUpperCase() || 'U' }}
                 </div>
-                <span class="font-medium text-slate-700">
+                <span 
+                    class="font-medium text-slate-700"
+                    :class="{ 'admin-shining-text': comment.authorRole === 'ROLE_ADMIN' }"
+                >
                     {{ comment.authorName && !['Unknown', 'Unknown User'].includes(comment.authorName) ? comment.authorName : '탈퇴한 회원' }}
                 </span>
                 <span class="text-xs text-slate-400">{{ formatDate(comment.createdAt) }}</span>
@@ -212,7 +213,10 @@
                   <div v-else class="w-6 h-6 rounded-full bg-slate-50 border border-slate-100 flex items-center justify-center text-slate-400 font-bold text-[10px]">
                     {{ reply.authorName?.charAt(0).toUpperCase() || 'U' }}
                   </div>
-                  <span class="font-medium text-slate-700 text-sm">
+                  <span 
+                    class="font-medium text-slate-700 text-sm"
+                    :class="{ 'admin-shining-text': reply.authorRole === 'ROLE_ADMIN' }"
+                  >
                     {{ reply.authorName && !['Unknown', 'Unknown User'].includes(reply.authorName) ? reply.authorName : '탈퇴한 회원' }}
                   </span>
                   <span class="text-xs text-slate-400">{{ formatDate(reply.createdAt) }}</span>
@@ -495,5 +499,22 @@ const isAdmin = computed(() => user.value?.role === 'ROLE_ADMIN');
 .delay-300 { animation-delay: 0.3s; }
 @keyframes fade-in-up {
   to { opacity: 1; transform: translateY(0); }
+}
+
+.admin-shining-text {
+  background: linear-gradient(to right, #6366f1 20%, #a855f7 40%, #ec4899 60%, #6366f1 80%);
+  background-size: 200% auto;
+  color: #000;
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: shine 3s linear infinite;
+  font-weight: 900;
+}
+
+@keyframes shine {
+  to {
+    background-position: 200% center;
+  }
 }
 </style>

@@ -71,12 +71,11 @@ public class StudyService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("User not found"));
 
+        // 스터디 이동(Transition): 이미 다른 Group 스터디에 있다면, 탈퇴 또는 삭제 처리
         if (user.getStudyId() != null) {
-            Study currentStudy = studyRepository.findById(user.getStudyId()).orElse(null);
-            // PERSONAL 타입이 아니면 중복 가입 불가 (비정상 상태 방지)
-            if (currentStudy != null && currentStudy.getStudyType() == StudyType.GROUP) {
-                throw new IllegalStateException("User already belongs to a study");
-            }
+            handleSeamlessTransition(user);
+            // 상태 변경 후 유저 정보 갱신
+            user = userRepository.findById(userId).orElseThrow();
         }
 
         // 대기 중인 가입 신청이 있으면 자동 취소
@@ -138,13 +137,7 @@ public class StudyService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("User not found"));
 
-        if (user.getStudyId() != null) {
-            Study currentStudy = studyRepository.findById(user.getStudyId()).orElse(null);
-            // PERSONAL 타입이면 지원 허용
-            if (currentStudy != null && currentStudy.getStudyType() == StudyType.GROUP) {
-                throw new IllegalStateException("User already belongs to a study");
-            }
-        }
+        // 스터디 이동 로직은 승인 시점에 처리됩니다. (applyForStudy에서는 체크하지 않음)
 
         // 스터디 존재 여부 확인
         if (studyRepository.findById(studyId).isEmpty()) {
@@ -219,20 +212,23 @@ public class StudyService {
         User user = userRepository.findById(application.getUserId())
                 .orElseThrow(() -> new IllegalArgumentException("User not found"));
 
-        // 유효성 검사: 유저가 이미 다른 GROUP 스터디에 소속되어 있는지 확인
+        // 유효성 검사 및 스터디 이동(Seamless Transition) 처리
         if (user.getStudyId() != null) {
             Study currentStudy = studyRepository.findById(user.getStudyId()).orElse(null);
+            
             if (currentStudy != null && currentStudy.getStudyType() == StudyType.GROUP) {
-                // 이미 GROUP 스터디에 소속된 경우 - 신청 자동 거절
-                studyRepository.deleteApplication(applicationId);
-
-                notificationService.send(
-                        user.getId(),
-                        String.format("'%s' 스터디 가입 신청이 자동 거절되었습니다.\n(이미 다른 스터디에 소속되어 있음)", study.getName()),
-                        "/",
-                        NotificationType.STUDY_RESULT);
-
-                throw new IllegalStateException("신청자가 이미 다른 스터디에 소속되어 있어 승인할 수 없습니다.");
+                try {
+                     // 기존 Group 스터디에서 나오기 (탈퇴/삭제)
+                     handleSeamlessTransition(user);
+                     // 유저 정보 갱신
+                     user = userRepository.findById(user.getId()).orElseThrow();
+                     
+                     // 이제 Personal 스터디 상태가 되었으므로 아래 로직에서 마이그레이션 처리됨
+                     currentStudy = studyRepository.findById(user.getStudyId()).orElse(null);
+                } catch (IllegalStateException e) {
+                     // 이동 실패 (예: 위임되지 않은 스터디장) -> 예외 전파
+                     throw e; 
+                }
             }
 
             // PERSONAL 스터디인 경우 - 기록 마이그레이션 (개인 스터디이거나, 스터디가 없던 상태일 수 있음)
@@ -423,6 +419,33 @@ public class StudyService {
         }
 
         return app;
+    }
+
+    // 유연한 스터디 이동을 위한 헬퍼 (Seamless Transition)
+    // - 일반 멤버: 기존 스터디 탈퇴 후 새 스터디 가입
+    // - 나홀로 스터디장: 기존 스터디 삭제 후 새 스터디 가입/생성
+    // - 멤버 있는 스터디장: 예외 발생 (위임 필요)
+    private void handleSeamlessTransition(User user) {
+        if (user.getStudyId() == null) return;
+        
+        Study currentStudy = studyRepository.findById(user.getStudyId()).orElse(null);
+        if (currentStudy == null || currentStudy.getStudyType() == StudyType.PERSONAL) return;
+
+        // Group 스터디일 경우 처리
+        if (Objects.equals(currentStudy.getCreatorId(), user.getId())) {
+            // 스터디장인 경우
+            int memberCount = userRepository.findByStudyId(currentStudy.getId()).size();
+            if (memberCount > 1) {
+                throw new IllegalStateException("스터디장은 바로 이동할 수 없습니다. 스터디장을 위임하거나 스터디원을 내보낸 후 다시 시도해주세요.");
+            }
+            // 나홀로 스터디장 -> 스터디 삭제 (Acorn Log 포함하여 안전하게 삭제)
+            // deleteStudy 메서드 내부에서 Acorn Log 삭제 및 멤버(본인)의 Personal 스터디로의 이관이 수행됩니다.
+            // 이후 호출 측에서 Personal 스터디 -> 새 스터디로 데이터를 다시 이관하게 됩니다.
+            deleteStudy(user.getId(), currentStudy.getId());
+        } else {
+            // 일반 멤버 -> 탈퇴 (Personal 스터디로 이동)
+            leaveStudy(user.getId());
+        }
     }
 
 }
