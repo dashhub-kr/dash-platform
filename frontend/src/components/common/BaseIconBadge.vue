@@ -46,7 +46,9 @@ const colorClasses = {
   emerald: 'bg-leaf/10 text-leaf', // Leaf (커스텀 색상 사용)
   green: 'bg-leaf/10 text-leaf',
   orange: 'bg-fox/10 text-fox', // Fox
+  fox: 'bg-fox/10 text-fox', // Fox Alias
   yellow: 'bg-bee/10 text-bee', // Bee
+  bee: 'bg-bee/10 text-bee', // Bee Alias
   rose: 'bg-rose-100 text-rose-600',
   indigo: 'bg-brand-100 text-brand-600', // 브랜드 색상으로 대체
   slate: 'bg-slate-100 text-slate-500'

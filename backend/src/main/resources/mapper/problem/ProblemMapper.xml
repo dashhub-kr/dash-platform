@@ -29,6 +29,10 @@
         FROM problems WHERE problem_number = #{problemNumber}
     </select>
 
+    <select id="countProblems" resultType="int">
+        SELECT COUNT(*) FROM problems
+    </select>
+
     <select id="findTagsByProblemNumber" resultType="string">
         SELECT tag_key
         FROM problem_tags

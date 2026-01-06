@@ -15,6 +15,8 @@ public interface ProblemMapper {
 
     Problem findProblemByNumber(String problemNumber);
 
+    int countProblems();
+
     List<String> findTagsByProblemNumber(String problemNumber);
 
     List<Problem> findProblemsByTagAndLevelRange(@org.apache.ibatis.annotations.Param("tagKey") String tagKey,
