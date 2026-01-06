@@ -11,8 +11,14 @@
     SELECT * FROM users WHERE id = #{id} AND deleted_at IS NULL
   </select>
 
-  <select id="selectAll" resultType="User">
     SELECT * FROM users WHERE deleted_at IS NULL ORDER BY id
+  </select>
+
+  <select id="selectByKeyword" resultType="User" parameterType="string">
+    SELECT * FROM users
+    WHERE (username LIKE CONCAT('%', #{keyword}, '%') OR email LIKE CONCAT('%', #{keyword}, '%'))
+    AND deleted_at IS NULL
+    ORDER BY id
   </select>
 
   <select id="selectByProviderAndProviderId" resultType="User">

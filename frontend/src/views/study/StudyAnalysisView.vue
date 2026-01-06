@@ -38,7 +38,7 @@
               <div class="bg-white border border-slate-200 rounded-3xl p-8 shadow-sm">
                 <div class="flex items-center justify-between mb-6">
                   <h2 class="font-black text-slate-900 flex items-center gap-2">
-                      <BookOpen class="w-6 h-6 text-brand-500" stroke-width="2.5" fill="currentColor" /> 추천 커리큘럼
+                      <BookOpen class="w-6 h-6 text-brand-500" stroke-width="2.5" fill="currentColor" /> 팀 문제 추천 (커리큘럼)
                   </h2>
                   <div v-if="loadingCurriculum" class="flex items-center gap-2 text-brand-600">
                      <span class="animate-spin text-sm">⏳</span>

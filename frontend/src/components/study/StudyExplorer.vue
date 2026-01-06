@@ -31,8 +31,8 @@
 
     <div v-else :class="{ 'flex flex-col h-full overflow-hidden': isOnboarding }">
       <!-- 검색 창 -->
-      <div class="shrink-0 bg-slate-50 p-6 rounded-3xl border border-slate-100"
-           :class="{ 'mb-4': isOnboarding, 'mb-10': !isOnboarding }">
+      <div class="shrink-0 bg-slate-50/90 backdrop-blur-md p-6 rounded-3xl border border-slate-100 z-30 sticky top-0 shadow-sm"
+           :class="{ 'mb-4': isOnboarding, 'mb-10 top-0': !isOnboarding }">
         <label class="block text-sm font-bold text-slate-500 mb-3 ml-1 flex items-center justify-between">
            <span>스터디 찾기</span>
            <span v-if="searchKeyword" class="text-brand-600 cursor-pointer hover:underline" @click="resetSearch">

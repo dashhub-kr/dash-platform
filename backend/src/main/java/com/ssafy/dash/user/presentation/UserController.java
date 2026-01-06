@@ -48,11 +48,18 @@ public class UserController {
     }
 
     @GetMapping
-    public ResponseEntity<List<UserResponse>> list() {
+    public ResponseEntity<List<UserResponse>> list(@org.springframework.web.bind.annotation.RequestParam(required = false) String keyword) {
 
-        List<UserResponse> responses = service.findAll().stream()
-                .map(UserResponse::from)
-                .collect(Collectors.toList());
+        List<UserResponse> responses;
+        if (keyword != null && !keyword.isBlank()) {
+            responses = service.searchByKeyword(keyword).stream()
+                    .map(UserResponse::from)
+                    .collect(Collectors.toList());
+        } else {
+            responses = service.findAll().stream()
+                    .map(UserResponse::from)
+                    .collect(Collectors.toList());
+        }
 
         return ResponseEntity.ok(responses);
     }

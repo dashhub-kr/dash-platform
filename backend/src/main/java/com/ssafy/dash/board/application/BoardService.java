@@ -154,6 +154,13 @@ public class BoardService {
     }
 
     private void validateOwnership(Board board, Long requestUserId) {
+        User requestUser = userRepository.findById(requestUserId)
+                .orElseThrow(() -> new UserNotFoundException(requestUserId));
+
+        if ("ROLE_ADMIN".equals(requestUser.getRole())) {
+            return;
+        }
+
         if (!board.getUserId().equals(requestUserId)) {
             throw new BusinessException(ErrorCode.UNAUTHORIZED_ACCESS, 
                 String.format("User %d is not authorized to modify Board with id %d", requestUserId, board.getId()));

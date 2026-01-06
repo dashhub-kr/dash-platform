@@ -1,44 +1,58 @@
 <template>
   <div 
-    class="group relative bg-white rounded-3xl shadow-sm transition-all duration-300"
-    :class="{ 'hover:shadow-md hover:-translate-y-0.5': !isExpanded, 'shadow-md': isExpanded, ...cardBorderClass }"
+    class="group relative bg-white rounded-3xl shadow-sm transition-all duration-300 hover:shadow-md hover:-translate-y-0.5"
+    :class="{ 'shadow-md': isExpanded, 'ring-2 ring-brand-500/20': props.record.tag === 'MISSION' }"
     @click.stop
   >
     <!-- 상태 헤더 바 -->
-    <div :class="statusHeaderClass" class="px-5 py-3 flex items-center gap-2 text-sm font-bold rounded-t-3xl cursor-pointer" @click="toggleExpand">
-      <span v-if="record.tag === 'DEFENSE'">
-        <Shield v-if="isPassed" :size="16" class="inline" />
-        <ShieldAlert v-else :size="16" class="inline" />
-      </span>
-      <span v-else>
-        <Check v-if="isPassed" :size="16" class="inline" />
-        <X v-else :size="16" class="inline" />
-      </span>
-      
-      <span v-if="record.tag === 'DEFENSE'">{{ isPassed ? '방어성공' : '방어실패' }}</span>
-      <span v-else>{{ isPassed ? 'PASSED' : 'FAILED' }}</span>
-
-      <span v-if="taskTypeLabel" class="ml-1 opacity-70 font-medium text-[10px]">[{{ taskTypeLabel }}]</span>
-
-      <!-- 디펜스 연속 성공 뱃지 -->
-      <div v-if="record.tag === 'DEFENSE' && defenseStreak > 0" 
-           class="flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-gradient-to-r from-orange-500 via-amber-500 to-yellow-500 text-white shadow-sm shadow-orange-200 border border-orange-400/50 mx-1">
-          <Flame class="w-3 h-3 animate-pulse" fill="currentColor" />
-          <span class="text-[9px] font-black tracking-wider">{{ defenseStreak }} 연승!</span>
+    <div :class="statusHeaderClass" class="px-5 py-3 flex items-center gap-3 text-sm font-bold rounded-t-3xl cursor-pointer" @click="toggleExpand">
+      <!-- 1. 상태 아이콘 -->
+      <div class="flex items-center gap-1.5">
+          <CheckCircle2 v-if="isPassed" :size="18" class="fill-current" />
+          <X v-else :size="18" />
+          <span>{{ isPassed ? 'SUCCESS' : 'FAILED' }}</span>
       </div>
 
-      <!-- 소요 시간 뱃지 (디펜스/모의고사용) -->
-      <div v-if="record.elapsedTimeSeconds && (record.tag === 'DEFENSE' || record.tag === 'MOCK_EXAM')" 
-           class="flex items-center gap-1 px-2 py-0.5 rounded-full bg-blue-100 text-blue-700 border border-blue-200">
-          <Clock :size="10" />
-          <span class="text-[9px] font-bold">{{ formatElapsedTime(record.elapsedTimeSeconds) }}</span>
+      <!-- 구분선 -->
+      <div class="h-3 w-px bg-current opacity-20 mx-1"></div>
+
+      <!-- 2. 유형 배지 (이제 색상이 아닌 아이콘과 라벨로 구분) -->
+      <div class="flex items-center gap-2">
+          <!-- 과제 -->
+          <span v-if="props.record.tag === 'MISSION'" class="flex items-center gap-1 text-brand-700 bg-brand-100 px-2 py-0.5 rounded-lg text-xs">
+              <BookOpen :size="12" /> 과제
+          </span>
+          <!-- 디펜스 -->
+          <span v-else-if="props.record.tag === 'DEFENSE'" class="flex items-center gap-1 text-indigo-600 bg-indigo-50 px-2 py-0.5 rounded-lg text-xs">
+              <Shield :size="12" /> 디펜스
+          </span>
+          <!-- 모의고사 -->
+          <span v-else-if="props.record.tag === 'MOCK_EXAM'" class="flex items-center gap-1 text-orange-600 bg-orange-50 px-2 py-0.5 rounded-lg text-xs">
+              <Clock :size="12" /> 모의고사
+          </span>
+          <!-- 일반 -->
+          <span v-else class="flex items-center gap-1 text-slate-500 bg-slate-100 px-2 py-0.5 rounded-lg text-xs">
+              <Code2 :size="12" /> 자유
+          </span>
+      </div>
+
+      <!-- 3. 메타 정보 (고정 위치) -->
+      <div class="flex items-center gap-2 ml-2">
+           <!-- 디펜스 연승 -->
+          <div v-if="props.record.tag === 'DEFENSE' && defenseStreak > 0" 
+               class="flex items-center gap-1 text-orange-600 text-[10px] font-bold bg-orange-50 px-1.5 py-0.5 rounded border border-orange-100">
+              <Flame :size="10" class="fill-orange-500" /> {{ defenseStreak }}연승
+          </div>
+          <!-- 소요 시간 -->
+          <div v-if="props.record.elapsedTimeSeconds && (props.record.tag === 'DEFENSE' || props.record.tag === 'MOCK_EXAM')" 
+               class="flex items-center gap-1 text-slate-500 text-[10px] bg-slate-100 px-1.5 py-0.5 rounded">
+              <Clock :size="10" /> {{ formatElapsedTime(props.record.elapsedTimeSeconds) }}
+          </div>
       </div>
       
       <!-- 오른쪽: 이름/날짜 -->
       <div class="ml-auto flex items-center gap-3">
-          <!-- 제출자 이름 & 날짜 -->
-          <div class="flex items-center gap-2 text-xs opacity-50">
-              <span class="font-bold border-r border-slate-400/30 pr-2">{{ record.username || '탈퇴한 회원' }}</span>
+          <div class="flex items-center gap-2 text-xs opacity-60 font-medium">
               <span>{{ formatDate(record.committedAt) }}</span>
           </div>
       </div>
@@ -53,27 +67,25 @@
                   <!-- 뱃지 -->
                   <div class="flex flex-wrap items-center gap-2 mb-2">
                     <span 
-                        class="px-3 py-1.5 rounded-xl text-[11px] font-black uppercase tracking-wider bg-slate-50 border-2 border-slate-100 text-slate-500"
+                        class="px-2.5 py-1 rounded-lg text-[10px] font-bold uppercase tracking-wider bg-slate-100 text-slate-500 border border-slate-200"
                     >
                         #{{ record.problemNumber }}
                     </span>
                     <span 
-                        class="px-3 py-1.5 rounded-xl text-[11px] font-black uppercase tracking-wider border-2"
-                        :class="(record.runtimeMs > 0 && record.memoryKb > 0) ? 'bg-slate-50 border-slate-100 text-slate-600' : 'bg-red-50 border-red-100 text-red-600'"
+                        class="px-2.5 py-1 rounded-lg text-[10px] font-bold uppercase tracking-wider border"
+                        :class="(record.runtimeMs > 0 && record.memoryKb > 0) ? 'bg-white border-slate-200 text-slate-600' : 'bg-rose-50 border-rose-100 text-rose-600'"
                     >
                         {{ record.language }}
                     </span>
-                    <!-- 패턴 태그 -->
-                    <span v-for="pattern in extractPatterns(record.patterns)" :key="pattern"
-                          class="px-3 py-1.5 bg-brand-50 text-brand-600 text-[10px] font-bold rounded-xl border-2 border-brand-100">
-                        {{ pattern }}
+                    
+                    <!-- 플랫폼 뱃지 (제목 옆에서 이동) -->
+                    <span v-if="platformBadge" class="px-2.5 py-1 rounded-lg text-[10px] font-bold bg-slate-50 text-slate-500 border border-slate-200">
+                        {{ platformBadge }}
                     </span>
                   </div>
+                  
                   <!-- 제목 -->
                   <h3 class="text-lg md:text-xl font-bold text-slate-800 leading-tight group-hover:text-brand-600 transition-colors flex items-center gap-2">
-                      <span v-if="platformBadge" class="text-slate-400 text-sm font-normal">
-                          [{{ platformBadge }}]
-                      </span>
                       {{ record.title }}
                   </h3>
               </div>
@@ -86,10 +98,8 @@
     </div>
 
     <!-- 확장 뷰: 코드 뷰어 전용 -->
-    <div v-if="isExpanded" class="animate-slide-down bg-slate-50 relative">
+    <div v-if="isExpanded" class="animate-slide-down bg-slate-50 relative rounded-b-3xl overflow-hidden border-t border-slate-100">
         <div class="flex flex-col">
-            
-            <!-- 중앙 패널: 코드 뷰어 (전체 너비) -->
             <div class="rounded-xl overflow-hidden">
                 <CodeViewer
                     ref="codeViewerRef"
@@ -102,16 +112,15 @@
                     :readOnly="false" 
                 />
             </div>
-
-            </div>
         </div>
+    </div>
 
   </div>
 </template>
 
 <script setup>
 import { ref, watch, computed, nextTick } from 'vue';
-import { ExternalLink, ChevronDown, ChevronUp, Bot, Bug, Send, Loader2, Activity, LayoutList, Lightbulb, Tag, MessageSquare, Wand2, CheckCircle2, BookOpen, Footprints, HelpCircle, Trophy, Clock, Check, X, Shield, ShieldAlert, Package, Key, Flame, Sparkles, MessageCircle, Copy } from 'lucide-vue-next';
+import { ExternalLink, ChevronDown, ChevronUp, Bot, Bug, Send, Loader2, Activity, LayoutList, Lightbulb, Tag, MessageSquare, Wand2, CheckCircle2, BookOpen, Footprints, HelpCircle, Trophy, Clock, X, Shield, Package, Key, Flame, Sparkles, MessageCircle, Copy } from 'lucide-vue-next';
 import CodeViewer from '@/components/editor/CodeViewer.vue';
 import { boardApi, commentApi } from '@/api/board';
 import { aiApi } from '@/api/ai'; 
@@ -448,14 +457,15 @@ const platformBadge = computed(() => {
 });
 
 const statusHeaderClass = computed(() => {
-    // Defense: Indigo theme (Premium, Shield-like)
-    if (props.record.tag === 'DEFENSE') return isPassed.value ? 'bg-brand-50 text-brand-700 border-b border-brand-100' : 'bg-red-50 text-red-700 border-b border-red-100';
-    // General: Emerald/Red theme
-    return isPassed.value ? 'bg-emerald-50 text-emerald-700 border-b border-emerald-100' : 'bg-red-50 text-red-700 border-b border-red-100';
+    // PASS -> Emerald Green
+    // FAIL -> Rose Red (or Slate if you prefer neutral, but Request said "Red")
+    return isPassed.value 
+        ? 'bg-emerald-50 text-emerald-700 border-b border-emerald-100' 
+        : 'bg-rose-50 text-rose-700 border-b border-rose-100';
 });
 
 const cardBorderClass = computed(() => {
-    // Borderless mode: no ring effects
+    // Remove old logic, handled in template
     return {};
 });
 

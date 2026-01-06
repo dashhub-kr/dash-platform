@@ -7,10 +7,10 @@ export const userApi = {
         return http.post('/users', data);
     },
 
-    // Get all users
+    // Get all users (or search by keyword)
     // GET /api/users
-    list() {
-        return http.get('/users');
+    list(params) {
+        return http.get('/users', { params });
     },
 
     // Get current user profile (synced with session)
