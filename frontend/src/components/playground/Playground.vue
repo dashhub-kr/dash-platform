@@ -75,12 +75,14 @@
 
 <script setup>
 import { ref, watch, onMounted } from "vue";
+import { useRoute } from "vue-router";
 import AcornStack from "./AcornStack.vue";
 import { useAuth } from "@/composables/useAuth";
 import { studyApi } from "@/api/study";
 import { Activity } from "lucide-vue-next";
 
 // ... (keep logic same)
+const route = useRoute();
 const { user } = useAuth();
 const currentTotalSolved = ref(0);
 const stackRef = ref(null);
@@ -91,10 +93,11 @@ const spawnPlatinum = ref(0);
 const acornLogs = ref([]);
 
 const fetchAndSpawn = async () => {
-  if (!user.value || !user.value.studyId) return;
+  const targetStudyId = route.query.studyId || user.value?.studyId;
+  if (!targetStudyId) return;
   
   try {
-    const studyRes = await studyApi.get(user.value.studyId);
+    const studyRes = await studyApi.get(targetStudyId);
     const study = studyRes.data;
     if (study) {
       const acornCount = study.acornCount || 0;
@@ -125,7 +128,7 @@ const fetchAndSpawn = async () => {
     }
 
     // 도토리 로그 가져오기
-    const logsRes = await studyApi.getAcornLogs(user.value.studyId);
+    const logsRes = await studyApi.getAcornLogs(targetStudyId);
     acornLogs.value = logsRes.data || [];
 
   } catch (e) {

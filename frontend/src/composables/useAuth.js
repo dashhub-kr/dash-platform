@@ -20,6 +20,18 @@ export function useAuth() {
     refresh();
   }
 
-  return { user, authChecked, refresh };
+  const logout = async () => {
+    try {
+      await import("../api/auth").then(m => m.authApi.logout());
+    } catch (e) {
+      console.error("Logout failed", e);
+    } finally {
+      user.value = null;
+      authChecked.value = false;
+      window.location.href = "/";
+    }
+  };
+
+  return { user, authChecked, refresh, logout };
 }
 

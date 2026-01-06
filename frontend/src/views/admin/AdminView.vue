@@ -85,6 +85,57 @@
 
         <!-- Other Admin Sections -->
         <section class="grid grid-cols-1 gap-6">
+            
+            <!-- Study Management -->
+            <div class="bg-white rounded-3xl p-8 border border-slate-200 shadow-sm">
+                <h2 class="text-xl font-bold text-slate-800 mb-6 flex items-center gap-2">
+                    <Compass class="w-6 h-6 text-brand-500" />
+                    스터디 관리/관전
+                </h2>
+                <div class="flex gap-4 mb-6">
+                    <input 
+                        v-model="studySearchKeyword" 
+                        @keyup.enter="searchStudies"
+                        type="text" 
+                        placeholder="스터디 이름으로 검색..." 
+                        class="flex-1 bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 font-medium text-slate-800 focus:outline-none focus:border-brand-500 focus:ring-4 focus:ring-brand-500/10 transition-all"
+                    />
+                    <button 
+                        @click="searchStudies"
+                        class="px-6 bg-slate-800 hover:bg-slate-900 text-white font-bold rounded-xl transition-colors"
+                    >
+                        검색
+                    </button>
+                </div>
+
+                <!-- Study Search Results -->
+                <div v-if="studySearchResults.length > 0" class="space-y-3">
+                    <div v-for="study in studySearchResults" :key="study.id" class="flex items-center justify-between p-4 bg-slate-50 rounded-xl border border-slate-100">
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 rounded-xl bg-brand-50 flex items-center justify-center text-brand-600">
+                                <Users class="w-5 h-5" />
+                            </div>
+                            <div>
+                                <div class="font-bold text-slate-800">{{ study.name }}</div>
+                                <div class="text-xs text-slate-400">멤버 {{ study.memberCount }}명 • {{ study.description || '소개 없음' }}</div>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-2">
+                             <button 
+                                @click="goToObservation(study.id)"
+                                class="px-3 py-1.5 text-xs font-bold text-slate-700 border border-slate-300 hover:bg-slate-200 rounded-lg transition-colors flex items-center gap-1"
+                            >
+                                <Eye :size="14" />
+                                관전
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div v-else-if="studySearched" class="text-center py-10 text-slate-400 bg-slate-50 rounded-xl border border-dashed border-slate-200">
+                    검색 결과가 없습니다.
+                </div>
+            </div>
+
             <!-- User Management -->
             <div class="bg-white rounded-3xl p-8 border border-slate-200 shadow-sm">
                 <h2 class="text-xl font-bold text-slate-800 mb-6 flex items-center gap-2">
@@ -151,13 +202,36 @@
 
 <script setup>
 import { ref, onMounted, computed } from 'vue';
-import { ShieldAlert, Gift, Send, Loader2, UserX, Settings } from 'lucide-vue-next';
+import { useRouter } from 'vue-router';
+import { ShieldAlert, Gift, Send, Loader2, UserX, Settings, Compass, Users, Eye } from 'lucide-vue-next';
 import { studyApi } from '@/api/study';
 import { adminApi } from '@/api/admin';
 import { userApi } from '@/api/user';
 
+const router = useRouter();
 const studies = ref([]);
 const gifting = ref(false);
+
+// Study Search State
+const studySearchKeyword = ref('');
+const studySearchResults = ref([]);
+const studySearched = ref(false);
+
+const searchStudies = async () => {
+    if (!studySearchKeyword.value.trim()) return;
+    try {
+        const res = await studyApi.getStudies({ keyword: studySearchKeyword.value });
+        studySearchResults.value = res.data;
+        studySearched.value = true;
+    } catch (e) {
+        console.error("Study search failed", e);
+        alert("스터디 검색에 실패했습니다.");
+    }
+};
+
+const goToObservation = (studyId) => {
+    router.push(`/admin/study/${studyId}/dashboard`);
+};
 
 // User Search State
 const searchKeyword = ref('');

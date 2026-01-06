@@ -110,24 +110,34 @@ public class GitHubSubmissionMetadataExtractor {
     }
 
     private String detectPlatform(String commitMessage, String filePath) {
-        String message = (commitMessage == null ? "" : commitMessage);
+        String message = (commitMessage == null ? "" : commitMessage).toLowerCase(Locale.ROOT);
+        String path = (filePath == null ? "" : filePath).toLowerCase(Locale.ROOT);
 
-        // Check for SWEA specific patterns in commit message only (case-insensitive
-        // checks might be safer, but tags are usually consistently cased)
-        // SWEA tags: [D1], [D2], ..., [Professional]
-        if (message.contains("[Professional]") || message.matches(".*\\[D\\d+].*")) {
+        // 1. Check File Path (Package/Directory Name) - High Priority
+        if (path.contains("boj/") || path.contains("baekjoon/")) {
+            return "BAEKJOON";
+        }
+        if (path.contains("swea/") || path.contains("swexpertacademy/")) {
             return "SWEA";
         }
 
-        String source = (message + " " + (filePath == null ? "" : filePath))
-                .toLowerCase(Locale.ROOT);
+        // 2. Check Commit Message - Medium Priority
+        // SWEA tags: [D1], [D2], ..., [Professional]
+        if (commitMessage != null && (commitMessage.contains("[Professional]") || commitMessage.matches(".*\\[D\\d+].*"))) {
+            return "SWEA";
+        }
 
-        if (source.contains("baekjoon") || source.contains("백준")) {
+        // 3. Check Commit Message for Keywords - Low Priority
+        if (message.contains("baekjoon") || message.contains("백준")) {
             return "BAEKJOON";
         }
-        if (source.contains("programmers") || source.contains("프로그래머스")) {
+        if (message.contains("programmers") || message.contains("프로그래머스")) {
             return "PROGRAMMERS";
         }
+        if (message.contains("swea")) {
+            return "SWEA";
+        }
+
         return "UNKNOWN";
     }
 

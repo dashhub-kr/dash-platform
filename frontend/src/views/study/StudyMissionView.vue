@@ -325,7 +325,7 @@ import {
     X
 } from 'lucide-vue-next';
 
-// Admin Observation Props
+// 관리자 관전 모드 Props
 const props = defineProps({
     studyId: {
         type: Number,
@@ -464,17 +464,19 @@ onMounted(async () => {
   try {
     const userRes = await axios.get('/api/users/me');
     
-    // If Admin Observing, use prop. Otherwise user's study.
+    // 관리자 관전 모드인 경우 prop을 사용. 
+    // 그렇지 않으면 userRes의 studyId를 사용 (기존 로직 유지)
     if (props.studyId) {
         studyId.value = props.studyId;
     } else {
         studyId.value = userRes.data.studyId;
     }
     
+    // currentUserId 명시적 업데이트
     currentUserId.value = userRes.data.id;
     isLeader.value = userRes.data.isStudyLeader || false;
     
-    // If observing, force remove leader privileges visually (handled by backend anyway, but for UI safety)
+    // 관전 모드일 경우 리더 권한 시각적으로 제거 (백엔드 보안 처리됨, UI용)
     if (isObserving.value) {
         isLeader.value = false; 
     }
@@ -486,9 +488,8 @@ onMounted(async () => {
       const statsRes = await studyApi.get(studyId.value);
       studyData.value = statsRes.data;
 
-      // Admin Observation needs to request records specifically for this study if possible ???
-      // Wait, dashboardApi.getRecords uses /dashboard/records. If I am admin observing, I should pass studyId to it?
-      // Yes, I just updated dashboardApi.getRecords to take studyId.
+      // 관전 모드 시 해당 스터디의 기록을 조회해야 함
+      // dashboardApi.getRecords에 studyId를 전달하도록 수정됨
       const recordsRes = await dashboardApi.getRecords(studyId.value);
       recordCount.value = recordsRes.data?.length || 0;
 

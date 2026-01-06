@@ -82,13 +82,13 @@
                       <span class="text-slate-400 font-bold">#</span>
                    </div>
                    <input v-model="input.value" type="text"
-                          :readonly="!!initialProblemIds"
+                          :readonly="!!initialProblemIds && creationMode !== 'EDIT'"
                           class="w-full pl-8 pr-4 py-3 bg-slate-50 border-2 border-slate-200 rounded-xl focus:ring-2 focus:ring-brand-500 focus:border-brand-500 transition-all read-only:bg-slate-100 read-only:text-slate-500 placeholder:text-slate-400"
                           placeholder="백준 문제 번호를 입력하세요 (예: 1000)"
                           @keydown.enter.prevent="addProblemInput" />
                 </div>
                 
-                <button v-if="!initialProblemIds && problemInputs.length > 1" 
+                <button v-if="(!initialProblemIds || creationMode === 'EDIT') && problemInputs.length > 1" 
                         @click="removeProblemInput(index)"
                         class="px-3 text-slate-400 hover:text-rose-500 hover:bg-rose-50 rounded-lg transition-colors"
                         title="삭제">
@@ -99,7 +99,7 @@
              </div>
           </div>
 
-          <button v-if="!initialProblemIds" 
+          <button v-if="!initialProblemIds || creationMode === 'EDIT'" 
                   @click="addProblemInput"
                   class="mt-3 w-full py-3 border-2 border-dashed border-slate-200 rounded-xl text-slate-500 font-bold hover:border-brand-300 hover:text-brand-500 hover:bg-brand-50/50 transition-all flex items-center justify-center gap-2">
              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">

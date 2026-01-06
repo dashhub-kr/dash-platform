@@ -21,4 +21,8 @@
         ORDER BY al.created_at DESC
     </select>
 
+    <delete id="deleteByStudyId">
+        DELETE FROM acorn_log WHERE study_id = #{studyId}
+    </delete>
+
 </mapper>

@@ -99,6 +99,12 @@ const getTierName = (tier) => {
     return 'Unrated';
 };
 
+const formatJoinedDate = (dateString) => {
+    if (!dateString) return '';
+    const date = new Date(dateString);
+    return date.toLocaleDateString('en-US', { year: 'numeric', month: 'short' });
+};
+
 const userData = ref({
     id: null,
     username: '',
@@ -299,7 +305,9 @@ const showFaq = ref(false);
                 <!-- 요청에 따라 이메일 숨김 -->
                 <!-- <p class="text-slate-400 font-bold text-sm mb-4">{{ userData.email }}</p> -->
                 
-                <div class="text-xs text-slate-300 font-bold uppercase tracking-wider">Joined Dec 2024</div>
+                <div class="text-xs text-slate-300 font-bold uppercase tracking-wider">
+                    Joined {{ formatJoinedDate(userData.createdAt) }}
+                </div>
             </div>
 
             <!-- 실제 통계 정보 -->

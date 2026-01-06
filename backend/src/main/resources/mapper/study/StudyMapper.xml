@@ -75,7 +75,7 @@
     UPDATE studies SET name = #{name}, acorn_count = #{acornCount}, 
     visibility = #{visibility}, description = #{description}, streak = #{streak}, 
     active_mission_title = #{activeMissionTitle}, active_mission_progress = #{activeMissionProgress},
-    study_type = #{studyType}
+    study_type = #{studyType}, creator_id = #{creatorId}
     WHERE id = #{id}
   </update>
 

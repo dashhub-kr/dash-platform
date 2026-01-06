@@ -26,4 +26,9 @@ public class AcornLogRepositoryImpl implements AcornLogRepository {
     public List<AcornLog> findByStudyId(Long studyId) {
         return acornLogMapper.selectByStudyId(studyId);
     }
+
+    @Override
+    public void deleteByStudyId(Long studyId) {
+        acornLogMapper.deleteByStudyId(studyId);
+    }
 }

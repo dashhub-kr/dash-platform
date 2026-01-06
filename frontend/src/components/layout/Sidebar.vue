@@ -319,7 +319,7 @@ import { studyApi } from "@/api/study";
 
 const emits = defineEmits(['scroll']);
 
-const { user, loginWithGithub, logout, refresh } = useAuth();
+const { user, logout, refresh } = useAuth();
 const route = useRoute();
 const router = useRouter();
 const mobileMenuOpen = ref(false);
@@ -355,7 +355,7 @@ const navGroups = computed(() => {
     title: '커뮤니티',
     items: [
       { label: '게시판', path: '/boards', icon: MessageSquare, color: 'bg-violet-500' }, // Reordered: Board first/second? User said "Explorer -> Board -> Social" order is weird. usually Board is main community.
-      { label: '스터디 탐험', path: '/study/ranking', icon: Compass, color: 'bg-yellow-500' }, // Renamed from '둘러보기' (Explorer). Reordered.
+      { label: '스터디 라운지', path: '/study/ranking', icon: Compass, color: 'bg-yellow-500' }, // Renamed from '스터디 탐험'.
       { label: '소셜', path: '/social', icon: Users, color: 'bg-pink-500' },
     ]
   },
@@ -628,10 +628,11 @@ const goToProfile = () => {
     profileMenuOpen.value = false;
     window.location.href = "/profile";
 };
+// Removed duplicate useAuth call
+// ...
 const handleLogout = async () => {
   if (!confirm("로그아웃 하시겠습니까?")) return;
-  try { await authApi.logout(); } catch (e) { console.error(e); }
-  finally { window.location.href = "/"; }
+  await logout();
 };
 
 const formatTimeAgo = (dateStr) => {

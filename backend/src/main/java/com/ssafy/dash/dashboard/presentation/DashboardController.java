@@ -26,8 +26,11 @@ public class DashboardController {
             @org.springframework.web.bind.annotation.RequestParam(required = false) Long studyId) {
         
         if (studyId != null) {
-            // Check Admin role
-             if (!oauthUser.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"))) {
+             boolean isAdmin = oauthUser.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
+             Long userStudyId = oauthUser.getStudyId();
+
+             // Study ID가 같으면 허용, 다르면 관리자만 허용
+             if (!isAdmin && (userStudyId == null || !userStudyId.equals(studyId))) {
                  return ResponseEntity.status(403).build();
              }
              return ResponseEntity.ok(dashboardService.getAlgorithmRecordsByStudyId(studyId));
@@ -42,7 +45,10 @@ public class DashboardController {
             @org.springframework.web.bind.annotation.RequestParam(required = false) Long studyId) {
         
         if (studyId != null) {
-             if (!oauthUser.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"))) {
+             boolean isAdmin = oauthUser.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
+             Long userStudyId = oauthUser.getStudyId();
+
+             if (!isAdmin && (userStudyId == null || !userStudyId.equals(studyId))) {
                  return ResponseEntity.status(403).build();
              }
              return ResponseEntity.ok(dashboardService.getHeatmap(null, studyId));

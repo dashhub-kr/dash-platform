@@ -125,12 +125,7 @@
 
              <!-- 하단 버튼 -->
              <div class="mt-auto relative z-10">
-                <button v-if="isAdmin" 
-                        @click.stop="observeStudy(study.id)"
-                        class="w-full py-3 bg-slate-800 text-white font-bold rounded-xl hover:bg-slate-700 transition-colors flex items-center justify-center gap-2">
-                   <Eye :size="18" /> 관전하기
-                </button>
-                <div v-else-if="userData?.studyId === study.id" 
+                <div v-if="userData?.studyId === study.id" 
                      class="w-full py-3 bg-brand-50 text-brand-600 font-bold rounded-xl text-center border border-brand-100 flex items-center justify-center gap-2">
                      <span class="w-2 h-2 rounded-full bg-brand-500 animate-pulse"></span>
                      참여 중
@@ -222,12 +217,7 @@
              <!-- 하단 버튼 -->
              <div class="mt-auto relative z-10">
                 <!-- 내 스터디 -->
-                <button v-if="isAdmin" 
-                        @click.stop="observeStudy(study.id)"
-                        class="w-full py-3 bg-slate-800 text-white font-bold rounded-xl hover:bg-slate-700 transition-colors flex items-center justify-center gap-2">
-                   <Eye :size="18" /> 관전하기
-                </button>
-                <div v-else-if="user?.studyId === study.id" 
+                <div v-if="user?.studyId === study.id" 
                      class="w-full py-3 bg-brand-50 text-brand-600 font-bold rounded-xl text-center border border-brand-100 flex items-center justify-center gap-2">
                      <span class="w-2 h-2 rounded-full bg-brand-500 animate-pulse"></span>
                      참여 중
@@ -504,6 +494,9 @@ const recommendedStudies = computed(() => {
     // 평균 티어가 없는 경우 제외
     if (!study.averageTier) return false;
     
+    // 내 스터디 제외
+    if (study.id === user.value.studyId) return false;
+
     // 내 티어 기준 ±5 범위 내
     const diff = Math.abs(study.averageTier - userTier);
     return diff <= 5;

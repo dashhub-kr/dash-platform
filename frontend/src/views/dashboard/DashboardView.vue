@@ -502,7 +502,10 @@ const exitObservation = () => {
 };
 
 const goToPlayground = () => {
-    router.push('/playground');
+    router.push({
+        path: '/playground',
+        query: { studyId: currentStudyId.value }
+    });
 };
 
 // 히트맵 툴팁 상태
