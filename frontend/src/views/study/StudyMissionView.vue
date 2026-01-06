@@ -575,6 +575,13 @@ const openEditModal = (mission) => {
     modalDeadline.value = mission.deadline;
     modalWeek.value = mission.week;
     
+    // 문제 번호 배열을 콤마로 구분된 문자열로 변환하여 전달
+    if (mission.problemIds && mission.problemIds.length > 0) {
+        modalProblemIds.value = mission.problemIds.join(', ');
+    } else {
+        modalProblemIds.value = '';
+    }
+    
     showCreateModal.value = true;
 };
 

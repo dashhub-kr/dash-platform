@@ -335,32 +335,27 @@ const navGroups = computed(() => {
     const hasStudy = user.value && user.value.studyId;
     return [
   {
-    title: '스터디',
+    title: '팀 스페이스', // Renamed from '스터디'
     items: [
       { label: '대시보드', path: '/dashboard', icon: LayoutGrid, color: 'bg-sky-500' },
-      { label: '미션', path: '/study/missions', icon: Target, color: 'bg-rose-500' },
-      { label: '분석', path: '/study/analysis', icon: PieChart, color: 'bg-emerald-500' },
+      { label: '팀 미션', path: '/study/missions', icon: Target, color: 'bg-rose-500' }, // Renamed from '미션'
+      { label: '팀 분석', path: '/study/analysis', icon: PieChart, color: 'bg-emerald-500' }, // Renamed from '분석'
     ]
   },
   {
-    title: '트레이닝',
+    title: '퍼스널 트레이닝', // New Group
     items: [
-      { label: '로드맵', path: '/training/roadmap', icon: School, color: 'bg-amber-500' },
-      { label: '스킬 트리', path: '/training/skilltree', icon: Network, color: 'bg-indigo-500' },
-    ]
-  },
-  {
-    title: '문제',
-    items: [
-      { label: '모의고사', path: '/mockexam', icon: FileText, color: 'bg-blue-500' },
-      { label: '디펜스', path: '/defense', icon: Shield, color: 'bg-slate-500' },
+      { label: '랜덤 디펜스', path: '/defense', icon: Shield, color: 'bg-slate-500' }, // Renamed & Moved to top (Action)
+      { label: '모의고사', path: '/mockexam', icon: FileText, color: 'bg-blue-500' }, // Moved to 2nd (Action)
+      { label: '스킬 트리', path: '/training/skilltree', icon: Network, color: 'bg-indigo-500' }, // Analysis/Status
+      { label: '로드맵', path: '/training/roadmap', icon: School, color: 'bg-amber-500' }, // Planning (Ending)
     ]
   },
   {
     title: '커뮤니티',
     items: [
-      { label: '둘러보기', path: '/study/ranking', icon: Compass, color: 'bg-yellow-500' },
-      { label: '게시판', path: '/boards', icon: MessageSquare, color: 'bg-violet-500' },
+      { label: '게시판', path: '/boards', icon: MessageSquare, color: 'bg-violet-500' }, // Reordered: Board first/second? User said "Explorer -> Board -> Social" order is weird. usually Board is main community.
+      { label: '스터디 탐험', path: '/study/ranking', icon: Compass, color: 'bg-yellow-500' }, // Renamed from '둘러보기' (Explorer). Reordered.
       { label: '소셜', path: '/social', icon: Users, color: 'bg-pink-500' },
     ]
   },
@@ -368,7 +363,7 @@ const navGroups = computed(() => {
     title: '관리자',
     items: [
        { label: '대시보드', path: '/admin', icon: Shield, color: 'bg-slate-900' },
-       { label: '스터디 관전', path: '/study/ranking', icon: UserCircle, color: 'bg-slate-700' }
+       // Removed '스터디 관전' as requested, relying on Admin Dashboard to find studies.
     ]
   }] : [])
 ]});

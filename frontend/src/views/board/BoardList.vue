@@ -9,7 +9,7 @@
         <main class="flex-1 min-w-0 space-y-6">
 
           <!-- 검색 바 -->
-          <div class="animate-fade-in-up">
+          <div class="animate-fade-in-up sticky top-6 z-40 bg-white/90 backdrop-blur-md p-1 -mx-1 rounded-2xl">
             <div class="flex gap-3">
               <div class="flex-1 relative">
                 <Search :size="18" class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" />
@@ -18,10 +18,10 @@
                   @keyup.enter="searchPosts"
                   type="number"
                   placeholder="문제 번호로 검색 (예: 1234)"
-                  class="w-full pl-12 pr-4 py-3 bg-white border border-slate-200 rounded-xl text-slate-700 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-brand-400 focus:border-transparent"
+                  class="w-full pl-12 pr-4 py-3 bg-white border border-slate-200 rounded-xl text-slate-700 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-brand-400 focus:border-transparent shadow-sm"
                 />
               </div>
-              <button @click="searchPosts" class="px-6 py-3 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl font-bold transition-colors">
+              <button @click="searchPosts" class="px-6 py-3 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl font-bold transition-colors shadow-sm">
                 검색
               </button>
               <button v-if="searchProblemNumber" @click="clearSearch" class="px-4 py-3 text-slate-500 hover:text-slate-700 transition-colors">
@@ -91,11 +91,17 @@
                   <UserX v-if="['Unknown User', 'Unknown'].includes(post.authorName)" :size="16" class="w-6 h-6 rounded-full border border-slate-200 bg-slate-50 p-1 text-slate-400" />
                   <img v-else-if="post.authorProfileImageUrl" :src="post.authorProfileImageUrl" class="w-6 h-6 rounded-full border border-slate-200" />
                   <div class="flex flex-col items-start">
-                    <span v-if="post.studyName" class="text-[10px] text-brand-500 font-bold">[{{ post.studyName }}]</span>
-                    <span class="flex items-center gap-1 min-w-0 max-w-[120px]">
-                        <span class="truncate">{{ ['Unknown User', 'Unknown'].includes(post.authorName) ? '탈퇴한 회원' : post.authorName }}</span>
-                        <span v-if="post.authorRole === 'ROLE_ADMIN'" class="shrink-0 px-1.5 py-0.5 rounded-md bg-slate-800 text-[10px] text-white font-bold leading-none" title="관리자">ADMIN</span>
-                    </span>
+                    <template v-if="post.authorRole === 'ROLE_ADMIN'">
+                         <span class="px-2 py-0.5 rounded-md bg-slate-900 text-[10px] text-white font-bold tracking-wider shadow-sm">
+                            ADMIN
+                         </span>
+                    </template>
+                    <template v-else>
+                        <span v-if="post.studyName" class="text-[10px] text-brand-500 font-bold">[{{ post.studyName }}]</span>
+                        <span class="flex items-center gap-1 min-w-0 max-w-[120px]">
+                            <span class="truncate">{{ ['Unknown User', 'Unknown'].includes(post.authorName) ? '탈퇴한 회원' : post.authorName }}</span>
+                        </span>
+                    </template>
                   </div>
                 </div>
                 <div class="col-span-2 text-center text-sm text-slate-500 flex items-center justify-center gap-3">
@@ -148,11 +154,16 @@
                   </div>
                 </div>
                 <h3 class="font-bold text-slate-800 truncate mb-1">{{ post.title }}</h3>
-                <div class="flex items-center gap-2 text-xs text-slate-500">
-                  <UserX v-if="['Unknown User', 'Unknown'].includes(post.authorName)" :size="14" class="w-5 h-5 rounded-full border border-orange-200 bg-orange-50 p-1 text-orange-400" />
-                  <span v-if="post.studyName" class="text-brand-600 font-bold">[{{ post.studyName }}]</span>
-                  <span>{{ ['Unknown User', 'Unknown'].includes(post.authorName) ? '탈퇴한 회원' : post.authorName }}</span>
-                </div>
+                  <div class="flex items-center gap-2 text-xs text-slate-500">
+                    <UserX v-if="['Unknown User', 'Unknown'].includes(post.authorName)" :size="14" class="w-5 h-5 rounded-full border border-orange-200 bg-orange-50 p-1 text-orange-400" />
+                    <template v-if="post.authorRole === 'ROLE_ADMIN'">
+                        <span class="px-1.5 py-0.5 rounded bg-slate-900 text-[10px] text-white font-bold tracking-wider">ADMIN</span>
+                    </template>
+                    <template v-else>
+                        <span v-if="post.studyName" class="text-brand-600 font-bold">[{{ post.studyName }}]</span>
+                        <span>{{ ['Unknown User', 'Unknown'].includes(post.authorName) ? '탈퇴한 회원' : post.authorName }}</span>
+                    </template>
+                  </div>
               </div>
             </div>
           </div>

@@ -15,6 +15,8 @@ public interface UserMapper {
 
     List<User> selectAll();
 
+    List<User> selectByKeyword(String keyword);
+
     User selectByProviderAndProviderId(String provider, String providerId);
 
     int update(User user);

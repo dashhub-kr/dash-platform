@@ -22,26 +22,24 @@
           <h1 class="text-3xl font-extrabold text-slate-900 mb-4 leading-tight">{{ post.title }}</h1>
           <div class="flex flex-wrap items-center gap-4 text-sm text-slate-500">
             <div class="flex items-center gap-2">
-              <img v-if="post.authorProfileImageUrl" 
-                   :src="post.authorProfileImageUrl" 
-                   class="w-8 h-8 rounded-full object-cover border border-brand-100" />
-              <div v-else class="w-8 h-8 rounded-full bg-brand-50 flex items-center justify-center text-brand-600 font-bold border border-brand-100">
-                 {{ post.authorName?.charAt(0).toUpperCase() || 'U' }}
-              </div>
-              <span class="text-slate-700 font-medium">
-                {{ post.authorName && !['Unknown', 'Unknown User'].includes(post.authorName) ? post.authorName : '탈퇴한 회원' }}
-              </span>
+              <template v-if="post.authorRole === 'ROLE_ADMIN'">
+                  <div class="px-3 py-1 bg-slate-900 rounded-full text-white shadow-sm border border-slate-700">
+                      <span class="text-xs font-black tracking-widest">ADMIN</span>
+                  </div>
+              </template>
+              <template v-else>
+                  <img v-if="post.authorProfileImageUrl" 
+                       :src="post.authorProfileImageUrl" 
+                       class="w-8 h-8 rounded-full object-cover border border-brand-100" />
+                  <div v-else class="w-8 h-8 rounded-full bg-brand-50 flex items-center justify-center text-brand-600 font-bold border border-brand-100">
+                     {{ post.authorName?.charAt(0).toUpperCase() || 'U' }}
+                  </div>
+                  <span class="text-slate-700 font-medium">
+                    {{ post.authorName && !['Unknown', 'Unknown User'].includes(post.authorName) ? post.authorName : '탈퇴한 회원' }}
+                  </span>
+              </template>
               
-              <!-- 차단 버튼 (관리자 전용) -->
-              <button 
-                v-if="isAdmin && post.authorName !== '탈퇴한 회원'"
-                @click="blockUser"
-                class="ml-2 px-2 py-0.5 text-[10px] font-bold text-rose-500 bg-rose-50 border border-rose-100 rounded hover:bg-rose-100 transition-colors flex items-center gap-1"
-                title="회원 차단"
-              >
-                <ShieldBan :size="12" />
-                BLOCK
-              </button>
+
             </div>
             <span class="w-1 h-1 rounded-full bg-slate-300"></span>
             <span>{{ formatDate(post.createdAt) }}</span>
@@ -290,7 +288,7 @@
 import { ref, onMounted, computed } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import axios from 'axios';
-import { ArrowLeft, ThumbsUp, MessageCircle, Code2, Pencil, Trash2, X, Check, UserX, ShieldBan } from 'lucide-vue-next';
+import { ArrowLeft, ThumbsUp, MessageCircle, Code2, Pencil, Trash2, X, Check, UserX } from 'lucide-vue-next';
 import { boardApi, commentApi } from '@/api/board';
 import { algorithmApi } from '@/api/algorithm';
 import { useAuth } from '@/composables/useAuth';
@@ -483,16 +481,7 @@ const deletePost = async () => {
 
 const isAdmin = computed(() => user.value?.role === 'ROLE_ADMIN');
 
-const blockUser = async () => {
-    if (!confirm(`'${post.value.authorName}' 회원을 정말로 차단하시겠습니까?`)) return;
-    try {
-        await axios.post(`/api/admin/users/${post.value.userId}/block`);
-        alert("회원이 차단되었습니다.");
-    } catch (e) {
-        console.error("Block failed", e);
-        alert("차단에 실패했습니다.");
-    }
-};
+
 </script>
 
 <style scoped>

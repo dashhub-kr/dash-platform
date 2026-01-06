@@ -83,20 +83,67 @@
             </div>
         </section>
 
-        <!-- Other Admin Sections (Placeholder) -->
-        <section class="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div class="bg-slate-50 rounded-3xl p-6 border border-slate-200 border-dashed flex flex-col items-center justify-center text-center py-12">
-                <UserX class="w-10 h-10 text-slate-300 mb-3" />
-                <h3 class="font-bold text-slate-500">신고 접수 관리</h3>
-                <p class="text-xs text-slate-400 mt-1">준비 중인 기능입니다</p>
+        <!-- Other Admin Sections -->
+        <section class="grid grid-cols-1 gap-6">
+            <!-- User Management -->
+            <div class="bg-white rounded-3xl p-8 border border-slate-200 shadow-sm">
+                <h2 class="text-xl font-bold text-slate-800 mb-6 flex items-center gap-2">
+                    <UserX class="w-6 h-6 text-rose-500" />
+                    회원 관리 (차단)
+                </h2>
+                <div class="flex gap-4 mb-6">
+                    <input 
+                        v-model="searchKeyword" 
+                        @keyup.enter="searchUsers"
+                        type="text" 
+                        placeholder="이름 또는 이메일로 검색..." 
+                        class="flex-1 bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 font-medium text-slate-800 focus:outline-none focus:border-brand-500 focus:ring-4 focus:ring-brand-500/10 transition-all"
+                    />
+                    <button 
+                        @click="searchUsers"
+                        class="px-6 bg-slate-800 hover:bg-slate-900 text-white font-bold rounded-xl transition-colors"
+                    >
+                        검색
+                    </button>
+                </div>
+
+                <!-- Search Results -->
+                <div v-if="searchResults.length > 0" class="space-y-3">
+                    <div v-for="user in searchResults" :key="user.id" class="flex items-center justify-between p-4 bg-slate-50 rounded-xl border border-slate-100">
+                        <div class="flex items-center gap-3">
+                            <img :src="user.avatarUrl || '/images/default-profile.png'" class="w-10 h-10 rounded-full object-cover bg-white border border-slate-200" />
+                            <div>
+                                <div class="font-bold text-slate-800">{{ user.username }}</div>
+                                <div class="text-xs text-slate-400">{{ user.email }}</div>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <span v-if="user.status === 'BLOCKED'" class="text-xs font-bold text-rose-500 bg-rose-50 px-2 py-1 rounded">차단됨</span>
+                            <button 
+                                v-else
+                                @click="handleBlockUser(user)"
+                                class="px-3 py-1.5 text-xs font-bold text-rose-500 border border-rose-200 hover:bg-rose-50 rounded-lg transition-colors flex items-center gap-1"
+                            >
+                                <ShieldAlert :size="14" />
+                                차단
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div v-else-if="searched" class="text-center py-10 text-slate-400 bg-slate-50 rounded-xl border border-dashed border-slate-200">
+                    검색 결과가 없습니다.
+                </div>
             </div>
+        </section>
+
+        <!-- Placeholders -->
+        <section class="grid grid-cols-1 md:grid-cols-2 gap-6">
              <div class="bg-slate-50 rounded-3xl p-6 border border-slate-200 border-dashed flex flex-col items-center justify-center text-center py-12">
                 <Settings class="w-10 h-10 text-slate-300 mb-3" />
                 <h3 class="font-bold text-slate-500">시스템 설정</h3>
                 <p class="text-xs text-slate-400 mt-1">준비 중인 기능입니다</p>
             </div>
         </section>
-
       </div>
     </div>
   </div>
@@ -107,9 +154,40 @@ import { ref, onMounted, computed } from 'vue';
 import { ShieldAlert, Gift, Send, Loader2, UserX, Settings } from 'lucide-vue-next';
 import { studyApi } from '@/api/study';
 import { adminApi } from '@/api/admin';
+import { userApi } from '@/api/user';
 
 const studies = ref([]);
 const gifting = ref(false);
+
+// User Search State
+const searchKeyword = ref('');
+const searchResults = ref([]);
+const searched = ref(false);
+
+const searchUsers = async () => {
+    if (!searchKeyword.value.trim()) return;
+    try {
+        const res = await userApi.list({ keyword: searchKeyword.value });
+        searchResults.value = res.data;
+        searched.value = true;
+    } catch (e) {
+        console.error("User search failed", e);
+        alert("사용자 검색에 실패했습니다.");
+    }
+};
+
+const handleBlockUser = async (user) => {
+    if (!confirm(`'${user.username}' 회원을 정말로 차단하시겠습니까?`)) return;
+    try {
+        await adminApi.blockUser(user.id);
+        alert("회원이 차단되었습니다.");
+        // Refresh search results
+        searchUsers();
+    } catch (e) {
+        console.error("Block failed", e);
+        alert("차단에 실패했습니다.");
+    }
+};
 
 const giftForm = ref({
     studyId: null,

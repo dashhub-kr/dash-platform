@@ -117,7 +117,29 @@
                             class="rounded-3xl p-6 shadow-none relative transition-all duration-500 bg-white border border-slate-200"
                             :class="getMissionThemeClass(targetMission)">
                             
-                            <div class="relative z-10 flex flex-col items-start gap-4">
+                            <div v-if="isMissionAllClear(targetMission)" class="relative z-10 flex flex-col items-center text-center gap-4 py-4">
+                                <div class="w-16 h-16 bg-gradient-to-br from-emerald-400 to-teal-500 rounded-full flex items-center justify-center text-white shadow-lg shadow-emerald-200 animate-bounce">
+                                    <Trophy :size="32" stroke-width="3" />
+                                </div>
+                                <div>
+                                    <h2 class="text-2xl font-black text-slate-800 mb-1">이번 주 미션 ALL CLEAR!</h2>
+                                    <p class="text-sm text-slate-500 font-medium">모든 팀원이 미션을 완수했습니다.<br/>스터디장님, 다음 미션을 등록해주세요!</p>
+                                </div>
+                                <div class="flex flex-wrap gap-2 justify-center mt-2 w-full">
+                                     <a 
+                                        v-for="problemId in targetMission.problemIds" 
+                                        :key="problemId"
+                                        :href="getProblemLink(problemId)" 
+                                        target="_blank"
+                                        class="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-bold bg-emerald-50 text-emerald-600 border border-emerald-100 hover:bg-emerald-100 transition-colors"
+                                    >
+                                        {{ problemId }}번
+                                        <Check :size="14" stroke-width="3" />
+                                    </a>
+                                </div>
+                            </div>
+
+                            <div v-else class="relative z-10 flex flex-col items-start gap-4">
                                 <div>
                                     <div class="flex items-center gap-2 mb-2">
                                         <span class="px-2 py-0.5 bg-slate-100 rounded-lg text-xs font-bold uppercase tracking-wider text-slate-400">
@@ -274,8 +296,8 @@
                     </div>
                 </div>
 
-                <!-- 2. 활동 로그 (이동됨) -->
-                <div v-if="!loading" class="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm">
+                <!-- 2. 활동 로그 (분석 중일 때는 숨김) -->
+                <div v-if="!loading && !activeAnalysisRecord" class="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm animate-fade-in-down">
                     <h3 class="font-black text-slate-700 text-sm mb-4">스터디 활동 로그</h3>
                     
                     <!-- 히트맵 시각화 -->
@@ -609,10 +631,11 @@ const activeMissions = computed(() => {
             const notExpired = deadline >= today;
             
             // 모든 팀원이 완료했는지 확인 (memberProgressList가 있는 경우)
-            const allMembersCompleted = m.memberProgressList?.length > 0 && 
-                m.memberProgressList.every(member => member.allCompleted);
+            // const allMembersCompleted = m.memberProgressList?.length > 0 && 
+            //     m.memberProgressList.every(member => member.allCompleted);
             
-            return notExpired && !allMembersCompleted;
+            // 완료되어도 마감일이 지나지 않았으면 계속 표시 (유저 피드백 반영)
+            return notExpired;
         })
         .sort((a, b) => a.week - b.week);  // 낮은 주차부터 표시
 });
@@ -658,7 +681,13 @@ const isMissionUrgent = (mission) => {
 
 // 미션별 테마 클래스
 const getMissionThemeClass = (mission) => {
+    if (isMissionAllClear(mission)) return 'bg-emerald-50/50 border-emerald-100';
     return 'bg-white';
+};
+
+const isMissionAllClear = (mission) => {
+    if (!mission || !mission.memberProgressList) return false;
+    return mission.memberProgressList.length > 0 && mission.memberProgressList.every(m => m.allCompleted);
 };
 
 // 멤버 리스트 정렬: 본인 우선, 그 외 이름순
@@ -860,7 +889,7 @@ onMounted(async () => {
   try {
       // 1. 사용자 기록 가져오기
       try {
-          const recordsRes = await dashboardApi.getRecords();
+          const recordsRes = await dashboardApi.getRecords(currentStudyId.value);
           records.value = recordsRes.data;
       } catch(e) {
           console.error('Records Load Error:', e);
