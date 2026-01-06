@@ -18,7 +18,7 @@
 
       <!-- 2. 유형 배지 (TaskBadge 컴포넌트 사용) -->
       <div class="flex items-center gap-2">
-          <TaskBadge :type="props.record.tag" />
+          <TaskBadge :type="props.record.tag || 'GENERAL'" />
       </div>
 
       <!-- 3. 메타 정보 (고정 위치) -->
