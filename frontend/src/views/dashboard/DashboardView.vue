@@ -183,7 +183,7 @@
 
                             <!-- 멤버 진행 상황 섹션 -->
                             <div v-if="targetMission.memberProgressList?.length > 0" class="mt-6 pt-4 border-t border-slate-100 flex flex-wrap items-center gap-4">
-                                <div v-for="member in sortMembers(targetMission.memberProgressList)" :key="member.userId" 
+                                <div v-for="member in sortMembers(targetMission.memberProgressList)" :key="member.userId"> 
                                     <!-- 아바타 및 이름 (NicknameRenderer 사용) -->
                                     <div class="flex flex-col items-center gap-1 group relative cursor-help">
                                         <!-- 이름 툴팁 -->
@@ -219,6 +219,7 @@
                                     </div>
                             </div>
                         </div>
+                    </div>
                         
                         <div v-if="!targetMission" class="bg-white rounded-3xl p-6 shadow-sm flex items-center justify-center gap-3 text-slate-400 border border-slate-200">
                             <MapIcon :size="20" />

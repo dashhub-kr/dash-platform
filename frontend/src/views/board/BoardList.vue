@@ -185,7 +185,7 @@ import { useRouter } from 'vue-router';
 import { PenSquare, Inbox, ThumbsUp, MessageCircle, Search, Flame, Lightbulb, Code2, UserX } from 'lucide-vue-next';
 import NicknameRenderer from '@/components/common/NicknameRenderer.vue';
 import { boardApi } from '@/api/board';
-import NicknameRenderer from '@/components/common/NicknameRenderer.vue';
+
 
 const router = useRouter();
 const posts = ref([]);

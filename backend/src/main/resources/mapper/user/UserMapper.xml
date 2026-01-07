@@ -61,7 +61,10 @@
   </update>
 
   <select id="selectByStudyId" resultType="User" parameterType="long">
-    SELECT * FROM users WHERE study_id = #{studyId} AND deleted_at IS NULL ORDER BY id
+    SELECT u.*, d.css_class as equipped_decoration_class
+    FROM users u
+    LEFT JOIN decorations d ON u.equipped_decoration_id = d.id
+    WHERE u.study_id = #{studyId} AND u.deleted_at IS NULL ORDER BY u.id
   </select>
 
   <select id="selectUsersForAnonymization" resultType="User" parameterType="java.time.LocalDateTime">
