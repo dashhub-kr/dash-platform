@@ -22,14 +22,14 @@
           <h1 class="text-3xl font-extrabold text-slate-900 mb-4 leading-tight">{{ post.title }}</h1>
           <div class="flex flex-wrap items-center gap-4 text-sm text-slate-500">
             <div class="flex items-center gap-2">
-                  <img v-if="post.authorProfileImageUrl" 
+                 <img v-if="post.authorProfileImageUrl" 
                        :src="post.authorProfileImageUrl" 
                        class="w-8 h-8 rounded-full object-cover border border-brand-100" />
                   <div v-else class="w-8 h-8 rounded-full bg-brand-50 flex items-center justify-center text-brand-600 font-bold border border-brand-100">
                      {{ post.authorName?.charAt(0).toUpperCase() || 'U' }}
                   </div>
                   <NicknameRenderer 
-                    :nickname="post.authorName"
+                    :nickname="post.authorName && !['Unknown', 'Unknown User'].includes(post.authorName) ? post.authorName : '탈퇴한 회원'"
                     :role="post.authorRole"
                     :decorationClass="post.authorDecorationClass"
                     class="font-medium"
