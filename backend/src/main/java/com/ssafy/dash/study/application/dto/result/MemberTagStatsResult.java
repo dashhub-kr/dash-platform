@@ -10,6 +10,7 @@ public record MemberTagStatsResult(
         String username,
         Integer tier,
         String avatarUrl,
+        String decorationClass,
         Map<String, Double> tagRates,
         Map<String, Integer> tagSolved) {
 }

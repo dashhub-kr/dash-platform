@@ -22,7 +22,9 @@ public record UserResponse(
         String studyType,
         String role,
         String pendingStudyName,
-        String friendshipStatus) {
+        String pendingStudyName,
+        String friendshipStatus,
+        String equippedDecorationClass) {
 
     public static UserResponse from(UserResult result) {
         return new UserResponse(
@@ -43,7 +45,9 @@ public record UserResponse(
                 result.studyType(),
                 result.role(),
                 result.pendingStudyName(),
-                result.friendshipStatus());
+                result.pendingStudyName(),
+                result.friendshipStatus(),
+                result.equippedDecorationClass());
     }
 
 }

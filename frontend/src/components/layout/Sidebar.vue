@@ -343,7 +343,7 @@ const navGroups = computed(() => {
     ]
   },
   {
-    title: '퍼스널 트레이닝', // New Group
+    title: '개인 학습', // New Group
     items: [
       { label: '랜덤 디펜스', path: '/defense', icon: Shield, color: 'bg-slate-500' }, // Renamed & Moved to top (Action)
       { label: '모의고사', path: '/mockexam', icon: FileText, color: 'bg-blue-500' }, // Moved to 2nd (Action)

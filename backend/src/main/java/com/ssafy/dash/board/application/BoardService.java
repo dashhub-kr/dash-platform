@@ -170,6 +170,7 @@ public class BoardService {
     private BoardResult toResult(Board board, User user, boolean isLiked) {
         String authorName = (user != null) ? user.getUsername() : "Unknown";
         String authorProfileImageUrl = (user != null) ? user.getAvatarUrl() : null;
+        String authorDecorationClass = (user != null) ? user.getEquippedDecorationClass() : null;
 
         // Get study name
         String studyName = null;
@@ -193,7 +194,7 @@ public class BoardService {
             }
         }
 
-        return BoardResult.from(board, authorName, authorProfileImageUrl, studyName, problemNumber, isLiked);
+        return BoardResult.from(board, authorName, authorProfileImageUrl, studyName, problemNumber, isLiked, authorDecorationClass);
     }
 
 }

@@ -24,7 +24,9 @@ public record UserResult(
         String studyType,
         String role,
         String pendingStudyName,
-        String friendshipStatus) {
+        String pendingStudyName,
+        String friendshipStatus,
+        String equippedDecorationClass) {
 
     public static UserResult from(User user) {
         return from(user, null, null, null);
@@ -63,7 +65,10 @@ public record UserResult(
                 type,
                 user.getRole(),
                 pendingStudyName,
-                null);
+                user.getRole(),
+                pendingStudyName,
+                null,
+                user.getEquippedDecorationClass());
     }
 
     public static UserResult from(User user, String friendshipStatus) {
@@ -85,7 +90,8 @@ public record UserResult(
                 null,
                 user.getRole(),
                 null,
-                friendshipStatus);
+                friendshipStatus,
+                user.getEquippedDecorationClass());
     }
 
 }

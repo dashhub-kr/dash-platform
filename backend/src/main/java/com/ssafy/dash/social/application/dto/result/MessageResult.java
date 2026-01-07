@@ -11,10 +11,11 @@ public record MessageResult(
         Long senderId,
         String senderName,
         String senderAvatar,
+        String senderDecorationClass,
         String content,
         boolean isRead,
         LocalDateTime createdAt,
-        boolean isMine // helper for frontend
+        boolean isMine // 프론트엔드용 헬퍼 필드
 ) {
     public static MessageResult from(DirectMessage dm, User sender, Long currentUserId) {
         return new MessageResult(
@@ -22,6 +23,7 @@ public record MessageResult(
                 sender.getId(),
                 sender.getUsername(),
                 sender.getAvatarUrl(),
+                sender.getEquippedDecorationClass(),
                 dm.getContent(),
                 dm.isRead(),
                 dm.getCreatedAt(),
