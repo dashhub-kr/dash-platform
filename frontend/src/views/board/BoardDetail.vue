@@ -22,20 +22,14 @@
           <h1 class="text-3xl font-extrabold text-slate-900 mb-4 leading-tight">{{ post.title }}</h1>
           <div class="flex flex-wrap items-center gap-4 text-sm text-slate-500">
             <div class="flex items-center gap-2">
-              <img v-if="post.authorProfileImageUrl" 
-                   :src="post.authorProfileImageUrl" 
-                   class="w-8 h-8 rounded-full object-cover border border-brand-100" />
-              <div v-else class="w-8 h-8 rounded-full bg-brand-50 flex items-center justify-center text-brand-600 font-bold border border-brand-100">
-                 {{ post.authorName?.charAt(0).toUpperCase() || 'U' }}
-              </div>
-              <span 
-                class="text-slate-700 font-medium" 
-                :class="{ 'admin-shining-text': post.authorRole === 'ROLE_ADMIN' }"
-              >
-                {{ post.authorName && !['Unknown', 'Unknown User'].includes(post.authorName) ? post.authorName : '탈퇴한 회원' }}
-              </span>
-              
-
+			  <NicknameRenderer 
+                   :username="post.authorName"
+                   :avatar-url="post.authorProfileImageUrl"
+                   :role="post.authorRole"
+                   avatar-class="w-8 h-8 object-cover border border-brand-100"
+                   text-class="font-medium text-slate-700"
+                   :icon-size="18"
+              />
             </div>
             <span class="w-1 h-1 rounded-full bg-slate-300"></span>
             <span>{{ formatDate(post.createdAt) }}</span>
@@ -132,18 +126,14 @@
           >
             <div class="flex items-center justify-between mb-3">
               <div class="flex items-center gap-3">
-                <img v-if="comment.authorProfileImageUrl" 
-                     :src="comment.authorProfileImageUrl" 
-                     class="w-8 h-8 rounded-full object-cover shadow-sm border border-slate-100" />
-                <div v-else class="w-8 h-8 rounded-full bg-white shadow-sm border border-slate-100 flex items-center justify-center text-slate-500 font-bold text-sm">
-                  {{ comment.authorName?.charAt(0).toUpperCase() || 'U' }}
-                </div>
-                <span 
-                    class="font-medium text-slate-700"
-                    :class="{ 'admin-shining-text': comment.authorRole === 'ROLE_ADMIN' }"
-                >
-                    {{ comment.authorName && !['Unknown', 'Unknown User'].includes(comment.authorName) ? comment.authorName : '탈퇴한 회원' }}
-                </span>
+                <NicknameRenderer 
+                     :username="comment.authorName"
+                     :avatar-url="comment.authorProfileImageUrl"
+                     :role="comment.authorRole"
+                     avatar-class="w-8 h-8 shadow-sm border border-slate-100"
+                     text-class="font-medium text-slate-700"
+                     :icon-size="18"
+                />
                 <span class="text-xs text-slate-400">{{ formatDate(comment.createdAt) }}</span>
               </div>
               <button 
@@ -205,18 +195,14 @@
                 class="bg-white rounded-xl p-4 border border-slate-100 shadow-sm"
               >
                 <div class="flex items-center gap-2 mb-2">
-                  <img v-if="reply.authorProfileImageUrl" 
-                       :src="reply.authorProfileImageUrl" 
-                       class="w-6 h-6 rounded-full object-cover border border-slate-100" />
-                  <div v-else class="w-6 h-6 rounded-full bg-slate-50 border border-slate-100 flex items-center justify-center text-slate-400 font-bold text-[10px]">
-                    {{ reply.authorName?.charAt(0).toUpperCase() || 'U' }}
-                  </div>
-                  <span 
-                    class="font-medium text-slate-700 text-sm"
-                    :class="{ 'admin-shining-text': reply.authorRole === 'ROLE_ADMIN' }"
-                  >
-                    {{ reply.authorName && !['Unknown', 'Unknown User'].includes(reply.authorName) ? reply.authorName : '탈퇴한 회원' }}
-                  </span>
+                  <NicknameRenderer 
+                       :username="reply.authorName"
+                       :avatar-url="reply.authorProfileImageUrl"
+                       :role="reply.authorRole"
+                       avatar-class="w-6 h-6 border border-slate-100 text-[10px]"
+                       text-class="font-medium text-slate-700 text-sm"
+                       :icon-size="14"
+                  />
                   <span class="text-xs text-slate-400">{{ formatDate(reply.createdAt) }}</span>
                 </div>
                 
@@ -295,6 +281,7 @@ import { boardApi, commentApi } from '@/api/board';
 import { algorithmApi } from '@/api/algorithm';
 import { useAuth } from '@/composables/useAuth';
 import CodeViewer from '@/components/editor/CodeViewer.vue';
+import NicknameRenderer from '@/components/common/NicknameRenderer.vue';
 
 const route = useRoute();
 const router = useRouter();

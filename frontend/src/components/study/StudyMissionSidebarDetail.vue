@@ -30,11 +30,13 @@
                    <td class="px-2 py-2 font-medium flex justify-center sticky left-0 z-10 group relative"
                        :class="isCurrentUser(member.userId) ? 'bg-emerald-50/30' : 'bg-white'">
                       <div class="relative">
-                        <img v-if="member.avatarUrl" :src="member.avatarUrl" class="w-8 h-8 rounded-full shadow-sm border border-slate-100" />
-                        <div v-else class="w-8 h-8 rounded-full bg-slate-200 flex items-center justify-center text-[10px] text-slate-500 font-bold border border-slate-100">
-                            <UserX v-if="member.username === '탈퇴한 회원'" :size="16" />
-                            <span v-else>{{ member.username?.substring(0, 1) }}</span>
-                        </div>
+                        <NicknameRenderer 
+                            :username="member.username"
+                            :avatar-url="member.avatarUrl"
+                            avatar-class="w-8 h-8 font-bold border border-slate-100"
+                            text-class="hidden"
+                            :icon-size="16"
+                        />
                         
                         <div v-if="member.completedCount === member.totalProblems" class="absolute -top-1 -right-1 text-rose-500 drop-shadow-sm">
                             <span class="text-[10px]">👑</span>
@@ -42,7 +44,11 @@
 
                         <!-- 커스텀 툴팁 (우측) -->
                         <div class="absolute left-full top-1/2 -translate-y-1/2 ml-3 px-2 py-1 bg-slate-800 text-white text-[10px] font-medium rounded shadow-xl z-50 whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
-                            {{ member.username }}
+                            <NicknameRenderer 
+                                :username="member.username"
+                                :show-avatar="false"
+                                text-class="text-white"
+                            />
                             <div class="absolute top-1/2 -translate-y-1/2 -left-1 w-2 h-2 bg-slate-800 rotate-45"></div>
                         </div>
                       </div>
@@ -152,9 +158,9 @@ import {
     Check as CheckIcon, 
     Flag as FlagIcon, 
     ExternalLink as ExternalLinkIcon,
-    Plus as PlusIcon,
-    UserX
+    Plus as PlusIcon
 } from 'lucide-vue-next';
+import NicknameRenderer from '@/components/common/NicknameRenderer.vue';
 import axios from 'axios';
 
 const props = defineProps({

@@ -62,16 +62,13 @@
                      @click="toggleLine(index + 1)">
                   <div class="flex -space-x-2">
                     <template v-for="(comment, cidx) in filteredCommentsByLine[index + 1].slice(0, 2)" :key="cidx">
-                      <img v-if="comment.authorProfileImageUrl" 
-                           :src="comment.authorProfileImageUrl" 
-                           :title="comment.authorName"
-                           class="w-5 h-5 rounded-full border-2 border-white shadow-sm object-cover" />
-                      <div v-else
-                           class="w-5 h-5 rounded-full bg-brand-100 border-2 border-white flex items-center justify-center text-[8px] font-bold text-brand-600 shadow-sm"
-                           :title="comment.authorName">
-                        <UserX v-if="comment.authorName === '탈퇴한 회원'" :size="12" />
-                        <span v-else>{{ comment.authorName?.charAt(0).toUpperCase() || 'U' }}</span>
-                      </div>
+                      <NicknameRenderer 
+                           :username="comment.authorName"
+                           :avatar-url="comment.authorProfileImageUrl"
+                           avatar-class="w-5 h-5 border-2 border-white shadow-sm text-[8px]"
+                           text-class="hidden"
+                           :icon-size="12"
+                      />
                     </template>
                     <div v-if="filteredCommentsByLine[index + 1].length > 2" 
                          class="w-5 h-5 rounded-full bg-slate-200 border-2 border-white flex items-center justify-center text-[8px] font-bold text-slate-600 shadow-sm">
@@ -111,16 +108,20 @@
                     :key="comment.id"
                     class="flex gap-2 items-start animate-fade-in"
                   >
-                    <img v-if="comment.authorProfileImageUrl" 
-                         :src="comment.authorProfileImageUrl" 
-                         class="w-5 h-5 rounded-full flex-shrink-0 border border-brand-200 object-cover" />
-                    <div v-else class="w-5 h-5 rounded-full bg-brand-100 flex-shrink-0 flex items-center justify-center text-brand-600 text-[9px] font-bold border border-brand-200">
-                       <UserX v-if="comment.authorName === '탈퇴한 회원'" :size="12" />
-                       <span v-else>{{ comment.authorName?.charAt(0).toUpperCase() || 'U' }}</span>
-                    </div>
+                    <NicknameRenderer 
+                         :username="comment.authorName"
+                         :avatar-url="comment.authorProfileImageUrl"
+                         avatar-class="w-5 h-5 flex-shrink-0 border border-brand-200 text-[9px]"
+                         text-class="hidden"
+                         :icon-size="12"
+                    />
                     <div class="flex-1 min-w-0">
                        <div class="flex items-center gap-2">
-                         <span class="font-bold text-slate-700 text-[11px]">{{ comment.authorName }}</span>
+                         <NicknameRenderer 
+                             :username="comment.authorName"
+                             :show-avatar="false"
+                             text-class="font-bold text-slate-700 text-[11px]"
+                         />
                          <span class="text-[9px] text-slate-400">{{ formatDate(comment.createdAt) }}</span>
                        </div>
                        <p class="text-slate-600 text-xs leading-relaxed">{{ comment.content }}</p>
@@ -188,6 +189,7 @@
 <script setup>
 import { ref, computed } from 'vue';
 import { Copy, MessageSquare, UserX } from 'lucide-vue-next';
+import NicknameRenderer from '@/components/common/NicknameRenderer.vue';
 import hljs from 'highlight.js';
 import 'highlight.js/styles/github.css';
 

@@ -184,36 +184,39 @@
                             <!-- 멤버 진행 상황 섹션 -->
                             <div v-if="targetMission.memberProgressList?.length > 0" class="mt-6 pt-4 border-t border-slate-100 flex flex-wrap items-center gap-4">
                                 <div v-for="member in sortMembers(targetMission.memberProgressList)" :key="member.userId" 
-                                    class="flex flex-col items-center gap-1 group relative cursor-help">
-                                    
-                                    <!-- 이름 툴팁 -->
-                                    <div class="absolute bottom-full mb-2 px-2 py-1 bg-black/80 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none z-20">
-                                        {{ member.username }} {{ isMe(member.userId) ? '(나)' : '' }}
-                                        <div class="absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-1 w-2 h-2 bg-black/80 rotate-45"></div>
-                                    </div>
+                                    <!-- 아바타 및 이름 (NicknameRenderer 사용) -->
+                                    <div class="flex flex-col items-center gap-1 group relative cursor-help">
+                                        <!-- 이름 툴팁 -->
+                                        <div class="absolute bottom-full mb-2 px-2 py-1 bg-black/80 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none z-20">
+                                            {{ member.username === '탈퇴한 회원' ? '탈퇴한 회원' : member.username }} {{ isMe(member.userId) ? '(나)' : '' }}
+                                            <div class="absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-1 w-2 h-2 bg-black/80 rotate-45"></div>
+                                        </div>
 
-                                    <!-- 아바타 -->
-                                    <UserX v-if="member.username === '탈퇴한 회원'" :size="40" class="w-10 h-10 rounded-full border-2 border-slate-200 bg-white p-2 text-slate-400" />
-                                    <img v-else :src="getMemberProfileImage(member)" :alt="member.username"
-                                        class="w-10 h-10 rounded-full object-cover border-2 transition-all relative z-10 bg-white"
-                                        :class="[
-                                            isMe(member.userId) 
-                                                ? 'border-emerald-400 ring-2 ring-emerald-400/30' + (member.allCompleted ? ' shadow-[0_0_12px_rgba(52,211,153,0.6)]' : '')
-                                                : member.allCompleted 
-                                                ? 'border-orange-400 shadow-[0_0_12px_rgba(251,146,60,0.5)]' 
-                                                : 'border-slate-200 opacity-80 grayscale-[0.0]'
-                                        ]" />
-                                    
-                                    <!-- 상태 -->
-                                    <div class="flex items-center gap-0.5 mt-0.5">
-                                        <Flame :size="13" 
-                                            class="transition-all"
-                                            :class="member.allCompleted ? 'fill-orange-400 text-orange-400 animate-pulse' : 'text-slate-300/40'" />
-                                        <span v-if="!member.allCompleted" class="text-[11px] font-bold text-slate-400">
-                                            {{ member.completedCount }}
-                                        </span>
+                                        <!-- 렌더러 -->
+                                        <NicknameRenderer 
+                                            :username="member.username"
+                                            :avatar-url="getMemberProfileImage(member)"
+                                            avatar-class="w-10 h-10 border-2"
+                                            text-class="hidden" 
+                                            :class="[
+                                                isMe(member.userId) 
+                                                    ? 'border-emerald-400 ring-2 ring-emerald-400/30' + (member.allCompleted ? ' shadow-[0_0_12px_rgba(52,211,153,0.6)]' : '')
+                                                    : member.allCompleted 
+                                                    ? 'border-orange-400 shadow-[0_0_12px_rgba(251,146,60,0.5)]' 
+                                                    : 'border-slate-200 opacity-80 grayscale-[0.0]'
+                                            ]"
+                                        />
+                                        
+                                        <!-- 상태 아이콘 -->
+                                        <div class="flex items-center gap-0.5 mt-0.5">
+                                            <Flame :size="13" 
+                                                class="transition-all"
+                                                :class="member.allCompleted ? 'fill-orange-400 text-orange-400 animate-pulse' : 'text-slate-300/40'" />
+                                            <span v-if="!member.allCompleted" class="text-[11px] font-bold text-slate-400">
+                                                {{ member.completedCount }}
+                                            </span>
+                                        </div>
                                     </div>
-                                </div>
                             </div>
                         </div>
                         
@@ -336,17 +339,15 @@
                                    <div v-if="heatmapTooltip.contributors?.length > 0" class="space-y-2">
                                        <div v-for="c in heatmapTooltip.contributors" :key="c.userId || c.username" 
                                             class="flex items-center gap-2 bg-slate-800/50 rounded-lg p-1.5 pr-3">
-                                           <!-- 프로필 이미지 -->
-                                           <UserX v-if="c.username === '탈퇴한 회원'" :size="16" class="w-6 h-6 rounded-full border border-slate-600 bg-slate-700 p-1 text-slate-400" />
-                                           <img v-else
-                                               :src="c.avatarUrl || getDefaultProfileImage(c.userId)" 
-                                               :alt="c.username"
-                                               class="w-6 h-6 rounded-full object-cover border border-slate-600 bg-slate-700"
+                                           <!-- 렌더러 -->
+                                           <NicknameRenderer 
+                                               :username="c.username"
+                                               :avatar-url="c.avatarUrl || getDefaultProfileImage(c.userId)"
+                                               avatar-class="w-6 h-6 border border-slate-600 bg-slate-700"
+                                               text-class="font-medium text-white truncate"
+                                               container-class="flex-1 min-w-0"
+                                               :icon-size="16"
                                            />
-                                           <!-- 이름 & 카운트 -->
-                                           <div class="flex-1 min-w-0">
-                                               <div class="font-medium text-white truncate">{{ c.username }}</div>
-                                           </div>
                                            <div class="text-brand-400 font-bold text-sm">{{ c.count }}건</div>
                                        </div>
                                    </div>
@@ -457,6 +458,7 @@ import {
 import hljs from 'highlight.js';
 import 'highlight.js/styles/github.css';
 import { marked } from 'marked';
+import NicknameRenderer from '@/components/common/NicknameRenderer.vue';
 
 const profileImages = [
     // '/profile/bag.png',
