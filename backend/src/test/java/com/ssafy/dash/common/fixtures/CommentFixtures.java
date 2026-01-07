@@ -86,7 +86,7 @@ public final class CommentFixtures {
         }
 
         public CommentResult toResult(LocalDateTime createdAt, LocalDateTime updatedAt) {
-            return new CommentResult(id, boardId, userId, authorName, null, parentId, lineNumber,
+            return new CommentResult(id, boardId, userId, authorName, null, null, null, parentId, lineNumber,
                     content, 0, false, java.util.Collections.emptyList(), createdAt, updatedAt);
         }
 
