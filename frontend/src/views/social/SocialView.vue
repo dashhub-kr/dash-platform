@@ -34,7 +34,7 @@
                 <div v-else class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                     <div v-for="item in friends" :key="item.id" class="p-4 rounded-2xl border border-slate-100 bg-slate-50 hover:bg-white hover:border-brand-200 hover:shadow-md transition-all group">
                         <div class="flex items-center gap-4">
-                            <img :src="item.friend.avatarUrl || '/images/profiles/default-profile.png'" class="w-12 h-12 rounded-full border border-slate-200 bg-white object-cover"/>
+                            <img :src="(item.friend.avatarUrl && !item.friend.avatarUrl.includes('dicebear')) ? item.friend.avatarUrl : '/images/profiles/default-profile.png'" class="w-12 h-12 rounded-full border border-slate-200 bg-white object-cover"/>
                             <div class="flex-1 min-w-0">
                                 <NicknameRenderer 
                                     :nickname="item.friend.username" 
@@ -67,7 +67,7 @@
                 <div v-else class="space-y-3">
                     <div v-for="req in requests" :key="req.id" class="flex items-center justify-between p-4 rounded-2xl border border-slate-100 hover:bg-slate-50">
                         <div class="flex items-center gap-4">
-                             <img :src="req.friend.avatarUrl || '/images/profiles/default-profile.png'" class="w-10 h-10 rounded-full border border-slate-200 bg-white object-cover"/>
+                             <img :src="(req.friend.avatarUrl && !req.friend.avatarUrl.includes('dicebear')) ? req.friend.avatarUrl : '/images/profiles/default-profile.png'" class="w-10 h-10 rounded-full border border-slate-200 bg-white object-cover"/>
                              <div>
                                 <NicknameRenderer 
                                     :nickname="req.friend.username" 
@@ -113,7 +113,7 @@
                 <div v-else class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div v-for="user in searchResults" :key="user.id" class="flex items-center justify-between p-4 rounded-2xl border border-slate-100 hover:bg-slate-50 transition-colors">
                             <div class="flex items-center gap-3">
-                                <img :src="user.avatarUrl || '/images/profiles/default-profile.png'" class="w-10 h-10 rounded-full border border-slate-200 bg-white object-cover"/>
+                                <img :src="(user.avatarUrl && !user.avatarUrl.includes('dicebear')) ? user.avatarUrl : '/images/profiles/default-profile.png'" class="w-10 h-10 rounded-full border border-slate-200 bg-white object-cover"/>
                                 <div>
                                     <NicknameRenderer 
                                         :nickname="user.username" 

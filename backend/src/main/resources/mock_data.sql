@@ -21,26 +21,27 @@ TRUNCATE TABLE studies;
 -- =====================================================
 -- 1. 유저 데이터 (총 15명) - study_id는 NULL로 먼저 생성
 -- =====================================================
-INSERT INTO users (username, email, solvedac_handle, solvedac_tier, solvedac_rating, solvedac_class, solved_count, stats_last_synced_at, silver_streak, gold_streak, max_silver_streak, max_gold_streak, created_at, provider, provider_id, avatar_url, study_id)
-VALUES
--- 기존 유저 (1-4)
-('algorithm_master', 'algo_master@github.placeholder', 'algo_master', 14, 1350, 4, 287, NOW(), 5, 3, 10, 5, DATE_SUB(NOW(), INTERVAL 30 DAY), 'github', '12345678', 'https://api.dicebear.com/7.x/adventurer/svg?seed=AlgoMaster', NULL),
-('code_ninja', 'code_ninja@github.placeholder', 'code_ninja', 10, 750, 3, 156, NOW(), 3, 0, 7, 2, DATE_SUB(NOW(), INTERVAL 25 DAY), 'github', '23456789', 'https://api.dicebear.com/7.x/adventurer/svg?seed=CodeNinja', NULL),
-('dp_expert', 'dp_expert@github.placeholder', 'dp_expert', 13, 1150, 4, 234, NOW(), 7, 4, 15, 8, DATE_SUB(NOW(), INTERVAL 20 DAY), 'github', '34567890', 'https://api.dicebear.com/7.x/adventurer/svg?seed=DPExpert', NULL),
-('graph_hero', 'graph_hero@github.placeholder', 'graph_hero', 16, 1620, 5, 412, NOW(), 10, 7, 20, 12, DATE_SUB(NOW(), INTERVAL 15 DAY), 'github', '45678901', 'https://api.dicebear.com/7.x/adventurer/svg?seed=GraphHero', NULL),
-
--- 신규 유저 (5-15)
-('greedy_king', 'greedy@github.placeholder', 'greedy_king', 18, 1850, 6, 620, NOW(), 15, 12, 30, 20, DATE_SUB(NOW(), INTERVAL 60 DAY), 'github', '56789012', 'https://api.dicebear.com/7.x/adventurer/svg?seed=GreedyKing', NULL),
-('bfs_master', 'bfs@github.placeholder', 'bfs_master', 14, 1380, 4, 310, NOW(), 6, 2, 12, 5, DATE_SUB(NOW(), INTERVAL 40 DAY), 'github', '67890123', 'https://api.dicebear.com/7.x/adventurer/svg?seed=BFSMaster', NULL),
-('newbie_coder', 'newbie@github.placeholder', 'newbie_coder', 4, 120, 1, 30, NOW(), 1, 0, 2, 0, DATE_SUB(NOW(), INTERVAL 5 DAY), 'github', '78901234', 'https://api.dicebear.com/7.x/adventurer/svg?seed=NewbieCoder', NULL),
-('full_stack', 'fullstack@github.placeholder', 'full_stack', 9, 650, 2, 120, NOW(), 4, 1, 8, 2, DATE_SUB(NOW(), INTERVAL 45 DAY), 'github', '89012345', 'https://api.dicebear.com/7.x/adventurer/svg?seed=FullStack', NULL),
-('kakao_intern', 'kakao@github.placeholder', 'kakao_intern', 15, 1480, 5, 380, NOW(), 8, 5, 18, 8, DATE_SUB(NOW(), INTERVAL 90 DAY), 'github', '90123456', 'https://api.dicebear.com/7.x/adventurer/svg?seed=KakaoIntern', NULL),
-('samsung_man', 'samsung@github.placeholder', 'samsung_man', 17, 1720, 5, 550, NOW(), 12, 8, 25, 15, DATE_SUB(NOW(), INTERVAL 100 DAY), 'github', '01234567', 'https://api.dicebear.com/7.x/adventurer/svg?seed=SamsungMan', NULL),
-('algorithm_god', 'god@github.placeholder', 'algorithm_god', 22, 2300, 7, 1200, NOW(), 50, 40, 100, 80, DATE_SUB(NOW(), INTERVAL 365 DAY), 'github', '11223344', 'https://api.dicebear.com/7.x/adventurer/svg?seed=AlgoGod', NULL),
-('python_lover', 'py@github.placeholder', 'python_lover', 8, 550, 2, 90, NOW(), 2, 0, 5, 1, DATE_SUB(NOW(), INTERVAL 10 DAY), 'github', '22334455', 'https://api.dicebear.com/7.x/adventurer/svg?seed=PyLover', NULL),
-('java_wizard', 'java@github.placeholder', 'java_wizard', 13, 1280, 4, 250, NOW(), 5, 3, 10, 4, DATE_SUB(NOW(), INTERVAL 28 DAY), 'github', '33445566', 'https://api.dicebear.com/7.x/adventurer/svg?seed=JavaWizard', NULL),
-('cpp_warrior', 'cpp@github.placeholder', 'cpp_warrior', 19, 1950, 6, 780, NOW(), 20, 15, 35, 22, DATE_SUB(NOW(), INTERVAL 150 DAY), 'github', '44556677', 'https://api.dicebear.com/7.x/adventurer/svg?seed=CppWarrior', NULL),
-('data_scientist', 'ds@github.placeholder', 'data_scientist', 11, 850, 3, 180, NOW(), 3, 1, 6, 2, DATE_SUB(NOW(), INTERVAL 35 DAY), 'github', '55667788', 'https://api.dicebear.com/7.x/adventurer/svg?seed=DataScientist', NULL);
+-- (사용자 요청으로 목 데이터 비활성화 - 2026-01-07)
+-- INSERT INTO users (username, email, solvedac_handle, solvedac_tier, solvedac_rating, solvedac_class, solved_count, stats_last_synced_at, silver_streak, gold_streak, max_silver_streak, max_gold_streak, created_at, provider, provider_id, avatar_url, study_id)
+-- VALUES
+-- -- 기존 유저 (1-4)
+-- ('algorithm_master', 'algo_master@github.placeholder', 'algo_master', 14, 1350, 4, 287, NOW(), 5, 3, 10, 5, DATE_SUB(NOW(), INTERVAL 30 DAY), 'github', '12345678', 'https://api.dicebear.com/7.x/adventurer/svg?seed=AlgoMaster', NULL),
+-- ('code_ninja', 'code_ninja@github.placeholder', 'code_ninja', 10, 750, 3, 156, NOW(), 3, 0, 7, 2, DATE_SUB(NOW(), INTERVAL 25 DAY), 'github', '23456789', 'https://api.dicebear.com/7.x/adventurer/svg?seed=CodeNinja', NULL),
+-- ('dp_expert', 'dp_expert@github.placeholder', 'dp_expert', 13, 1150, 4, 234, NOW(), 7, 4, 15, 8, DATE_SUB(NOW(), INTERVAL 20 DAY), 'github', '34567890', 'https://api.dicebear.com/7.x/adventurer/svg?seed=DPExpert', NULL),
+-- ('graph_hero', 'graph_hero@github.placeholder', 'graph_hero', 16, 1620, 5, 412, NOW(), 10, 7, 20, 12, DATE_SUB(NOW(), INTERVAL 15 DAY), 'github', '45678901', 'https://api.dicebear.com/7.x/adventurer/svg?seed=GraphHero', NULL),
+-- 
+-- -- 신규 유저 (5-15)
+-- ('greedy_king', 'greedy@github.placeholder', 'greedy_king', 18, 1850, 6, 620, NOW(), 15, 12, 30, 20, DATE_SUB(NOW(), INTERVAL 60 DAY), 'github', '56789012', 'https://api.dicebear.com/7.x/adventurer/svg?seed=GreedyKing', NULL),
+-- ('bfs_master', 'bfs@github.placeholder', 'bfs_master', 14, 1380, 4, 310, NOW(), 6, 2, 12, 5, DATE_SUB(NOW(), INTERVAL 40 DAY), 'github', '67890123', 'https://api.dicebear.com/7.x/adventurer/svg?seed=BFSMaster', NULL),
+-- ('newbie_coder', 'newbie@github.placeholder', 'newbie_coder', 4, 120, 1, 30, NOW(), 1, 0, 2, 0, DATE_SUB(NOW(), INTERVAL 5 DAY), 'github', '78901234', 'https://api.dicebear.com/7.x/adventurer/svg?seed=NewbieCoder', NULL),
+-- ('full_stack', 'fullstack@github.placeholder', 'full_stack', 9, 650, 2, 120, NOW(), 4, 1, 8, 2, DATE_SUB(NOW(), INTERVAL 45 DAY), 'github', '89012345', 'https://api.dicebear.com/7.x/adventurer/svg?seed=FullStack', NULL),
+-- ('kakao_intern', 'kakao@github.placeholder', 'kakao_intern', 15, 1480, 5, 380, NOW(), 8, 5, 18, 8, DATE_SUB(NOW(), INTERVAL 90 DAY), 'github', '90123456', 'https://api.dicebear.com/7.x/adventurer/svg?seed=KakaoIntern', NULL),
+-- ('samsung_man', 'samsung@github.placeholder', 'samsung_man', 17, 1720, 5, 550, NOW(), 12, 8, 25, 15, DATE_SUB(NOW(), INTERVAL 100 DAY), 'github', '01234567', 'https://api.dicebear.com/7.x/adventurer/svg?seed=SamsungMan', NULL),
+-- ('algorithm_god', 'god@github.placeholder', 'algorithm_god', 22, 2300, 7, 1200, NOW(), 50, 40, 100, 80, DATE_SUB(NOW(), INTERVAL 365 DAY), 'github', '11223344', 'https://api.dicebear.com/7.x/adventurer/svg?seed=AlgoGod', NULL),
+-- ('python_lover', 'py@github.placeholder', 'python_lover', 8, 550, 2, 90, NOW(), 2, 0, 5, 1, DATE_SUB(NOW(), INTERVAL 10 DAY), 'github', '22334455', 'https://api.dicebear.com/7.x/adventurer/svg?seed=PyLover', NULL),
+-- ('java_wizard', 'java@github.placeholder', 'java_wizard', 13, 1280, 4, 250, NOW(), 5, 3, 10, 4, DATE_SUB(NOW(), INTERVAL 28 DAY), 'github', '33445566', 'https://api.dicebear.com/7.x/adventurer/svg?seed=JavaWizard', NULL),
+-- ('cpp_warrior', 'cpp@github.placeholder', 'cpp_warrior', 19, 1950, 6, 780, NOW(), 20, 15, 35, 22, DATE_SUB(NOW(), INTERVAL 150 DAY), 'github', '44556677', 'https://api.dicebear.com/7.x/adventurer/svg?seed=CppWarrior', NULL),
+-- ('data_scientist', 'ds@github.placeholder', 'data_scientist', 11, 850, 3, 180, NOW(), 3, 1, 6, 2, DATE_SUB(NOW(), INTERVAL 35 DAY), 'github', '55667788', 'https://api.dicebear.com/7.x/adventurer/svg?seed=DataScientist', NULL);
 
 -- =====================================================
 -- 2. 스터디 그룹 데이터 (총 5개)
