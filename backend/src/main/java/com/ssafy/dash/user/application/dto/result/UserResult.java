@@ -24,7 +24,6 @@ public record UserResult(
         String studyType,
         String role,
         String pendingStudyName,
-        String pendingStudyName,
         String friendshipStatus,
         String equippedDecorationClass) {
 
@@ -63,8 +62,6 @@ public record UserResult(
                 webhook,
                 isLeader,
                 type,
-                user.getRole(),
-                pendingStudyName,
                 user.getRole(),
                 pendingStudyName,
                 null,
