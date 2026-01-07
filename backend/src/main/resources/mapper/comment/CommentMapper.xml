@@ -12,7 +12,9 @@
       c.id, c.board_id, c.user_id, c.parent_id, c.line_number, c.content, c.like_count, 
       c.created_at, c.updated_at,
       u.username as author_name,
-      u.avatar_url as author_profile_image_url
+      u.username as author_name,
+      u.avatar_url as author_profile_image_url,
+      u.role as author_role
     FROM comments c
     LEFT JOIN users u ON c.user_id = u.id
     WHERE c.id = #{id}
@@ -23,7 +25,9 @@
       c.id, c.board_id, c.user_id, c.parent_id, c.line_number, c.content, c.like_count, 
       c.created_at, c.updated_at,
       u.username as author_name,
+      u.username as author_name,
       u.avatar_url as author_profile_image_url,
+      u.role as author_role,
       (SELECT COUNT(*) FROM comment_likes cl WHERE cl.comment_id = c.id AND cl.user_id = #{userId}) > 0 as is_liked
     FROM comments c
     LEFT JOIN users u ON c.user_id = u.id
@@ -36,7 +40,9 @@
       c.id, c.board_id, c.user_id, c.parent_id, c.line_number, c.content, c.like_count, 
       c.created_at, c.updated_at,
       u.username as author_name,
+      u.username as author_name,
       u.avatar_url as author_profile_image_url,
+      u.role as author_role,
       (SELECT COUNT(*) FROM comment_likes cl WHERE cl.comment_id = c.id AND cl.user_id = #{userId}) > 0 as is_liked
     FROM comments c
     LEFT JOIN users u ON c.user_id = u.id

@@ -87,7 +87,7 @@
                     {{ post.title }}
                   </h3>
                 </div>
-                <div class="col-span-2 text-center text-sm font-medium text-slate-600 flex items-center justify-center gap-2">
+                <div class="col-span-2 text-center text-sm font-medium text-slate-600 flex items-center justify-start pl-8 gap-2">
                   <UserX v-if="['Unknown User', 'Unknown'].includes(post.authorName)" :size="16" class="w-6 h-6 rounded-full border border-slate-200 bg-slate-50 p-1 text-slate-400" />
                   <img v-else-if="post.authorProfileImageUrl" :src="post.authorProfileImageUrl" class="w-6 h-6 rounded-full border border-slate-200" />
                   <div class="flex flex-col items-start">
