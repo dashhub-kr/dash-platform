@@ -25,20 +25,28 @@
             <div class="flex-1 overflow-y-auto p-4 space-y-4 bg-slate-50" ref="messagesContainer">
                 <div v-if="loading" class="flex justify-center py-10"><Loader2 class="animate-spin text-brand-500"/></div>
                 <template v-else>
-                    <div 
-                        v-for="msg in messages" 
-                        :key="msg.id" 
-                        class="flex flex-col"
-                        :class="msg.isMine ? 'items-end' : 'items-start'"
-                    >
-                         <div 
-                            class="max-w-[70%] px-4 py-2.5 rounded-2xl text-sm font-medium shadow-sm leading-relaxed whitespace-pre-wrap"
-                            :class="msg.isMine ? 'bg-brand-500 text-white rounded-tr-sm' : 'bg-white text-slate-700 border border-slate-200 rounded-tl-sm'"
-                         >
-                            {{ msg.content }}
-                         </div>
-                         <span class="text-[10px] text-slate-400 mt-1 px-1">{{ formatTime(msg.createdAt) }}</span>
-                    </div>
+                    <template v-for="(msg, index) in messages" :key="msg.id">
+                        <!-- Date Separator -->
+                        <div v-if="showDateSeparator(index, messages)" class="w-full flex justify-center my-6">
+                            <span class="text-xs font-bold text-slate-600 bg-slate-200/80 px-4 py-1.5 rounded-full border border-slate-300/50 shadow-sm">
+                                {{ formatDate(msg.createdAt) }}
+                            </span>
+                        </div>
+
+                        <!-- Message Item -->
+                        <div 
+                            class="flex flex-col"
+                            :class="msg.isMine ? 'items-end' : 'items-start'"
+                        >
+                             <div 
+                                class="max-w-[70%] px-4 py-2.5 rounded-2xl text-sm font-medium shadow-sm leading-relaxed whitespace-pre-wrap"
+                                :class="msg.isMine ? 'bg-brand-500 text-white rounded-tr-sm' : 'bg-white text-slate-700 border border-slate-200 rounded-tl-sm'"
+                             >
+                                {{ msg.content }}
+                             </div>
+                             <span class="text-[10px] text-slate-400 mt-1 px-1">{{ formatTime(msg.createdAt) }}</span>
+                        </div>
+                    </template>
                 </template>
             </div>
             
@@ -130,6 +138,24 @@ const formatTime = (iso) => {
     return d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 };
 
+const formatDate = (iso) => {
+    const d = new Date(iso);
+    return d.toLocaleDateString('ko-KR', { 
+        year: 'numeric', 
+        month: 'long', 
+        day: 'numeric', 
+        weekday: 'long' 
+    });
+};
+
+const showDateSeparator = (index, msgs) => {
+    if (index === 0) return true;
+    
+    const currentMsgDate = new Date(msgs[index].createdAt).toLocaleDateString();
+    const prevMsgDate = new Date(msgs[index - 1].createdAt).toLocaleDateString();
+    
+    return currentMsgDate !== prevMsgDate;
+};
 let pollInterval;
 
 onMounted(() => {

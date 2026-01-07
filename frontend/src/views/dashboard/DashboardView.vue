@@ -483,7 +483,7 @@ const props = defineProps({
     }
 });
 
-const { user } = useAuth();
+const { user, refresh } = useAuth();
 const router = useRouter();
 const records = ref([]);
 const studyData = ref(null);
@@ -889,14 +889,16 @@ const handleAcornUsed = () => {
 };
 
 onMounted(async () => {
-  try {
-      // 1. 사용자 기록 가져오기
-      try {
-          const recordsRes = await dashboardApi.getRecords(currentStudyId.value);
-          records.value = recordsRes.data;
-      } catch(e) {
-          console.error('Records Load Error:', e);
-      }
+    try {
+        await refresh();
+
+        // 1. 사용자 기록 가져오기
+        try {
+            const recordsRes = await dashboardApi.getRecords(currentStudyId.value);
+            records.value = recordsRes.data;
+        } catch(e) {
+            console.error('Records Load Error:', e);
+        }
       
       // 2. 태그 통계 가져오기
       try {
