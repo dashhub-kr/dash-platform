@@ -14,15 +14,16 @@
                 class="rounded-full bg-brand-50 flex items-center justify-center text-brand-600 font-bold border border-brand-100"
                 :class="avatarClass"
             >
-                {{ username?.charAt(0).toUpperCase() || 'U' }}
+                {{ nickname?.charAt(0).toUpperCase() || username?.charAt(0).toUpperCase() || 'U' }}
             </div>
         </template>
 
-        <!-- Username -->
+        <!-- Username / Nickname -->
         <span 
             class="font-medium truncate" 
             :class="[
                 textClass, 
+                decorationClass,
                 isUnknown ? 'text-slate-400' : 'text-slate-700',
                 { 'admin-shining-text': isAdmin }
             ]"
@@ -37,9 +38,13 @@ import { computed } from 'vue';
 import { UserX } from 'lucide-vue-next';
 
 const props = defineProps({
-    username: { type: String, default: '' },
+    nickname: { type: String, default: '' }, 
+    username: { type: String, default: '' }, 
     avatarUrl: { type: String, default: null },
     role: { type: String, default: null },
+    decorationClass: { type: String, default: null }, 
+    verified: { type: Boolean, default: false },
+    
     showAvatar: { type: Boolean, default: true },
     avatarClass: { type: String, default: 'w-6 h-6' },
     textClass: { type: String, default: 'text-xs' },
@@ -47,12 +52,15 @@ const props = defineProps({
     iconSize: { type: Number, default: 14 }
 });
 
+const effectiveNickname = computed(() => props.nickname || props.username);
+
 const isUnknown = computed(() => {
-    return !props.username || ['Unknown', 'Unknown User', '탈퇴한 회원'].includes(props.username);
+    const name = effectiveNickname.value;
+    return !name || ['Unknown', 'Unknown User', '탈퇴한 회원'].includes(name);
 });
 
 const displayName = computed(() => {
-    return isUnknown.value ? '탈퇴한 회원' : props.username;
+    return isUnknown.value ? '탈퇴한 회원' : effectiveNickname.value;
 });
 
 const isAdmin = computed(() => props.role === 'ROLE_ADMIN');
