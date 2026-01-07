@@ -156,6 +156,8 @@ const showDateSeparator = (index, msgs) => {
     
     return currentMsgDate !== prevMsgDate;
 };
+let pollInterval;
+
 onMounted(() => {
     fetchMessages();
     pollInterval = setInterval(fetchMessages, 3000); // 3초마다 새 메시지 폴링
