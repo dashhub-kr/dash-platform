@@ -188,7 +188,7 @@
 
 <script setup>
 import { ref, computed } from 'vue';
-import { Copy, MessageSquare, UserX } from 'lucide-vue-next';
+import { Copy, MessageSquare } from 'lucide-vue-next';
 import NicknameRenderer from '@/components/common/NicknameRenderer.vue';
 import hljs from 'highlight.js';
 import 'highlight.js/styles/github.css';
