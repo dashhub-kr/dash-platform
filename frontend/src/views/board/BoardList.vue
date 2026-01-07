@@ -87,18 +87,18 @@
                     {{ post.title }}
                   </h3>
                 </div>
-                <div class="col-span-2 text-center text-sm font-medium text-slate-600 flex items-center justify-center gap-2">
+                <div class="col-span-2 text-center text-sm font-medium text-slate-600 flex items-center justify-start pl-8 gap-2">
                   <UserX v-if="['Unknown User', 'Unknown'].includes(post.authorName)" :size="16" class="w-6 h-6 rounded-full border border-slate-200 bg-slate-50 p-1 text-slate-400" />
                   <img v-else-if="post.authorProfileImageUrl" :src="post.authorProfileImageUrl" class="w-6 h-6 rounded-full border border-slate-200" />
                   <div class="flex flex-col items-start">
                        <span v-if="post.studyName" class="text-[10px] text-brand-500 font-bold hidden sm:inline">[{{ post.studyName }}]</span>
                        <span class="flex items-center gap-1 min-w-0 max-w-[120px]">
-                          <span 
-                              class="truncate block max-w-[80px] sm:max-w-[100px]"
-                              :class="{ 'admin-shining-text': post.authorRole === 'ROLE_ADMIN' }"
-                          >
-                              {{ ['Unknown User', 'Unknown'].includes(post.authorName) ? '탈퇴한 회원' : post.authorName }}
-                          </span>
+                          <NicknameRenderer 
+                              :nickname="post.authorName"
+                              :role="post.authorRole"
+                              :decorationClass="post.authorDecorationClass" 
+                              class="text-sm"
+                          />
                        </span>
                   </div>
                 </div>
@@ -156,12 +156,11 @@
                     <UserX v-if="['Unknown User', 'Unknown'].includes(post.authorName)" :size="14" class="w-5 h-5 rounded-full border border-orange-200 bg-orange-50 p-1 text-orange-400" />
                     <template v-else>
                         <span v-if="post.studyName" class="text-brand-600 font-bold hidden xl:inline">[{{ post.studyName }}]</span>
-                        <span 
-                            class="truncate max-w-[100px]"
-                            :class="{ 'admin-shining-text': post.authorRole === 'ROLE_ADMIN' }"
-                        >
-                            {{ ['Unknown User', 'Unknown'].includes(post.authorName) ? '탈퇴한 회원' : post.authorName }}
-                        </span>
+                        <NicknameRenderer 
+                            :nickname="post.authorName"
+                            :role="post.authorRole"
+                            :decorationClass="post.authorDecorationClass"
+                        />
                     </template>
                   </div>
               </div>
@@ -192,6 +191,7 @@ import { ref, computed, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
 import { PenSquare, Inbox, ThumbsUp, MessageCircle, Search, Flame, Lightbulb, Code2, UserX } from 'lucide-vue-next';
 import { boardApi } from '@/api/board';
+import NicknameRenderer from '@/components/common/NicknameRenderer.vue';
 
 const router = useRouter();
 const posts = ref([]);
@@ -259,20 +259,4 @@ onMounted(async () => {
   }
 }
 
-.admin-shining-text {
-  background: linear-gradient(to right, #6366f1 20%, #a855f7 40%, #ec4899 60%, #6366f1 80%);
-  background-size: 200% auto;
-  color: #000;
-  background-clip: text;
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  animation: shine 3s linear infinite;
-  font-weight: 900;
-}
-
-@keyframes shine {
-  to {
-    background-position: 200% center;
-  }
-}
 </style>

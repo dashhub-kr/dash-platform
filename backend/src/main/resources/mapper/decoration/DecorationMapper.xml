@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ssafy.dash.decoration.infrastructure.mapper.DecorationMapper">
+
+    <insert id="insert" parameterType="Decoration" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO decorations (name, description, css_class, type, created_at)
+        VALUES (#{name}, #{description}, #{cssClass}, #{type}, #{createdAt})
+    </insert>
+
+    <select id="selectAll" resultType="Decoration">
+        SELECT * FROM decorations ORDER BY id DESC
+    </select>
+
+    <select id="selectById" resultType="Decoration">
+        SELECT * FROM decorations WHERE id = #{id}
+    </select>
+
+    <delete id="delete">
+        DELETE FROM decorations WHERE id = #{id}
+    </delete>
+
+    <!-- User Decoration -->
+    <insert id="insertUserDecoration" parameterType="UserDecoration" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO user_decorations (user_id, decoration_id, acquired_at)
+        VALUES (#{userId}, #{decorationId}, #{acquiredAt})
+    </insert>
+
+    <resultMap id="UserDecorationResult" type="UserDecoration">
+        <id property="id" column="id"/>
+        <result property="userId" column="user_id"/>
+        <result property="decorationId" column="decoration_id"/>
+        <result property="acquiredAt" column="acquired_at"/>
+        <association property="decoration" javaType="Decoration">
+            <id property="id" column="d_id"/>
+            <result property="name" column="d_name"/>
+            <result property="description" column="d_description"/>
+            <result property="cssClass" column="d_css_class"/>
+            <result property="type" column="d_type"/>
+        </association>
+    </resultMap>
+
+    <select id="selectByUserId" resultMap="UserDecorationResult">
+        SELECT 
+            ud.id, ud.user_id, ud.decoration_id, ud.acquired_at,
+            d.id as d_id, d.name as d_name, d.description as d_description,
+            d.css_class as d_css_class, d.type as d_type
+        FROM user_decorations ud
+        JOIN decorations d ON ud.decoration_id = d.id
+        WHERE ud.user_id = #{userId}
+        ORDER BY ud.acquired_at DESC
+    </select>
+
+    <select id="countUserDecoration" resultType="int">
+        SELECT COUNT(*) FROM user_decorations WHERE user_id = #{userId} AND decoration_id = #{decorationId}
+    </select>
+
+    <delete id="deleteUserDecoration">
+        DELETE FROM user_decorations WHERE user_id = #{userId} AND decoration_id = #{decorationId}
+    </delete>
+
+</mapper>

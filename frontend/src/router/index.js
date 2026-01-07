@@ -152,6 +152,18 @@ const routes = [
     component: () => import("../views/admin/AdminView.vue"),
     meta: { requiresAuth: true, requiresAdmin: true }
   },
+  {
+    path: "/admin/decorations",
+    name: "DecorationAdmin",
+    component: () => import("../views/admin/DecorationAdmin.vue"),
+    meta: { requiresAuth: true, requiresAdmin: true }
+  },
+  {
+    path: "/profile/decorations",
+    name: "MyDecorations",
+    component: () => import("../views/user/MyDecorations.vue"),
+    meta: { requiresAuth: true }
+  },
 ];
 
 const router = createRouter({
@@ -159,11 +171,11 @@ const router = createRouter({
   routes,
 });
 
-// Global Navigation Guard
+// 글로벌 네비게이션 가드 (Global Navigation Guard)
 router.beforeEach(async (to, from, next) => {
   const { user, authChecked, refresh } = useAuth();
 
-  // 1. Ensure authentication state is loaded
+  // 1. 인증 상태 로드 확인
   if (!authChecked.value) {
     await refresh();
   }
@@ -171,57 +183,57 @@ router.beforeEach(async (to, from, next) => {
   const isAuthenticated = !!user.value;
   const isPublicRoute = to.meta.public;
 
-  // 2. Unauthenticated User Handling
+  // 2. 미인증 사용자 처리
   if (!isAuthenticated) {
     if (to.meta.requiresAuth) {
-      // Accessing protected route -> Redirect to Landing
+      // 보호된 라우트 접근 -> Landing으로 리다이렉트
       return next('/');
     }
-    // Accessing public route -> Allow
+    // 공개 라우트 접근 -> 허용
     return next();
   }
 
-  // 3. Authenticated User Handling
+  // 3. 인증된 사용자 처리
   const isPlatformConnected = user.value &&
     (user.value.solvedacId || user.value.solvedacHandle) &&
     user.value.repositoryName;
 
   if (!isPlatformConnected) {
-    // Case 3-1: Incomplete Profile (No Git/Solved.ac)
-    // Block access to private routes except Onboarding
+    // Case 3-1: 프로필 미완성 (Git/Solved.ac 미연동)
+    // Onboarding을 제외한 비공개 라우트 접근 차단
     if (to.path !== '/onboarding' && to.meta.requiresAuth) {
       return next('/onboarding');
     }
     return next();
   }
 
-  // Case 3-2: Platform Connected
-  // Prevent re-entry to Onboarding
+  // Case 3-2: 플랫폼 연동 완료
+  // Onboarding 재진입 방지
   if (to.path === '/onboarding') {
     return next(user.value.studyId ? '/dashboard' : '/training/roadmap');
   }
 
-  // Admin Check
+  // 관리자 권한 확인
   if (to.meta.requiresAdmin && user.value.role !== 'ROLE_ADMIN') {
-      alert("관리자 권한이 필요합니다.");
-      return next('/');
+    alert("관리자 권한이 필요합니다.");
+    return next('/');
   }
 
-  // Check Study Membership for specific routes
+  // 특정 라우트에 대한 스터디 멤버십 확인
   const studyRoutes = ['/dashboard', '/study/missions', '/study/analysis'];
   const isStudyRoute = studyRoutes.includes(to.path);
 
   if (isStudyRoute && !user.value.studyId && !to.meta.requiresAdmin) {
     if (user.value.hasPendingApplication) {
-        // Redirect to Roadmap but can show a toast or banner there, or just let them wait
-        // Maybe redirect to /training/roadmap?pending=true
-        return next('/training/roadmap?pending=true');
+      // 로드맵으로 리다이렉트하지만 토스트나 배너를 표시할 수 있음
+      // 예: /training/roadmap?pending=true 로 리다이렉트
+      return next('/training/roadmap?pending=true');
     }
-    // If trying to access study routes without a study, redirect to Roadmap
+    // 스터디 없이 스터디 라우트 접근 시 로드맵으로 리다이렉트
     return next('/training/roadmap');
   }
 
-  // Redirect Landing to appropriate home
+  // Landing을 적절한 홈으로 리다이렉트
   if (to.path === '/') {
     return next(user.value.studyId ? '/dashboard' : '/training/roadmap');
   }

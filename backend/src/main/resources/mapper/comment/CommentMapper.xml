@@ -12,9 +12,12 @@
       c.id, c.board_id, c.user_id, c.parent_id, c.line_number, c.content, c.like_count, 
       c.created_at, c.updated_at,
       u.username as author_name,
-      u.avatar_url as author_profile_image_url
+      u.avatar_url as author_profile_image_url,
+      u.role as author_role,
+      d.css_class as author_decoration_class
     FROM comments c
     LEFT JOIN users u ON c.user_id = u.id
+    LEFT JOIN decorations d ON u.equipped_decoration_id = d.id
     WHERE c.id = #{id}
   </select>
 
@@ -24,9 +27,12 @@
       c.created_at, c.updated_at,
       u.username as author_name,
       u.avatar_url as author_profile_image_url,
+      u.role as author_role,
+      d.css_class as author_decoration_class,
       (SELECT COUNT(*) FROM comment_likes cl WHERE cl.comment_id = c.id AND cl.user_id = #{userId}) > 0 as is_liked
     FROM comments c
     LEFT JOIN users u ON c.user_id = u.id
+    LEFT JOIN decorations d ON u.equipped_decoration_id = d.id
     WHERE c.board_id = #{boardId}
     ORDER BY c.created_at ASC
   </select>
@@ -37,9 +43,12 @@
       c.created_at, c.updated_at,
       u.username as author_name,
       u.avatar_url as author_profile_image_url,
+      u.role as author_role,
+      d.css_class as author_decoration_class,
       (SELECT COUNT(*) FROM comment_likes cl WHERE cl.comment_id = c.id AND cl.user_id = #{userId}) > 0 as is_liked
     FROM comments c
     LEFT JOIN users u ON c.user_id = u.id
+    LEFT JOIN decorations d ON u.equipped_decoration_id = d.id
     WHERE c.board_id = #{boardId} AND c.line_number = #{lineNumber}
     ORDER BY c.created_at ASC
   </select>

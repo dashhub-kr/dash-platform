@@ -12,7 +12,11 @@
                         :alt="partnerName"
                     />
                     <div>
-                        <h3 class="font-bold text-slate-800">{{ partnerName }}</h3>
+                        <NicknameRenderer 
+                            :nickname="partnerName" 
+                            :decorationClass="partnerDecoration"
+                            class="text-base"
+                        />
                         <p class="text-xs text-brand-500 font-bold">Online</p>
                     </div>
                 </div>
@@ -78,11 +82,15 @@
 import { ref, onMounted, nextTick, onBeforeUnmount } from 'vue';
 import { socialApi } from '@/api/social';
 import { X, Send, Loader2 } from 'lucide-vue-next';
+import NicknameRenderer from '@/components/common/NicknameRenderer.vue';
 
 const props = defineProps({
     partnerId: Number,
     partnerName: String,
-    partnerAvatar: String
+    partnerId: Number,
+    partnerName: String,
+    partnerAvatar: String,
+    partnerDecoration: String
 });
 
 const emit = defineEmits(['close']);
