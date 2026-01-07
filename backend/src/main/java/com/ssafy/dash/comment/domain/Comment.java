@@ -25,7 +25,6 @@ public class Comment {
 
     // 조인 필드
     private String authorName;
-    private String authorName;
     private String authorProfileImageUrl;
     private String authorRole; // Join Field
     private String authorDecorationClass; // Join Field
