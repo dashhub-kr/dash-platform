@@ -38,9 +38,13 @@
       <!-- 오른쪽: 이름/날짜 -->
       <div class="ml-auto flex items-center gap-3">
           <!-- 작성자 표시 -->
-          <div v-if="record.username" class="flex items-center gap-1.5 text-xs font-medium text-slate-600 bg-slate-50 px-2 py-1 rounded-full border border-slate-100">
-              <User :size="12" />
-              <span>{{ record.username }}</span>
+          <div class="flex items-center gap-1.5 bg-slate-50 px-2 py-1 rounded-full border border-slate-100">
+              <NicknameRenderer 
+                  :username="record.username" 
+                  :show-avatar="false"
+                  text-class="text-xs font-medium text-slate-600"
+              >
+              </NicknameRenderer>
           </div>
 
           <div class="flex items-center gap-2 text-xs opacity-60 font-medium">
@@ -116,6 +120,7 @@ import { ref, watch, computed, nextTick } from 'vue';
 import { ExternalLink, ChevronDown, ChevronUp, Bot, Bug, Send, Loader2, Activity, LayoutList, Lightbulb, Tag, MessageSquare, Wand2, CheckCircle2, BookOpen, Footprints, HelpCircle, Trophy, Clock, X, Shield, Package, Key, Flame, Sparkles, MessageCircle, Copy, User, Code2 } from 'lucide-vue-next';
 import CodeViewer from '@/components/editor/CodeViewer.vue';
 import TaskBadge from '@/components/common/TaskBadge.vue';
+import NicknameRenderer from '@/components/common/NicknameRenderer.vue';
 import { boardApi, commentApi } from '@/api/board';
 import { aiApi } from '@/api/ai'; 
 import { useAuth } from '@/composables/useAuth';

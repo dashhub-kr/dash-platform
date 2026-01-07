@@ -10,7 +10,9 @@ import java.time.LocalDateTime;
  */
 @Getter
 @Setter
+@Builder
 @NoArgsConstructor
+@AllArgsConstructor
 public class UserTagStat {
     private Long id;
     private Long userId;

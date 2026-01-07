@@ -1,7 +1,9 @@
 package com.ssafy.dash.ai.infrastructure.client.dto.request;
 
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import java.util.List;
 
@@ -11,6 +13,8 @@ import java.util.List;
  */
 @Getter
 @Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class LearningPathRequest {
     private String currentLevel; // 현재 레벨 (예: "Gold V")
     private Integer tier; // 숫자형 티어 (1-30)
@@ -22,6 +26,8 @@ public class LearningPathRequest {
 
     @Getter
     @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
     public static class TagStats {
         private String tagKey; // 태그 키
         private String tagName; // 태그명
@@ -32,6 +38,8 @@ public class LearningPathRequest {
 
     @Getter
     @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
     public static class ClassStats {
         private int classNumber; // 클래스 번호 (1-10)
         private int essentialSolved; // 에센셜 푼 수

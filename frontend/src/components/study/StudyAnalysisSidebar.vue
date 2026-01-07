@@ -30,11 +30,13 @@
             
             <!-- 아바타 (GitHub 프로필) -->
             <div class="flex-shrink-0">
-                <img v-if="member.avatarUrl" :src="member.avatarUrl" class="w-8 h-8 rounded-full border-2 border-white bg-slate-100 object-cover shadow-sm" />
-                <div v-else class="w-8 h-8 rounded-full bg-slate-200 flex items-center justify-center text-xs font-bold text-slate-500 border-2 border-white">
-                    <UserX v-if="member.username === '탈퇴한 회원'" :size="16" />
-                    <span v-else>{{ member.username?.substring(0, 1).toUpperCase() }}</span>
-                </div>
+                <NicknameRenderer 
+                    :username="member.username"
+                    :avatar-url="member.avatarUrl"
+                    avatar-class="w-8 h-8 border-2 border-white bg-slate-100 object-cover shadow-sm"
+                    text-class="hidden"
+                    :icon-size="16"
+                />
             </div>
 
             <NicknameRenderer 
@@ -73,7 +75,7 @@
 </template>
 
 <script setup>
-import { AlertTriangle, Users, UserX } from 'lucide-vue-next';
+import { AlertTriangle, Users } from 'lucide-vue-next';
 import NicknameRenderer from '@/components/common/NicknameRenderer.vue';
 
 const props = defineProps({

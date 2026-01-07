@@ -175,13 +175,14 @@
                                                 <div class="relative transition-transform duration-300 transform group-hover/runner-group:scale-110 group/avatar"
                                                     :class="idx > 0 ? 'group-hover/runner-group:opacity-80' : ''">
                                                     
-                                                    <img v-if="member.avatarUrl" :src="member.avatarUrl" 
-                                                        class="w-8 h-8 rounded-full border-2 border-white object-cover shadow-sm bg-white"
-                                                        :class="member.userId === currentUserId ? 'ring-2 ring-brand/30' : ''" />
-                                                    <div v-else class="w-8 h-8 rounded-full border-2 border-white bg-slate-300 flex items-center justify-center text-[10px] font-bold text-white uppercase shadow-sm"
-                                                        :style="{ backgroundColor: stringToColor(member.username) }">
-                                                        {{ member.username?.substring(0, 2) }}
-                                                    </div>
+                                                    <NicknameRenderer 
+                                                        :username="member.username"
+                                                        :avatar-url="member.avatarUrl"
+                                                        avatar-class="w-8 h-8 flex-shrink-0 border-2 border-white shadow-sm bg-white"
+                                                        :class="member.userId === currentUserId ? 'ring-2 ring-brand/30' : ''"
+                                                        text-class="hidden"
+                                                        :icon-size="16"
+                                                    />
 
                                                     <!-- 완료 깃발 -->
                                                     <div v-if="member.completedCount === member.totalProblems" class="absolute -top-3 -right-2 text-rose-500 drop-shadow-md animate-bounce z-50">
@@ -203,7 +204,11 @@
                                     <div v-for="member in mission.memberProgressList?.slice(0, 3)" :key="'legend-'+member.userId" 
                                         class="flex items-center gap-1.5 text-[10px] font-bold text-slate-400 bg-white px-2 py-1 rounded-lg border border-slate-100">
                                         <div class="w-1.5 h-1.5 rounded-full" :class="member.completedCount === member.totalProblems ? 'bg-emerald-500' : 'bg-slate-300'"></div>
-                                        {{ member.username }}
+                                        <NicknameRenderer 
+                                            :username="member.username"
+                                            :show-avatar="false"
+                                            text-class="text-[10px]"
+                                        />
                                     </div>
                                     <div v-if="mission.memberProgressList?.length > 3" class="text-[10px] font-bold text-slate-300 px-1 py-1">
                                         +{{ mission.memberProgressList.length - 3 }}
@@ -324,6 +329,7 @@ import {
     Check,
     X
 } from 'lucide-vue-next';
+import NicknameRenderer from '@/components/common/NicknameRenderer.vue';
 
 // 관리자 관전 모드 Props
 const props = defineProps({
