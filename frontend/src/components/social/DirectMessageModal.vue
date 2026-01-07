@@ -87,8 +87,6 @@ import NicknameRenderer from '@/components/common/NicknameRenderer.vue';
 const props = defineProps({
     partnerId: Number,
     partnerName: String,
-    partnerId: Number,
-    partnerName: String,
     partnerAvatar: String,
     partnerDecoration: String
 });
