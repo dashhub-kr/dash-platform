@@ -36,12 +36,17 @@
                         <div class="flex items-center gap-4">
                             <img :src="item.friend.avatarUrl || '/images/profiles/default-profile.png'" class="w-12 h-12 rounded-full border border-slate-200 bg-white object-cover"/>
                             <div class="flex-1 min-w-0">
-                                <div class="font-bold text-slate-800 truncate">{{ item.friend.username }}</div>
+                                <NicknameRenderer 
+                                    :nickname="item.friend.username" 
+                                    :decorationClass="item.friend.equippedDecorationClass"
+                                    :role="item.friend.role"
+                                    class="text-base"
+                                />
                                 <div class="text-xs text-slate-400 truncate">{{ item.friend.email }}</div>
                             </div>
                         </div>
                         <div class="mt-4 flex gap-2">
-                             <button @click="openDM(item.friend.id, item.friend.username, item.friend.avatarUrl)" class="flex-1 py-2 bg-brand-500 text-white rounded-xl text-sm font-bold hover:bg-brand-600 transition-colors flex items-center justify-center gap-2">
+                             <button @click="openDM(item.friend.id, item.friend.username, item.friend.avatarUrl, item.friend.equippedDecorationClass)" class="flex-1 py-2 bg-brand-500 text-white rounded-xl text-sm font-bold hover:bg-brand-600 transition-colors flex items-center justify-center gap-2">
                                 <MessageCircle :size="16"/> 쪽지
                              </button>
                              <button @click="deleteFriend(item.friend.id)" class="px-3 py-2 bg-slate-200 text-slate-500 rounded-xl hover:bg-rose-100 hover:text-rose-500 transition-colors">
@@ -64,7 +69,12 @@
                         <div class="flex items-center gap-4">
                              <img :src="req.friend.avatarUrl || '/images/profiles/default-profile.png'" class="w-10 h-10 rounded-full border border-slate-200 bg-white object-cover"/>
                              <div>
-                                <div class="font-bold text-slate-800">{{ req.friend.username }}</div>
+                                <NicknameRenderer 
+                                    :nickname="req.friend.username" 
+                                    :decorationClass="req.friend.equippedDecorationClass" 
+                                    :role="req.friend.role"
+                                    class="text-base"
+                                />
                                 <div class="text-xs text-slate-400">님이 친구 신청을 보냈습니다.</div>
                              </div>
                         </div>
@@ -105,7 +115,12 @@
                             <div class="flex items-center gap-3">
                                 <img :src="user.avatarUrl || '/images/profiles/default-profile.png'" class="w-10 h-10 rounded-full border border-slate-200 bg-white object-cover"/>
                                 <div>
-                                    <div class="font-bold text-slate-800">{{ user.username }}</div>
+                                    <NicknameRenderer 
+                                        :nickname="user.username" 
+                                        :decorationClass="user.equippedDecorationClass"
+                                        :role="user.role"
+                                        class="text-base"
+                                    />
                                     <div class="text-xs text-slate-400">{{ user.email }}</div>
                                 </div>
                             </div>
@@ -139,6 +154,7 @@
             :partner-id="dmPartnerId" 
             :partner-name="dmPartnerName"
             :partner-avatar="dmPartnerAvatar"
+            :partner-decoration="dmPartnerDecoration"
             @close="showDMModal = false"
         />
 
@@ -151,6 +167,7 @@ import { useRoute } from 'vue-router';
 import { socialApi } from '@/api/social';
 import { Loader2, Users, Bell, Search, UserPlus, MessageCircle, UserMinus, CheckCircle2 } from 'lucide-vue-next';
 import DirectMessageModal from '@/components/social/DirectMessageModal.vue';
+import NicknameRenderer from '@/components/common/NicknameRenderer.vue';
 
 const route = useRoute();
 const activeTab = ref('friends');
@@ -174,6 +191,7 @@ const showDMModal = ref(false);
 const dmPartnerId = ref(null);
 const dmPartnerName = ref('');
 const dmPartnerAvatar = ref('');
+const dmPartnerDecoration = ref('');
 
 const loadData = async () => {
     loading.value = true;
@@ -252,10 +270,11 @@ const deleteFriend = async (friendId) => {
     }
 };
 
-const openDM = (id, name, avatar) => {
+const openDM = (id, name, avatar, decoration) => {
     dmPartnerId.value = id;
     dmPartnerName.value = name;
     dmPartnerAvatar.value = avatar;
+    dmPartnerDecoration.value = decoration || '';
     showDMModal.value = true;
 };
 
@@ -271,6 +290,7 @@ const checkQueryForDM = async () => {
         if (friend) {
             dmPartnerName.value = friend.friend.username;
             dmPartnerAvatar.value = friend.friend.avatarUrl;
+            dmPartnerDecoration.value = friend.friend.equippedDecorationClass || '';
             showDMModal.value = true;
         } else {
             // 2. 없으면 검색 API 등을 통해 사용자 정보 가져오기 

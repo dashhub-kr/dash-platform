@@ -39,6 +39,7 @@ CREATE TABLE IF NOT EXISTS users (
 	provider_id VARCHAR(255),
     avatar_url VARCHAR(512),
     study_id BIGINT,
+    equipped_decoration_id BIGINT,
     deleted_at TIMESTAMP NULL DEFAULT NULL,
     FOREIGN KEY (study_id) REFERENCES studies(id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
@@ -470,4 +471,26 @@ CREATE TABLE IF NOT EXISTS direct_messages (
     FOREIGN KEY (receiver_id) REFERENCES users(id) ON DELETE CASCADE,
     INDEX idx_dm_sender_receiver (sender_id, receiver_id),
     INDEX idx_dm_receiver_sender (receiver_id, sender_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+
+-- 닉네임 치장 (이펙트)
+CREATE TABLE IF NOT EXISTS decorations (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(50) NOT NULL,
+    description VARCHAR(255),
+    css_class VARCHAR(50) NOT NULL,
+    type VARCHAR(20) DEFAULT 'PUBLIC',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- 사용자 보유 치장
+CREATE TABLE IF NOT EXISTS user_decorations (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    user_id BIGINT NOT NULL,
+    decoration_id BIGINT NOT NULL,
+    acquired_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+    FOREIGN KEY (decoration_id) REFERENCES decorations(id) ON DELETE CASCADE,
+    UNIQUE KEY uk_user_decoration (user_id, decoration_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;

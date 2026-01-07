@@ -301,6 +301,7 @@ public class StudyAnalysisService {
                     member.getUsername(),
                     member.getSolvedacTier(),
                     member.getAvatarUrl(),
+                    member.getEquippedDecorationClass(),
                     tagRates,
                     tagSolved));
         }
@@ -312,7 +313,7 @@ public class StudyAnalysisService {
                 weaknessTags.subList(0, Math.min(3, weaknessTags.size())));
     }
 
-    // Internal helper records (not exposed to presentation layer)
+    // 내부 헬퍼 레코드 (프레젠테이션 계층에 노출되지 않음)
     record RecommendedTag(
             String tagKey,
             String tagName,
