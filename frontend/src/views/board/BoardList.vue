@@ -185,6 +185,7 @@ import { useRouter } from 'vue-router';
 import { PenSquare, Inbox, ThumbsUp, MessageCircle, Search, Flame, Lightbulb, Code2, UserX } from 'lucide-vue-next';
 import NicknameRenderer from '@/components/common/NicknameRenderer.vue';
 import { boardApi } from '@/api/board';
+import NicknameRenderer from '@/components/common/NicknameRenderer.vue';
 
 const router = useRouter();
 const posts = ref([]);
@@ -252,20 +253,4 @@ onMounted(async () => {
   }
 }
 
-.admin-shining-text {
-  background: linear-gradient(to right, #6366f1 20%, #a855f7 40%, #ec4899 60%, #6366f1 80%);
-  background-size: 200% auto;
-  color: #000;
-  background-clip: text;
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  animation: shine 3s linear infinite;
-  font-weight: 900;
-}
-
-@keyframes shine {
-  to {
-    background-position: 200% center;
-  }
-}
 </style>

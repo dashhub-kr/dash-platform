@@ -876,8 +876,8 @@ const fetchStudyData = async () => {
         missions.value = missionsRes.data || [];
         
         // 히트맵 데이터 처리
-        // Admin observation: use specific study ID if provided
-        const heatmapRes = await dashboardApi.getHeatmap(props.studyId);
+        // Admin observation: use currentStudyId
+        const heatmapRes = await dashboardApi.getHeatmap(currentStudyId.value);
         heatmapResData.value = heatmapRes.data || [];
         processHeatmap(heatmapResData.value);
     } catch(e) {
@@ -911,23 +911,25 @@ onMounted(async () => {
       }
       
       // 3. 스터디 데이터 가져오기 (해당되는 경우)
-      if (user.value?.studyId) {
+      if (currentStudyId.value) {
           await fetchStudyData();
       }
 
-      // 4. Fetch Heatmap
-      try {
-        const heatmapRes = await dashboardApi.getHeatmap();
-        heatmapResData.value = heatmapRes.data || [];
-        processHeatmap(heatmapResData.value);
-        nextTick(() => {
-          if (heatmapScrollRef.value) {
-            heatmapScrollRef.value.scrollLeft = heatmapScrollRef.value.scrollWidth;
+      // 4. Fetch Heatmap (If not already fetched by fetchStudyData)
+      if (!currentStudyId.value) {
+          try {
+            const heatmapRes = await dashboardApi.getHeatmap();
+            heatmapResData.value = heatmapRes.data || [];
+            processHeatmap(heatmapResData.value);
+            nextTick(() => {
+              if (heatmapScrollRef.value) {
+                heatmapScrollRef.value.scrollLeft = heatmapScrollRef.value.scrollWidth;
+              }
+            });
+          } catch(e) {
+            console.error('Heatmap Load Error:', e);
+            processHeatmap([]);
           }
-        });
-      } catch(e) {
-        console.error('Heatmap Load Error:', e);
-        processHeatmap([]);
       }
   } catch (globalError) {
       console.error("Critical Dashboard Error:", globalError);

@@ -24,6 +24,8 @@ public class User {
     private String providerId;
     private String avatarUrl;
     private Long studyId;
+    private Long equippedDecorationId;
+    private String equippedDecorationClass; // Join Field
     private LocalDateTime deletedAt;
 
     // Solved.ac 연동 필드

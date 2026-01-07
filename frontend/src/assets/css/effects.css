@@ -1,0 +1,106 @@
+/* Standard Effects */
+
+/* 1. Rainbow Shining */
+.effect-rainbow {
+  background: linear-gradient(
+    to right,
+    #ff0000,
+    #ff7f00,
+    #cccc00,
+    #00aa00,
+    #0000ff,
+    #4b0082,
+    #9400d3
+  );
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  animation: rainbow-move 3s linear infinite;
+  background-size: 200% 100%;
+  font-weight: 700;
+}
+
+@keyframes rainbow-move {
+  0% { background-position: 100% 0; }
+  100% { background-position: 0 0; }
+}
+
+/* 2. Fire Effect */
+.effect-fire {
+  color: #ff4500; /* Fallback */
+  background: linear-gradient(0deg, #ff0000, #ffae00);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  animation: fire-flicker 0.1s infinite alternate;
+  text-shadow: 0 0 2px #ff450055;
+  font-weight: 800;
+}
+
+@keyframes fire-flicker {
+  from { text-shadow: 0 0 2px #ff0000; }
+  to { text-shadow: 0 0 5px #ffae00, 0 -2px 5px rgba(255, 69, 0, 0.5); }
+}
+
+/* 3. Neon Blue (Cyberpunk) */
+.effect-neon {
+  color: #0ff;
+  text-shadow: 
+    0 0 5px #0ff,
+    0 0 10px #0ff,
+    0 0 20px #00f,
+    0 0 40px #00f;
+  animation: neon-pulse 1.5s infinite alternate;
+  font-weight: 700;
+}
+
+@keyframes neon-pulse {
+  from { text-shadow: 0 0 5px #0ff, 0 0 10px #0ff; }
+  to { text-shadow: 0 0 2px #0ff, 0 0 5px #0ff; }
+}
+
+/* 4. Water/Ice */
+.effect-water {
+  background: linear-gradient(to right, #00c6ff, #0072ff);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  font-weight: 700;
+  position: relative;
+}
+
+/* 5. Gold (Admin/Premium) */
+.effect-gold {
+  background: linear-gradient(to right, #cfc09f, #ffecb3, #bfa05d, #ffecb3, #cfc09f);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  background-size: 200% auto;
+  animation: shine 3s linear infinite;
+  font-weight: 800;
+  text-shadow: 0 1px 1px rgba(0,0,0,0.1);
+}
+
+@keyframes shine {
+  to {
+    background-position: 200% center;
+  }
+}
+
+/* 6. Admin Special (Platinum + Sparkle) */
+.effect-admin {
+  background: linear-gradient(45deg, #e0e0e0, #ffffff, #a0a0a0, #ffffff, #e0e0e0);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  background-size: 300% 300%;
+  animation: admin-shine 4s ease infinite;
+  font-weight: 900;
+  letter-spacing: 0.5px;
+}
+
+@keyframes admin-shine {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}

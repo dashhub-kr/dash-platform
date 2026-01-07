@@ -70,8 +70,10 @@ public class CommentService {
         }
         String authorName = (user != null) ? user.getUsername() : "Unknown";
         String authorProfileImageUrl = (user != null) ? user.getAvatarUrl() : null;
+        String authorRole = (user != null) ? user.getRole() : null;
+        String authorDecoration = (user != null) ? user.getEquippedDecorationClass() : null;
 
-        return CommentResult.from(comment, authorName, authorProfileImageUrl);
+        return CommentResult.from(comment, authorName, authorProfileImageUrl, authorRole, authorDecoration);
     }
 
     @Transactional(readOnly = true)
@@ -94,8 +96,10 @@ public class CommentService {
         User user = userRepository.findById(comment.getUserId()).orElse(null);
         String authorName = (user != null) ? user.getUsername() : "Unknown";
         String authorProfileImageUrl = (user != null) ? user.getAvatarUrl() : null;
+        String authorRole = (user != null) ? user.getRole() : null;
+        String authorDecoration = (user != null) ? user.getEquippedDecorationClass() : null;
 
-        return CommentResult.from(comment, authorName, authorProfileImageUrl);
+        return CommentResult.from(comment, authorName, authorProfileImageUrl, authorRole, authorDecoration);
     }
 
     @Transactional
@@ -111,8 +115,10 @@ public class CommentService {
         User user = userRepository.findById(comment.getUserId()).orElse(null);
         String authorName = (user != null) ? user.getUsername() : "Unknown";
         String authorProfileImageUrl = (user != null) ? user.getAvatarUrl() : null;
+        String authorRole = (user != null) ? user.getRole() : null;
+        String authorDecoration = (user != null) ? user.getEquippedDecorationClass() : null;
 
-        return CommentResult.from(comment, authorName, authorProfileImageUrl);
+        return CommentResult.from(comment, authorName, authorProfileImageUrl, authorRole, authorDecoration);
     }
 
     @Transactional
@@ -144,15 +150,19 @@ public class CommentService {
                 .map(comment -> {
                     String authorName = comment.getAuthorName() != null ? comment.getAuthorName() : "Unknown";
                     String authorProfileImageUrl = comment.getAuthorProfileImageUrl();
+                    String authorRole = comment.getAuthorRole();
+                    String authorDecoration = comment.getAuthorDecorationClass();
                     List<Comment> replies = repliesMap.getOrDefault(comment.getId(), List.of());
                     List<CommentResult> replyResults = replies.stream()
                             .map(reply -> {
                                 String replyAuthor = reply.getAuthorName() != null ? reply.getAuthorName() : "Unknown";
                                 String replyProfileImageUrl = reply.getAuthorProfileImageUrl();
-                                return CommentResult.from(reply, replyAuthor, replyProfileImageUrl);
+                                String replyRole = reply.getAuthorRole();
+                                String replyDecoration = reply.getAuthorDecorationClass();
+                                return CommentResult.from(reply, replyAuthor, replyProfileImageUrl, replyRole, replyDecoration);
                             })
                             .collect(Collectors.toList());
-                    return CommentResult.from(comment, authorName, authorProfileImageUrl, replyResults);
+                    return CommentResult.from(comment, authorName, authorProfileImageUrl, authorRole, authorDecoration, replyResults);
                 })
                 .collect(Collectors.toList());
     }

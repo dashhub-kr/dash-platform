@@ -26,6 +26,7 @@ public class Board {
     private String authorName;
     private Integer commentCount;
     private String authorRole;
+    private String authorDecorationClass;
 
     private Board(Long userId, String title, String content, Long algorithmRecordId,
             String boardType, LocalDateTime createdAt, LocalDateTime updatedAt) {

@@ -13,9 +13,11 @@
       b.created_at, b.updated_at,
       u.username as author_name,
       u.role as author_role,
+      d.css_class as author_decoration_class,
       (SELECT COUNT(*) FROM comments c WHERE c.board_id = b.id) as comment_count
     FROM boards b
     LEFT JOIN users u ON b.user_id = u.id
+    LEFT JOIN decorations d ON u.equipped_decoration_id = d.id
     WHERE b.id = #{id}
   </select>
 
@@ -25,9 +27,11 @@
       b.created_at, b.updated_at,
       u.username as author_name,
       u.role as author_role,
+      d.css_class as author_decoration_class,
       (SELECT COUNT(*) FROM comments c WHERE c.board_id = b.id) as comment_count
     FROM boards b
     LEFT JOIN users u ON b.user_id = u.id
+    LEFT JOIN decorations d ON u.equipped_decoration_id = d.id
     WHERE b.algorithm_record_id = #{recordId}
     LIMIT 1
   </select>
@@ -38,9 +42,11 @@
       b.created_at, b.updated_at,
       u.username as author_name,
       u.role as author_role,
+      d.css_class as author_decoration_class,
       (SELECT COUNT(*) FROM comments c WHERE c.board_id = b.id) as comment_count
     FROM boards b
     LEFT JOIN users u ON b.user_id = u.id
+    LEFT JOIN decorations d ON u.equipped_decoration_id = d.id
     ORDER BY b.id DESC
   </select>
 

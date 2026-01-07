@@ -486,20 +486,4 @@ const isAdmin = computed(() => user.value?.role === 'ROLE_ADMIN');
   to { opacity: 1; transform: translateY(0); }
 }
 
-.admin-shining-text {
-  background: linear-gradient(to right, #6366f1 20%, #a855f7 40%, #ec4899 60%, #6366f1 80%);
-  background-size: 200% auto;
-  color: #000;
-  background-clip: text;
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  animation: shine 3s linear infinite;
-  font-weight: 900;
-}
-
-@keyframes shine {
-  to {
-    background-position: 200% center;
-  }
-}
 </style>

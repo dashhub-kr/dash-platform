@@ -25,7 +25,10 @@ public class Comment {
 
     // 조인 필드
     private String authorName;
+    private String authorName;
     private String authorProfileImageUrl;
+    private String authorRole; // Join Field
+    private String authorDecorationClass; // Join Field
     private List<Comment> replies; // 대댓글 목록
     private boolean isLiked; // 현재 사용자의 좋아요 여부 (조회용)
 

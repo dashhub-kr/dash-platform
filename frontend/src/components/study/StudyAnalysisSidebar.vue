@@ -39,7 +39,11 @@
                 />
             </div>
 
-            <span class="text-sm font-bold text-slate-700 truncate flex-1 min-w-0" :title="member.username">{{ member.username }}</span>
+            <NicknameRenderer 
+              :nickname="member.username" 
+              :decorationClass="member.decorationClass"
+              class="flex-1 min-w-0 text-sm"
+            />
             
             <!-- 티어 뱃지 -->
             <div class="flex items-center gap-1.5 flex-shrink-0 bg-slate-50 px-2.5 py-1 rounded-lg border border-slate-100">

@@ -343,7 +343,7 @@ const navGroups = computed(() => {
     ]
   },
   {
-    title: '퍼스널 트레이닝', // New Group
+    title: '개인 학습', // New Group
     items: [
       { label: '랜덤 디펜스', path: '/defense', icon: Shield, color: 'bg-slate-500' }, // Renamed & Moved to top (Action)
       { label: '모의고사', path: '/mockexam', icon: FileText, color: 'bg-blue-500' }, // Moved to 2nd (Action)
@@ -354,7 +354,7 @@ const navGroups = computed(() => {
   {
     title: '커뮤니티',
     items: [
-      { label: '게시판', path: '/boards', icon: MessageSquare, color: 'bg-violet-500' }, // Reordered: Board first/second? User said "Explorer -> Board -> Social" order is weird. usually Board is main community.
+      { label: '전국 게시판', path: '/boards', icon: MessageSquare, color: 'bg-violet-500' }, // Reordered: Board first/second? User said "Explorer -> Board -> Social" order is weird. usually Board is main community.
       { label: '스터디 라운지', path: '/study/ranking', icon: Compass, color: 'bg-yellow-500' }, // Renamed from '스터디 탐험'.
       { label: '소셜', path: '/social', icon: Users, color: 'bg-pink-500' },
     ]
@@ -363,7 +363,6 @@ const navGroups = computed(() => {
     title: '관리자',
     items: [
        { label: '대시보드', path: '/admin', icon: Shield, color: 'bg-slate-900' },
-       // Removed '스터디 관전' as requested, relying on Admin Dashboard to find studies.
     ]
   }] : [])
 ]});
