@@ -11,7 +11,6 @@ public record CommentResponse(
                 Long boardId,
                 Long userId,
                 String authorName,
-                String authorName,
                 String authorProfileImageUrl,
                 String authorRole,
                 String authorDecorationClass,

@@ -22,7 +22,6 @@ public record UserResponse(
         String studyType,
         String role,
         String pendingStudyName,
-        String pendingStudyName,
         String friendshipStatus,
         String equippedDecorationClass) {
 
@@ -44,7 +43,6 @@ public record UserResponse(
                 result.isStudyLeader(),
                 result.studyType(),
                 result.role(),
-                result.pendingStudyName(),
                 result.pendingStudyName(),
                 result.friendshipStatus(),
                 result.equippedDecorationClass());
