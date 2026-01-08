@@ -62,6 +62,7 @@
               <span class="w-6 h-6 rounded-full bg-gradient-to-br from-amber-400 to-orange-500 text-white text-[10px] font-black flex items-center justify-center shadow-sm">S</span>
               <span class="w-6 h-6 rounded-full bg-gradient-to-br from-purple-400 to-violet-500 text-white text-[10px] font-black flex items-center justify-center shadow-sm">A</span>
               <span class="w-6 h-6 rounded-full bg-gradient-to-br from-sky-400 to-blue-500 text-white text-[10px] font-black flex items-center justify-center shadow-sm">B</span>
+              <span class="w-6 h-6 rounded-full bg-gradient-to-br from-teal-400 to-emerald-500 text-white text-[10px] font-black flex items-center justify-center shadow-sm">C</span>
               <span class="text-[10px] text-slate-400 ml-1">= 중요도</span>
             </div>
           </div>

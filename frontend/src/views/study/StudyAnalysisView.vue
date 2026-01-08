@@ -64,8 +64,11 @@
                         <span v-if="problem.tags?.length" class="px-2 py-0.5 bg-brand-100 text-brand-700 text-[10px] font-bold rounded-md truncate max-w-[120px]">{{ problem.tags[0] }}</span>
                       </div>
                       <p class="text-slate-800 font-bold truncate text-sm mb-1">{{ problem.title }}</p>
-                      <div class="flex items-center gap-2">
-                           <span class="text-xs font-medium text-slate-500">Lv.{{ problem.level }}</span>
+                      <div class="flex items-center gap-1.5 bg-slate-50 px-2.5 py-1 rounded-lg border border-slate-100 w-fit">
+                           <img :src="getTierIconUrl(problem.level)" class="w-3.5 h-3.5 object-contain" />
+                           <span class="text-xs font-bold" :class="getTierColorClass(problem.level)">
+                                {{ getFormattedTierName(problem.level) }}
+                           </span>
                       </div>
                     </a>
                     <!-- 팀장 전용: 미션 등록 버튼 -->

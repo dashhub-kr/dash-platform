@@ -196,15 +196,18 @@
                                         <NicknameRenderer 
                                             :username="member.username"
                                             :avatar-url="getMemberProfileImage(member)"
-                                            avatar-class="w-10 h-10 border-2"
-                                            text-class="hidden" 
                                             :class="[
                                                 isMe(member.userId) 
-                                                    ? 'border-emerald-400 ring-2 ring-emerald-400/30' + (member.allCompleted ? ' shadow-[0_0_12px_rgba(52,211,153,0.6)]' : '')
-                                                    : member.allCompleted 
-                                                    ? 'border-orange-400 shadow-[0_0_12px_rgba(251,146,60,0.5)]' 
-                                                    : 'border-slate-200 opacity-80 grayscale-[0.0]'
+                                                    ? '' 
+                                                    : 'opacity-80 grayscale-[0.0]'
                                             ]"
+                                            :avatar-class="`w-10 h-10 border-2 rounded-full ${
+                                                isMe(member.userId)
+                                                    ? 'border-emerald-400 ring-2 ring-emerald-400/30' + (member.allCompleted ? ' shadow-[0_0_12px_rgba(52,211,153,0.6)]' : '')
+                                                    : member.allCompleted
+                                                    ? 'border-orange-400 shadow-[0_0_12px_rgba(251,146,60,0.5)]'
+                                                    : 'border-slate-200'
+                                            }`"
                                         />
                                         
                                         <!-- 상태 아이콘 -->

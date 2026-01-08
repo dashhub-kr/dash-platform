@@ -40,6 +40,7 @@
                                     :nickname="item.friend.username" 
                                     :decorationClass="item.friend.equippedDecorationClass"
                                     :role="item.friend.role"
+                                    :show-avatar="false"
                                     class="text-base"
                                 />
                                 <div class="text-xs text-slate-400 truncate">{{ item.friend.email }}</div>
@@ -73,6 +74,7 @@
                                     :nickname="req.friend.username" 
                                     :decorationClass="req.friend.equippedDecorationClass" 
                                     :role="req.friend.role"
+                                    :show-avatar="false"
                                     class="text-base"
                                 />
                                 <div class="text-xs text-slate-400">님이 친구 신청을 보냈습니다.</div>
@@ -119,6 +121,7 @@
                                         :nickname="user.username" 
                                         :decorationClass="user.equippedDecorationClass"
                                         :role="user.role"
+                                        :show-avatar="false"
                                         class="text-base"
                                     />
                                     <div class="text-xs text-slate-400">{{ user.email }}</div>

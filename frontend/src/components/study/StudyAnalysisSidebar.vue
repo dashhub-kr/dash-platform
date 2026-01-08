@@ -42,6 +42,7 @@
             <NicknameRenderer 
               :nickname="member.username" 
               :decorationClass="member.decorationClass"
+              :show-avatar="false"
               class="flex-1 min-w-0 text-sm"
             />
             

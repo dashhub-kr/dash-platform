@@ -178,8 +178,8 @@
                                                     <NicknameRenderer 
                                                         :username="member.username"
                                                         :avatar-url="member.avatarUrl"
-                                                        avatar-class="w-8 h-8 flex-shrink-0 border-2 border-white shadow-sm bg-white"
-                                                        :class="[member.userId === currentUserId ? 'ring-2 ring-brand/30' : '', 'rounded-full']"
+                                                        :avatar-class="`w-8 h-8 flex-shrink-0 border-2 border-white shadow-sm bg-white ${member.userId === currentUserId ? 'ring-2 ring-brand ring-offset-2' : ''}`"
+                                                        class="rounded-full"
                                                         text-class="hidden"
                                                         :icon-size="16"
                                                     />

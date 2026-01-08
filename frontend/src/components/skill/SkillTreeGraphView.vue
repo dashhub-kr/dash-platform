@@ -238,7 +238,8 @@ const getMaxStars = (tier) => {
   if (tier === 'S') return 5;
   if (tier === 'A') return 4;
   if (tier === 'B') return 3;
-  return 2;
+  if (tier === 'C') return 2;
+  return 1;
 };
 
 const getFilledStars = (masteryLevel) => {

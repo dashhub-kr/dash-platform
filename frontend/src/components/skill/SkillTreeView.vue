@@ -317,6 +317,7 @@ const getSubNodeClass = (tag) => {
   if (tag.tier === 'S') return 'bg-amber-50 border-amber-400';
   if (tag.tier === 'A') return 'bg-purple-50 border-purple-400';
   if (tag.tier === 'B') return 'bg-sky-50 border-sky-400';
+  if (tag.tier === 'C') return 'bg-teal-50 border-teal-400';
   if (tag.progressPercent >= 70) return 'bg-emerald-50 border-emerald-400';
   return 'bg-slate-50 border-slate-200';
 };
@@ -346,6 +347,7 @@ const getTierBadgeClass = (tier) => {
   if (tier === 'S') return 'bg-gradient-to-br from-amber-400 to-orange-500 text-white';
   if (tier === 'A') return 'bg-gradient-to-br from-purple-400 to-violet-500 text-white';
   if (tier === 'B') return 'bg-gradient-to-br from-sky-400 to-blue-500 text-white';
+  if (tier === 'C') return 'bg-gradient-to-br from-teal-400 to-emerald-500 text-white';
   return 'bg-slate-400 text-white';
 };
 
@@ -376,7 +378,8 @@ const getMaxStars = (tier) => {
   if (tier === 'S') return 5;
   if (tier === 'A') return 4;
   if (tier === 'B') return 3;
-  return 2; // C 또는 기타
+  if (tier === 'C') return 2;
+  return 1; // Unrated or unknown
 };
 
 const getFilledStars = (masteryLevel) => {
