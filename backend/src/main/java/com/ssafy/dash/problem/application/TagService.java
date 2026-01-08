@@ -22,20 +22,21 @@ public class TagService {
 
     private final TagMapper tagMapper;
     private final ObjectMapper objectMapper;
+    private final java.util.Map<String, String> tagNameCache = new java.util.concurrent.ConcurrentHashMap<>();
 
     @Transactional
     public void initializeTags() {
-        // 이미 태그 데이터가 있으면 스킵
-        if (!tagMapper.findAllTags().isEmpty()) {
-            log.info("태그 데이터가 이미 존재합니다. 초기화를 건너뜁니다.");
-            // 메타데이터(Tier, Weight, Family, Core) 전체 동기화
-            syncTagMetadata();
-            return;
+        // 태그 데이터가 있어도 메타데이터/표시이름 동기화를 위해 실행
+        log.info("태그 초기화 및 메타데이터 동기화 시작...");
+
+        try {
+            initializeFamilies();
+        } catch (Exception e) {
+            log.warn("태그 패밀리 초기화 중 오류 (무시 가능): {}", e.getMessage());
         }
 
-        initializeFamilies();
-        loadTagsFromJson();
-        syncTagMetadata(); // 초기화 후에도 동기화 보장
+        loadTagsFromJson(); // DB Upsert (Fixes truncated display_names)
+        syncTagMetadata(); // Cache update & Consistency check
     }
 
     /**
@@ -45,6 +46,9 @@ public class TagService {
     @Transactional
     public void syncTagMetadata() {
         List<Tag> allTags = tagMapper.findAllTags();
+        // 캐시 업데이트
+        allTags.forEach(tag -> tagNameCache.put(tag.getTagKey(), tag.getKoreanName()));
+
         int updatedCount = 0;
 
         for (Tag tag : allTags) {
@@ -161,5 +165,11 @@ public class TagService {
         } catch (IOException e) {
             log.error("JSON 파일에서 태그 로드 실패", e);
         }
+    }
+
+    public String getKoreanName(String tagKey) {
+        if (tagKey == null)
+            return null;
+        return tagNameCache.getOrDefault(tagKey, tagKey);
     }
 }

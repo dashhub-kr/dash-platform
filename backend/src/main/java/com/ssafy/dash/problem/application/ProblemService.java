@@ -22,6 +22,7 @@ public class ProblemService {
     private final ProblemMapper problemMapper;
     private final AlgorithmRecordMapper algorithmRecordMapper;
     private final ObjectMapper objectMapper;
+    private final TagService tagService;
 
     @Transactional
     public void initializeProblems() {
@@ -32,8 +33,9 @@ public class ProblemService {
 
             // DB 개수와 JSON 개수가 같더라도 내용이 변경되었을 수 있으므로 항상 업데이트 시도 (UPSERT 동작)
             // if (dbCount >= jsonCount) {
-            //    log.info("문제 데이터가 이미 최신 상태입니다 (DB: {}, JSON: {}). 초기화를 건너뜁니다.", dbCount, jsonCount);
-            //    return;
+            // log.info("문제 데이터가 이미 최신 상태입니다 (DB: {}, JSON: {}). 초기화를 건너뜁니다.", dbCount,
+            // jsonCount);
+            // return;
             // }
 
             log.info("문제 데이터 초기화 시작... (DB: {}, JSON: {})", dbCount, jsonCount);
@@ -100,7 +102,11 @@ public class ProblemService {
         return problems.stream()
                 .map(problem -> {
                     java.util.List<String> tags = problemMapper.findTagsByProblemNumber(problem.getProblemNumber());
-                    return com.ssafy.dash.problem.presentation.dto.response.ProblemRecommendationResponse.from(problem, tags);
+                    java.util.List<String> displayTags = tags.stream()
+                            .map(tagService::getKoreanName)
+                            .toList();
+                    return com.ssafy.dash.problem.presentation.dto.response.ProblemRecommendationResponse.from(problem,
+                            displayTags);
                 })
                 .collect(java.util.stream.Collectors.toList());
     }
