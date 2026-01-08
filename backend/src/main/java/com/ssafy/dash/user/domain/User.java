@@ -36,6 +36,7 @@ public class User {
     private Integer solvedacRating;
     private Integer solvedacClass;
     private Integer solvedCount;
+    private Integer avgTop100Level; // Top 100 문제 평균 레벨 (거품 탐지용)
     private LocalDateTime statsLastSyncedAt;
 
     // 랜덤 디펜스 필드
@@ -93,6 +94,10 @@ public class User {
         this.statsLastSyncedAt = LocalDateTime.now();
     }
 
+    public void updateTop100Stats(Integer avgTop100Level) {
+        this.avgTop100Level = avgTop100Level;
+    }
+
     public void block() {
         this.status = "BLOCKED";
     }
@@ -107,6 +112,5 @@ public class User {
     private static LocalDateTime requireTimestamp(LocalDateTime value) {
         return Objects.requireNonNull(value, "createdAt" + " must not be null");
     }
-
 
 }

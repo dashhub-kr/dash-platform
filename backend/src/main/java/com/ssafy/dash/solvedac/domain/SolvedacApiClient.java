@@ -24,5 +24,22 @@ public interface SolvedacApiClient {
      */
     TagStat getTagStats(String handle);
 
+    /**
+     * 태그별 판정(Rating) 정보 조회
+     * GET /user/tag_ratings?handle={handle}
+     */
+    List<TagRating> getTagRatings(String handle);
+
+    /**
+     * 사용자가 푼 문제 검색 (페이지네이션)
+     * GET /search/problem?query=s@{handle}&page={page}
+     */
+    ProblemSearchResult searchSolvedProblems(String handle, int page);
+
+    /**
+     * 사용자의 상위 100개 문제 조회
+     * GET /user/top_100?handle={handle}
+     */
+    List<Top100Problem> getTop100(String handle);
 
 }
