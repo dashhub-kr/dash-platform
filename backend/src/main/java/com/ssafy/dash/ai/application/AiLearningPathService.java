@@ -38,6 +38,7 @@ public class AiLearningPathService {
         private final UserRepository userRepository;
         private final LearningPathCacheMapper cacheMapper;
         private final ObjectMapper objectMapper;
+        private final com.ssafy.dash.analytics.application.SolvedacSyncService solvedacSyncService;
 
         /**
          * AI 개인화 학습 경로 생성 (대시보드용 종합 데이터 반환)
@@ -182,6 +183,9 @@ public class AiLearningPathService {
                 // solved.ac API에서 가져온 정확한 solvedCount 사용
                 int totalSolved = user.getSolvedCount() != null ? user.getSolvedCount() : 0;
 
+                // Top 100 레벨 실시간 계산
+                int avgTop100 = solvedacSyncService.fetchTop100AverageLevel(user.getSolvedacHandle());
+
                 return LearningPathRequest.builder()
                                 .currentLevel(currentLevel)
                                 .tier(user.getSolvedacTier())
@@ -190,15 +194,14 @@ public class AiLearningPathService {
                                 .weaknessTags(weaknessTags)
                                 .strengthTags(strengthTags)
                                 .classStats(classStatsDto)
-                                .bubbleIndex(calculateBubbleIndex(user))
-                                .avgTop100Level(user.getAvgTop100Level())
+                                .bubbleIndex(calculateBubbleIndex(user, avgTop100))
+                                .avgTop100Level(avgTop100)
                                 .build();
         }
 
-        private Integer calculateBubbleIndex(User user) {
+        private Integer calculateBubbleIndex(User user, int avgTop100) {
                 Integer tier = user.getSolvedacTier();
-                Integer avgTop100 = user.getAvgTop100Level();
-                if (tier == null || avgTop100 == null)
+                if (tier == null || avgTop100 == 0)
                         return null;
                 return tier - avgTop100;
         }

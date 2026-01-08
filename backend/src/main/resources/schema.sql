@@ -24,7 +24,6 @@ CREATE TABLE IF NOT EXISTS users (
 	solvedac_rating INT,
 	solvedac_class INT,
 	solved_count INT DEFAULT 0,
-	avg_top100_level INT DEFAULT NULL COMMENT 'Top 100 문제 평균 레벨 (거품 탐지용)',
 	stats_last_synced_at TIMESTAMP NULL,
 	
     -- 랜덤 디펜스

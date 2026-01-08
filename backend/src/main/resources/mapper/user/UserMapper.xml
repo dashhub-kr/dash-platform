@@ -1,93 +1,54 @@
-<?xml version="1.0" encoding="UTF-8" ?>
+<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.ssafy.dash.user.infrastructure.mapper.UserMapper">
 
-  <insert id="insert" parameterType="User" useGeneratedKeys="true" keyProperty="id">
-    INSERT INTO users (username, email, role, status, created_at, provider, provider_id, avatar_url, equipped_decoration_id)
-    VALUES (#{username}, #{email}, #{role}, #{status}, #{createdAt}, #{provider}, #{providerId}, #{avatarUrl}, #{equippedDecorationId})
-  </insert>
+  <insert id="insert" parameterType="User" useGeneratedKeys="true" keyProperty="id"> INSERT INTO
+    users (username, email, role, status, created_at, provider, provider_id, avatar_url,
+    equipped_decoration_id) VALUES (#{username}, #{email}, #{role}, #{status}, #{createdAt},
+    #{provider}, #{providerId}, #{avatarUrl}, #{equippedDecorationId}) </insert>
 
-  <select id="selectById" resultType="User" parameterType="long">
-    SELECT u.*, d.css_class as equipped_decoration_class
-    FROM users u
-    LEFT JOIN decorations d ON u.equipped_decoration_id = d.id
-    WHERE u.id = #{id} AND u.deleted_at IS NULL
-  </select>
+  <select id="selectById" resultType="User" parameterType="long"> SELECT u.*, d.css_class as
+    equipped_decoration_class FROM users u LEFT JOIN decorations d ON u.equipped_decoration_id =
+    d.id WHERE u.id = #{id} AND u.deleted_at IS NULL </select>
 
 
-  <select id="selectAll" resultType="User">
-    SELECT u.*, d.css_class as equipped_decoration_class
-    FROM users u
-    LEFT JOIN decorations d ON u.equipped_decoration_id = d.id
-    WHERE u.deleted_at IS NULL ORDER BY u.id
-  </select>
+  <select id="selectAll" resultType="User"> SELECT u.*, d.css_class as equipped_decoration_class
+    FROM users u LEFT JOIN decorations d ON u.equipped_decoration_id = d.id WHERE u.deleted_at IS
+    NULL ORDER BY u.id </select>
 
-  <select id="selectByKeyword" resultType="User" parameterType="string">
-    SELECT u.*, d.css_class as equipped_decoration_class
-    FROM users u
-    LEFT JOIN decorations d ON u.equipped_decoration_id = d.id
-    WHERE (u.username LIKE CONCAT('%', #{keyword}, '%') OR u.email LIKE CONCAT('%', #{keyword}, '%'))
-    AND u.deleted_at IS NULL
-    ORDER BY u.id
-  </select>
+  <select id="selectByKeyword" resultType="User" parameterType="string"> SELECT u.*, d.css_class as
+    equipped_decoration_class FROM users u LEFT JOIN decorations d ON u.equipped_decoration_id =
+    d.id WHERE (u.username LIKE CONCAT('%', #{keyword}, '%') OR u.email LIKE CONCAT('%', #{keyword},
+    '%')) AND u.deleted_at IS NULL ORDER BY u.id </select>
 
-  <select id="selectByProviderAndProviderId" resultType="User">
-    SELECT * FROM users 
-    WHERE provider = #{provider} AND provider_id = #{providerId}
-  </select>
+  <select id="selectByProviderAndProviderId" resultType="User"> SELECT * FROM users WHERE provider =
+    #{provider} AND provider_id = #{providerId} </select>
 
-  <update id="update" parameterType="User">
-    UPDATE users
-    SET username = #{username}, email = #{email}, role = #{role}, status = #{status}, provider = #{provider}, 
-        provider_id = #{providerId}, avatar_url = #{avatarUrl}, study_id = #{studyId}, equipped_decoration_id = #{equippedDecorationId},
-        solvedac_handle = #{solvedacHandle}, solvedac_tier = #{solvedacTier},
-        solvedac_rating = #{solvedacRating}, solvedac_class = #{solvedacClass},
-        solved_count = #{solvedCount},
-        avg_top100_level = #{avgTop100Level},
-        stats_last_synced_at = #{statsLastSyncedAt},
-        defense_type = #{defenseType},
-        defense_problem_id = #{defenseProblemId},
-        defense_start_time = #{defenseStartTime},
-        silver_streak = #{silverStreak},
-        gold_streak = #{goldStreak},
-        max_silver_streak = #{maxSilverStreak},
-        max_gold_streak = #{maxGoldStreak},
-        deleted_at = #{deletedAt}
-    WHERE id = #{id}
-  </update>
+  <update id="update" parameterType="User"> UPDATE users SET username = #{username}, email =
+    #{email}, role = #{role}, status = #{status}, provider = #{provider}, provider_id =
+    #{providerId}, avatar_url = #{avatarUrl}, study_id = #{studyId}, equipped_decoration_id =
+    #{equippedDecorationId}, solvedac_handle = #{solvedacHandle}, solvedac_tier = #{solvedacTier},
+    solvedac_rating = #{solvedacRating}, solvedac_class = #{solvedacClass}, solved_count =
+    #{solvedCount}, stats_last_synced_at = #{statsLastSyncedAt}, defense_type = #{defenseType},
+    defense_problem_id = #{defenseProblemId}, defense_start_time = #{defenseStartTime},
+    silver_streak = #{silverStreak}, gold_streak = #{goldStreak}, max_silver_streak =
+    #{maxSilverStreak}, max_gold_streak = #{maxGoldStreak}, deleted_at = #{deletedAt} WHERE id =
+    #{id} </update>
 
-  <update id="delete" parameterType="long">
-    UPDATE users SET deleted_at = CURRENT_TIMESTAMP
-    WHERE id = #{id}
-  </update>
+  <update id="delete" parameterType="long"> UPDATE users SET deleted_at = CURRENT_TIMESTAMP WHERE id
+    = #{id} </update>
 
-  <select id="selectByStudyId" resultType="User" parameterType="long">
-    SELECT u.*, d.css_class as equipped_decoration_class
-    FROM users u
-    LEFT JOIN decorations d ON u.equipped_decoration_id = d.id
-    WHERE u.study_id = #{studyId} AND u.deleted_at IS NULL ORDER BY u.id
-  </select>
+  <select id="selectByStudyId" resultType="User" parameterType="long"> SELECT u.*, d.css_class as
+    equipped_decoration_class FROM users u LEFT JOIN decorations d ON u.equipped_decoration_id =
+    d.id WHERE u.study_id = #{studyId} AND u.deleted_at IS NULL ORDER BY u.id </select>
 
   <select id="selectUsersForAnonymization" resultType="User" parameterType="java.time.LocalDateTime">
-    SELECT * FROM users
-    WHERE deleted_at IS NOT NULL
-      AND deleted_at &lt; #{threshold}
-      AND provider_id IS NOT NULL
-  </select>
+    SELECT * FROM users WHERE deleted_at IS NOT NULL AND deleted_at &lt; #{threshold} AND
+    provider_id IS NOT NULL </select>
 
-  <update id="anonymize" parameterType="long">
-    UPDATE users
-    SET username = 'Unknown User',
-        email = CONCAT('deleted_', id, '@deleted.com'),
-        provider = NULL,
-        provider_id = NULL,
-        avatar_url = NULL,
-        solvedac_handle = NULL,
-        solvedac_tier = NULL,
-        solvedac_rating = NULL,
-        solvedac_class = NULL,
-        solved_count = 0
-    WHERE id = #{id}
-  </update>
+  <update id="anonymize" parameterType="long"> UPDATE users SET username = 'Unknown User', email =
+    CONCAT('deleted_', id, '@deleted.com'), provider = NULL, provider_id = NULL, avatar_url = NULL,
+    solvedac_handle = NULL, solvedac_tier = NULL, solvedac_rating = NULL, solvedac_class = NULL,
+    solved_count = 0 WHERE id = #{id} </update>
 
 </mapper>

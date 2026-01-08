@@ -70,9 +70,6 @@ public class SolvedacSyncService {
         // 5. 태그 통계 동기화
         syncTagStats(userId, handle);
 
-        // 6. Top 100 평균 레벨 계산
-        syncTop100Stats(userId, handle);
-
         // 7. 전체 푼 문제 동기화 (문제 추천 제외용, 비동기 호출)
         problemSyncer.syncAllSolvedProblems(userId, handle);
 
@@ -143,16 +140,14 @@ public class SolvedacSyncService {
     }
 
     /**
-     * Top 100 문제 평균 레벨 계산 및 저장
+     * Top 100 문제 평균 레벨 계산 (DB 저장 안함, On-the-fly)
      */
-    @Transactional
-    public void syncTop100Stats(Long userId, String handle) {
+    public int fetchTop100AverageLevel(String handle) {
         try {
             List<Top100Problem> top100 = solvedacClient.getTop100(handle);
 
             if (top100.isEmpty()) {
-                log.info("No top 100 problems found for user {}", userId);
-                return;
+                return 0;
             }
 
             // 평균 레벨 계산
@@ -161,18 +156,10 @@ public class SolvedacSyncService {
                     .average()
                     .orElse(0.0);
 
-            int avgTop100Level = (int) Math.round(avgLevel);
-
-            // User 업데이트
-            User user = userRepository.findById(userId)
-                    .orElseThrow(() -> new IllegalArgumentException("User not found: " + userId));
-            user.updateTop100Stats(avgTop100Level);
-            userRepository.update(user);
-
-            log.info("Synced top 100 stats for user {}: avgLevel={}", userId, avgTop100Level);
+            return (int) Math.round(avgLevel);
         } catch (Exception e) {
-            log.warn("Failed to sync top 100 stats for user {}: {}", userId, e.getMessage());
-            // Top 100 실패해도 전체 동기화는 계속 진행
+            log.warn("Failed to fetch top 100 stats for handle {}: {}", handle, e.getMessage());
+            return 0;
         }
     }
 
