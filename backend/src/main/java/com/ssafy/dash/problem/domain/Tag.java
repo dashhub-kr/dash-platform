@@ -46,17 +46,7 @@ public class Tag {
         if (displayNames == null || displayNames.isEmpty()) {
             return tagKey;
         }
-        try {
-            // 간단한 정규식으로 ko 언어 이름 추출
-            java.util.regex.Pattern pattern = java.util.regex.Pattern.compile(
-                    "\"language\"\\s*:\\s*\"ko\"[^}]*\"name\"\\s*:\\s*\"([^\"]+)\"");
-            java.util.regex.Matcher matcher = pattern.matcher(displayNames);
-            if (matcher.find()) {
-                return matcher.group(1);
-            }
-        } catch (Exception e) {
-            // 파싱 실패 시 tagKey 반환
-        }
-        return tagKey;
+        // TagService에서 이미 한국어 이름만 추출해서 저장하므로 그대로 반환
+        return displayNames;
     }
 }
