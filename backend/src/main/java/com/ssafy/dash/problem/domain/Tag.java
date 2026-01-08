@@ -16,10 +16,11 @@ public class Tag {
     private String importanceTier;
     private Double weight;
     private Boolean isCore;
+    private Boolean isBasic;
     private String displayNames; // stored as JSON string
 
     private Tag(String tagKey, Integer bojTagId, Long familyId, String parentTagKey, String importanceTier,
-            Double weight, Boolean isCore, String displayNames) {
+            Double weight, Boolean isCore, Boolean isBasic, String displayNames) {
         this.tagKey = tagKey;
         this.bojTagId = bojTagId;
         this.familyId = familyId;
@@ -27,12 +28,13 @@ public class Tag {
         this.importanceTier = importanceTier;
         this.weight = weight;
         this.isCore = isCore;
+        this.isBasic = isBasic;
         this.displayNames = displayNames;
     }
 
     public static Tag create(String tagKey, Integer bojTagId, Long familyId, String parentTagKey, String importanceTier,
-            Double weight, Boolean isCore, String displayNames) {
-        return new Tag(tagKey, bojTagId, familyId, parentTagKey, importanceTier, weight, isCore, displayNames);
+            Double weight, Boolean isCore, Boolean isBasic, String displayNames) {
+        return new Tag(tagKey, bojTagId, familyId, parentTagKey, importanceTier, weight, isCore, isBasic, displayNames);
     }
 
     /**

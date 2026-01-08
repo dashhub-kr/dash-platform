@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ssafy.dash.problem.domain.Tag;
 import com.ssafy.dash.problem.domain.TagFamily;
+import com.ssafy.dash.problem.domain.CoreTagsConfig;
 import com.ssafy.dash.problem.infrastructure.persistence.TagMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -12,6 +13,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -26,11 +28,69 @@ public class TagService {
         // 이미 태그 데이터가 있으면 스킵
         if (!tagMapper.findAllTags().isEmpty()) {
             log.info("태그 데이터가 이미 존재합니다. 초기화를 건너뜁니다.");
+            // 메타데이터(Tier, Weight, Family, Core) 전체 동기화
+            syncTagMetadata();
             return;
         }
 
         initializeFamilies();
         loadTagsFromJson();
+        syncTagMetadata(); // 초기화 후에도 동기화 보장
+    }
+
+    /**
+     * CoreTagsConfig 기반으로 DB의 태그 메타데이터 전체 동기화
+     * - Tier, Weight, FamilyId, IsCore 업데이트
+     */
+    @Transactional
+    public void syncTagMetadata() {
+        List<Tag> allTags = tagMapper.findAllTags();
+        int updatedCount = 0;
+
+        for (Tag tag : allTags) {
+            CoreTagsConfig.TagMetadata metadata = CoreTagsConfig.getMetadata(tag.getTagKey());
+            boolean updated = false;
+
+            // Update isCore
+            if (!Boolean.valueOf(metadata.isCore()).equals(tag.getIsCore())) {
+                tag.setIsCore(metadata.isCore());
+                updated = true;
+            }
+
+            // Update isBasic
+            if (!Boolean.valueOf(metadata.isBasic()).equals(tag.getIsBasic())) {
+                tag.setIsBasic(metadata.isBasic());
+                updated = true;
+            }
+
+            // Update Tier
+            if (!metadata.tier().equals(tag.getImportanceTier())) {
+                tag.setImportanceTier(metadata.tier());
+                updated = true;
+            }
+
+            // Update Weight
+            if (tag.getWeight() == null || Math.abs(metadata.weight() - tag.getWeight()) > 0.001) {
+                tag.setWeight(metadata.weight());
+                updated = true;
+            }
+
+            // Update FamilyId
+            if (metadata.familyKey() != null) {
+                TagFamily family = tagMapper.findFamilyByKey(metadata.familyKey());
+                if (family != null && !family.getId().equals(tag.getFamilyId())) {
+                    tag.setFamilyId(family.getId());
+                    updated = true;
+                }
+            }
+
+            if (updated) {
+                tagMapper.updateTagMetadata(tag);
+                updatedCount++;
+            }
+        }
+
+        log.info("태그 메타데이터 동기화 완료: {}개 태그 업데이트됨", updatedCount);
     }
 
     private void initializeFamilies() {
@@ -48,7 +108,7 @@ public class TagService {
         for (String[] fam : families) {
             TagFamily family = TagFamily.create(fam[0], fam[1], Integer.parseInt(fam[2]));
             try {
-                tagMapper.saveTagFamily(family); // Correct method name
+                tagMapper.saveTagFamily(family);
             } catch (Exception e) {
                 log.warn("Family already exists: {}", fam[0]);
             }
@@ -74,11 +134,12 @@ public class TagService {
                     }
                 }
 
-                TagMetadata metadata = analyzeTag(key);
+                // CoreTagsConfig에서 메타데이터 조회
+                CoreTagsConfig.TagMetadata metadata = CoreTagsConfig.getMetadata(key);
 
                 Long familyId = null;
-                if (metadata.familyKey != null) {
-                    TagFamily family = tagMapper.findFamilyByKey(metadata.familyKey);
+                if (metadata.familyKey() != null) {
+                    TagFamily family = tagMapper.findFamilyByKey(metadata.familyKey());
                     if (family != null) {
                         familyId = family.getId();
                     }
@@ -88,108 +149,17 @@ public class TagService {
                         key,
                         bojTagId,
                         familyId,
-                        metadata.parentKey,
-                        metadata.tier,
-                        metadata.weight,
-                        "S".equals(metadata.tier) || "A".equals(metadata.tier),
+                        null, // parentKey (현재 사용 안함)
+                        metadata.tier(),
+                        metadata.weight(),
+                        metadata.isCore(),
+                        metadata.isBasic(),
                         koreanName);
 
                 tagMapper.saveTag(tag);
             }
         } catch (IOException e) {
             log.error("JSON 파일에서 태그 로드 실패", e);
-        }
-    }
-
-    private TagMetadata analyzeTag(String key) {
-        // TIER S - Implementation
-        if (isOneOf(key, "implementation", "simulation", "bruteforcing", "ad_hoc", "recursion"))
-            return new TagMetadata("IMPLEMENTATION", "S", 3.0, null);
-
-        // TIER S - Math
-        if (isOneOf(key, "math", "arithmetic", "number_theory", "combinatorics"))
-            return new TagMetadata("MATH", "S", 3.0, null);
-
-        // TIER S - DP
-        if (isOneOf(key, "dp", "knapsack"))
-            return new TagMetadata("DP", "S", 3.0, null);
-
-        // TIER S - Graph
-        if (isOneOf(key, "graphs", "graph_traversal", "bfs", "dfs"))
-            return new TagMetadata("GRAPH", "S", 3.0, null);
-
-        // TIER S - Greedy
-        if (key.equals("greedy"))
-            return new TagMetadata("GREEDY", "S", 3.0, null);
-
-        // TIER S - String
-        if (key.equals("string"))
-            return new TagMetadata("STRING", "S", 3.0, null);
-
-        // TIER S - Data Structure
-        if (isOneOf(key, "data_structures", "stack", "queue", "priority_queue", "deque"))
-            return new TagMetadata("DATA_STRUCTURE", "S", 3.0, null);
-
-        // TIER A - Implementation
-        if (isOneOf(key, "case_work", "constructive", "sorting"))
-            return new TagMetadata("IMPLEMENTATION", "A", 2.0, null);
-
-        // TIER A - Math
-        if (isOneOf(key, "euclidean", "primality_test", "sieve", "probability"))
-            return new TagMetadata("MATH", "A", 2.0, null);
-
-        // TIER A - DP
-        if (isOneOf(key, "dp_tree", "dp_bitfield", "lis"))
-            return new TagMetadata("DP", "A", 2.0, null);
-
-        // TIER A - Graph
-        if (isOneOf(key, "shortest_path", "dijkstra", "floyd_warshall", "topological_sorting", "mst", "trees"))
-            return new TagMetadata("GRAPH", "A", 2.0, null);
-
-        // TIER A - String
-        if (isOneOf(key, "kmp", "trie", "hashing", "parsing"))
-            return new TagMetadata("STRING", "A", 2.0, null);
-
-        // TIER A - Data Structure
-        if (isOneOf(key, "segtree", "disjoint_set", "binary_search", "set", "hash_set", "tree_set"))
-            return new TagMetadata("DATA_STRUCTURE", "A", 2.0, null);
-
-        // TIER B - Advanced
-        if (isOneOf(key, "divide_and_conquer", "two_pointer", "prefix_sum", "sweeping", "backtracking",
-                "bitmask", "sliding_window", "offline_queries", "parametric_search"))
-            return new TagMetadata("ADVANCED", "B", 1.0, null);
-
-        // TIER A - Graph (추가) - 정말 중요한 그래프 알고리즘
-        if (isOneOf(key, "bellman_ford", "lca", "scc"))
-            return new TagMetadata("GRAPH", "A", 2.0, null);
-
-        // TIER B - 핵심만 (최소한)
-        if (isOneOf(key, "flood_fill", "dp_digit", "bipartite_matching", "flow", "geometry"))
-            return new TagMetadata("ADVANCED", "B", 1.0, null);
-
-        // Default to Tier C / Advanced
-        return new TagMetadata("ADVANCED", "C", 0.5, null);
-    }
-
-    private boolean isOneOf(String key, String... candidates) {
-        for (String candidate : candidates) {
-            if (key.equals(candidate))
-                return true;
-        }
-        return false;
-    }
-
-    private static class TagMetadata {
-        String familyKey;
-        String tier;
-        Double weight;
-        String parentKey;
-
-        TagMetadata(String familyKey, String tier, Double weight, String parentKey) {
-            this.familyKey = familyKey;
-            this.tier = tier;
-            this.weight = weight;
-            this.parentKey = parentKey;
         }
     }
 }

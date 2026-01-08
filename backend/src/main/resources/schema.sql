@@ -199,6 +199,7 @@ CREATE TABLE IF NOT EXISTS tags (
     importance_tier VARCHAR(10),
     weight DOUBLE DEFAULT 0.0,
     is_core BOOLEAN DEFAULT FALSE,
+    is_basic BOOLEAN DEFAULT FALSE,  -- Whether this is a basic tag for beginners
     display_names VARCHAR(100),
     FOREIGN KEY (family_id) REFERENCES tag_families(id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
@@ -295,6 +296,7 @@ CREATE TABLE IF NOT EXISTS user_tag_stats (
     solved INT NOT NULL DEFAULT 0 COMMENT '사용자가 푼 문제 수',
     partial INT NOT NULL DEFAULT 0 COMMENT '사용자가 부분 성공한 문제 수',
     tried INT NOT NULL DEFAULT 0 COMMENT '사용자가 시도해 본 문제 수',
+    rating INT DEFAULT 0 COMMENT '태그 레이팅 점수',
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
     FOREIGN KEY (tag_key) REFERENCES tags(tag_key),
