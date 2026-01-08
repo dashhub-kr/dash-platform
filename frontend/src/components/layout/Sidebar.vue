@@ -658,6 +658,8 @@ onBeforeUnmount(() => document.removeEventListener("click", onDocClick));
 </script>
 
 <style scoped>
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@500;700;900&display=swap');
+
 .custom-scrollbar::-webkit-scrollbar {
   width: 4px;
 }
@@ -678,6 +680,4 @@ onBeforeUnmount(() => document.removeEventListener("click", onDocClick));
   opacity: 0;
   transform: translateY(10px) scale(0.95);
 }
-
-@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@500;700;900&display=swap');
 </style>
