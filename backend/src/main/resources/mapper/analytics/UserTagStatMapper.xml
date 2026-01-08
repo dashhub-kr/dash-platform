@@ -1,48 +1,28 @@
-<?xml version="1.0" encoding="UTF-8" ?>
-<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
-        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.ssafy.dash.analytics.infrastructure.persistence.UserTagStatMapper">
 
-    <insert id="upsert">
-        INSERT INTO user_tag_stats 
-            (user_id, tag_key, total, solved, partial, tried)
-        VALUES 
-            (#{userId}, #{tagKey}, #{total}, #{solved}, #{partial}, #{tried})
-        ON DUPLICATE KEY UPDATE
-            total = VALUES(total),
-            solved = VALUES(solved),
-            partial = VALUES(partial),
-            tried = VALUES(tried),
-            updated_at = CURRENT_TIMESTAMP
-    </insert>
+    <insert id="upsert"> INSERT INTO user_tag_stats (user_id, tag_key, total, solved, partial,
+        tried, rating) VALUES (#{userId}, #{tagKey}, #{total}, #{solved}, #{partial}, #{tried},
+        #{rating}) ON DUPLICATE KEY UPDATE total = VALUES(total), solved = VALUES(solved), partial =
+        VALUES(partial), tried = VALUES(tried), rating = VALUES(rating), updated_at =
+        CURRENT_TIMESTAMP </insert>
 
-    <select id="findByUserId" resultType="UserTagStat">
-        SELECT * FROM user_tag_stats WHERE user_id = #{userId} ORDER BY solved DESC
-    </select>
+    <select id="findByUserId" resultType="UserTagStat"> SELECT uts.*, t.is_basic as isBasic FROM
+        user_tag_stats uts LEFT JOIN tags t ON uts.tag_key = t.tag_key WHERE uts.user_id = #{userId}
+        ORDER BY uts.solved DESC </select>
 
-    <select id="findFamilyStatsByUserId" resultType="UserFamilyStat">
-        SELECT
-            tf.family_key as familyKey,
-            tf.name as familyName,
-            CAST(SUM(uts.total) AS UNSIGNED) as total,
-            CAST(SUM(uts.solved) AS UNSIGNED) as solved,
-            CAST(SUM(uts.partial) AS UNSIGNED) as partial,
-            CAST(SUM(uts.tried) AS UNSIGNED) as tried,
-            SUM(uts.solved * t.weight) as rawScore
-        FROM user_tag_stats uts
-        JOIN tags t ON uts.tag_key = t.tag_key
-        JOIN tag_families tf ON t.family_id = tf.id
-        WHERE uts.user_id = #{userId}
-        GROUP BY tf.id, tf.family_key, tf.name, tf.order_index
-        ORDER BY tf.order_index ASC
-    </select>
+    <select id="findFamilyStatsByUserId" resultType="UserFamilyStat"> SELECT tf.family_key as
+        familyKey, tf.name as familyName, CAST(SUM(uts.total) AS UNSIGNED) as total,
+        CAST(SUM(uts.solved) AS UNSIGNED) as solved, CAST(SUM(uts.partial) AS UNSIGNED) as partial,
+        CAST(SUM(uts.tried) AS UNSIGNED) as tried, SUM(uts.solved * t.weight) as rawScore FROM
+        user_tag_stats uts JOIN tags t ON uts.tag_key = t.tag_key JOIN tag_families tf ON
+        t.family_id = tf.id WHERE uts.user_id = #{userId} GROUP BY tf.id, tf.family_key, tf.name,
+        tf.order_index ORDER BY tf.order_index ASC </select>
 
-    <select id="findByUserIdAndTag" resultType="UserTagStat">
-        SELECT * FROM user_tag_stats WHERE user_id = #{userId} AND tag_key = #{tagKey}
-    </select>
+    <select id="findByUserIdAndTag" resultType="UserTagStat"> SELECT * FROM user_tag_stats WHERE
+        user_id = #{userId} AND tag_key = #{tagKey} </select>
 
-    <delete id="deleteByUserId">
-        DELETE FROM user_tag_stats WHERE user_id = #{userId}
-    </delete>
+    <delete id="deleteByUserId"> DELETE FROM user_tag_stats WHERE user_id = #{userId} </delete>
 
 </mapper>

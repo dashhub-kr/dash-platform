@@ -4,6 +4,7 @@ import com.ssafy.dash.problem.domain.Tag;
 import com.ssafy.dash.problem.domain.TagFamily;
 import java.util.List;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 
 @Mapper
 public interface TagMapper {
@@ -19,7 +20,9 @@ public interface TagMapper {
 
     List<Tag> findAllTags();
 
-    List<Tag> findCoreTagsByFamilyId(Long familyId);
+    List<Tag> findCoreTagsByFamilyId(@Param("familyId") Long familyId);
+
+    List<Tag> findCandidateTags();
 
     void updateTagMetadata(Tag tag);
 }

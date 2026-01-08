@@ -23,10 +23,12 @@ public class UserTagStat {
     private Integer solved;
     private Integer partial;
     private Integer tried;
+    private Integer rating;
+    private Boolean isBasic;
     private LocalDateTime updatedAt;
 
     public static UserTagStat create(Long userId, String tagKey, Integer total,
-            Integer solved, Integer partial, Integer tried) {
+            Integer solved, Integer partial, Integer tried, Integer rating) {
         UserTagStat stat = new UserTagStat();
         stat.userId = userId;
         stat.tagKey = tagKey;
@@ -34,6 +36,7 @@ public class UserTagStat {
         stat.solved = solved;
         stat.partial = partial;
         stat.tried = tried;
+        stat.rating = rating != null ? rating : 0;
         return stat;
     }
 
