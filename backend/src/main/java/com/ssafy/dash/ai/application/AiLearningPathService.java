@@ -12,6 +12,7 @@ import com.ssafy.dash.analytics.domain.UserTagStat;
 import com.ssafy.dash.analytics.infrastructure.persistence.UserClassStatMapper;
 import com.ssafy.dash.analytics.infrastructure.persistence.UserTagStatMapper;
 import com.ssafy.dash.problem.domain.Tag;
+import com.ssafy.dash.problem.domain.CoreTagsConfig;
 import com.ssafy.dash.problem.infrastructure.persistence.TagMapper;
 import com.ssafy.dash.user.domain.User;
 import com.ssafy.dash.user.domain.UserRepository;
@@ -22,6 +23,7 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDate;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Set;
 
 /**
  * AI 기반 개인화 학습 경로 서비스
@@ -137,10 +139,36 @@ public class AiLearningPathService {
                 String currentLevel = buildCurrentLevel(user);
                 String goalLevel = determineNextGoal(classStats);
 
-                // 약점 태그 (상위 5개)
-                List<LearningPathRequest.TagStats> weaknessTags = tagStats.stream()
-                                .filter(t -> t.getSolved() > 0 && t.getSolved() < 10)
-                                .sorted(Comparator.comparing(UserTagStat::getSolved))
+                // 사용자 티어 기반 레이팅 (비교 기준)
+                int userTierRating = user.getSolvedacTier() != null ? user.getSolvedacTier() * 100 : 0;
+
+                // 분석 대상 태그 (Core + Basic) 전체 조회
+                List<Tag> candidateTags = tagMapper.findCandidateTags();
+                java.util.Map<String, UserTagStat> statMap = tagStats.stream()
+                                .collect(java.util.stream.Collectors.toMap(UserTagStat::getTagKey,
+                                                java.util.function.Function.identity()));
+
+                // 모든 후보 태그에 대해 통계 확보 (없으면 기본값 0)
+                List<UserTagStat> fullStats = candidateTags.stream()
+                                .map(tag -> statMap.getOrDefault(tag.getTagKey(),
+                                                UserTagStat.builder()
+                                                                .userId(user.getId())
+                                                                .tagKey(tag.getTagKey())
+                                                                .total(0)
+                                                                .solved(0)
+                                                                .rating(0)
+                                                                .isBasic(tag.getIsBasic())
+                                                                .build()))
+                                .toList();
+
+                // 약점 태그:
+                // 1. 유저 수준에 맞는 태그 (Bronze: Basic, Silver+: Core)
+                // 2. 레이팅이 낮은 순 (0점 포함 -> 미학습 분야가 최우선 약점)
+                List<LearningPathRequest.TagStats> weaknessTags = fullStats.stream()
+                                .filter(t -> isAppropriateForUser(t, user.getSolvedacTier()))
+                                // rating > 0 필터 제거: 아예 안 푼(0점) 태그도 약점으로 추천해야 함
+                                .sorted(Comparator.comparing(UserTagStat::getRating)
+                                                .thenComparing(UserTagStat::getSolved)) // 레이팅 같으면 푼 문제 적은 순
                                 .limit(5)
                                 .map(t -> {
                                         Tag tag = tagMapper.findTagByKey(t.getTagKey());
@@ -150,13 +178,16 @@ public class AiLearningPathService {
                                                         .bojTagId(tag != null ? tag.getBojTagId() : null)
                                                         .solved(t.getSolved())
                                                         .total(t.getTotal())
+                                                        .rating(t.getRating())
                                                         .build();
                                 })
                                 .toList();
 
-                // 강점 태그 (상위 5개)
-                List<LearningPathRequest.TagStats> strengthTags = tagStats.stream()
-                                .sorted(Comparator.comparing(UserTagStat::getSolved).reversed())
+                // 강점 태그: 레이팅이 높은 순 (진짜 잘하는 분야)
+                // 강점은 무조건 레이팅이 있어야 함 (0점은 강점이 아님)
+                List<LearningPathRequest.TagStats> strengthTags = fullStats.stream()
+                                .filter(t -> t.getRating() > 0)
+                                .sorted(Comparator.comparing(UserTagStat::getRating).reversed())
                                 .limit(5)
                                 .map(t -> {
                                         Tag tag = tagMapper.findTagByKey(t.getTagKey());
@@ -166,12 +197,22 @@ public class AiLearningPathService {
                                                         .bojTagId(tag != null ? tag.getBojTagId() : null)
                                                         .solved(t.getSolved())
                                                         .total(t.getTotal())
+                                                        .rating(t.getRating())
                                                         .build();
                                 })
                                 .toList();
 
-                // 클래스 통계
+                // 클래스 통계 (Forward Progression 적용)
+                // 가장 높은 완성된 클래스 번호 찾기
+                int maxClearedClass = classStats.stream()
+                                .filter(c -> c.getEssentialCompletionRate() >= 100)
+                                .mapToInt(UserClassStat::getClassNumber)
+                                .max()
+                                .orElse(0);
+
+                // AI에게는 이미 완성한 클래스보다 높은 것만 전달
                 List<LearningPathRequest.ClassStats> classStatsDto = classStats.stream()
+                                .filter(c -> c.getClassNumber() > maxClearedClass) // Forward Progression!
                                 .map(c -> LearningPathRequest.ClassStats.builder()
                                                 .classNumber(c.getClassNumber())
                                                 .essentialSolved(c.getEssentialSolved())
@@ -229,7 +270,16 @@ public class AiLearningPathService {
         }
 
         private String determineNextGoal(List<UserClassStat> classStats) {
+                // 1. 가장 높은 '완성(100%)' 클래스 번호를 찾음
+                int maxClearedClass = classStats.stream()
+                                .filter(c -> c.getEssentialCompletionRate() >= 100)
+                                .mapToInt(UserClassStat::getClassNumber)
+                                .max()
+                                .orElse(0); // 완성한 게 없으면 0
+
+                // 2. 그보다 높은 클래스 중에서 가장 낮은 '미완성' 클래스를 찾음
                 return classStats.stream()
+                                .filter(c -> c.getClassNumber() > maxClearedClass) // 이미 깬 레벨보다 높은 것만
                                 .filter(c -> c.getEssentialCompletionRate() < 100)
                                 .min(Comparator.comparing(UserClassStat::getClassNumber))
                                 .map(c -> String.format("Class %d 에센셜 완성 (남은 문제: %d개)",
@@ -238,7 +288,16 @@ public class AiLearningPathService {
         }
 
         private LearningDashboardResponse.DailyChallenge determineDailyChallenge(List<UserClassStat> classStats) {
+                // 1. 가장 높은 '완성(100%)' 클래스 번호를 찾음
+                int maxClearedClass = classStats.stream()
+                                .filter(c -> c.getEssentialCompletionRate() >= 100)
+                                .mapToInt(UserClassStat::getClassNumber)
+                                .max()
+                                .orElse(0);
+
+                // 2. 그보다 높은 클래스 중에서 가장 낮은 '미완성' 클래스를 찾음
                 return classStats.stream()
+                                .filter(c -> c.getClassNumber() > maxClearedClass)
                                 .filter(c -> c.getEssentialCompletionRate() < 100)
                                 .min(Comparator.comparing(UserClassStat::getClassNumber))
                                 .map(c -> LearningDashboardResponse.DailyChallenge.builder()
@@ -259,7 +318,16 @@ public class AiLearningPathService {
 
         private LearningDashboardResponse.DailyChallenge determineDailyChallengeFromDto(
                         List<LearningPathRequest.ClassStats> classStats) {
+                // 1. 가장 높은 '완성(100%)' 클래스 번호를 찾음
+                int maxClearedClass = classStats.stream()
+                                .filter(c -> c.getEssentials() > 0 && c.getEssentialSolved() >= c.getEssentials())
+                                .mapToInt(LearningPathRequest.ClassStats::getClassNumber)
+                                .max()
+                                .orElse(0);
+
+                // 2. 그보다 높은 클래스 중에서 가장 낮은 '미완성' 클래스를 찾음
                 return classStats.stream()
+                                .filter(c -> c.getClassNumber() > maxClearedClass)
                                 .filter(c -> c.getEssentials() > 0 && c.getEssentialSolved() < c.getEssentials())
                                 .min(Comparator.comparing(LearningPathRequest.ClassStats::getClassNumber))
                                 .map(c -> LearningDashboardResponse.DailyChallenge.builder()
@@ -276,6 +344,19 @@ public class AiLearningPathService {
                                                 .description("새로운 목표를 찾아보세요.")
                                                 .link("https://solved.ac/classes")
                                                 .build());
+        }
+
+        /**
+         * 유저 티어에 따라 태그가 적절한지 판단
+         * Bronze 이하(Tier < 6)인 경우 기초 태그만 허용 (DB isBasic 필드 사용)
+         */
+        private boolean isAppropriateForUser(UserTagStat stat, Integer userTier) {
+                // 티어 정보가 없거나 Bronze 이하인 경우
+                if (userTier == null || userTier < 6) {
+                        return Boolean.TRUE.equals(stat.getIsBasic());
+                }
+                // Silver 이상은 모든 Core Tag 허용
+                return true;
         }
 
 }
