@@ -67,6 +67,12 @@ class LearningPathRequest(BaseModel):
     class_stats: List[ClassStats] = Field(default_factory=list, alias="classStats",
         description="각 클래스별 에센셜 진행 현황")
     
+    # 거품 탐지 데이터
+    bubble_index: Optional[int] = Field(None, alias="bubbleIndex",
+        description="티어 - Top100 평균 레벨. 양수면 거품 (예: 3이면 티어가 실력보다 3단계 높음)")
+    avg_top100_level: Optional[int] = Field(None, alias="avgTop100Level",
+        description="Top 100 문제 평균 난이도 (1-30). 실제 풀이 실력 지표")
+    
     class Config:
         populate_by_name = True
 

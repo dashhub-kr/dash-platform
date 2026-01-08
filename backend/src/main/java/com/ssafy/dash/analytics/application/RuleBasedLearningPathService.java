@@ -65,10 +65,16 @@ public class RuleBasedLearningPathService {
         // Phase 3: 강점 태그 심화
         addStrengthPhase(phases, tagStats);
 
+        // 거품 탐지
+        Integer bubbleIndex = calculateBubbleIndex(user);
+        String bubbleWarning = generateBubbleWarning(bubbleIndex, user);
+
         return LearningPathDto.builder()
                 .currentLevel(currentLevel)
                 .nextGoal(nextGoal)
                 .phases(phases)
+                .bubbleIndex(bubbleIndex)
+                .bubbleWarning(bubbleWarning)
                 .build();
     }
 
@@ -179,5 +185,37 @@ public class RuleBasedLearningPathService {
                         tag.getSolved()))
                 .problems(List.of()) // 실제 문제 추천은 Phase 2 확장 시 구현
                 .build());
+    }
+
+    /**
+     * 거품 지수 계산
+     * 
+     * @return 티어 - Top100 평균 레벨 (0이면 정상, 양수면 거품)
+     */
+    private Integer calculateBubbleIndex(User user) {
+        Integer tier = user.getSolvedacTier();
+        Integer avgTop100 = user.getAvgTop100Level();
+
+        if (tier == null || avgTop100 == null) {
+            return null; // 데이터 없음
+        }
+
+        return tier - avgTop100;
+    }
+
+    /**
+     * 거품 경고 메시지 생성
+     */
+    private String generateBubbleWarning(Integer bubbleIndex, User user) {
+        if (bubbleIndex == null || bubbleIndex <= 2) {
+            return null; // 정상
+        }
+
+        String realTier = getTierName(user.getAvgTop100Level());
+        String displayTier = getTierName(user.getSolvedacTier());
+
+        return String.format(
+                "현재 티어(%s)에 비해 실제 풀이 수준(%s)이 낮습니다. 기초부터 다시 잡아보세요!",
+                displayTier, realTier);
     }
 }

@@ -190,7 +190,17 @@ public class AiLearningPathService {
                                 .weaknessTags(weaknessTags)
                                 .strengthTags(strengthTags)
                                 .classStats(classStatsDto)
+                                .bubbleIndex(calculateBubbleIndex(user))
+                                .avgTop100Level(user.getAvgTop100Level())
                                 .build();
+        }
+
+        private Integer calculateBubbleIndex(User user) {
+                Integer tier = user.getSolvedacTier();
+                Integer avgTop100 = user.getAvgTop100Level();
+                if (tier == null || avgTop100 == null)
+                        return null;
+                return tier - avgTop100;
         }
 
         private String buildCurrentLevel(User user) {

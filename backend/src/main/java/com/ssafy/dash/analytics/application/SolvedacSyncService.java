@@ -8,6 +8,7 @@ import com.ssafy.dash.solvedac.domain.SolvedacApiClient;
 import com.ssafy.dash.solvedac.domain.ClassStat;
 import com.ssafy.dash.solvedac.domain.SolvedacUser;
 import com.ssafy.dash.solvedac.domain.TagStat;
+import com.ssafy.dash.solvedac.domain.Top100Problem;
 import com.ssafy.dash.user.domain.User;
 import com.ssafy.dash.user.domain.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -68,7 +69,10 @@ public class SolvedacSyncService {
         // 5. 태그 통계 동기화
         syncTagStats(userId, handle);
 
-        // 5. 학습 경로 캐시 무효화 (데이터 변경됨)
+        // 6. Top 100 평균 레벨 계산
+        syncTop100Stats(userId, handle);
+
+        // 7. 학습 경로 캐시 무효화 (데이터 변경됨)
         cacheMapper.deleteByUserId(userId);
         log.info("Invalidated learning path cache for user {}", userId);
 
@@ -118,8 +122,6 @@ public class SolvedacSyncService {
         log.info("Synced {} tag stats for user {}", response.count(), userId);
     }
 
-
-
     /**
      * 전체 통계 재동기화 (주기적 업데이트용)
      */
@@ -134,5 +136,39 @@ public class SolvedacSyncService {
         }
 
         registerSolvedacHandle(userId, handle, null);
+    }
+
+    /**
+     * Top 100 문제 평균 레벨 계산 및 저장
+     */
+    @Transactional
+    public void syncTop100Stats(Long userId, String handle) {
+        try {
+            List<Top100Problem> top100 = solvedacClient.getTop100(handle);
+
+            if (top100.isEmpty()) {
+                log.info("No top 100 problems found for user {}", userId);
+                return;
+            }
+
+            // 평균 레벨 계산
+            double avgLevel = top100.stream()
+                    .mapToInt(Top100Problem::level)
+                    .average()
+                    .orElse(0.0);
+
+            int avgTop100Level = (int) Math.round(avgLevel);
+
+            // User 업데이트
+            User user = userRepository.findById(userId)
+                    .orElseThrow(() -> new IllegalArgumentException("User not found: " + userId));
+            user.updateTop100Stats(avgTop100Level);
+            userRepository.update(user);
+
+            log.info("Synced top 100 stats for user {}: avgLevel={}", userId, avgTop100Level);
+        } catch (Exception e) {
+            log.warn("Failed to sync top 100 stats for user {}: {}", userId, e.getMessage());
+            // Top 100 실패해도 전체 동기화는 계속 진행
+        }
     }
 }

@@ -28,6 +28,9 @@ class LearningPathService(BaseService):
         # 클래스 진행률 포맷팅
         class_progress = self._format_class_progress(request.class_stats)
         
+        # 거품 분석 포맷팅
+        bubble_analysis = self._format_bubble_analysis(request.bubble_index, request.avg_top100_level)
+        
         # 프롬프트 포맷팅
         prompt = self.prompts.format(
             "learning_path",
@@ -37,7 +40,8 @@ class LearningPathService(BaseService):
             goal_level=request.goal_level or "다음 티어",
             strength_tags=strength_tags,
             weakness_tags=weakness_tags,
-            class_progress=class_progress
+            class_progress=class_progress,
+            bubble_analysis=bubble_analysis
         )
         
         # LLM 호출
@@ -69,3 +73,20 @@ class LearningPathService(BaseService):
                 f"{stat.essential_solved}/{stat.essentials} 에센셜{decoration}"
             )
         return "\n".join(lines)
+    
+    def _format_bubble_analysis(self, bubble_index: int | None, avg_top100_level: int | None) -> str:
+        """거품 분석 데이터를 포맷팅"""
+        if bubble_index is None or avg_top100_level is None:
+            return "- 분석 데이터 없음"
+        
+        tier_names = ["Unrated"] + [
+            f"{t} {l}" for t in ["Bronze", "Silver", "Gold", "Platinum", "Diamond", "Ruby"]
+            for l in ["V", "IV", "III", "II", "I"]
+        ] + ["Master"]
+        
+        real_tier = tier_names[avg_top100_level] if 0 <= avg_top100_level < len(tier_names) else "Unknown"
+        
+        if bubble_index <= 2:
+            return f"- 실제 실력: {real_tier} (정상 범위)"
+        else:
+            return f"- 실제 실력: {real_tier} (⚠️ 거품 경고: 현재 티어보다 {bubble_index}단계 낮음)"
