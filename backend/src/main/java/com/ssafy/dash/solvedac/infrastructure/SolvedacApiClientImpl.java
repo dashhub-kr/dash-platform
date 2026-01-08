@@ -17,6 +17,8 @@ import com.ssafy.dash.solvedac.domain.ProblemSearchResult;
 import com.ssafy.dash.solvedac.domain.Top100Problem;
 import com.ssafy.dash.solvedac.infrastructure.dto.Top100Response;
 
+import java.util.Arrays;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -97,10 +99,11 @@ public class SolvedacApiClientImpl implements SolvedacApiClient {
     public List<TagRating> getTagRatings(String handle) {
         try {
             log.debug("Fetching tag ratings for handle: {}", handle);
-            SolvedacTagRatingResponse response = restClient.get()
+            // API returns a direct JSON array, not a wrapper object
+            SolvedacTagRatingResponse.Item[] response = restClient.get()
                     .uri(baseUrl + "/user/tag_ratings?handle={handle}", handle)
                     .retrieve()
-                    .body(SolvedacTagRatingResponse.class);
+                    .body(SolvedacTagRatingResponse.Item[].class);
             return mapToTagRatingList(response);
         } catch (RestClientException e) {
             log.error("Failed to fetch tag ratings for handle: {}", handle, e);
@@ -168,13 +171,14 @@ public class SolvedacApiClientImpl implements SolvedacApiClient {
         return new TagStat(dto.getCount(), items);
     }
 
-    private List<TagRating> mapToTagRatingList(SolvedacTagRatingResponse dto) {
-        if (dto == null || dto.getItems() == null)
+    private List<TagRating> mapToTagRatingList(SolvedacTagRatingResponse.Item[] items) {
+        if (items == null || items.length == 0)
             return Collections.emptyList();
-        return dto.getItems().stream()
+        return Arrays.stream(items)
+                .filter(item -> item.getTag() != null)
                 .map(item -> new TagRating(
                         item.getTag().getKey(),
-                        item.getRating(),
+                        item.getRating() != null ? item.getRating() : 0,
                         item.getSolvedCount() == null ? 0 : item.getSolvedCount()))
                 .collect(Collectors.toList());
     }

@@ -51,13 +51,14 @@ class LearningPathService(BaseService):
         )
     
     def _format_tags(self, tags: list) -> str:
-        """태그 목록을 포맷팅된 문자열로 변환"""
+        """태그 목록을 포맷팅된 문자열로 변환 (레이팅 포함)"""
         if not tags:
             return "- 데이터 없음"
         
         lines = []
         for tag in tags[:5]:  # 상위 5개만
-            lines.append(f"- {tag.tag_name or tag.tag_key}: {tag.solved}/{tag.total} 문제")
+            rating_info = f" (레이팅: {tag.rating})" if hasattr(tag, 'rating') and tag.rating else ""
+            lines.append(f"- {tag.tag_name or tag.tag_key}: {tag.solved}/{tag.total} 문제{rating_info}")
         return "\n".join(lines)
     
     def _format_class_progress(self, stats: list) -> str:

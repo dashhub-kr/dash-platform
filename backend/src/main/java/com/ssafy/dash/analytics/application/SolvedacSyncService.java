@@ -107,20 +107,41 @@ public class SolvedacSyncService {
      */
     @Transactional
     public void syncTagStats(Long userId, String handle) {
-        TagStat response = solvedacClient.getTagStats(handle);
+        // 1. 태그 통계 (문제 수) 조회
+        TagStat tagStats = solvedacClient.getTagStats(handle);
 
-        response.items().forEach(item -> {
+        // 2. 태그 레이팅 조회 (Optional - 숨겨진 API라 실패할 수 있음)
+        java.util.Map<String, Integer> ratingMapTemp = new java.util.HashMap<>();
+        try {
+            List<com.ssafy.dash.solvedac.domain.TagRating> tagRatings = solvedacClient.getTagRatings(handle);
+            ratingMapTemp = tagRatings.stream()
+                    .collect(java.util.stream.Collectors.toMap(
+                            com.ssafy.dash.solvedac.domain.TagRating::tagKey,
+                            com.ssafy.dash.solvedac.domain.TagRating::rating,
+                            (existing, replacement) -> existing));
+            log.info("Fetched {} tag ratings for user {}", tagRatings.size(), handle);
+        } catch (Exception e) {
+            log.warn("Failed to fetch tag ratings for {} (using 0 for all tags): {}", handle, e.getMessage());
+        }
+        final java.util.Map<String, Integer> ratingMap = ratingMapTemp;
+
+        // 3. 병합 및 저장
+        tagStats.items().forEach(item -> {
+            String key = item.tag().key();
+            int rating = ratingMap.getOrDefault(key, 0);
+
             UserTagStat entity = UserTagStat.create(
                     userId,
-                    item.tag().key(),
+                    key,
                     item.total(),
                     item.solved(),
                     item.partial(),
-                    item.tried());
+                    item.tried(),
+                    rating);
             tagStatRepository.save(entity);
         });
 
-        log.info("Synced {} tag stats for user {}", response.count(), userId);
+        log.info("Synced {} tag stats (with ratings) for user {}", tagStats.count(), userId);
     }
 
     /**

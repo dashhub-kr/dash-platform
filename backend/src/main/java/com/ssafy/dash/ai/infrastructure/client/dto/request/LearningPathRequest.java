@@ -38,6 +38,7 @@ public class LearningPathRequest {
         private Integer bojTagId; // 백준 태그 ID (정수형)
         private int solved; // 푼 문제 수
         private int total; // 전체 문제 수
+        private int rating; // 태그 레이팅 점수
     }
 
     @Getter
