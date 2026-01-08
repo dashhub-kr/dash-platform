@@ -92,6 +92,8 @@
                        :username="post.authorName"
                        :avatar-url="post.authorProfileImageUrl"
                        :role="post.authorRole"
+                       :user-id="post.userId"
+                       :clickable="true"
                        avatar-class="w-6 h-6 border border-slate-200"
                        text-class="font-medium text-slate-600 truncate max-w-[80px] sm:max-w-[100px]"
                        :icon-size="16"

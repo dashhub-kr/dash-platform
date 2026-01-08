@@ -25,8 +25,10 @@
                 textClass, 
                 decorationClass,
                 isUnknown ? 'text-slate-400' : 'text-slate-700',
-                { 'admin-shining-text': isAdmin }
+                { 'admin-shining-text': isAdmin },
+                { 'cursor-pointer hover:underline hover:text-brand-600': clickable && !isUnknown }
             ]"
+            @click="handleClick"
         >
             {{ displayName }}
         </span>
@@ -36,21 +38,41 @@
 <script setup>
 import { computed } from 'vue';
 import { UserX } from 'lucide-vue-next';
+import { useUserProfileModal } from '@/composables/useUserProfileModal';
 
 const props = defineProps({
     nickname: { type: String, default: '' }, 
     username: { type: String, default: '' }, 
+    userId: { type: Number, default: null }, // NEW
     avatarUrl: { type: String, default: null },
     role: { type: String, default: null },
     decorationClass: { type: String, default: null }, 
     verified: { type: Boolean, default: false },
     
     showAvatar: { type: Boolean, default: true },
+    clickable: { type: Boolean, default: false }, // NEW
     avatarClass: { type: String, default: 'w-6 h-6' },
     textClass: { type: String, default: 'text-xs' },
     containerClass: { type: String, default: '' },
     iconSize: { type: Number, default: 14 }
 });
+
+const { open } = useUserProfileModal();
+
+const handleClick = (e) => {
+    if (props.clickable && !isUnknown.value && props.userId) {
+        e.stopPropagation();
+        open({
+            userId: props.userId,
+            nickname: props.nickname,
+            username: props.username,
+            avatarUrl: props.avatarUrl,
+            role: props.role,
+            decorationClass: props.decorationClass
+            // email is not usually passed here, can be fetched if needed or just omitted
+        });
+    }
+};
 
 const effectiveNickname = computed(() => props.nickname || props.username);
 

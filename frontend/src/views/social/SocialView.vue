@@ -148,16 +148,6 @@
 
         </div>
 
-        <!-- DM Modal -->
-        <DirectMessageModal 
-            v-if="showDMModal" 
-            :partner-id="dmPartnerId" 
-            :partner-name="dmPartnerName"
-            :partner-avatar="dmPartnerAvatar"
-            :partner-decoration="dmPartnerDecoration"
-            @close="showDMModal = false"
-        />
-
     </div>
 </template>
 
@@ -166,8 +156,8 @@ import { ref, watch, onMounted } from 'vue';
 import { useRoute } from 'vue-router';
 import { socialApi } from '@/api/social';
 import { Loader2, Users, Bell, Search, UserPlus, MessageCircle, UserMinus, CheckCircle2 } from 'lucide-vue-next';
-import DirectMessageModal from '@/components/social/DirectMessageModal.vue';
 import NicknameRenderer from '@/components/common/NicknameRenderer.vue';
+import { useDirectMessageModal } from '@/composables/useDirectMessageModal';
 
 const route = useRoute();
 const activeTab = ref('friends');
@@ -187,11 +177,7 @@ const searchLoading = ref(false);
 const searchResults = ref(null);
 
 // 쪽지 (DM)
-const showDMModal = ref(false);
-const dmPartnerId = ref(null);
-const dmPartnerName = ref('');
-const dmPartnerAvatar = ref('');
-const dmPartnerDecoration = ref('');
+const { open: openGlobalDM } = useDirectMessageModal();
 
 const loadData = async () => {
     loading.value = true;
@@ -271,11 +257,12 @@ const deleteFriend = async (friendId) => {
 };
 
 const openDM = (id, name, avatar, decoration) => {
-    dmPartnerId.value = id;
-    dmPartnerName.value = name;
-    dmPartnerAvatar.value = avatar;
-    dmPartnerDecoration.value = decoration || '';
-    showDMModal.value = true;
+    openGlobalDM({
+        partnerId: id,
+        partnerName: name,
+        partnerAvatar: avatar,
+        partnerDecoration: decoration || ''
+    });
 };
 
 // 라우트 쿼리 핸들러 (예: 알림 클릭 시)
@@ -283,21 +270,27 @@ const checkQueryForDM = async () => {
     const pid = route.query.partnerId;
     if (pid) {
         const partnerId = parseInt(pid);
-        dmPartnerId.value = partnerId;
         
         // 1. 친구 목록에서 찾아보기
         const friend = friends.value.find(f => f.friend.id === partnerId);
         if (friend) {
-            dmPartnerName.value = friend.friend.username;
-            dmPartnerAvatar.value = friend.friend.avatarUrl;
-            dmPartnerDecoration.value = friend.friend.equippedDecorationClass || '';
-            showDMModal.value = true;
+            openGlobalDM({
+                partnerId: friend.friend.id,
+                partnerName: friend.friend.username,
+                partnerAvatar: friend.friend.avatarUrl,
+                partnerDecoration: friend.friend.equippedDecorationClass || ''
+            });
         } else {
             // 2. 없으면 검색 API 등을 통해 사용자 정보 가져오기 
             try {
                 if (!loading.value) { 
-                     showDMModal.value = true;
-                     if (!dmPartnerName.value) dmPartnerName.value = 'Friend';
+                     // 정보가 없으므로 최소한의 정보로 염
+                     openGlobalDM({
+                        partnerId: partnerId,
+                        partnerName: 'User', // 로드 전 임시
+                        partnerAvatar: null,
+                        partnerDecoration: ''
+                     });
                 }
             } catch (e) {
                 console.error(e);

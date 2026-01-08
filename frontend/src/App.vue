@@ -5,8 +5,20 @@
     <div class="bg-slate-50 min-h-screen transition-all duration-300" :class="{ 'md:ml-64': isSidebarVisible }">
         <router-view />
     </div>
+
+    <!-- Global Modals -->
+    <UserProfileModal />
+    <DirectMessageModal 
+      v-if="isDMOpen && dmPartnerInfo"
+      :partner-id="dmPartnerInfo.partnerId"
+      :partner-name="dmPartnerInfo.partnerName"
+      :partner-avatar="dmPartnerInfo.partnerAvatar"
+      :partner-decoration="dmPartnerInfo.partnerDecoration"
+      @close="closeDM"
+    />
   </template>
 </template>
+
 
 <script setup>
 import { computed, ref, onMounted, onUnmounted } from "vue";
@@ -15,9 +27,16 @@ import { useAuth } from "@/composables/useAuth";
 import Sidebar from "./components/layout/Sidebar.vue";
 import MobileRestrictionView from "@/views/MobileRestrictionView.vue";
 
+// Global Modals
+import UserProfileModal from "@/components/social/UserProfileModal.vue";
+import DirectMessageModal from "@/components/social/DirectMessageModal.vue";
+import { useDirectMessageModal } from "@/composables/useDirectMessageModal";
+
 const route = useRoute();
 const { user } = useAuth();
 const isMobile = ref(false);
+
+const { isOpen: isDMOpen, partnerInfo: dmPartnerInfo, close: closeDM } = useDirectMessageModal();
 
 const checkMobile = () => {
   if (typeof window !== "undefined") {
