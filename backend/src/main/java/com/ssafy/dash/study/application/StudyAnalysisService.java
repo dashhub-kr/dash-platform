@@ -21,6 +21,7 @@ import com.ssafy.dash.analytics.infrastructure.persistence.UserTagStatMapper;
 import com.ssafy.dash.problem.application.ProblemService;
 import com.ssafy.dash.problem.presentation.dto.response.ProblemRecommendationResponse;
 import com.ssafy.dash.problem.domain.Tag;
+import com.ssafy.dash.problem.domain.CoreTagsConfig;
 import com.ssafy.dash.problem.infrastructure.persistence.TagMapper;
 import com.ssafy.dash.user.domain.User;
 import com.ssafy.dash.user.domain.UserRepository;
@@ -130,9 +131,10 @@ public class StudyAnalysisService {
                 .min()
                 .orElse(1);
 
-        // 모든 세부 태그 조회 (S, A, B 티어만)
+        // 모든 세부 태그 조회 (S, A, B 티어이면서 코테 빈출 태그만)
         List<Tag> allTags = tagMapper.findAllTags().stream()
                 .filter(tag -> TIER_WEIGHTS.containsKey(tag.getImportanceTier()))
+                .filter(tag -> CoreTagsConfig.isCoreTag(tag.getTagKey())) // 코테 빈출 태그만
                 .toList();
 
         if (allTags.isEmpty()) {
