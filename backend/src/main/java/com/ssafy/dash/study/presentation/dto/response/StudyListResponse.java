@@ -19,13 +19,12 @@ public record StudyListResponse(
         String mvpUsername,
         Integer streak,
         Double averageSubmissionRate,
-        List<MemberPreview> memberPreviews, // 상위 5명 멤버 미리보기
+        List<MemberPreview> memberPreviews, // 멤버 미리보기 (프론트에서 표시 개수 조절)
         String description) {
 
     public static StudyListResponse from(Study study, List<User> members) {
         List<MemberPreview> previews = members != null
                 ? members.stream()
-                        .limit(5)
                         .map(MemberPreview::from)
                         .toList()
                 : List.of();

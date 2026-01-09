@@ -31,7 +31,7 @@
 
     <div v-else :class="{ 'flex flex-col h-full overflow-hidden': isOnboarding }">
       <!-- 검색 창 -->
-      <div class="shrink-0 bg-slate-50/90 backdrop-blur-md p-6 rounded-3xl border border-slate-100 z-30 sticky top-0 shadow-sm"
+      <div class="shrink-0 bg-slate-50/90 backdrop-blur-md p-6 rounded-3xl border border-slate-100 z-10 sticky top-0 shadow-sm"
            :class="{ 'mb-4': isOnboarding, 'mb-10 top-0': !isOnboarding }">
         <label class="block text-sm font-bold text-slate-500 mb-3 ml-1 flex items-center justify-between">
            <span>스터디 찾기</span>
@@ -79,7 +79,8 @@
 
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div v-for="(study, idx) in recommendedStudies" :key="'rec-'+study.id" 
-               class="bg-white rounded-3xl p-6 border-2 border-violet-100 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all group relative overflow-visible flex flex-col h-full ring-4 ring-transparent hover:ring-violet-50">
+               class="bg-white rounded-3xl p-6 border-2 border-violet-100 shadow-sm transition-all group relative overflow-visible flex flex-col h-full ring-4 ring-transparent"
+               :class="openMemberPopup === study.id ? '' : 'hover:shadow-xl hover:-translate-y-1 hover:ring-violet-50'">
             
             <!-- 추천 배지 -->
              <div class="absolute top-4 right-4 bg-violet-100 text-violet-600 text-[10px] font-bold px-2 py-1 rounded-full uppercase tracking-wider">
@@ -89,14 +90,15 @@
             <!-- 상단 정보 -->
             <div class="relative z-10 mb-4 mt-2">
                               <div class="flex items-center gap-2 mb-3">
-                  <div class="flex items-center -space-x-2">
-                     <template v-for="member in (study.memberPreviews || []).slice(0, 4)" :key="member.userId">
+                  <!-- 아바타 영역 전체 클릭 가능 -->
+                  <div @click="toggleMemberPopup(study.id, $event)" class="flex items-center -space-x-2 cursor-pointer relative">
+                     <template v-for="member in (study.memberPreviews || []).slice(0, 11)" :key="member.userId">
                         <div class="relative group/avatar">
-                           <NicknameRenderer :username="member.username" :avatar-url="member.avatarUrl" avatar-class="w-7 h-7 border-2 border-white shadow-sm" text-class="hidden" :show-avatar="true" />
+                           <NicknameRenderer :username="member.username" :avatar-url="member.avatarUrl" avatar-class="w-7 h-7 border-2 border-white shadow-sm hover:ring-2 hover:ring-violet-300" text-class="hidden" :show-avatar="true" />
                            <div class="absolute left-1/2 -translate-x-1/2 -top-8 bg-slate-800 text-white text-[10px] font-bold px-2 py-1 rounded-lg opacity-0 group-hover/avatar:opacity-100 transition-opacity whitespace-nowrap pointer-events-none z-50">{{ member.username }}</div>
                         </div>
                      </template>
-                     <div v-if="study.memberCount > 4" class="w-7 h-7 rounded-full bg-slate-100 border-2 border-white flex items-center justify-center text-[10px] font-bold text-slate-500">+{{ study.memberCount - 4 }}</div>
+                     <div v-if="study.memberCount > 11" class="w-7 h-7 rounded-full bg-slate-200 border-2 border-white flex items-center justify-center text-[10px] font-bold text-slate-600 hover:bg-slate-300 transition-colors">···</div>
                   </div>
                   <span class="text-xs font-medium text-slate-400 ml-1">{{ study.memberCount }}명</span>
                </div>
@@ -123,7 +125,7 @@
                   <img :src="`https://static.solved.ac/tier_small/${Math.floor(study.averageTier || 0)}.svg`" class="w-6 h-6 object-contain" alt="Tier" />
                   <span class="text-lg font-black text-slate-800 whitespace-nowrap">{{ study.tierBadge || 'Unranked' }}</span>
                   <!-- Tooltip -->
-                  <div class="absolute left-1/2 -translate-x-1/2 bottom-full mb-2 bg-slate-800 text-white text-xs font-medium px-4 py-3 rounded-2xl opacity-0 group-hover/tier:opacity-100 transition-all pointer-events-none z-50 shadow-xl min-w-[160px]">
+                  <div class="absolute left-1/2 -translate-x-1/2 bottom-full mb-2 bg-slate-800 text-white text-xs font-medium px-4 py-3 rounded-2xl opacity-0 group-hover/tier:opacity-100 transition-all pointer-events-none z-[9999] shadow-xl min-w-[160px]">
                      <div class="text-slate-400 text-[10px] uppercase tracking-wider mb-1">평균 티어</div>
                      <div class="text-base font-bold">{{ study.tierBadge || 'Unranked' }}</div>
                      <div class="absolute left-1/2 -translate-x-1/2 top-full w-0 h-0 border-l-8 border-r-8 border-t-8 border-l-transparent border-r-transparent border-t-slate-800"></div>
@@ -135,7 +137,7 @@
                   <Flame class="w-6 h-6 text-orange-500 fill-orange-500" stroke-width="2" />
                   <span class="text-lg font-black text-slate-800 whitespace-nowrap">{{ study.streak || 0 }}</span>
                   <!-- Tooltip -->
-                  <div class="absolute left-1/2 -translate-x-1/2 bottom-full mb-2 bg-slate-800 text-white text-xs font-medium px-4 py-3 rounded-2xl opacity-0 group-hover/streak:opacity-100 transition-all pointer-events-none z-50 shadow-xl min-w-[160px]">
+                  <div class="absolute left-1/2 -translate-x-1/2 bottom-full mb-2 bg-slate-800 text-white text-xs font-medium px-4 py-3 rounded-2xl opacity-0 group-hover/streak:opacity-100 transition-all pointer-events-none z-[9999] shadow-xl min-w-[160px]">
                      <div class="text-slate-400 text-[10px] uppercase tracking-wider mb-1">연속 스트릭</div>
                      <div class="text-base font-bold">{{ study.streak || 0 }}일 연속</div>
                      <div class="absolute left-1/2 -translate-x-1/2 top-full w-0 h-0 border-l-8 border-r-8 border-t-8 border-l-transparent border-r-transparent border-t-slate-800"></div>
@@ -147,7 +149,7 @@
                   <Send class="w-5 h-5 text-sky-500 fill-sky-500" stroke-width="2" />
                   <span class="text-lg font-black text-slate-800 whitespace-nowrap">{{ (study.averageSubmissionRate || 0).toFixed(0) }}</span>
                   <!-- Tooltip -->
-                  <div class="absolute left-1/2 -translate-x-1/2 bottom-full mb-2 bg-slate-800 text-white text-xs font-medium px-4 py-3 rounded-2xl opacity-0 group-hover/activity:opacity-100 transition-all pointer-events-none z-50 shadow-xl min-w-[160px]">
+                  <div class="absolute left-1/2 -translate-x-1/2 bottom-full mb-2 bg-slate-800 text-white text-xs font-medium px-4 py-3 rounded-2xl opacity-0 group-hover/activity:opacity-100 transition-all pointer-events-none z-[9999] shadow-xl min-w-[160px]">
                      <div class="text-slate-400 text-[10px] uppercase tracking-wider mb-1">최근 7일간 1인당 평균 풀이</div>
                      <div class="text-base font-bold">{{ (study.averageSubmissionRate || 0).toFixed(0) }}문제</div>
                      <div class="absolute left-1/2 -translate-x-1/2 top-full w-0 h-0 border-l-8 border-r-8 border-t-8 border-l-transparent border-r-transparent border-t-slate-800"></div>
@@ -206,7 +208,8 @@
 
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div v-for="(study, idx) in studies" :key="study.id" 
-               class="bg-white rounded-3xl p-6 border border-slate-200 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all group relative overflow-visible flex flex-col h-full">
+               class="bg-white rounded-3xl p-6 border border-slate-200 shadow-sm transition-all group relative overflow-visible flex flex-col h-full"
+               :class="openMemberPopup === study.id ? '' : 'hover:shadow-xl hover:-translate-y-1'">
             
             <!-- 랭킹 배지 (순서) -->
              <div class="absolute top-4 right-4 text-4xl font-black text-slate-100 italic pointer-events-none group-hover:text-brand-50 transition-colors">
@@ -216,14 +219,15 @@
             <!-- 상단 정보 -->
             <div class="relative z-10 mb-4">
                               <div class="flex items-center gap-2 mb-3">
-                  <div class="flex items-center -space-x-2">
-                     <template v-for="member in (study.memberPreviews || []).slice(0, 4)" :key="member.userId">
+                  <!-- 아바타 영역 전체 클릭 가능 -->
+                  <div @click="toggleMemberPopup(study.id, $event)" class="flex items-center -space-x-2 cursor-pointer relative">
+                     <template v-for="member in (study.memberPreviews || []).slice(0, 11)" :key="member.userId">
                         <div class="relative group/avatar">
-                           <NicknameRenderer :username="member.username" :avatar-url="member.avatarUrl" avatar-class="w-7 h-7 border-2 border-white shadow-sm" text-class="hidden" :show-avatar="true" />
+                           <NicknameRenderer :username="member.username" :avatar-url="member.avatarUrl" avatar-class="w-7 h-7 border-2 border-white shadow-sm hover:ring-2 hover:ring-brand-300" text-class="hidden" :show-avatar="true" />
                            <div class="absolute left-1/2 -translate-x-1/2 -top-8 bg-slate-800 text-white text-[10px] font-bold px-2 py-1 rounded-lg opacity-0 group-hover/avatar:opacity-100 transition-opacity whitespace-nowrap pointer-events-none z-50">{{ member.username }}</div>
                         </div>
                      </template>
-                     <div v-if="study.memberCount > 4" class="w-7 h-7 rounded-full bg-slate-100 border-2 border-white flex items-center justify-center text-[10px] font-bold text-slate-500">+{{ study.memberCount - 4 }}</div>
+                     <div v-if="study.memberCount > 11" class="w-7 h-7 rounded-full bg-slate-200 border-2 border-white flex items-center justify-center text-[10px] font-bold text-slate-600 hover:bg-slate-300 transition-colors">···</div>
                   </div>
                   <span class="text-xs font-medium text-slate-400 ml-1">{{ study.memberCount }}명</span>
                </div>
@@ -433,12 +437,28 @@
           </div>
         </div>
       </Teleport>
+
+      <!-- Member Popup Teleport -->
+      <Teleport to="body">
+       <div v-if="currentStudy" @click.stop 
+            class="fixed bg-white text-slate-800 rounded-2xl z-[9999] min-w-[180px] max-h-[300px] overflow-y-auto shadow-2xl border border-slate-100 p-3" 
+            :style="{ 
+                top: `${popupPosition.top}px`, 
+                left: `${popupPosition.left}px`,
+                transform: 'translate(-50%, -100%) translateY(-10px)'
+            }">
+          <div class="text-slate-400 text-[10px] uppercase tracking-wider mb-2 pb-2 border-b border-slate-100 font-bold">스터디원 ({{ currentStudy.memberCount }}명)</div>
+          <div v-for="member in (currentStudy.memberPreviews || [])" :key="member.userId" class="flex items-center gap-3 py-2 border-b border-slate-50 last:border-0">
+             <NicknameRenderer :username="member.username" :avatar-url="member.avatarUrl" avatar-class="w-8 h-8" text-class="text-sm font-medium text-slate-700" :show-avatar="true" />
+          </div>
+       </div>
+      </Teleport>
     </div>
   </div>
 </template>
 
 <script setup>
-import { ref, onMounted, computed } from 'vue';
+import { ref, onMounted, onUnmounted, computed, nextTick } from 'vue';
 import { useRouter } from 'vue-router';
 import axios from 'axios';
 import { useAuth } from '@/composables/useAuth';
@@ -469,6 +489,31 @@ const searchKeyword = ref('');
 const searchError = ref('');
 
 const pendingApp = ref(null);
+
+// Member popup state
+const openMemberPopup = ref(null);
+const popupPosition = ref({ top: 0, left: 0 });
+const closeMemberPopup = () => { openMemberPopup.value = null; };
+const toggleMemberPopup = (studyId, event) => {
+    event.stopPropagation();
+    if (openMemberPopup.value === studyId) {
+        openMemberPopup.value = null;
+    } else {
+        // 클릭 위치 기반으로 팝업 위치 계산
+        const rect = event.currentTarget.getBoundingClientRect();
+        popupPosition.value = {
+            top: rect.top + window.scrollY,
+            left: rect.left + rect.width / 2
+        };
+        openMemberPopup.value = studyId;
+    }
+};
+
+const currentStudy = computed(() => {
+    if (!openMemberPopup.value) return null;
+    const allStudies = [...(recommendedStudies.value || []), ...(studies.value || [])];
+    return allStudies.find(s => s.id === openMemberPopup.value);
+});
 
 const isAdmin = computed(() => {
     return user.value?.role === 'ROLE_ADMIN' || user.value?.role === 'ADMIN'; 
@@ -577,6 +622,12 @@ onMounted(() => {
   if (user.value && (!user.value.studyId || user.value.studyType === 'PERSONAL')) {
       checkMyApplication();
   }
+  // 외부 클릭 시 팝업 닫기
+  document.addEventListener('click', closeMemberPopup);
+});
+
+onUnmounted(() => {
+  document.removeEventListener('click', closeMemberPopup);
 });
 
 const openApplyModal = (study) => {
