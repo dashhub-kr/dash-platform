@@ -23,6 +23,7 @@ public record UserResponse(
         String role,
         String pendingStudyName,
         String friendshipStatus,
+        Boolean hasAnalysis,
         String equippedDecorationClass) {
 
     public static UserResponse from(UserResult result) {
@@ -45,6 +46,7 @@ public record UserResponse(
                 result.role(),
                 result.pendingStudyName(),
                 result.friendshipStatus(),
+                result.hasAnalysis(),
                 result.equippedDecorationClass());
     }
 
