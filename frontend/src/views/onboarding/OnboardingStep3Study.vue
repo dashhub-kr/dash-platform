@@ -116,14 +116,14 @@
 
       <!-- Explorer View -->
       <transition name="slide-up">
-        <div v-if="isExploring" class="relative h-[80vh] flex flex-col">
-            <div class="flex items-center justify-between mb-6 px-4">
+        <div v-if="isExploring" class="relative h-[85vh] flex flex-col">
+            <div class="flex items-center justify-between mb-3 px-4">
                <button @click="backToMain" class="flex items-center gap-2 text-slate-500 hover:text-slate-900 font-bold transition-colors bg-white px-4 py-2 rounded-xl shadow-sm border border-slate-100">
                    <ArrowLeft class="w-4 h-4" /> 처음으로
                </button>
             </div>
             
-            <div class="bg-white/80 backdrop-blur-xl border border-white/60 rounded-3xl p-6 shadow-2xl overflow-hidden flex-1 min-h-0 relative">
+            <div class="bg-white/80 backdrop-blur-xl border border-white/60 rounded-3xl p-4 shadow-2xl overflow-hidden flex-1 min-h-0 relative">
                 <!-- Use existing StudyExplorer but customized if needed via props -->
                 <StudyExplorer :is-onboarding="true" @apply-success="onStudyJoined" />
             </div>

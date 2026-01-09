@@ -99,8 +99,8 @@ public class SkillTreeService {
                                                         Collections.emptyList());
 
                                         List<SkillTreeNode> children = familyTags.stream()
-                                                        // S, A, B 티어만 표시 (C 티어 제외)
-                                                        .filter(tag -> !"C".equals(tag.getImportanceTier()))
+                                                        // S, A, B, C 티어 모두 표시
+                                                        // .filter(tag -> !"C".equals(tag.getImportanceTier()))
                                                         .map(tag -> buildTagNode(tag,
                                                                         userStatsMap.get(tag.getTagKey())))
                                                         .sorted(Comparator.comparing(SkillTreeNode::getTier)

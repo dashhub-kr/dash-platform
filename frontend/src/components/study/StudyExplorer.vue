@@ -4,8 +4,8 @@
     <div v-if="!isOnboarding" class="mb-8 flex items-start justify-between">
       <div>
         <h1 class="text-2xl font-black text-slate-800 flex items-center gap-3 mb-2">
-          <div class="w-10 h-10 bg-yellow-100 rounded-xl flex items-center justify-center">
-            <Compass class="w-6 h-6 text-yellow-600" :stroke-width="2.5" />
+          <div class="w-10 h-10 bg-yellow-500 rounded-xl flex items-center justify-center">
+            <Compass class="w-6 h-6 text-white" :stroke-width="2.5" />
           </div>
           스터디 둘러보기
         </h1>
@@ -66,8 +66,8 @@
       <!-- 추천 스터디 섹션 -->
       <div v-if="recommendedStudies.length > 0" class="mb-12">
         <div class="flex items-center gap-2 mb-6">
-          <div class="bg-violet-100 p-2 rounded-xl">
-            <Sparkles class="w-5 h-5 text-violet-600" fill="currentColor" />
+          <div class="bg-violet-500 p-2 rounded-xl">
+            <Sparkles class="w-5 h-5 text-white" />
           </div>
           <div>
             <h2 class="text-xl font-bold text-slate-800">
@@ -79,7 +79,7 @@
 
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div v-for="(study, idx) in recommendedStudies" :key="'rec-'+study.id" 
-               class="bg-white rounded-3xl p-6 border-2 border-violet-100 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all group relative overflow-hidden flex flex-col h-full ring-4 ring-transparent hover:ring-violet-50">
+               class="bg-white rounded-3xl p-6 border-2 border-violet-100 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all group relative overflow-visible flex flex-col h-full ring-4 ring-transparent hover:ring-violet-50">
             
             <!-- 추천 배지 -->
              <div class="absolute top-4 right-4 bg-violet-100 text-violet-600 text-[10px] font-bold px-2 py-1 rounded-full uppercase tracking-wider">
@@ -88,14 +88,19 @@
 
             <!-- 상단 정보 -->
             <div class="relative z-10 mb-4 mt-2">
-               <div class="flex items-center gap-2 mb-3">
-                 <span class="px-2.5 py-1 bg-slate-100 text-slate-600 text-xs font-bold rounded-lg border border-slate-200">
-                  알고리즘
-                 </span>
-                 <span class="flex items-center gap-1 text-xs font-medium text-slate-500">
-                    <Users class="w-3 h-3" /> {{ study.memberCount }}명
-                 </span>
+                              <div class="flex items-center gap-2 mb-3">
+                  <div class="flex items-center -space-x-2">
+                     <template v-for="member in (study.memberPreviews || []).slice(0, 4)" :key="member.userId">
+                        <div class="relative group/avatar">
+                           <NicknameRenderer :username="member.username" :avatar-url="member.avatarUrl" avatar-class="w-7 h-7 border-2 border-white shadow-sm" text-class="hidden" :show-avatar="true" />
+                           <div class="absolute left-1/2 -translate-x-1/2 -top-8 bg-slate-800 text-white text-[10px] font-bold px-2 py-1 rounded-lg opacity-0 group-hover/avatar:opacity-100 transition-opacity whitespace-nowrap pointer-events-none z-50">{{ member.username }}</div>
+                        </div>
+                     </template>
+                     <div v-if="study.memberCount > 4" class="w-7 h-7 rounded-full bg-slate-100 border-2 border-white flex items-center justify-center text-[10px] font-bold text-slate-500">+{{ study.memberCount - 4 }}</div>
+                  </div>
+                  <span class="text-xs font-medium text-slate-400 ml-1">{{ study.memberCount }}명</span>
                </div>
+
                
                <h3 class="text-xl font-bold text-slate-900 mb-2 truncate pr-8 group-hover:text-violet-600 transition-colors">
                  {{ study.name }}
@@ -105,23 +110,51 @@
                </p>
             </div>
 
-            <!-- 통계 정보 -->
-            <div class="grid grid-cols-2 gap-3 mb-6 relative z-10">
-               <div class="bg-violet-50/50 rounded-2xl p-3 border border-violet-100">
-                  <div class="text-[10px] text-violet-400 font-bold mb-1 uppercase tracking-wider">Average Tier</div>
-                  <div class="text-violet-700 font-bold flex items-center gap-1.5 text-sm">
-                     <Trophy class="w-4 h-4 text-violet-500" /> 
-                     {{ study.tierBadge || 'Unranked' }}
+            <!-- 통계 정보 (Horizontal Divided Layout) -->
+            <!-- 통계 정보 (Refined Horizontal Layout - No Border) -->
+            <!-- 통계 정보 (Solved.ac Tier + Solid Icon Backgrounds) -->
+            <!-- 통계 정보 (Rounded Square Solid BG + White Line Icons) -->
+            <!-- 통계 정보 (Solid Filled Icons) -->
+            <!-- 통계 정보 with Hover Tooltips -->
+            <div class="flex items-center py-3 mb-6 relative z-10">
+               
+               <!-- Tier (Solved.ac Icon) -->
+               <div class="flex-1 flex items-center justify-center gap-2 px-4 py-2 -my-2 rounded-xl cursor-default relative group/tier hover:bg-slate-50 transition-colors">
+                  <img :src="`https://static.solved.ac/tier_small/${Math.floor(study.averageTier || 0)}.svg`" class="w-6 h-6 object-contain" alt="Tier" />
+                  <span class="text-lg font-black text-slate-800 whitespace-nowrap">{{ study.tierBadge || 'Unranked' }}</span>
+                  <!-- Tooltip -->
+                  <div class="absolute left-1/2 -translate-x-1/2 bottom-full mb-2 bg-slate-800 text-white text-xs font-medium px-4 py-3 rounded-2xl opacity-0 group-hover/tier:opacity-100 transition-all pointer-events-none z-50 shadow-xl min-w-[160px]">
+                     <div class="text-slate-400 text-[10px] uppercase tracking-wider mb-1">평균 티어</div>
+                     <div class="text-base font-bold">{{ study.tierBadge || 'Unranked' }}</div>
+                     <div class="absolute left-1/2 -translate-x-1/2 top-full w-0 h-0 border-l-8 border-r-8 border-t-8 border-l-transparent border-r-transparent border-t-slate-800"></div>
                   </div>
                </div>
-               <div class="bg-slate-50 rounded-2xl p-3 border border-slate-100">
-                  <div class="text-[10px] text-slate-400 font-bold mb-1 uppercase tracking-wider">Activity</div>
-                  <div class="text-slate-700 font-bold flex items-center gap-1.5 text-sm">
-                     <Activity class="w-4 h-4 text-slate-400" />
-                     {{ (study.averageSubmissionRate || 0).toFixed(1) }}문제
+
+               <!-- Streak -->
+               <div class="flex-1 flex items-center justify-center gap-2 px-4 py-2 -my-2 rounded-xl cursor-default relative group/streak hover:bg-slate-50 transition-colors">
+                  <Flame class="w-6 h-6 text-orange-500 fill-orange-500" stroke-width="2" />
+                  <span class="text-lg font-black text-slate-800 whitespace-nowrap">{{ study.streak || 0 }}</span>
+                  <!-- Tooltip -->
+                  <div class="absolute left-1/2 -translate-x-1/2 bottom-full mb-2 bg-slate-800 text-white text-xs font-medium px-4 py-3 rounded-2xl opacity-0 group-hover/streak:opacity-100 transition-all pointer-events-none z-50 shadow-xl min-w-[160px]">
+                     <div class="text-slate-400 text-[10px] uppercase tracking-wider mb-1">연속 스트릭</div>
+                     <div class="text-base font-bold">{{ study.streak || 0 }}일 연속</div>
+                     <div class="absolute left-1/2 -translate-x-1/2 top-full w-0 h-0 border-l-8 border-r-8 border-t-8 border-l-transparent border-r-transparent border-t-slate-800"></div>
+                  </div>
+               </div>
+
+               <!-- Activity -->
+               <div class="flex-1 flex items-center justify-center gap-2 px-4 py-2 -my-2 rounded-xl cursor-default relative group/activity hover:bg-slate-50 transition-colors">
+                  <Send class="w-5 h-5 text-sky-500 fill-sky-500" stroke-width="2" />
+                  <span class="text-lg font-black text-slate-800 whitespace-nowrap">{{ (study.averageSubmissionRate || 0).toFixed(0) }}</span>
+                  <!-- Tooltip -->
+                  <div class="absolute left-1/2 -translate-x-1/2 bottom-full mb-2 bg-slate-800 text-white text-xs font-medium px-4 py-3 rounded-2xl opacity-0 group-hover/activity:opacity-100 transition-all pointer-events-none z-50 shadow-xl min-w-[160px]">
+                     <div class="text-slate-400 text-[10px] uppercase tracking-wider mb-1">일일 활동량</div>
+                     <div class="text-base font-bold">{{ (study.averageSubmissionRate || 0).toFixed(0) }}건/일</div>
+                     <div class="absolute left-1/2 -translate-x-1/2 top-full w-0 h-0 border-l-8 border-r-8 border-t-8 border-l-transparent border-r-transparent border-t-slate-800"></div>
                   </div>
                </div>
             </div>
+
 
              <!-- 하단 버튼 -->
              <div class="mt-auto relative z-10">
@@ -163,7 +196,9 @@
       <div v-if="studies.length > 0">
         <div class="flex items-center justify-between mb-6">
           <h2 class="text-xl font-bold text-slate-800 flex items-center gap-2">
-            <Search class="w-5 h-5 text-slate-400" fill="currentColor" />
+            <div class="bg-sky-500 p-2 rounded-xl">
+              <Search class="w-5 h-5 text-white" />
+            </div>
             활동 중인 스터디
             <span class="text-base font-normal text-slate-400 ml-1">총 {{ studies.length }}개</span>
           </h2>
@@ -171,7 +206,7 @@
 
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div v-for="(study, idx) in studies" :key="study.id" 
-               class="bg-white rounded-3xl p-6 border border-slate-200 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all group relative overflow-hidden flex flex-col h-full">
+               class="bg-white rounded-3xl p-6 border border-slate-200 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all group relative overflow-visible flex flex-col h-full">
             
             <!-- 랭킹 배지 (순서) -->
              <div class="absolute top-4 right-4 text-4xl font-black text-slate-100 italic pointer-events-none group-hover:text-brand-50 transition-colors">
@@ -180,14 +215,19 @@
 
             <!-- 상단 정보 -->
             <div class="relative z-10 mb-4">
-               <div class="flex items-center gap-2 mb-3">
-                 <span class="px-2.5 py-1 bg-slate-100 text-slate-600 text-xs font-bold rounded-lg border border-slate-200">
-                  알고리즘
-                 </span>
-                 <span class="flex items-center gap-1 text-xs font-medium text-slate-500">
-                    <Users class="w-3 h-3" /> {{ study.memberCount }}명
-                 </span>
+                              <div class="flex items-center gap-2 mb-3">
+                  <div class="flex items-center -space-x-2">
+                     <template v-for="member in (study.memberPreviews || []).slice(0, 4)" :key="member.userId">
+                        <div class="relative group/avatar">
+                           <NicknameRenderer :username="member.username" :avatar-url="member.avatarUrl" avatar-class="w-7 h-7 border-2 border-white shadow-sm" text-class="hidden" :show-avatar="true" />
+                           <div class="absolute left-1/2 -translate-x-1/2 -top-8 bg-slate-800 text-white text-[10px] font-bold px-2 py-1 rounded-lg opacity-0 group-hover/avatar:opacity-100 transition-opacity whitespace-nowrap pointer-events-none z-50">{{ member.username }}</div>
+                        </div>
+                     </template>
+                     <div v-if="study.memberCount > 4" class="w-7 h-7 rounded-full bg-slate-100 border-2 border-white flex items-center justify-center text-[10px] font-bold text-slate-500">+{{ study.memberCount - 4 }}</div>
+                  </div>
+                  <span class="text-xs font-medium text-slate-400 ml-1">{{ study.memberCount }}명</span>
                </div>
+
                
                <h3 class="text-xl font-bold text-slate-900 mb-2 truncate pr-8 group-hover:text-brand-600 transition-colors">
                  {{ study.name }}
@@ -197,19 +237,47 @@
                </p>
             </div>
 
-            <!-- 통계 정보 -->
-            <div class="grid grid-cols-2 gap-3 mb-6 relative z-10">
-               <div class="bg-slate-50 rounded-2xl p-3 border border-slate-100">
-                  <div class="text-[10px] text-slate-400 font-bold mb-1 uppercase tracking-wider">Streak</div>
-                  <div class="text-orange-600 font-bold flex items-center gap-1.5">
-                     <Flame class="w-4 h-4 text-orange-500 fill-orange-100" /> {{ study.streak || 0 }}일
+            <!-- 통계 정보 (Horizontal Divided Layout) -->
+            <!-- 통계 정보 (Refined Horizontal Layout - No Border) -->
+            <!-- 통계 정보 (Solved.ac Tier + Solid Icon Backgrounds) -->
+            <!-- 통계 정보 (Rounded Square Solid BG + White Line Icons) -->
+            <!-- 통계 정보 (Solid Filled Icons) -->
+            <!-- 통계 정보 with Hover Tooltips -->
+            <div class="flex items-center py-3 mb-6 relative z-10">
+               
+               <!-- Tier (Solved.ac Icon) -->
+               <div class="flex-1 flex items-center justify-center gap-2 px-4 py-2 -my-2 rounded-xl cursor-default relative group/tier hover:bg-slate-50 transition-colors">
+                  <img :src="`https://static.solved.ac/tier_small/${Math.floor(study.averageTier || 0)}.svg`" class="w-6 h-6 object-contain" alt="Tier" />
+                  <span class="text-lg font-black text-slate-800 whitespace-nowrap">{{ study.tierBadge || 'Unranked' }}</span>
+                  <!-- Tooltip -->
+                  <div class="absolute left-1/2 -translate-x-1/2 bottom-full mb-2 bg-slate-800 text-white text-xs font-medium px-4 py-3 rounded-2xl opacity-0 group-hover/tier:opacity-100 transition-all pointer-events-none z-50 shadow-xl min-w-[160px]">
+                     <div class="text-slate-400 text-[10px] uppercase tracking-wider mb-1">평균 티어</div>
+                     <div class="text-base font-bold">{{ study.tierBadge || 'Unranked' }}</div>
+                     <div class="absolute left-1/2 -translate-x-1/2 top-full w-0 h-0 border-l-8 border-r-8 border-t-8 border-l-transparent border-r-transparent border-t-slate-800"></div>
                   </div>
                </div>
-               <div class="bg-slate-50 rounded-2xl p-3 border border-slate-100">
-                  <div class="text-[10px] text-slate-400 font-bold mb-1 uppercase tracking-wider">Activity</div>
-                  <div class="text-slate-700 font-bold flex items-center gap-1.5">
-                     <Activity class="w-4 h-4 text-slate-400" />
-                     {{ (study.averageSubmissionRate || 0).toFixed(1) }}문제
+
+               <!-- Streak -->
+               <div class="flex-1 flex items-center justify-center gap-2 px-4 py-2 -my-2 rounded-xl cursor-default relative group/streak hover:bg-slate-50 transition-colors">
+                  <Flame class="w-6 h-6 text-orange-500 fill-orange-500" stroke-width="2" />
+                  <span class="text-lg font-black text-slate-800 whitespace-nowrap">{{ study.streak || 0 }}</span>
+                  <!-- Tooltip -->
+                  <div class="absolute left-1/2 -translate-x-1/2 bottom-full mb-2 bg-slate-800 text-white text-xs font-medium px-4 py-3 rounded-2xl opacity-0 group-hover/streak:opacity-100 transition-all pointer-events-none z-50 shadow-xl min-w-[160px]">
+                     <div class="text-slate-400 text-[10px] uppercase tracking-wider mb-1">연속 스트릭</div>
+                     <div class="text-base font-bold">{{ study.streak || 0 }}일 연속</div>
+                     <div class="absolute left-1/2 -translate-x-1/2 top-full w-0 h-0 border-l-8 border-r-8 border-t-8 border-l-transparent border-r-transparent border-t-slate-800"></div>
+                  </div>
+               </div>
+
+               <!-- Activity -->
+               <div class="flex-1 flex items-center justify-center gap-2 px-4 py-2 -my-2 rounded-xl cursor-default relative group/activity hover:bg-slate-50 transition-colors">
+                  <Send class="w-5 h-5 text-sky-500 fill-sky-500" stroke-width="2" />
+                  <span class="text-lg font-black text-slate-800 whitespace-nowrap">{{ (study.averageSubmissionRate || 0).toFixed(0) }}</span>
+                  <!-- Tooltip -->
+                  <div class="absolute left-1/2 -translate-x-1/2 bottom-full mb-2 bg-slate-800 text-white text-xs font-medium px-4 py-3 rounded-2xl opacity-0 group-hover/activity:opacity-100 transition-all pointer-events-none z-50 shadow-xl min-w-[160px]">
+                     <div class="text-slate-400 text-[10px] uppercase tracking-wider mb-1">일일 활동량</div>
+                     <div class="text-base font-bold">{{ (study.averageSubmissionRate || 0).toFixed(0) }}건/일</div>
+                     <div class="absolute left-1/2 -translate-x-1/2 top-full w-0 h-0 border-l-8 border-r-8 border-t-8 border-l-transparent border-r-transparent border-t-slate-800"></div>
                   </div>
                </div>
             </div>
@@ -375,6 +443,7 @@ import { useRouter } from 'vue-router';
 import axios from 'axios';
 import { useAuth } from '@/composables/useAuth';
 import { Trophy, Flame, Users, Search, Activity, ArrowRight, Send, Sparkles, Compass, AlertCircle, Plus, Eye } from 'lucide-vue-next';
+import NicknameRenderer from '@/components/common/NicknameRenderer.vue';
 import { studyApi } from '@/api/study';
 
 const props = defineProps({

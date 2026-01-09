@@ -1,117 +1,79 @@
-<?xml version="1.0" encoding="UTF-8" ?>
+<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.ssafy.dash.study.infrastructure.mapper.StudyMapper">
 
-  <insert id="save" parameterType="Study" useGeneratedKeys="true" keyProperty="id">
-    INSERT INTO studies (name, creator_id, created_at, acorn_count, visibility, description, streak, active_mission_title, active_mission_progress, study_type)
-    VALUES (#{name}, #{creatorId}, #{createdAt}, #{acornCount}, #{visibility}, #{description}, #{streak}, #{activeMissionTitle}, #{activeMissionProgress}, #{studyType})
-  </insert>
+  <insert id="save" parameterType="Study" useGeneratedKeys="true" keyProperty="id"> INSERT INTO
+    studies (name, creator_id, created_at, acorn_count, visibility, description, streak,
+    active_mission_title, active_mission_progress, study_type) VALUES (#{name}, #{creatorId},
+    #{createdAt}, #{acornCount}, #{visibility}, #{description}, #{streak}, #{activeMissionTitle},
+    #{activeMissionProgress}, #{studyType}) </insert>
 
-  <select id="findById" resultType="Study" parameterType="long">
-    SELECT s.*, 
-       (SELECT COUNT(*) FROM users u WHERE u.study_id = s.id AND u.deleted_at IS NULL) as member_count,
-       (SELECT AVG(u.solvedac_tier) FROM users u WHERE u.study_id = s.id AND u.deleted_at IS NULL AND u.solvedac_tier IS NOT NULL) as average_tier,
-       (SELECT COUNT(*) FROM algorithm_records ar 
-        INNER JOIN users u ON ar.user_id = u.id 
-        WHERE u.study_id = s.id AND u.deleted_at IS NULL AND ar.record_type = 'USER_SOLUTION') as total_solved,
-       (SELECT u2.username FROM users u2 
-        WHERE u2.study_id = s.id AND u2.deleted_at IS NULL 
-        ORDER BY (SELECT COUNT(*) FROM algorithm_records ar2 WHERE ar2.user_id = u2.id AND ar2.record_type = 'USER_SOLUTION') DESC 
-        LIMIT 1) as mvp_username,
-       (SELECT COUNT(*) 
-        FROM algorithm_records ar3 
-        JOIN users u3 ON ar3.user_id = u3.id 
-        WHERE u3.study_id = s.id 
-        AND ar3.created_at >= DATE_SUB(NOW(), INTERVAL 7 DAY)) / 
-       NULLIF((SELECT COUNT(*) FROM users u4 WHERE u4.study_id = s.id), 0) as average_submission_rate
-    FROM studies s WHERE id = #{id}
-  </select>
+  <select id="findById" resultType="Study" parameterType="long"> SELECT s.*, (SELECT COUNT(*) FROM
+    users u WHERE u.study_id = s.id AND u.deleted_at IS NULL) as member_count, (SELECT
+    AVG(u.solvedac_tier) FROM users u WHERE u.study_id = s.id AND u.deleted_at IS NULL AND
+    u.solvedac_tier IS NOT NULL) as average_tier, (SELECT COUNT(*) FROM algorithm_records ar INNER
+    JOIN users u ON ar.user_id = u.id WHERE u.study_id = s.id AND u.deleted_at IS NULL AND
+    ar.record_type = 'USER_SOLUTION') as total_solved, (SELECT u2.username FROM users u2 WHERE
+    u2.study_id = s.id AND u2.deleted_at IS NULL ORDER BY (SELECT COUNT(*) FROM algorithm_records
+    ar2 WHERE ar2.user_id = u2.id AND ar2.record_type = 'USER_SOLUTION') DESC LIMIT 1) as
+    mvp_username, FLOOR((SELECT COUNT(*) FROM algorithm_records ar3 JOIN users u3 ON ar3.user_id =
+    u3.id WHERE u3.study_id = s.id AND ar3.record_type = 'USER_SOLUTION' AND ar3.created_at >=
+    DATE_SUB(NOW(), INTERVAL 7 DAY)) / NULLIF((SELECT COUNT(*) FROM users u4 WHERE u4.study_id =
+    s.id), 0)) as average_submission_rate FROM studies s WHERE id = #{id} </select>
 
-  <select id="findAll" resultType="Study">
-    SELECT s.*, 
-           (SELECT COUNT(*) FROM users u WHERE u.study_id = s.id AND u.deleted_at IS NULL) as member_count,
-           (SELECT AVG(u.solvedac_tier) FROM users u WHERE u.study_id = s.id AND u.deleted_at IS NULL AND u.solvedac_tier IS NOT NULL) as average_tier,
-           (SELECT COUNT(*) FROM algorithm_records ar 
-            INNER JOIN users u ON ar.user_id = u.id 
-            WHERE u.study_id = s.id AND u.deleted_at IS NULL AND ar.record_type = 'USER_SOLUTION') as total_solved,
-           (SELECT u2.username FROM users u2 
-            WHERE u2.study_id = s.id AND u2.deleted_at IS NULL 
-            ORDER BY (SELECT COUNT(*) FROM algorithm_records ar2 WHERE ar2.user_id = u2.id AND ar2.record_type = 'USER_SOLUTION') DESC 
-            LIMIT 1) as mvp_username,
-           (SELECT COUNT(*) 
-            FROM algorithm_records ar3 
-            JOIN users u3 ON ar3.user_id = u3.id 
-            WHERE u3.study_id = s.id 
-            AND ar3.created_at >= DATE_SUB(NOW(), INTERVAL 7 DAY)) / 
-           NULLIF((SELECT COUNT(*) FROM users u4 WHERE u4.study_id = s.id), 0) as average_submission_rate
-    FROM studies s 
-    WHERE s.study_type = 'GROUP'
-    ORDER BY total_solved DESC, s.id
-  </select>
+  <select id="findAll" resultType="Study"> SELECT s.*, (SELECT COUNT(*) FROM users u WHERE
+    u.study_id = s.id AND u.deleted_at IS NULL) as member_count, (SELECT AVG(u.solvedac_tier) FROM
+    users u WHERE u.study_id = s.id AND u.deleted_at IS NULL AND u.solvedac_tier IS NOT NULL) as
+    average_tier, (SELECT COUNT(*) FROM algorithm_records ar INNER JOIN users u ON ar.user_id = u.id
+    WHERE u.study_id = s.id AND u.deleted_at IS NULL AND ar.record_type = 'USER_SOLUTION') as
+    total_solved, (SELECT u2.username FROM users u2 WHERE u2.study_id = s.id AND u2.deleted_at IS
+    NULL ORDER BY (SELECT COUNT(*) FROM algorithm_records ar2 WHERE ar2.user_id = u2.id AND
+    ar2.record_type = 'USER_SOLUTION') DESC LIMIT 1) as mvp_username, FLOOR((SELECT COUNT(*) FROM
+    algorithm_records ar3 JOIN users u3 ON ar3.user_id = u3.id WHERE u3.study_id = s.id AND
+    ar3.record_type = 'USER_SOLUTION' AND ar3.created_at >= DATE_SUB(NOW(), INTERVAL 7 DAY)) /
+    NULLIF((SELECT COUNT(*) FROM users u4 WHERE u4.study_id = s.id), 0)) as average_submission_rate
+    FROM studies s WHERE s.study_type = 'GROUP' ORDER BY total_solved DESC, s.id </select>
 
-  <select id="searchByKeyword" resultType="Study">
-    SELECT s.*, 
-           (SELECT COUNT(*) FROM users u WHERE u.study_id = s.id AND u.deleted_at IS NULL) as member_count,
-           (SELECT AVG(u.solvedac_tier) FROM users u WHERE u.study_id = s.id AND u.deleted_at IS NULL AND u.solvedac_tier IS NOT NULL) as average_tier,
-           (SELECT COUNT(*) FROM algorithm_records ar 
-            INNER JOIN users u ON ar.user_id = u.id 
-            WHERE u.study_id = s.id AND u.deleted_at IS NULL AND ar.record_type = 'USER_SOLUTION') as total_solved,
-           (SELECT u2.username FROM users u2 
-            WHERE u2.study_id = s.id AND u2.deleted_at IS NULL 
-            ORDER BY (SELECT COUNT(*) FROM algorithm_records ar2 WHERE ar2.user_id = u2.id AND ar2.record_type = 'USER_SOLUTION') DESC 
-            LIMIT 1) as mvp_username,
-           (SELECT COUNT(*) 
-            FROM algorithm_records ar3 
-            JOIN users u3 ON ar3.user_id = u3.id 
-            WHERE u3.study_id = s.id 
-            AND ar3.created_at >= DATE_SUB(NOW(), INTERVAL 7 DAY)) / 
-           NULLIF((SELECT COUNT(*) FROM users u4 WHERE u4.study_id = s.id), 0) as average_submission_rate
-    FROM studies s 
-    WHERE s.study_type = 'GROUP' AND s.name LIKE CONCAT('%', #{keyword}, '%')
-    ORDER BY total_solved DESC, s.id
-  </select>
+  <select id="searchByKeyword" resultType="Study"> SELECT s.*, (SELECT COUNT(*) FROM users u WHERE
+    u.study_id = s.id AND u.deleted_at IS NULL) as member_count, (SELECT AVG(u.solvedac_tier) FROM
+    users u WHERE u.study_id = s.id AND u.deleted_at IS NULL AND u.solvedac_tier IS NOT NULL) as
+    average_tier, (SELECT COUNT(*) FROM algorithm_records ar INNER JOIN users u ON ar.user_id = u.id
+    WHERE u.study_id = s.id AND u.deleted_at IS NULL AND ar.record_type = 'USER_SOLUTION') as
+    total_solved, (SELECT u2.username FROM users u2 WHERE u2.study_id = s.id AND u2.deleted_at IS
+    NULL ORDER BY (SELECT COUNT(*) FROM algorithm_records ar2 WHERE ar2.user_id = u2.id AND
+    ar2.record_type = 'USER_SOLUTION') DESC LIMIT 1) as mvp_username, FLOOR((SELECT COUNT(*) FROM
+    algorithm_records ar3 JOIN users u3 ON ar3.user_id = u3.id WHERE u3.study_id = s.id AND
+    ar3.record_type = 'USER_SOLUTION' AND ar3.created_at >= DATE_SUB(NOW(), INTERVAL 7 DAY)) /
+    NULLIF((SELECT COUNT(*) FROM users u4 WHERE u4.study_id = s.id), 0)) as average_submission_rate
+    FROM studies s WHERE s.study_type = 'GROUP' AND s.name LIKE CONCAT('%', #{keyword}, '%') ORDER
+    BY total_solved DESC, s.id </select>
 
-  <update id="update" parameterType="Study">
-    UPDATE studies SET name = #{name}, acorn_count = #{acornCount}, 
-    visibility = #{visibility}, description = #{description}, streak = #{streak}, 
-    active_mission_title = #{activeMissionTitle}, active_mission_progress = #{activeMissionProgress},
-    study_type = #{studyType}, creator_id = #{creatorId}
-    WHERE id = #{id}
-  </update>
+  <update id="update" parameterType="Study"> UPDATE studies SET name = #{name}, acorn_count =
+    #{acornCount}, visibility = #{visibility}, description = #{description}, streak = #{streak},
+    active_mission_title = #{activeMissionTitle}, active_mission_progress =
+    #{activeMissionProgress}, study_type = #{studyType}, creator_id = #{creatorId} WHERE id = #{id} </update>
 
-  <delete id="delete" parameterType="long">
-    DELETE FROM studies WHERE id = #{id}
-  </delete>
+  <delete id="delete" parameterType="long"> DELETE FROM studies WHERE id = #{id} </delete>
 
   <!-- Application Queries -->
-  <insert id="saveApplication" parameterType="com.ssafy.dash.study.domain.StudyApplication" useGeneratedKeys="true" keyProperty="id">
-    INSERT INTO study_applications (study_id, user_id, message, status, created_at)
-    VALUES (#{studyId}, #{userId}, #{message}, #{status}, #{createdAt})
-  </insert>
+  <insert id="saveApplication" parameterType="com.ssafy.dash.study.domain.StudyApplication"
+    useGeneratedKeys="true" keyProperty="id"> INSERT INTO study_applications (study_id, user_id,
+    message, status, created_at) VALUES (#{studyId}, #{userId}, #{message}, #{status}, #{createdAt}) </insert>
 
-  <select id="findApplicationById" resultMap="StudyApplicationResult">
-    SELECT sa.*, u.id as u_id, u.username, u.avatar_url 
-    FROM study_applications sa
-    JOIN users u ON sa.user_id = u.id
-    WHERE sa.id = #{id}
-  </select>
-  
-  <select id="findApplicationByStudyIdAndUserId" resultType="com.ssafy.dash.study.domain.StudyApplication">
-    SELECT * FROM study_applications WHERE study_id = #{studyId} AND user_id = #{userId}
-  </select>
+  <select id="findApplicationById" resultMap="StudyApplicationResult"> SELECT sa.*, u.id as u_id,
+    u.username, u.avatar_url FROM study_applications sa JOIN users u ON sa.user_id = u.id WHERE
+    sa.id = #{id} </select>
 
-    <update id="updateApplicationStatus">
-        UPDATE study_applications
-        SET status = #{status}
-        WHERE id = #{id}
-    </update>
+  <select id="findApplicationByStudyIdAndUserId"
+    resultType="com.ssafy.dash.study.domain.StudyApplication"> SELECT * FROM study_applications
+    WHERE study_id = #{studyId} AND user_id = #{userId} </select>
 
-    <delete id="deleteApplication">
-        DELETE FROM study_applications
-        WHERE id = #{id}
-    </delete>
+  <update id="updateApplicationStatus"> UPDATE study_applications SET status = #{status} WHERE id =
+    #{id} </update>
 
-<resultMap id="StudyApplicationResult" type="com.ssafy.dash.study.domain.StudyApplication">
+  <delete id="deleteApplication"> DELETE FROM study_applications WHERE id = #{id} </delete>
+
+  <resultMap id="StudyApplicationResult" type="com.ssafy.dash.study.domain.StudyApplication">
     <id property="id" column="id" />
     <result property="studyId" column="study_id" />
     <result property="userId" column="user_id" />
@@ -119,21 +81,17 @@
     <result property="status" column="status" />
     <result property="createdAt" column="created_at" />
     <association property="applicant" javaType="com.ssafy.dash.user.domain.User">
-        <id property="id" column="u_id" />
-        <result property="username" column="username" />
-        <result property="avatarUrl" column="avatar_url" />
+      <id property="id" column="u_id" />
+      <result property="username" column="username" />
+      <result property="avatarUrl" column="avatar_url" />
     </association>
-</resultMap>
+  </resultMap>
 
-<select id="findPendingApplicationsByStudyId" resultMap="StudyApplicationResult">
-    SELECT sa.*, u.id as u_id, u.username, u.avatar_url 
-    FROM study_applications sa
-    JOIN users u ON sa.user_id = u.id
-    WHERE sa.study_id = #{studyId} AND sa.status = 'PENDING'
-</select>
+  <select id="findPendingApplicationsByStudyId" resultMap="StudyApplicationResult"> SELECT sa.*,
+    u.id as u_id, u.username, u.avatar_url FROM study_applications sa JOIN users u ON sa.user_id =
+    u.id WHERE sa.study_id = #{studyId} AND sa.status = 'PENDING' </select>
 
-<select id="findPendingApplicationByUserId" resultMap="StudyApplicationResult">
-    SELECT * FROM study_applications WHERE user_id = #{userId} AND status = 'PENDING'
-</select>
+  <select id="findPendingApplicationByUserId" resultMap="StudyApplicationResult"> SELECT * FROM
+    study_applications WHERE user_id = #{userId} AND status = 'PENDING' </select>
 
 </mapper>

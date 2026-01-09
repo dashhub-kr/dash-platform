@@ -90,13 +90,19 @@ const getTierColorName = (tier) => {
 };
 
 const getTierName = (tier) => {
-    if (tier >= 1 && tier <= 5) return `Bronze ${6 - tier}`;
-    if (tier >= 6 && tier <= 10) return `Silver ${11 - tier}`;
-    if (tier >= 11 && tier <= 15) return `Gold ${16 - tier}`;
-    if (tier >= 16 && tier <= 20) return `Platinum ${21 - tier}`;
-    if (tier >= 21 && tier <= 25) return `Diamond ${26 - tier}`;
-    if (tier >= 26 && tier <= 30) return `Ruby ${31 - tier}`;
+    if (tier >= 1 && tier <= 5) return `Bronze ${toRoman(6 - tier)}`;
+    if (tier >= 6 && tier <= 10) return `Silver ${toRoman(11 - tier)}`;
+    if (tier >= 11 && tier <= 15) return `Gold ${toRoman(16 - tier)}`;
+    if (tier >= 16 && tier <= 20) return `Platinum ${toRoman(21 - tier)}`;
+    if (tier >= 21 && tier <= 25) return `Diamond ${toRoman(26 - tier)}`;
+    if (tier >= 26 && tier <= 30) return `Ruby ${toRoman(31 - tier)}`;
+    if (tier >= 31) return 'Master';
     return 'Unrated';
+};
+
+const toRoman = (n) => {
+    const map = { 1: 'I', 2: 'II', 3: 'III', 4: 'IV', 5: 'V' };
+    return map[n] || '';
 };
 
 const formatJoinedDate = (dateString) => {
@@ -321,7 +327,7 @@ const showFaq = ref(false);
                     />
                     <div>
                         <div class="text-xl font-black text-slate-800 tracking-tight">
-                            {{ getTierName(userData.solvedacTier).split(' ')[0] || 'Unrated' }}
+                            {{ getTierName(userData.solvedacTier) || 'Unrated' }}
                         </div>
                         <div class="text-xs font-bold text-slate-400 uppercase">Solved.ac Tier</div>
                     </div>

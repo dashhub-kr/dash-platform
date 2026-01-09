@@ -47,16 +47,20 @@ public class StudyController {
     public ResponseEntity<List<StudyListResponse>> getStudies(
             @Parameter(hidden = true) @AuthenticationPrincipal OAuth2User principal,
             @RequestParam(required = false) String keyword) {
-        
+
         Long userId = null;
         if (principal instanceof CustomOAuth2User customUser) {
             userId = customUser.getUserId();
         }
 
         List<Study> studies = studyService.getStudies(userId, keyword);
-        
+
+        // 각 스터디에 대해 멤버 미리보기 정보 포함
         List<StudyListResponse> response = studies.stream()
-                .map(StudyListResponse::from)
+                .map(study -> {
+                    List<com.ssafy.dash.user.domain.User> members = studyService.getStudyMembersRaw(study.getId());
+                    return StudyListResponse.from(study, members);
+                })
                 .toList();
         return ResponseEntity.ok(response);
     }
@@ -65,7 +69,10 @@ public class StudyController {
     @GetMapping("/{studyId}")
     public ResponseEntity<StudyListResponse> getStudy(@PathVariable Long studyId) {
         return studyService.findStudyById(studyId)
-                .map(StudyListResponse::from)
+                .map(study -> {
+                    List<com.ssafy.dash.user.domain.User> members = studyService.getStudyMembersRaw(studyId);
+                    return StudyListResponse.from(study, members);
+                })
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
@@ -214,19 +221,22 @@ public class StudyController {
             // Admin can access any study's missions
             boolean isAdmin = customUser.getAuthorities().stream()
                     .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
-            
+
             if (isAdmin) {
                 return ResponseEntity.ok(studyMissionService.getMissions(studyId, customUser.getUserId()));
             }
 
-            // Regular user: Member check is implicitly done by studyMissionService logic or we should check it here?
+            // Regular user: Member check is implicitly done by studyMissionService logic or
+            // we should check it here?
             // Currently studyMissionService.getMissions returns all members' progress.
-            // But usually we want to ensure the requester is a member. 
-            // Existing code didn't explicitly check membership here because it relied on frontend sending correct studyId 
-            // and maybe service handles it? actually service just queries by studyId. 
-            // Ideally we should check membership for non-admins, but for now I'm just adding the admin bypass 
+            // But usually we want to ensure the requester is a member.
+            // Existing code didn't explicitly check membership here because it relied on
+            // frontend sending correct studyId
+            // and maybe service handles it? actually service just queries by studyId.
+            // Ideally we should check membership for non-admins, but for now I'm just
+            // adding the admin bypass
             // which effectively allows the "observation" flow.
-            
+
             return ResponseEntity.ok(studyMissionService.getMissions(studyId, customUser.getUserId()));
         }
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();

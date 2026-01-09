@@ -99,6 +99,14 @@ public class ProblemService {
         java.util.List<Problem> problems = problemMapper.findProblemsByTagAndLevelRange(
                 tag, minLevel, maxLevel, solvedProblemNumbers);
 
+        // Fallback: 만약 추천된 문제가 없다면 범위를 넓혀서 재검색 (±5)
+        if (problems.isEmpty()) {
+            int fallbackMin = Math.max(1, userTier - 5);
+            int fallbackMax = Math.min(30, userTier + 5);
+            problems = problemMapper.findProblemsByTagAndLevelRange(
+                    tag, fallbackMin, fallbackMax, solvedProblemNumbers);
+        }
+
         return problems.stream()
                 .map(problem -> {
                     java.util.List<String> tags = problemMapper.findTagsByProblemNumber(problem.getProblemNumber());

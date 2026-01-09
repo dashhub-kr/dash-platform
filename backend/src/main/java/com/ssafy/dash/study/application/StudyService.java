@@ -52,7 +52,7 @@ public class StudyService {
         // 4. 본인 스터디 제외 로직 제거.
         // 리더보드/전체 목록에 "내 스터디"가 표시되어야 합니다.
         // "추천 스터디"에서의 제외는 프론트엔드에서 처리합니다.
-        
+
         return studies;
     }
 
@@ -100,9 +100,9 @@ public class StudyService {
 
         // 이제 기존 PERSONAL 스터디는 안전하게 삭제할 수 있습니다. (유저가 더 이상 참조하지 않으므로)
         if (oldStudy != null && oldStudy.getStudyType() == StudyType.PERSONAL) {
-             // 기존 Personal Study ID가 있으면 해당 ID의 기록을 모두 이동
-             algorithmRecordService.migrateStudyId(oldStudy.getId(), study.getId());
-             studyRepository.delete(oldStudy.getId());
+            // 기존 Personal Study ID가 있으면 해당 ID의 기록을 모두 이동
+            algorithmRecordService.migrateStudyId(oldStudy.getId(), study.getId());
+            studyRepository.delete(oldStudy.getId());
         } else if (oldStudy == null) {
             // 이전에 스터디가 없었더라도(null -> Group), 유저의 모든 고아 기록을 새 스터디로 이동
             algorithmRecordService.migrateUserRecords(user.getId(), null, study.getId());
@@ -215,19 +215,19 @@ public class StudyService {
         // 유효성 검사 및 스터디 이동(Seamless Transition) 처리
         if (user.getStudyId() != null) {
             Study currentStudy = studyRepository.findById(user.getStudyId()).orElse(null);
-            
+
             if (currentStudy != null && currentStudy.getStudyType() == StudyType.GROUP) {
                 try {
-                     // 기존 Group 스터디에서 나오기 (탈퇴/삭제)
-                     handleSeamlessTransition(user);
-                     // 유저 정보 갱신
-                     user = userRepository.findById(user.getId()).orElseThrow();
-                     
-                     // 이제 Personal 스터디 상태가 되었으므로 아래 로직에서 마이그레이션 처리됨
-                     currentStudy = studyRepository.findById(user.getStudyId()).orElse(null);
+                    // 기존 Group 스터디에서 나오기 (탈퇴/삭제)
+                    handleSeamlessTransition(user);
+                    // 유저 정보 갱신
+                    user = userRepository.findById(user.getId()).orElseThrow();
+
+                    // 이제 Personal 스터디 상태가 되었으므로 아래 로직에서 마이그레이션 처리됨
+                    currentStudy = studyRepository.findById(user.getStudyId()).orElse(null);
                 } catch (IllegalStateException e) {
-                     // 이동 실패 (예: 위임되지 않은 스터디장) -> 예외 전파
-                     throw e; 
+                    // 이동 실패 (예: 위임되지 않은 스터디장) -> 예외 전파
+                    throw e;
                 }
             }
 
@@ -235,10 +235,9 @@ public class StudyService {
             if (currentStudy == null || currentStudy.getStudyType() == StudyType.PERSONAL) {
                 // 이전 스터디 ID가 뭐든간에(null 포함) 현재 가입하는 스터디로 모든 기록을 이동
                 algorithmRecordService.migrateUserRecords(
-                    user.getId(), 
-                    currentStudy != null ? currentStudy.getId() : null, 
-                    study.getId()
-                );
+                        user.getId(),
+                        currentStudy != null ? currentStudy.getId() : null,
+                        study.getId());
             }
         }
 
@@ -251,10 +250,10 @@ public class StudyService {
 
         // 기존 Personal 스터디가 있다면 삭제
         if (oldStudyId != null) {
-             Study oldStudy = studyRepository.findById(oldStudyId).orElse(null);
-             if (oldStudy != null && oldStudy.getStudyType() == StudyType.PERSONAL) {
-                 studyRepository.delete(oldStudyId);
-             }
+            Study oldStudy = studyRepository.findById(oldStudyId).orElse(null);
+            if (oldStudy != null && oldStudy.getStudyType() == StudyType.PERSONAL) {
+                studyRepository.delete(oldStudyId);
+            }
         }
 
         // 신청자에게 알림 전송
@@ -379,6 +378,14 @@ public class StudyService {
                 .toList();
     }
 
+    /**
+     * 스터디 멤버 목록 조회 (Raw User 객체 반환 - 내부용)
+     */
+    @Transactional(readOnly = true)
+    public List<User> getStudyMembersRaw(Long studyId) {
+        return userRepository.findByStudyId(studyId);
+    }
+
     @Transactional
     public void delegateLeader(Long currentLeaderId, Long studyId, Long newLeaderId) {
         Study study = studyRepository.findById(studyId)
@@ -426,10 +433,12 @@ public class StudyService {
     // - 나홀로 스터디장: 기존 스터디 삭제 후 새 스터디 가입/생성
     // - 멤버 있는 스터디장: 예외 발생 (위임 필요)
     private void handleSeamlessTransition(User user) {
-        if (user.getStudyId() == null) return;
-        
+        if (user.getStudyId() == null)
+            return;
+
         Study currentStudy = studyRepository.findById(user.getStudyId()).orElse(null);
-        if (currentStudy == null || currentStudy.getStudyType() == StudyType.PERSONAL) return;
+        if (currentStudy == null || currentStudy.getStudyType() == StudyType.PERSONAL)
+            return;
 
         // Group 스터디일 경우 처리
         if (Objects.equals(currentStudy.getCreatorId(), user.getId())) {

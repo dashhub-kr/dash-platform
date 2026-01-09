@@ -235,22 +235,25 @@ const TIER_PRIORITY = { 'S': 0, 'A': 1, 'B': 2, 'C': 3 };
 
 const recommendedTagKey = computed(() => {
   if (!selectedFamily.value?.children?.length) return null;
-  const learningTags = selectedFamily.value.children.filter(
-    t => t.solved > 0 && t.masteryLevel !== 'MASTER'
+
+  // 1. 마스터하지 않은 모든 태그 후보 (C등급 제외)
+  const candidates = selectedFamily.value.children.filter(
+    t => t.masteryLevel !== 'MASTER' && t.tier !== 'C'
   );
-  if (learningTags.length === 0) {
-    // 아직 안 푼 태그 중 S티어 우선으로 첫 번째 권장
-    const unstarted = selectedFamily.value.children
-      .filter(t => t.solved === 0)
-      .sort((a, b) => (TIER_PRIORITY[a.tier] ?? 4) - (TIER_PRIORITY[b.tier] ?? 4));
-    return unstarted.length > 0 ? unstarted[0].key : null;
-  }
-  // 가장 낮은 진행률 + S티어 우선
-  const sorted = [...learningTags].sort((a, b) => {
-    const progressDiff = (a.progressPercent || 0) - (b.progressPercent || 0);
-    if (progressDiff !== 0) return progressDiff;
-    return (TIER_PRIORITY[a.tier] ?? 4) - (TIER_PRIORITY[b.tier] ?? 4);
+  
+  if (candidates.length === 0) return null;
+
+  // 2. 정렬: 티어 우선 (S > A > B > C) -> 진행률 낮은 순
+  const sorted = [...candidates].sort((a, b) => {
+    // 티어 비교 (S < A < B < C)
+    const tierDiff = (TIER_PRIORITY[a.tier] ?? 4) - (TIER_PRIORITY[b.tier] ?? 4);
+    if (tierDiff !== 0) return tierDiff;
+    
+    // 진행률 비교 (낮은 순)
+    return (a.progressPercent || 0) - (b.progressPercent || 0);
   });
+
+  // 가장 높은 우선순위 태그 반환
   return sorted[0].key;
 });
 
