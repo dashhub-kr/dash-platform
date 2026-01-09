@@ -148,8 +148,8 @@
                   <span class="text-lg font-black text-slate-800 whitespace-nowrap">{{ (study.averageSubmissionRate || 0).toFixed(0) }}</span>
                   <!-- Tooltip -->
                   <div class="absolute left-1/2 -translate-x-1/2 bottom-full mb-2 bg-slate-800 text-white text-xs font-medium px-4 py-3 rounded-2xl opacity-0 group-hover/activity:opacity-100 transition-all pointer-events-none z-50 shadow-xl min-w-[160px]">
-                     <div class="text-slate-400 text-[10px] uppercase tracking-wider mb-1">일일 활동량</div>
-                     <div class="text-base font-bold">{{ (study.averageSubmissionRate || 0).toFixed(0) }}건/일</div>
+                     <div class="text-slate-400 text-[10px] uppercase tracking-wider mb-1">최근 7일간 1인당 평균 풀이</div>
+                     <div class="text-base font-bold">{{ (study.averageSubmissionRate || 0).toFixed(0) }}문제</div>
                      <div class="absolute left-1/2 -translate-x-1/2 top-full w-0 h-0 border-l-8 border-r-8 border-t-8 border-l-transparent border-r-transparent border-t-slate-800"></div>
                   </div>
                </div>
@@ -275,8 +275,8 @@
                   <span class="text-lg font-black text-slate-800 whitespace-nowrap">{{ (study.averageSubmissionRate || 0).toFixed(0) }}</span>
                   <!-- Tooltip -->
                   <div class="absolute left-1/2 -translate-x-1/2 bottom-full mb-2 bg-slate-800 text-white text-xs font-medium px-4 py-3 rounded-2xl opacity-0 group-hover/activity:opacity-100 transition-all pointer-events-none z-50 shadow-xl min-w-[160px]">
-                     <div class="text-slate-400 text-[10px] uppercase tracking-wider mb-1">일일 활동량</div>
-                     <div class="text-base font-bold">{{ (study.averageSubmissionRate || 0).toFixed(0) }}건/일</div>
+                     <div class="text-slate-400 text-[10px] uppercase tracking-wider mb-1">최근 7일간 1인당 평균 풀이 수</div>
+                     <div class="text-base font-bold">{{ (study.averageSubmissionRate || 0).toFixed(0) }}문제</div>
                      <div class="absolute left-1/2 -translate-x-1/2 top-full w-0 h-0 border-l-8 border-r-8 border-t-8 border-l-transparent border-r-transparent border-t-slate-800"></div>
                   </div>
                </div>
