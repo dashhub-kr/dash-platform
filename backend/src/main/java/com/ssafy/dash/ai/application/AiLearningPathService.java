@@ -70,7 +70,6 @@ public class AiLearningPathService {
                                         // Update cache with patched data
                                         String updatedJson = objectMapper.writeValueAsString(response);
                                         cacheMapper.update(userId, updatedJson, today);
-                                        cacheMapper.update(userId, updatedJson, today);
                                 }
 
                                 // 4. Force Korean Names (Display Name) - Apply to cache as well
