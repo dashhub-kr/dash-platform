@@ -346,6 +346,9 @@ const handleButtonClick = async () => {
         if (verificationSuccess.value) {
             console.log("Emitting next");
             emit('next');
+        } else if (verifyError.value) {
+            // 실패 후 재시도: 에러만 초기화하고 가이드 화면 유지 (재검증은 사용자가 다시 버튼 누르면 수행)
+            verifyError.value = null;
         } else {
             await processVerification();
         }
