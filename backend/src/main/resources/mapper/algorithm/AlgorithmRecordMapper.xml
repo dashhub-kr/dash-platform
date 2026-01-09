@@ -60,7 +60,7 @@
     FROM algorithm_records r
     LEFT JOIN users u ON r.user_id = u.id
     LEFT JOIN code_analysis_results car ON r.id = car.algorithm_record_id
-    WHERE r.study_id = #{studyId} 
+    WHERE r.study_id = #{studyId} AND r.record_type = 'USER_SOLUTION' 
     ORDER BY r.id DESC
   </select>
 
@@ -92,7 +92,7 @@
   <select id="countSuccessfulSubmissionByUserIdAndProblemNumber" resultType="int">
     SELECT COUNT(*)
     FROM algorithm_records
-    WHERE user_id = #{userId}
+    WHERE user_id = #{userId} AND record_type = 'USER_SOLUTION'
       AND problem_number = #{problemNumber}
       AND runtime_ms IS NOT NULL
       AND memory_kb IS NOT NULL

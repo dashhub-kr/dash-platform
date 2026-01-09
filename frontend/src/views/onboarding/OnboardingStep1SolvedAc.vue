@@ -101,38 +101,39 @@
 
                 <!-- Verification Guide (Only when confirmed) -->
                 <transition name="fade">
-                  <div v-if="confirmed && !verificationSuccess" class="mt-4 pt-4 border-t border-slate-100 space-y-3">
+                  <div v-if="confirmed && !verificationSuccess && !verifyError" class="mt-4 pt-4 border-t border-slate-100 space-y-3">
                     <div class="p-4 bg-slate-50 rounded-xl border border-slate-200">
                         <h4 class="text-sm font-bold text-slate-700 mb-2 flex items-center gap-1.5">
                             <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
                             본인 인증이 필요합니다
                         </h4>
                         <p class="text-xs text-slate-500 leading-relaxed mb-3">
-                            타인 도용 방지를 위해, 
-                            <a :href="`https://solved.ac/profile/${handle}`" target="_blank" class="text-blue-500 hover:underline font-bold">Solved.ac</a>
-                            로그인 후 '프로필 편집' 버튼을 눌러 자기소개란에 아래 코드를 입력해주세요.
+                            타인 도용 방지를 위해, Solved.ac 로그인 후 '프로필 편집'을 눌러 자기소개란에 아래 코드를 입력하고 저장해주세요.
                         </p>
                         
-                        <div class="flex items-center gap-2">
-                             <div 
-                                @click="copyVerificationCode"
-                                class="flex-1 flex items-center justify-between bg-white border border-slate-200 rounded-lg p-2.5 cursor-pointer hover:border-emerald-500 hover:text-emerald-600 transition-all group"
-                            >
-                                <code class="font-mono text-sm font-bold text-slate-700 group-hover:text-emerald-600">DashHub:{{ user?.username }}</code>
-                                <Copy class="w-4 h-4 text-slate-400 group-hover:text-emerald-500" />
+                        <!-- 코드 복사 영역 -->
+                        <div 
+                            @click="copyVerificationCode"
+                            class="w-full flex items-center justify-between bg-white border border-slate-200 rounded-lg p-3 cursor-pointer hover:border-emerald-500 hover:text-emerald-600 transition-all group mb-3"
+                        >
+                            <code class="font-mono text-sm font-bold text-slate-700 group-hover:text-emerald-600">DashHub:{{ user?.username }}</code>
+                            <div class="flex items-center gap-1 text-xs text-slate-400 group-hover:text-emerald-500">
+                                <Copy class="w-4 h-4" />
+                                <span>복사</span>
                             </div>
-                            
-                            <a 
-                                :href="`https://solved.ac/profile/${handle}`" 
-                                target="_blank"
-                                class="p-2.5 bg-white border border-slate-200 rounded-lg text-slate-400 hover:text-blue-500 hover:border-blue-200 transition-colors"
-                                title="Solved.ac 프로필로 이동"
-                            >
-                                <ExternalLink class="w-5 h-5" />
-                            </a>
                         </div>
-                         <p class="text-[10px] text-slate-400 mt-2 text-right">
-                            * 설정 저장 후 아래 버튼을 눌러주세요.
+
+                        <!-- Solved.ac 이동 버튼 (단독, 명확한 텍스트) -->
+                        <a 
+                            :href="`https://solved.ac/profile/${handle}`" 
+                            target="_blank"
+                            class="w-full flex items-center justify-center gap-2 py-3 bg-blue-500 hover:bg-blue-600 text-white font-bold text-sm rounded-xl transition-colors"
+                        >
+                            <ExternalLink class="w-4 h-4" />
+                            Solved.ac 프로필 편집하러 가기
+                        </a>
+                         <p class="text-[10px] text-slate-400 mt-3 text-center">
+                            저장 완료 후 아래 '인증하기' 버튼을 눌러주세요
                         </p>
                     </div>
                   </div>
@@ -154,21 +155,51 @@
 
           <!-- Error State -->
           <transition name="fade">
-            <div v-if="verifyError" class="bg-rose-50/50 border border-rose-100 rounded-2xl p-4 flex items-start gap-3">
-              <AlertCircle class="w-5 h-5 text-rose-500 shrink-0 mt-0.5" />
-              <div>
-                <p class="text-sm font-bold text-rose-600">
-                    {{ verifyError.includes('존재하지') ? '계정을 찾을 수 없어요' : '인증에 실패했습니다' }}
-                </p>
-                <p class="text-xs text-rose-400 mt-1">{{ verifyError }}</p>
-                <a 
-                    v-if="confirmed && verifyError && !verifyError.includes('존재하지')"
-                    :href="`https://solved.ac/profile/${handle}`"
-                    target="_blank"
-                    class="inline-flex items-center gap-1 text-xs font-bold text-rose-600 underline mt-2 hover:text-rose-700"
-                >
-                    내 프로필 확인하기 <ExternalLink class="w-3 h-3" />
-                </a>
+            <div v-if="verifyError" class="space-y-3">
+              <div class="bg-rose-50/50 border border-rose-100 rounded-2xl p-4 flex items-start gap-3">
+                <AlertCircle class="w-5 h-5 text-rose-500 shrink-0 mt-0.5" />
+                <div>
+                  <p class="text-sm font-bold text-rose-600">
+                      {{ verifyError.includes('존재하지') ? '계정을 찾을 수 없어요' : '인증에 실패했습니다' }}
+                  </p>
+                  <p class="text-xs text-rose-400 mt-1">{{ verifyError }}</p>
+                </div>
+              </div>
+
+              <!-- 인증 가이드 (에러 상태에서도 표시) -->
+              <div v-if="confirmed && !verifyError.includes('존재하지')" class="p-4 bg-slate-50 rounded-xl border border-slate-200">
+                  <h4 class="text-sm font-bold text-slate-700 mb-2 flex items-center gap-1.5">
+                      <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+                      아래 코드를 자기소개에 입력해주세요
+                  </h4>
+                  <p class="text-xs text-slate-500 leading-relaxed mb-3">
+                      Solved.ac 로그인 후 '프로필 편집'을 눌러 자기소개란에 아래 코드를 입력하고 저장해주세요.
+                  </p>
+                  
+                  <!-- 코드 복사 영역 -->
+                  <div 
+                      @click="copyVerificationCode"
+                      class="w-full flex items-center justify-between bg-white border border-slate-200 rounded-lg p-3 cursor-pointer hover:border-emerald-500 hover:text-emerald-600 transition-all group mb-3"
+                  >
+                      <code class="font-mono text-sm font-bold text-slate-700 group-hover:text-emerald-600">DashHub:{{ user?.username }}</code>
+                      <div class="flex items-center gap-1 text-xs text-slate-400 group-hover:text-emerald-500">
+                          <Copy class="w-4 h-4" />
+                          <span>복사</span>
+                      </div>
+                  </div>
+
+                  <!-- Solved.ac 이동 버튼 (단독, 명확한 텍스트) -->
+                  <a 
+                      :href="`https://solved.ac/profile/${handle}`" 
+                      target="_blank"
+                      class="w-full flex items-center justify-center gap-2 py-3 bg-blue-500 hover:bg-blue-600 text-white font-bold text-sm rounded-xl transition-colors"
+                  >
+                      <ExternalLink class="w-4 h-4" />
+                      Solved.ac 프로필 편집하러 가기
+                  </a>
+                   <p class="text-[10px] text-slate-400 mt-3 text-center">
+                      저장 완료 후 아래 '다시 인증하기' 버튼을 눌러주세요
+                  </p>
               </div>
             </div>
           </transition>
@@ -346,6 +377,9 @@ const handleButtonClick = async () => {
         if (verificationSuccess.value) {
             console.log("Emitting next");
             emit('next');
+        } else if (verifyError.value) {
+            // 실패 후 재시도: 에러만 초기화하고 가이드 화면 유지 (재검증은 사용자가 다시 버튼 누르면 수행)
+            verifyError.value = null;
         } else {
             await processVerification();
         }

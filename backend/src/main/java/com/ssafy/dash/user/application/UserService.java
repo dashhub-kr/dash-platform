@@ -1,5 +1,6 @@
 package com.ssafy.dash.user.application;
 
+import com.ssafy.dash.ai.infrastructure.persistence.LearningPathCacheMapper;
 import com.ssafy.dash.study.domain.Study;
 import com.ssafy.dash.study.domain.StudyRepository;
 import com.ssafy.dash.user.application.dto.command.UserCreateCommand;
@@ -21,13 +22,16 @@ public class UserService {
     private final UserRepository userRepository;
     private final com.ssafy.dash.onboarding.domain.OnboardingRepository onboardingRepository;
     private final StudyRepository studyRepository;
+    private final LearningPathCacheMapper learningPathCacheMapper;
 
     public UserService(UserRepository userRepository,
             com.ssafy.dash.onboarding.domain.OnboardingRepository onboardingRepository,
-            StudyRepository studyRepository) {
+            StudyRepository studyRepository,
+            LearningPathCacheMapper learningPathCacheMapper) {
         this.userRepository = userRepository;
         this.onboardingRepository = onboardingRepository;
         this.studyRepository = studyRepository;
+        this.learningPathCacheMapper = learningPathCacheMapper;
     }
 
     @Transactional
@@ -60,7 +64,10 @@ public class UserService {
             }
         }
 
-        return UserResult.from(u, onboarding, study, pendingStudyName);
+        // 분석 데이터 존재 여부 확인
+        boolean hasAnalysis = learningPathCacheMapper.findByUserId(id) != null;
+
+        return UserResult.from(u, onboarding, study, pendingStudyName, hasAnalysis);
     }
 
     @Transactional(readOnly = true)

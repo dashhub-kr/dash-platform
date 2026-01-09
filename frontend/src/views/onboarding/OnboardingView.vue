@@ -67,6 +67,8 @@ const determineInitialStep = () => {
   const hasSolvedac = user.value.solvedacId || user.value.solvedacHandle;
   const hasStudy = !!user.value.studyId;
   const hasRepo = !!user.value.repositoryName;
+  const hasAnalysis = !!user.value.hasAnalysis;
+  const hasPendingStudy = !!user.value.pendingStudyName;
 
   // 1. Solved.ac 확인
   if (!hasSolvedac) {
@@ -76,9 +78,18 @@ const determineInitialStep = () => {
 
   // 2. 스터디 확인
   if (!hasStudy) {
-    // Solved.ac는 있지만 스터디가 없는 경우, 분석(1) -> 스터디(2) 허용
-    // 스터디가 없을 때마다 사용자가 다시 돌아오면 분석을 보여주고 싶은 경우:
-    currentStepIndex.value = 1; 
+    // 스터디 신청 대기 중이면 스터디 찾기 단계도 스킵 -> 익스텐션 단계로
+    if (hasPendingStudy) {
+      currentStepIndex.value = 3; // extension 단계로 바로 이동
+      return;
+    }
+    // 분석 데이터가 있으면 분석 단계 스킵 -> 스터디 단계로
+    if (hasAnalysis) {
+      currentStepIndex.value = 2; // study 단계로 바로 이동
+      return;
+    }
+    // 분석도 없고 신청도 없으면 분석 단계부터 시작
+    currentStepIndex.value = 1;
     return;
   }
 

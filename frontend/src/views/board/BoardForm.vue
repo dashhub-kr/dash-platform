@@ -59,7 +59,7 @@
           
           <!-- 게시판 유형 & 기록 선택 (항상 표시하지만 스타일 다름) -->
           <div class="bg-white/80 backdrop-blur-md border border-white/60 shadow-xl shadow-brand-500/5 rounded-2xl p-6">
-             <div class="mb-6">
+             <div class="mb-6" v-if="!isEdit">
                 <label class="block text-sm font-bold text-slate-700 mb-2">게시글 유형</label>
                 <div class="flex gap-4 p-1 bg-slate-100/50 rounded-xl border border-slate-200/50">
                   <label class="flex-1 relative cursor-pointer group">
@@ -81,24 +81,33 @@
              <!-- 알고리즘 기록 선택 -->
              <div v-if="form.boardType === 'CODE_REVIEW'">
                 <label class="block text-sm font-bold text-slate-700 mb-2">풀이 선택</label>
-                <div v-if="loadingRecords" class="py-3 text-sm text-slate-500 flex items-center gap-2">
-                   <div class="w-4 h-4 border-2 border-brand-500 border-t-transparent rounded-full animate-spin"></div>
-                   불러오는 중...
+                
+                <!-- 수정 모드일 때는 읽기 전용으로 표시 -->
+                <div v-if="isEdit && selectedRecord" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-slate-600 font-medium">
+                    [#{{ selectedRecord.problemNumber }}] {{ selectedRecord.title }} ({{ selectedRecord.language }})
+                    <span class="text-xs text-slate-400 ml-2">* 수정 시 변경 불가</span>
                 </div>
-                <div v-else-if="studyRecords.length === 0" class="text-sm text-slate-400 py-2">
-                   내가 작성한 풀이가 없습니다.
+
+                <div v-else>
+                    <div v-if="loadingRecords" class="py-3 text-sm text-slate-500 flex items-center gap-2">
+                    <div class="w-4 h-4 border-2 border-brand-500 border-t-transparent rounded-full animate-spin"></div>
+                    불러오는 중...
+                    </div>
+                    <div v-else-if="studyRecords.length === 0" class="text-sm text-slate-400 py-2">
+                    내가 작성한 풀이가 없습니다.
+                    </div>
+                    <select
+                    v-else
+                    v-model="form.algorithmRecordId"
+                    class="w-full bg-white border border-slate-200 rounded-xl px-4 py-3 text-slate-800 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all shadow-sm cursor-pointer hover:bg-slate-50"
+                    :class="{'ring-2 ring-emerald-500 border-transparent': form.algorithmRecordId}"
+                    >
+                    <option :value="null">리뷰할 풀이를 선택하세요</option>
+                    <option v-for="record in studyRecords" :key="record.id" :value="record.id">
+                        [#{{ record.problemNumber }}] {{ record.title }} ({{ record.language }})
+                    </option>
+                    </select>
                 </div>
-                <select
-                  v-else
-                  v-model="form.algorithmRecordId"
-                  class="w-full bg-white border border-slate-200 rounded-xl px-4 py-3 text-slate-800 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all shadow-sm cursor-pointer hover:bg-slate-50"
-                  :class="{'ring-2 ring-emerald-500 border-transparent': form.algorithmRecordId}"
-                >
-                  <option :value="null">리뷰할 풀이를 선택하세요</option>
-                  <option v-for="record in studyRecords" :key="record.id" :value="record.id">
-                    [#{{ record.problemNumber }}] {{ record.title }} ({{ record.language }})
-                  </option>
-                </select>
              </div>
           </div>
 
@@ -249,7 +258,17 @@ onMounted(async () => {
                 };
                 // 코드 리뷰인 경우 기록 로드
                 if (form.value.boardType === 'CODE_REVIEW') {
-                    await loadStudyRecords();
+                    // 수정 모드에서는 해당 기록을 단건 조회하여 리스트에 추가 (내 기록이 아닐 수 있으므로)
+                    if (form.value.algorithmRecordId) {
+                         try {
+                             const recordRes = await algorithmApi.findById(form.value.algorithmRecordId);
+                             studyRecords.value = [recordRes.data];
+                         } catch (e) {
+                             console.error("Failed to load attached record", e);
+                         }
+                    } else {
+                        await loadStudyRecords();
+                    }
                 }
             }
         } catch (e) {
