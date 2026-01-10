@@ -11,5 +11,6 @@ public enum NotificationType {
     SYSTEM,
     FRIEND_REQUEST,
     FRIEND_ACCEPTED,
-    DIRECT_MESSAGE
+    DIRECT_MESSAGE,
+    BATTLE_INVITE
 }

@@ -41,7 +41,7 @@ public class BattleService {
             if (creator != null) {
                 String message = creator.getUsername() + "님이 " +
                         (type == Battle.BattleType.MOCK_EXAM ? "모의고사" : "디펜스") + " 배틀에 도전했어요!";
-                notificationService.notify(inviteeId, NotificationType.BATTLE_INVITE, message, "/social");
+                notificationService.send(inviteeId, message, "/social", NotificationType.BATTLE_INVITE);
             }
         }
 
