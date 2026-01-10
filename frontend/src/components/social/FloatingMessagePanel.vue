@@ -105,8 +105,11 @@ import { useDirectMessageModal } from '@/composables/useDirectMessageModal';
 
 const router = useRouter();
 const route = useRoute();
-const { isAuthenticated } = useAuth();
+const { user } = useAuth();
 const { open: openDM } = useDirectMessageModal();
+
+// user가 있으면 인증됨
+const isAuthenticated = computed(() => !!user.value);
 
 const isOpen = ref(false);
 const loading = ref(false);
