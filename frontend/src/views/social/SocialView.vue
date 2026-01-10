@@ -34,39 +34,112 @@
                     <!-- Content -->
                     <div class="bg-white rounded-3xl border border-slate-200 shadow-sm min-h-[500px] p-6">
                         
-                        <!-- Tab: Messages (쪽지함) -->
-                        <div v-if="activeTab === 'messages'" class="space-y-4">
-                            <div v-if="loadingConversations" class="flex justify-center py-20"><Loader2 class="animate-spin text-brand-500"/></div>
-                            <div v-else-if="conversations.length === 0" class="text-center py-20 text-slate-400">
-                                <MessageCircle :size="48" class="mx-auto mb-4 opacity-20"/>
-                                <p>아직 주고받은 쪽지가 없어요.</p>
-                            </div>
-                            <div v-else class="space-y-3">
-                                <div v-for="conv in conversations" :key="conv.partnerId" 
-                                     @click="openDM(conv.partnerId, conv.partnerName, conv.partnerAvatar, conv.partnerDecorationClass)"
-                                     class="flex items-center justify-between p-4 rounded-2xl border border-slate-100 hover:bg-brand-50 hover:border-brand-200 cursor-pointer transition-all group">
-                                    <div class="flex items-center gap-4 flex-1 min-w-0">
-                                        <div class="relative">
-                                            <img :src="(conv.partnerAvatar && !conv.partnerAvatar.includes('dicebear')) ? conv.partnerAvatar : '/images/profiles/default-profile.png'" 
-                                                 class="w-12 h-12 rounded-full border border-slate-200 bg-white object-cover"/>
-                                            <div v-if="conv.unreadCount > 0" class="absolute -top-1 -right-1 min-w-[18px] h-[18px] bg-rose-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center px-1">
-                                                {{ conv.unreadCount > 9 ? '9+' : conv.unreadCount }}
+                        <!-- Tab: Messages (쪽지함) with Inline Chat -->
+                        <div v-if="activeTab === 'messages'">
+                            <!-- 대화 목록 뷰 -->
+                            <div v-if="chatViewMode === 'list'" class="space-y-4">
+                                <div v-if="loadingConversations" class="flex justify-center py-20"><Loader2 class="animate-spin text-brand-500"/></div>
+                                <div v-else-if="conversations.length === 0" class="text-center py-20 text-slate-400">
+                                    <MessageCircle :size="48" class="mx-auto mb-4 opacity-20"/>
+                                    <p>아직 주고받은 쪽지가 없어요.</p>
+                                </div>
+                                <div v-else class="space-y-3">
+                                    <div v-for="conv in conversations" :key="conv.partnerId" 
+                                         @click="openInlineChat(conv)"
+                                         class="flex items-center justify-between p-4 rounded-2xl border border-slate-100 hover:bg-brand-50 hover:border-brand-200 cursor-pointer transition-all group">
+                                        <div class="flex items-center gap-4 flex-1 min-w-0">
+                                            <div class="relative">
+                                                <img :src="getAvatar(conv.partnerAvatar)" 
+                                                     class="w-12 h-12 rounded-full border border-slate-200 bg-white object-cover"/>
+                                                <div v-if="conv.unreadCount > 0" class="absolute -top-1 -right-1 min-w-[18px] h-[18px] bg-rose-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center px-1">
+                                                    {{ conv.unreadCount > 9 ? '9+' : conv.unreadCount }}
+                                                </div>
+                                            </div>
+                                            <div class="flex-1 min-w-0">
+                                                <div class="flex items-center gap-2">
+                                                    <NicknameRenderer 
+                                                        :nickname="conv.partnerName" 
+                                                        :decorationClass="conv.partnerDecorationClass"
+                                                        :show-avatar="false"
+                                                        class="text-base"
+                                                    />
+                                                    <span class="text-xs text-slate-400">{{ formatTime(conv.lastMessageTime) }}</span>
+                                                </div>
+                                                <p class="text-sm text-slate-500 truncate">{{ conv.lastMessagePreview || '메시지 없음' }}</p>
                                             </div>
                                         </div>
-                                        <div class="flex-1 min-w-0">
-                                            <div class="flex items-center gap-2">
-                                                <NicknameRenderer 
-                                                    :nickname="conv.partnerName" 
-                                                    :decorationClass="conv.partnerDecorationClass"
-                                                    :show-avatar="false"
-                                                    class="text-base"
-                                                />
-                                                <span class="text-xs text-slate-400">{{ formatTime(conv.lastMessageTime) }}</span>
-                                            </div>
-                                            <p class="text-sm text-slate-500 truncate">{{ conv.lastMessagePreview || '메시지 없음' }}</p>
-                                        </div>
+                                        <ChevronRight :size="20" class="text-slate-300 group-hover:text-brand-500 transition-colors" />
                                     </div>
-                                    <ChevronRight :size="20" class="text-slate-300 group-hover:text-brand-500 transition-colors" />
+                                </div>
+                            </div>
+
+                            <!-- 인라인 채팅 뷰 -->
+                            <div v-else class="flex flex-col h-[600px]">
+                                <!-- 채팅 헤더 -->
+                                <div class="flex items-center gap-3 pb-4 border-b border-slate-100">
+                                    <button @click="goBackToList" class="p-2 hover:bg-slate-100 rounded-lg transition-colors text-slate-500">
+                                        <ChevronLeft :size="20" />
+                                    </button>
+                                    <img :src="getAvatar(activeChat?.partnerAvatar)" class="w-10 h-10 rounded-full border border-slate-200"/>
+                                    <div>
+                                        <NicknameRenderer 
+                                            :nickname="activeChat?.partnerName" 
+                                            :decorationClass="activeChat?.partnerDecoration"
+                                            :show-avatar="false"
+                                            class="text-base font-bold"
+                                        />
+                                    </div>
+                                </div>
+
+                                <!-- 메시지 목록 -->
+                                <div class="flex-1 overflow-y-auto py-4 space-y-3" ref="messagesContainer">
+                                    <div v-if="messagesLoading" class="flex justify-center py-10">
+                                        <Loader2 class="animate-spin text-brand-500" />
+                                    </div>
+                                    <template v-else>
+                                        <template v-for="(msg, index) in messages" :key="msg.id">
+                                            <!-- Date Separator -->
+                                            <div v-if="showDateSeparator(index)" class="w-full flex justify-center my-4">
+                                                <span class="text-[10px] font-bold text-slate-500 bg-slate-100 px-3 py-1 rounded-full">
+                                                    {{ formatDate(msg.createdAt) }}
+                                                </span>
+                                            </div>
+
+                                            <!-- Message Item -->
+                                            <div 
+                                                class="flex flex-col"
+                                                :class="msg.isMine ? 'items-end' : 'items-start'"
+                                            >
+                                                <div 
+                                                    class="max-w-[70%] px-4 py-2.5 rounded-2xl text-sm shadow-sm leading-relaxed whitespace-pre-wrap"
+                                                    :class="msg.isMine ? 'bg-brand-500 text-white rounded-tr-sm' : 'bg-slate-100 text-slate-700 rounded-tl-sm'"
+                                                >
+                                                    {{ msg.content }}
+                                                </div>
+                                                <span class="text-[10px] text-slate-400 mt-1 px-1">{{ formatMsgTime(msg.createdAt) }}</span>
+                                            </div>
+                                        </template>
+                                    </template>
+                                </div>
+
+                                <!-- 입력 영역 -->
+                                <div class="pt-4 border-t border-slate-100">
+                                    <form @submit.prevent="sendMessage" class="flex items-center gap-2">
+                                        <input 
+                                            v-model="newMessage" 
+                                            type="text" 
+                                            placeholder="메시지를 입력하세요..." 
+                                            class="flex-1 px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20 transition-all text-sm"
+                                            :disabled="sending"
+                                        />
+                                        <button 
+                                            type="submit" 
+                                            class="p-3 bg-brand-500 text-white rounded-xl hover:bg-brand-600 disabled:opacity-50 transition-all"
+                                            :disabled="!newMessage.trim() || sending"
+                                        >
+                                            <Send :size="20" />
+                                        </button>
+                                    </form>
                                 </div>
                             </div>
                         </div>
@@ -229,10 +302,10 @@
 </template>
 
 <script setup>
-import { ref, watch, onMounted, computed } from 'vue';
+import { ref, watch, onMounted, onBeforeUnmount, computed, nextTick } from 'vue';
 import { useRoute } from 'vue-router';
 import { socialApi } from '@/api/social';
-import { Loader2, Users, Bell, Search, UserPlus, MessageCircle, UserMinus, CheckCircle2, ChevronRight } from 'lucide-vue-next';
+import { Loader2, Users, Bell, Search, UserPlus, MessageCircle, UserMinus, CheckCircle2, ChevronRight, ChevronLeft, Send } from 'lucide-vue-next';
 import NicknameRenderer from '@/components/common/NicknameRenderer.vue';
 import { useDirectMessageModal } from '@/composables/useDirectMessageModal';
 
@@ -259,7 +332,17 @@ const searchResults = ref(null);
 const conversations = ref([]);
 const loadingConversations = ref(false);
 
-// 쪽지 (DM)
+// 인라인 채팅 상태
+const chatViewMode = ref('list'); // 'list' or 'chat'
+const activeChat = ref(null);
+const messages = ref([]);
+const messagesLoading = ref(false);
+const newMessage = ref('');
+const sending = ref(false);
+const messagesContainer = ref(null);
+let chatPollInterval = null;
+
+// 쪽지 (DM) - 모달용 (친구 목록에서 사용)
 const { open: openGlobalDM } = useDirectMessageModal();
 
 const loadData = async () => {
@@ -305,6 +388,103 @@ const formatTime = (dateString) => {
     } else {
         return date.toLocaleDateString('ko-KR', { month: 'short', day: 'numeric' });
     }
+};
+
+// 인라인 채팅 함수들
+const getAvatar = (url) => {
+    if (url && !url.includes('dicebear')) return url;
+    return '/images/profiles/default-profile.png';
+};
+
+const openInlineChat = (conv) => {
+    activeChat.value = {
+        partnerId: conv.partnerId,
+        partnerName: conv.partnerName,
+        partnerAvatar: conv.partnerAvatar,
+        partnerDecoration: conv.partnerDecorationClass || ''
+    };
+    chatViewMode.value = 'chat';
+    messages.value = [];
+    fetchMessages();
+    startChatPolling();
+};
+
+const goBackToList = () => {
+    chatViewMode.value = 'list';
+    activeChat.value = null;
+    stopChatPolling();
+    loadConversations();
+};
+
+const fetchMessages = async () => {
+    if (!activeChat.value) return;
+    if (messages.value.length === 0) messagesLoading.value = true;
+    try {
+        const res = await socialApi.getConversation(activeChat.value.partnerId);
+        messages.value = res.data;
+        if (messagesLoading.value) scrollToBottom();
+    } catch (e) {
+        console.error(e);
+    } finally {
+        messagesLoading.value = false;
+    }
+};
+
+const sendMessage = async () => {
+    if (!newMessage.value.trim() || sending.value || !activeChat.value) return;
+    
+    const content = newMessage.value;
+    newMessage.value = '';
+    sending.value = true;
+    
+    try {
+        await socialApi.sendMessage(activeChat.value.partnerId, content);
+        await fetchMessages();
+        scrollToBottom();
+    } catch (e) {
+        console.error(e);
+        newMessage.value = content;
+        alert('전송 실패');
+    } finally {
+        sending.value = false;
+    }
+};
+
+const scrollToBottom = () => {
+    nextTick(() => {
+        if (messagesContainer.value) {
+            messagesContainer.value.scrollTop = messagesContainer.value.scrollHeight;
+        }
+    });
+};
+
+const startChatPolling = () => {
+    stopChatPolling();
+    chatPollInterval = setInterval(fetchMessages, 3000);
+};
+
+const stopChatPolling = () => {
+    if (chatPollInterval) {
+        clearInterval(chatPollInterval);
+        chatPollInterval = null;
+    }
+};
+
+const formatMsgTime = (iso) => {
+    const d = new Date(iso);
+    return d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+};
+
+const formatDate = (iso) => {
+    const d = new Date(iso);
+    return d.toLocaleDateString('ko-KR', { month: 'long', day: 'numeric' });
+};
+
+const showDateSeparator = (index) => {
+    if (index === 0) return true;
+    const currentMsgDate = new Date(messages.value[index].createdAt).toLocaleDateString();
+    const prevMsgDate = new Date(messages.value[index - 1].createdAt).toLocaleDateString();
+    return currentMsgDate !== prevMsgDate;
 };
 
 const handleSearch = async () => {
@@ -414,10 +594,19 @@ onMounted(async () => {
 });
 
 watch(activeTab, () => {
+    // 탭 변경 시 인라인 채팅 초기화
+    if (chatViewMode.value === 'chat') {
+        goBackToList();
+    }
+    
     if (activeTab.value === 'messages') {
         loadConversations();
     } else {
         loadData();
     }
+});
+
+onBeforeUnmount(() => {
+    stopChatPolling();
 });
 </script>
