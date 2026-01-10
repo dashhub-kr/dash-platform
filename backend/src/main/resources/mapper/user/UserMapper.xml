@@ -11,6 +11,10 @@
     equipped_decoration_class FROM users u LEFT JOIN decorations d ON u.equipped_decoration_id =
     d.id WHERE u.id = #{id} AND u.deleted_at IS NULL </select>
 
+  <select id="selectByIdIncludingDeleted" resultType="User" parameterType="long"> SELECT u.*, d.css_class as
+    equipped_decoration_class FROM users u LEFT JOIN decorations d ON u.equipped_decoration_id =
+    d.id WHERE u.id = #{id} </select>
+
 
   <select id="selectAll" resultType="User"> SELECT u.*, d.css_class as equipped_decoration_class
     FROM users u LEFT JOIN decorations d ON u.equipped_decoration_id = d.id WHERE u.deleted_at IS

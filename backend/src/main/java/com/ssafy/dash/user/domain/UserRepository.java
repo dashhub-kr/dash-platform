@@ -9,6 +9,8 @@ public interface UserRepository {
 
     Optional<User> findById(Long id);
 
+    Optional<User> findByIdIncludingDeleted(Long id);
+
     List<User> findAll();
 
     List<User> searchByKeyword(String keyword);

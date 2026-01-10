@@ -61,7 +61,7 @@
     message, status, created_at) VALUES (#{studyId}, #{userId}, #{message}, #{status}, #{createdAt}) </insert>
 
   <select id="findApplicationById" resultMap="StudyApplicationResult"> SELECT sa.*, u.id as u_id,
-    u.username, u.avatar_url FROM study_applications sa JOIN users u ON sa.user_id = u.id WHERE
+    u.username, u.avatar_url, u.deleted_at as u_deleted_at FROM study_applications sa JOIN users u ON sa.user_id = u.id WHERE
     sa.id = #{id} </select>
 
   <select id="findApplicationByStudyIdAndUserId"
@@ -84,11 +84,12 @@
       <id property="id" column="u_id" />
       <result property="username" column="username" />
       <result property="avatarUrl" column="avatar_url" />
+      <result property="deletedAt" column="u_deleted_at" />
     </association>
   </resultMap>
 
   <select id="findPendingApplicationsByStudyId" resultMap="StudyApplicationResult"> SELECT sa.*,
-    u.id as u_id, u.username, u.avatar_url FROM study_applications sa JOIN users u ON sa.user_id =
+    u.id as u_id, u.username, u.avatar_url, u.deleted_at as u_deleted_at FROM study_applications sa JOIN users u ON sa.user_id =
     u.id WHERE sa.study_id = #{studyId} AND sa.status = 'PENDING' </select>
 
   <select id="findPendingApplicationByUserId" resultMap="StudyApplicationResult"> SELECT * FROM

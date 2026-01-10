@@ -212,6 +212,11 @@ public class StudyService {
         User user = userRepository.findById(application.getUserId())
                 .orElseThrow(() -> new IllegalArgumentException("User not found"));
 
+        // 탈퇴한 유저인지 확인
+        if (user.isDeleted()) {
+            throw new IllegalStateException("탈퇴한 회원의 가입 신청은 승인할 수 없습니다.");
+        }
+
         // 유효성 검사 및 스터디 이동(Seamless Transition) 처리
         if (user.getStudyId() != null) {
             Study currentStudy = studyRepository.findById(user.getStudyId()).orElse(null);

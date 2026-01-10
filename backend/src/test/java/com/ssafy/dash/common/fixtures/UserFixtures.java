@@ -68,7 +68,7 @@ public final class UserFixtures {
 
         public UserResult toResult(LocalDateTime createdAt) {
             return new UserResult(id, username, email, createdAt, provider, providerId, avatarUrl, null, null, null,
-                    null, null, null, null, null, null, null, null, null, null, 0);
+                    null, null, null, null, null, null, null, null, null, null, 0, false);
         }
 
         public UserCreateCommand toCreateCommand() {

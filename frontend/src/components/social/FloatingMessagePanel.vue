@@ -51,10 +51,13 @@
                             <ChevronLeft :size="20" />
                         </button>
                         <img 
-                            :src="getAvatar(activeChat?.partnerAvatar)" 
+                            :src="getAvatar(activeChat?.partnerAvatar, isPartnerDeleted)" 
                             class="w-9 h-9 rounded-full border border-slate-200 bg-white object-cover"
+                            :class="{ 'grayscale opacity-60': isPartnerDeleted }"
                         />
-                        <span class="font-bold text-slate-800 text-sm">{{ activeChat?.partnerName }}</span>
+                        <span class="font-bold text-slate-800 text-sm" :class="{ 'text-slate-500': isPartnerDeleted }">
+                            {{ isPartnerDeleted ? '탈퇴한 회원' : activeChat?.partnerName }}
+                        </span>
                     </div>
                     <div class="flex items-center gap-1">
                         <button @click="openFullView" class="p-1.5 hover:bg-slate-200 rounded-lg transition-colors text-slate-500" title="전체보기">
@@ -140,7 +143,14 @@
 
                     <!-- 입력 영역 -->
                     <div class="p-3 bg-white border-t border-slate-100 shrink-0">
-                        <form @submit.prevent="sendMessage" class="flex items-center gap-2">
+                        <!-- 탈퇴 회원 경고 -->
+                        <div v-if="isPartnerDeleted" class="p-3 bg-rose-50 border border-rose-200 rounded-xl flex items-center justify-center gap-2">
+                            <AlertCircle :size="16" class="text-rose-500 shrink-0"/>
+                            <p class="text-xs text-rose-600 font-bold">탈퇴한 회원에게는 메시지를 보낼 수 없습니다.</p>
+                        </div>
+                        
+                        <!-- 일반 입력창 -->
+                        <form v-else @submit.prevent="sendMessage" class="flex items-center gap-2">
                             <input 
                                 v-model="newMessage" 
                                 type="text" 
@@ -166,8 +176,9 @@
 <script setup>
 import { ref, computed, onMounted, onUnmounted, watch, nextTick } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
-import { MessageCircle, X, Maximize2, Loader2, ChevronLeft, Send } from 'lucide-vue-next';
+import { MessageCircle, X, Maximize2, Loader2, ChevronLeft, Send, AlertCircle } from 'lucide-vue-next';
 import { socialApi } from '@/api/social';
+import { userApi } from '@/api/user';
 import { useAuth } from '@/composables/useAuth';
 import { useFloatingChat } from '@/composables/useFloatingChat';
 
@@ -189,6 +200,7 @@ const messagesLoading = ref(false);
 const newMessage = ref('');
 const sending = ref(false);
 const messagesContainer = ref(null);
+const isPartnerDeleted = ref(false);
 
 let chatPollInterval = null;
 
@@ -209,10 +221,22 @@ watch(isOpen, (newVal) => {
 });
 
 // Watch activeChat to switch to chat view
-watch(activeChat, (newVal) => {
+watch(activeChat, async (newVal) => {
     if (newVal) {
         viewMode.value = 'chat';
         messages.value = [];
+        isPartnerDeleted.value = false; // 초기화
+        
+        // 탈퇴 여부 확인
+        try {
+            const res = await userApi.getById(newVal.partnerId);
+            if (res.data.isDeleted) {
+                isPartnerDeleted.value = true;
+            }
+        } catch (e) {
+            console.error("Failed to check partner status", e);
+        }
+
         fetchMessages();
         startChatPolling();
     }
@@ -238,15 +262,12 @@ const openChat = (conv) => {
         partnerAvatar: conv.partnerAvatar,
         partnerDecoration: conv.partnerDecorationClass || ''
     };
-    viewMode.value = 'chat';
-    messages.value = [];
-    fetchMessages();
-    startChatPolling();
 };
 
 const goBack = () => {
     viewMode.value = 'list';
     activeChat.value = null;
+    isPartnerDeleted.value = false;
     stopChatPolling();
     loadConversations(); // Refresh unread counts
 };
@@ -266,7 +287,7 @@ const fetchMessages = async () => {
 };
 
 const sendMessage = async () => {
-    if (!newMessage.value.trim() || sending.value || !activeChat.value) return;
+    if (!newMessage.value.trim() || sending.value || !activeChat.value || isPartnerDeleted.value) return;
     
     const content = newMessage.value;
     newMessage.value = '';
@@ -279,7 +300,7 @@ const sendMessage = async () => {
     } catch (e) {
         console.error(e);
         newMessage.value = content;
-        alert('전송 실패');
+        alert(e.response?.data?.message || '전송 실패');
     } finally {
         sending.value = false;
     }
@@ -311,7 +332,8 @@ const openFullView = () => {
     stopChatPolling();
 };
 
-const getAvatar = (url) => {
+const getAvatar = (url, isDeleted = false) => {
+    if (isDeleted) return 'https://avatars.githubusercontent.com/u/0';
     if (url && !url.includes('dicebear')) return url;
     return '/images/profiles/default-profile.png';
 };

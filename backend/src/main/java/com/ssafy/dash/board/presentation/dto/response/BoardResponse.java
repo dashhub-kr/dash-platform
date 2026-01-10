@@ -20,6 +20,7 @@ public record BoardResponse(
         Boolean isLiked,
         String authorRole,
         String authorDecorationClass,
+        Boolean authorIsDeleted,
         LocalDateTime createdAt,
         LocalDateTime updatedAt) {
 
@@ -40,6 +41,7 @@ public record BoardResponse(
                 result.isLiked(),
                 result.authorRole(),
                 result.authorDecorationClass(),
+                result.authorIsDeleted(),
                 result.createdAt(),
                 result.updatedAt());
     }

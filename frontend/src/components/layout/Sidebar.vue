@@ -231,65 +231,87 @@
                 </div>
                 
                 <template v-else-if="selectedApp">
-                    <div class="flex items-center gap-4 mb-6 p-4 bg-slate-50 rounded-2xl">
-                        <img 
-                            :src="selectedApp.applicant?.avatarUrl || '/images/profiles/default-profile.png'" 
-                            class="w-12 h-12 rounded-full border border-slate-200 bg-white object-cover"
-                        />
-                        <div>
-                            <div class="font-bold text-slate-800 text-lg">{{ selectedApp.applicant?.username || '알 수 없는 사용자' }}</div>
-                            <div class="text-xs text-slate-400">가입 인사를 확인해주세요.</div>
+                    <!-- 탈퇴 회원: 안내 메시지만 표시 -->
+                    <template v-if="selectedApp.applicant?.isDeleted || selectedApp.applicant?.deletedAt">
+                        <div class="py-6 text-center">
+                            <div class="w-16 h-16 rounded-full bg-slate-100 mx-auto mb-4 flex items-center justify-center">
+                                <AlertCircle :size="32" class="text-slate-400"/>
+                            </div>
+                            <p class="text-lg font-bold text-slate-600 mb-2">탈퇴한 회원의 가입 신청</p>
+                            <p class="text-sm text-slate-400 mb-6">해당 신청은 더 이상 유효하지 않습니다.</p>
+                            <button 
+                                @click="handleDismissDeletedApplication"
+                                class="w-full py-3.5 rounded-xl font-bold text-white bg-slate-500 hover:bg-slate-600 transition-colors shadow-lg"
+                            >
+                                확인
+                            </button>
                         </div>
-                    </div>
-                    
-                    <div v-if="!isRejecting">
-                         <div class="mb-8">
-                             <div class="text-xs font-bold text-slate-400 uppercase mb-2">Message</div>
-                             <div class="bg-slate-50 p-4 rounded-2xl text-slate-700 font-medium leading-relaxed whitespace-pre-wrap max-h-60 overflow-y-auto custom-scrollbar">
-                                 {{ selectedApp.message }}
-                             </div>
+                    </template>
+
+                    <!-- 일반 회원: 기존 승인/거절 UI -->
+                    <template v-else>
+                        <div class="flex items-center gap-4 mb-4 p-4 bg-slate-50 rounded-2xl">
+                            <img 
+                                :src="selectedApp.applicant?.avatarUrl || '/images/profiles/default-profile.png'" 
+                                class="w-12 h-12 rounded-full border border-slate-200 bg-white object-cover"
+                            />
+                            <div>
+                                <div class="font-bold text-lg text-slate-800">
+                                    {{ selectedApp.applicant?.username || '알 수 없는 사용자' }}
+                                </div>
+                                <div class="text-xs text-slate-400">가입 인사를 확인해주세요.</div>
+                            </div>
                         </div>
 
-                        <div class="flex gap-3">
-                            <button 
-                                @click="handleApproveApp"
-                                class="flex-1 py-3.5 rounded-xl font-bold text-white bg-brand-500 hover:bg-brand-600 transition-colors shadow-lg shadow-brand-500/30"
-                            >
-                                승인
-                            </button>
-                            <button 
-                                @click="handleRejectClick"
-                                class="flex-1 py-3.5 rounded-xl font-bold text-rose-500 bg-rose-50 hover:bg-rose-100 transition-colors"
-                            >
-                                거절
-                            </button>
-                        </div>
-                    </div>
+                        <div v-if="!isRejecting">
+                             <div class="mb-8">
+                                 <div class="text-xs font-bold text-slate-400 uppercase mb-2">Message</div>
+                                 <div class="bg-slate-50 p-4 rounded-2xl text-slate-700 font-medium leading-relaxed whitespace-pre-wrap max-h-60 overflow-y-auto custom-scrollbar">
+                                     {{ selectedApp.message }}
+                                 </div>
+                            </div>
 
-                    <div v-else class="animate-fade-in">
-                        <div class="mb-6">
-                            <label class="text-xs font-bold text-slate-400 uppercase mb-2 block">거절 사유</label>
-                            <textarea
-                                v-model="rejectReason"
-                                class="w-full h-32 p-4 bg-slate-50 border-2 border-slate-100 rounded-xl focus:border-rose-500 focus:ring-0 transition-all font-medium text-slate-700 resize-none"
-                                placeholder="거절 사유를 입력해주세요 (선택사항)"
-                            ></textarea>
+                            <div class="flex gap-3">
+                                <button 
+                                    @click="handleApproveApp"
+                                    class="flex-1 py-3.5 rounded-xl font-bold text-white bg-brand-500 hover:bg-brand-600 transition-colors shadow-lg shadow-brand-500/30"
+                                >
+                                    승인
+                                </button>
+                                <button 
+                                    @click="handleRejectClick"
+                                    class="flex-1 py-3.5 rounded-xl font-bold text-rose-500 bg-rose-50 hover:bg-rose-100 transition-colors"
+                                >
+                                    거절
+                                </button>
+                            </div>
                         </div>
-                        <div class="flex gap-3">
-                            <button 
-                                @click="handleCancelReject"
-                                class="flex-1 py-3.5 rounded-xl font-bold text-slate-500 hover:bg-slate-100 transition-colors"
-                            >
-                                취소
-                            </button>
-                            <button 
-                                @click="confirmReject"
-                                class="flex-1 py-3.5 rounded-xl font-bold text-white bg-rose-500 hover:bg-rose-600 transition-colors shadow-lg shadow-rose-500/30"
-                            >
-                                거절하기
-                            </button>
+
+                        <div v-else class="animate-fade-in">
+                            <div class="mb-6">
+                                <label class="text-xs font-bold text-slate-400 uppercase mb-2 block">거절 사유</label>
+                                <textarea
+                                    v-model="rejectReason"
+                                    class="w-full h-32 p-4 bg-slate-50 border-2 border-slate-100 rounded-xl focus:border-rose-500 focus:ring-0 transition-all font-medium text-slate-700 resize-none"
+                                    placeholder="거절 사유를 입력해주세요 (선택사항)"
+                                ></textarea>
+                            </div>
+                            <div class="flex gap-3">
+                                <button 
+                                    @click="handleCancelReject"
+                                    class="flex-1 py-3.5 rounded-xl font-bold text-slate-500 hover:bg-slate-100 transition-colors"
+                                >
+                                    취소
+                                </button>
+                                <button 
+                                    @click="confirmReject"
+                                    class="flex-1 py-3.5 rounded-xl font-bold text-white bg-rose-500 hover:bg-rose-600 transition-colors shadow-lg shadow-rose-500/30"
+                                >
+                                    거절하기
+                                </button>
+                            </div>
                         </div>
-                    </div>
+                    </template>
                 </template>
                 
                 <div v-else class="py-10 text-center text-slate-400 font-medium bg-slate-50 rounded-2xl">
@@ -485,7 +507,16 @@ const openApplicationModal = async (applicationId) => {
         const res = await studyApi.getApplication(applicationId);
         selectedApp.value = res.data;
     } catch (e) {
-        console.error(e);
+        console.error("Failed to load application:", e);
+        selectedApp.value = {
+            id: applicationId,
+            applicant: { 
+                isDeleted: true, 
+                username: '알 수 없음',
+                avatarUrl: null
+            },
+            message: '신청 정보를 불러올 수 없거나 신청자가 탈퇴했습니다.'
+        };
     } finally {
         loadingApp.value = false;
     }
@@ -544,6 +575,23 @@ const confirmReject = async () => {
     } catch (e) {
         console.error(e);
         alert(e.response?.data?.message || "거절에 실패했습니다.");
+    }
+};
+
+// 탈퇴 회원 가입신청 확인 버튼 - 알림 읽음 처리 후 모달 닫기
+const handleDismissDeletedApplication = async () => {
+    if (!selectedApp.value) return;
+    try {
+        // 관련 알림 찾아서 읽음 처리
+        const relatedNotif = notifications.value.find(n => n.relatedId === selectedApp.value.id && n.type === 'STUDY_REQUEST');
+        if (relatedNotif && !relatedNotif.isRead) {
+            await markAsRead(relatedNotif.id);
+            relatedNotif.isRead = true;
+        }
+        showApplicationModal.value = false;
+    } catch (e) {
+        console.error(e);
+        showApplicationModal.value = false;
     }
 };
 

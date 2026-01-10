@@ -195,8 +195,8 @@
 </template>
 
 <script setup>
-import { ref, onMounted, onBeforeUnmount, watch } from 'vue';
-import { useRouter } from 'vue-router';
+import { ref, watch, onMounted, onBeforeUnmount } from 'vue';
+import { useRoute, useRouter } from 'vue-router';
 import { socialApi } from '@/api/social';
 import { Loader2, Users, Search, Bell, MessageCircle, Rss, Check, X } from 'lucide-vue-next';
 import TierBadge from '@/components/common/TierBadge.vue';
@@ -204,6 +204,7 @@ import FeedItem from '@/components/social/FeedItem.vue';
 import { useFloatingChat } from '@/composables/useFloatingChat';
 import { useUserProfileModal } from '@/composables/useUserProfileModal';
 
+const route = useRoute();
 const router = useRouter();
 const { openChat: openGlobalDM } = useFloatingChat();
 const { open: openProfile } = useUserProfileModal();
@@ -329,11 +330,13 @@ const rejectRequest = async (requestId) => {
 
 // 액션
 const openDM = (friend) => {
+    if (friend.isDeleted) return; // 탈퇴 회원 클릭 방지
     openGlobalDM({
         partnerId: friend.id,
         partnerName: friend.username,
         partnerAvatar: friend.avatarUrl,
-        partnerDecoration: friend.equippedDecorationClass || ''
+        partnerDecoration: friend.equippedDecorationClass || '',
+        partnerIsDeleted: friend.isDeleted || false
     });
 };
 
@@ -347,7 +350,8 @@ const openUserProfile = (user) => {
         avatarUrl: user.avatarUrl,
         solvedacTier: user.solvedacTier,
         decorationClass: user.equippedDecorationClass, // 필드명 확인 필요
-        friendshipStatus: 'ACCEPTED' // 친구 목록에서 클릭했으므로 항상 ACCEPTED
+        friendshipStatus: 'ACCEPTED', // 친구 목록에서 클릭했으므로 항상 ACCEPTED
+        isDeleted: user.isDeleted || false 
     });
 };
 
@@ -355,9 +359,35 @@ const handleViewBattle = (item) => {
     router.push(`/battle/${item.battleId}`);
 };
 
-onMounted(() => {
+// 라우트 쿼리 핸들러 (예: 알림 클릭 시) - HEAD에서 가져옴
+const checkQueryForDM = async () => {
+    const pid = route.query.partnerId;
+    if (pid) {
+        const partnerId = parseInt(pid);
+        
+        // 1. 친구 목록 로드 대기 (이미 로드되었겠지만 확실히)
+        if (friends.value.length === 0) await loadFriends();
+
+        // 2. 친구 목록에서 찾아보기
+        const friendItem = friends.value.find(f => f.friend.id === partnerId);
+        
+        if (friendItem) {
+            // 친구인 경우 DM 모달 열기
+            openDM(friendItem.friend);
+        } else {
+            // 친구가 아닌 경우 (혹은 탈퇴)
+             alert('현재 친구 목록에 없는 사용자이거나 정보를 불러올 수 없습니다.');
+        }
+
+        // 쿼리 파라미터 제거하여 URL 정리
+        router.replace({ query: { ...route.query, partnerId: undefined } });
+    }
+};
+
+onMounted(async () => {
     loadFeed(true);
-    loadFriends();
+    await loadFriends(); // 친구 목록 먼저 로드
+    checkQueryForDM();   // 그 다음 쿼리 체크
     
     // 무한 스크롤 옵저버
     observer = new IntersectionObserver((entries) => {

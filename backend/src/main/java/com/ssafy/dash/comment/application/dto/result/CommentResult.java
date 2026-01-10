@@ -23,7 +23,8 @@ public record CommentResult(
         LocalDateTime createdAt,
         LocalDateTime updatedAt) {
 
-    public static CommentResult from(Comment comment, String authorName, String authorProfileImageUrl, String authorRole, String authorDecorationClass) {
+    public static CommentResult from(Comment comment, String authorName, String authorProfileImageUrl,
+            String authorRole, String authorDecorationClass) {
         return new CommentResult(
                 comment.getId(),
                 comment.getBoardId(),
@@ -42,7 +43,8 @@ public record CommentResult(
                 comment.getUpdatedAt());
     }
 
-    public static CommentResult from(Comment comment, String authorName, String authorProfileImageUrl, String authorRole, String authorDecorationClass,
+    public static CommentResult from(Comment comment, String authorName, String authorProfileImageUrl,
+            String authorRole, String authorDecorationClass,
             List<CommentResult> replies) {
         return new CommentResult(
                 comment.getId(),
