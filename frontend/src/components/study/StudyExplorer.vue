@@ -31,7 +31,8 @@
 
     <div v-else :class="{ 'flex flex-col h-full overflow-hidden': isOnboarding }">
       <!-- 검색 창 -->
-      <div class="shrink-0 bg-slate-50/90 backdrop-blur-md p-6 rounded-3xl border border-slate-100 z-10 sticky top-0 shadow-sm"
+      <!-- 검색 창 (온보딩 모드에서만 표시) -->
+      <div v-if="isOnboarding" class="shrink-0 bg-slate-50/90 backdrop-blur-md p-6 rounded-3xl border border-slate-100 z-10 sticky top-0 shadow-sm"
            :class="{ 'mb-4': isOnboarding, 'mb-10 top-0': !isOnboarding }">
         <label class="block text-sm font-bold text-slate-500 mb-3 ml-1 flex items-center justify-between">
            <span>스터디 찾기</span>
@@ -458,7 +459,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted, onUnmounted, computed, nextTick } from 'vue';
+import { ref, onMounted, onUnmounted, computed, watch } from 'vue';
 import { useRouter } from 'vue-router';
 import axios from 'axios';
 import { useAuth } from '@/composables/useAuth';
@@ -470,6 +471,10 @@ const props = defineProps({
   isOnboarding: {
     type: Boolean,
     default: false
+  },
+  externalSearchKeyword: {
+    type: String,
+    default: ''
   }
 });
 
@@ -487,6 +492,14 @@ const applying = ref(false);
 
 const searchKeyword = ref('');
 const searchError = ref('');
+
+// 외부 검색 키워드 동기화
+watch(() => props.externalSearchKeyword, (newVal) => {
+    if (newVal !== searchKeyword.value) {
+        searchKeyword.value = newVal;
+        searchStudy();
+    }
+});
 
 const pendingApp = ref(null);
 
