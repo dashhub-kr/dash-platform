@@ -1,5 +1,4 @@
--- Battle Feature DB Schema
--- 친구와 함께하는 모의고사/디펜스 배틀
+SET FOREIGN_KEY_CHECKS=0;
 
 CREATE TABLE IF NOT EXISTS battle (
     id BIGINT PRIMARY KEY AUTO_INCREMENT,
@@ -11,6 +10,8 @@ CREATE TABLE IF NOT EXISTS battle (
     started_at DATETIME,
     completed_at DATETIME,
     
+    KEY idx_battle_creator (creator_id),
+    KEY idx_battle_status (status),
     FOREIGN KEY (creator_id) REFERENCES user(id)
 );
 
@@ -25,12 +26,11 @@ CREATE TABLE IF NOT EXISTS battle_participant (
     started_at DATETIME,
     completed_at DATETIME,
     
+    KEY idx_battle_participant_user (user_id),
+    KEY idx_battle_participant_status (status),
     FOREIGN KEY (battle_id) REFERENCES battle(id) ON DELETE CASCADE,
     FOREIGN KEY (user_id) REFERENCES user(id),
     UNIQUE KEY uk_battle_user (battle_id, user_id)
 );
 
-CREATE INDEX idx_battle_creator ON battle(creator_id);
-CREATE INDEX idx_battle_status ON battle(status);
-CREATE INDEX idx_battle_participant_user ON battle_participant(user_id);
-CREATE INDEX idx_battle_participant_status ON battle_participant(status);
+SET FOREIGN_KEY_CHECKS=1;
