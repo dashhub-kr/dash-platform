@@ -77,7 +77,10 @@
                             @click.prevent.stop="toggleMemberPopup(problem.problemId, $event)">
                             <div class="flex -space-x-1.5">
                                <template v-for="member in problem.solvedMembers.slice(0, 5)" :key="member.id">
-                                   <img :src="member.avatarUrl" :title="member.username" class="w-5 h-5 rounded-full border border-white ring-1 ring-emerald-50 bg-slate-100 object-cover" />
+                                   <div class="relative group/avatar">
+                                       <img :src="member.avatarUrl" :alt="member.username" class="w-5 h-5 rounded-full border border-white ring-1 ring-emerald-50 bg-slate-100 object-cover" />
+                                       <div class="absolute left-1/2 -translate-x-1/2 -top-8 bg-slate-800 text-white text-[10px] font-bold px-2 py-1 rounded-lg opacity-0 group-hover/avatar:opacity-100 transition-opacity whitespace-nowrap pointer-events-none z-50">{{ member.username }}</div>
+                                   </div>
                                </template>
                                <div v-if="problem.solvedMembers.length > 5" class="w-5 h-5 rounded-full bg-emerald-50 border border-white flex items-center justify-center text-[8px] font-bold text-emerald-600">
                                    +{{ problem.solvedMembers.length - 5 }}
@@ -181,7 +184,7 @@ const toggleMemberPopup = (problemId, event) => {
     } else {
         const rect = event.currentTarget.getBoundingClientRect();
         popupPosition.value = {
-            top: rect.top + window.scrollY,
+            top: rect.top, // Fixed layout uses viewport coordinates, scrollY is not needed
             left: rect.left + rect.width / 2
         };
         openPopupProblemId.value = problemId;
