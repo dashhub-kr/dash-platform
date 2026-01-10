@@ -154,18 +154,29 @@
                             <div v-else class="space-y-3">
                                 <div v-for="item in friends" :key="item.id" 
                                      class="flex items-center justify-between p-4 rounded-2xl border border-slate-100 hover:bg-slate-50 hover:border-slate-200 transition-all group">
-                                    <div class="flex items-center gap-4">
-                                        <img :src="(item.friend.avatarUrl && !item.friend.avatarUrl.includes('dicebear')) ? item.friend.avatarUrl : '/images/profiles/default-profile.png'" 
+                                    <div class="flex items-center gap-4 flex-1 min-w-0">
+                                        <img :src="getAvatar(item.friend.avatarUrl)" 
                                              class="w-12 h-12 rounded-full border-2 border-white shadow-sm bg-white object-cover"/>
                                         <div class="flex-1 min-w-0">
-                                            <NicknameRenderer 
-                                                :nickname="item.friend.username" 
-                                                :decorationClass="item.friend.equippedDecorationClass"
-                                                :role="item.friend.role"
-                                                :show-avatar="false"
-                                                class="text-base font-semibold"
-                                            />
-                                            <div class="text-xs text-slate-400 truncate mt-0.5">{{ item.friend.email }}</div>
+                                            <div class="flex items-center gap-2">
+                                                <NicknameRenderer 
+                                                    :nickname="item.friend.username" 
+                                                    :decorationClass="item.friend.equippedDecorationClass"
+                                                    :role="item.friend.role"
+                                                    :show-avatar="false"
+                                                    class="text-base font-semibold"
+                                                />
+                                            </div>
+                                            <div class="flex items-center gap-2 mt-1 flex-wrap">
+                                                <TierBadge v-if="item.friend.solvedacTier" :tier="item.friend.solvedacTier" size="xs" />
+                                                <span v-if="item.friend.studyName" class="text-xs text-slate-500 flex items-center gap-1">
+                                                    <BookOpen :size="12" /> {{ item.friend.studyName }}
+                                                </span>
+                                                <span v-else-if="item.friend.studyId" class="text-xs text-slate-400">스터디 소속</span>
+                                                <span v-if="item.friend.solvedCount" class="text-xs text-emerald-600 flex items-center gap-1">
+                                                    <CheckCircle2 :size="12" /> {{ item.friend.solvedCount }}문제
+                                                </span>
+                                            </div>
                                         </div>
                                     </div>
                                     <div class="flex items-center gap-2">
@@ -214,9 +225,9 @@
                     </div>
                 </main>
 
-                <!-- 오른쪽 컬럼: 사이드바 (친구 검색) -->
+                <!-- 오른쪽 컬럼: 사이드바 (탭별 동적 콘텐츠) -->
                 <aside class="hidden lg:flex w-[380px] shrink-0 flex-col gap-6 sticky top-8 h-fit">
-                    <!-- 친구 검색 -->
+                    <!-- 친구 검색 (모든 탭 공통) -->
                     <div class="bg-white rounded-3xl border border-slate-200 shadow-sm p-6">
                         <h2 class="text-lg font-bold text-slate-800 mb-4 flex items-center gap-2">
                             <div class="w-8 h-8 bg-violet-500 rounded-lg flex items-center justify-center">
@@ -243,22 +254,24 @@
 
                         <!-- 검색 결과 -->
                         <div v-if="searchLoading" class="flex justify-center py-6"><Loader2 class="animate-spin text-brand-500"/></div>
-                        <div v-else-if="searchResults" class="mt-4 space-y-3 max-h-[400px] overflow-y-auto">
+                        <div v-else-if="searchResults" class="mt-4 space-y-3 max-h-[300px] overflow-y-auto">
                             <div v-if="searchResults.length === 0" class="text-center py-6 text-slate-400 text-sm">
                                 검색 결과가 없습니다.
                             </div>
                             <div v-for="user in searchResults" :key="user.id" class="flex items-center justify-between p-3 rounded-xl border border-slate-100 hover:bg-slate-50 transition-colors">
                                 <div class="flex items-center gap-3 flex-1 min-w-0">
-                                    <img :src="(user.avatarUrl && !user.avatarUrl.includes('dicebear')) ? user.avatarUrl : '/images/profiles/default-profile.png'" class="w-9 h-9 rounded-full border border-slate-200 bg-white object-cover"/>
+                                    <img :src="getAvatar(user.avatarUrl)" class="w-9 h-9 rounded-full border border-slate-200 bg-white object-cover"/>
                                     <div class="min-w-0">
-                                        <NicknameRenderer 
-                                            :nickname="user.username" 
-                                            :decorationClass="user.equippedDecorationClass"
-                                            :role="user.role"
-                                            :show-avatar="false"
-                                            class="text-sm"
-                                        />
-                                        <div class="text-[10px] text-slate-400 truncate">{{ user.email }}</div>
+                                        <div class="flex items-center gap-1">
+                                            <NicknameRenderer 
+                                                :nickname="user.username" 
+                                                :decorationClass="user.equippedDecorationClass"
+                                                :role="user.role"
+                                                :show-avatar="false"
+                                                class="text-sm"
+                                            />
+                                            <TierBadge v-if="user.solvedacTier" :tier="user.solvedacTier" size="xs" :show-roman="false" />
+                                        </div>
                                     </div>
                                 </div>
                                 <div v-if="user.friendshipStatus === 'ACCEPTED'" class="px-2 py-1 bg-slate-100 text-slate-400 text-[10px] font-bold rounded-md flex items-center gap-1">
@@ -282,17 +295,56 @@
                         </div>
                     </div>
 
-                    <!-- 가이드 -->
-                    <div class="bg-gradient-to-br from-pink-50 to-violet-50 rounded-3xl p-6 border border-pink-100">
+                    <!-- 탭별 동적 콘텐츠 -->
+                    <!-- 쪽지함 탭: 팁 -->
+                    <div v-if="activeTab === 'messages'" class="bg-gradient-to-br from-blue-50 to-cyan-50 rounded-3xl p-6 border border-blue-100">
                         <h3 class="font-bold text-slate-700 text-sm mb-2 flex items-center gap-2">
-                            <div class="w-6 h-6 bg-pink-500 rounded-lg flex items-center justify-center text-white">
+                            <div class="w-6 h-6 bg-blue-500 rounded-lg flex items-center justify-center text-white">
                                 <MessageCircle :size="12" />
                             </div>
-                            친구와 함께해요
+                            쪽지 TIP
                         </h3>
                         <p class="text-xs text-slate-500 leading-relaxed">
-                            같은 문제를 풀거나 서로의 코드를 리뷰하며 함께 성장할 수 있어요!
+                            친구에게 코드 질문이나 풀이 힌트를 요청해보세요!
+                            함께 공부하면 더 빨리 성장할 수 있어요.
                         </p>
+                    </div>
+
+                    <!-- 친구 탭: 통계 -->
+                    <div v-if="activeTab === 'friends'" class="bg-gradient-to-br from-emerald-50 to-teal-50 rounded-3xl p-6 border border-emerald-100">
+                        <h3 class="font-bold text-slate-700 text-sm mb-3 flex items-center gap-2">
+                            <div class="w-6 h-6 bg-emerald-500 rounded-lg flex items-center justify-center text-white">
+                                <Users :size="12" />
+                            </div>
+                            친구 통계
+                        </h3>
+                        <div class="grid grid-cols-2 gap-3">
+                            <div class="bg-white rounded-xl p-3 text-center shadow-sm">
+                                <div class="text-2xl font-black text-emerald-600">{{ friends.length }}</div>
+                                <div class="text-[10px] text-slate-400 font-bold">총 친구</div>
+                            </div>
+                            <div class="bg-white rounded-xl p-3 text-center shadow-sm">
+                                <div class="text-2xl font-black text-teal-600">{{ avgTier }}</div>
+                                <div class="text-[10px] text-slate-400 font-bold">평균 티어</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 친구 요청 탭: 가이드 -->
+                    <div v-if="activeTab === 'requests'" class="bg-gradient-to-br from-pink-50 to-violet-50 rounded-3xl p-6 border border-pink-100">
+                        <h3 class="font-bold text-slate-700 text-sm mb-2 flex items-center gap-2">
+                            <div class="w-6 h-6 bg-pink-500 rounded-lg flex items-center justify-center text-white">
+                                <Bell :size="12" />
+                            </div>
+                            친구 요청
+                        </h3>
+                        <p class="text-xs text-slate-500 leading-relaxed">
+                            친구 요청을 수락하면 서로의 풀이를 볼 수 있고,
+                            쪽지를 주고받을 수 있어요!
+                        </p>
+                        <div v-if="requests.length > 0" class="mt-3 text-sm font-bold text-pink-600">
+                            📬 {{ requests.length }}개의 요청이 대기 중
+                        </div>
                     </div>
                 </aside>
 
@@ -305,8 +357,9 @@
 import { ref, watch, onMounted, onBeforeUnmount, computed, nextTick } from 'vue';
 import { useRoute } from 'vue-router';
 import { socialApi } from '@/api/social';
-import { Loader2, Users, Bell, Search, UserPlus, MessageCircle, UserMinus, CheckCircle2, ChevronRight, ChevronLeft, Send } from 'lucide-vue-next';
+import { Loader2, Users, Bell, Search, UserPlus, MessageCircle, UserMinus, CheckCircle2, ChevronRight, ChevronLeft, Send, BookOpen } from 'lucide-vue-next';
 import NicknameRenderer from '@/components/common/NicknameRenderer.vue';
+import TierBadge from '@/components/common/TierBadge.vue';
 import { useDirectMessageModal } from '@/composables/useDirectMessageModal';
 
 const route = useRoute();
@@ -322,6 +375,26 @@ const mainTabs = computed(() => [
     { id: 'friends', label: '내 친구', count: 0, showBadge: false },
     { id: 'requests', label: '친구 요청', count: requests.value.length, showBadge: true },
 ]);
+
+// 친구 평균 티어 계산
+const avgTier = computed(() => {
+    const tieredFriends = friends.value.filter(f => f.friend?.solvedacTier);
+    if (tieredFriends.length === 0) return '-';
+    const sum = tieredFriends.reduce((acc, f) => acc + f.friend.solvedacTier, 0);
+    const avg = Math.round(sum / tieredFriends.length);
+    return getTierName(avg);
+});
+
+const getTierName = (tier) => {
+    if (!tier || tier === 0) return '-';
+    if (tier <= 5) return 'B' + (6 - tier);
+    if (tier <= 10) return 'S' + (11 - tier);
+    if (tier <= 15) return 'G' + (16 - tier);
+    if (tier <= 20) return 'P' + (21 - tier);
+    if (tier <= 25) return 'D' + (26 - tier);
+    if (tier <= 30) return 'R' + (31 - tier);
+    return 'M';
+};
 
 // 검색 (Search)
 const searchQuery = ref('');
