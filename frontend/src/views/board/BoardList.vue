@@ -29,21 +29,15 @@
                   class="w-full pl-12 pr-4 py-3 bg-white border border-slate-200 rounded-xl text-slate-700 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-brand-400 focus:border-transparent shadow-sm"
                 />
               </div>
-              <button @click="searchPosts" class="px-6 py-3 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl font-bold transition-colors shadow-sm">
-                검색
-              </button>
-              <button v-if="searchProblemNumber" @click="clearSearch" class="px-4 py-3 text-slate-500 hover:text-slate-700 transition-colors">
-                초기화
-              </button>
-              <div class="w-px h-full bg-slate-200 mx-1"></div>
-              <button
-                @click="$router.push('/boards/write')"
-                class="flex items-center gap-2 px-5 py-3 bg-brand-600 hover:bg-brand-500 text-white rounded-xl font-bold transition-all shadow-md shadow-brand-200 hover:-translate-y-0.5 shrink-0"
-              >
-                <PenSquare :size="18" />
-                글쓰기
-              </button>
-            </div>
+              전국 게시판
+            </h1>
+            <button
+              @click="$router.push('/boards/write')"
+              class="flex items-center gap-2 px-5 py-3 bg-brand-600 hover:bg-brand-500 text-white rounded-xl font-bold transition-all shadow-md shadow-brand-200 hover:-translate-y-0.5 shrink-0"
+            >
+              <PenSquare :size="18" />
+              글쓰기
+            </button>
           </div>
 
           <!-- 게시판 목록 -->
@@ -129,8 +123,8 @@
           </div>
         </main>
 
-        <!-- 오른쪽 컬럼: 사이드바 (인기글) -->
-        <aside class="hidden xl:flex w-[380px] shrink-0 flex-col gap-6 sticky top-8 h-[calc(100vh-4rem)]">
+        <!-- 오른쪽 컬럼: 사이드바 (인기글 + 검색) -->
+        <aside class="hidden lg:flex w-[380px] shrink-0 flex-col gap-6 sticky top-8 h-fit">
           <!-- 인기글 섹션 -->
           <div v-if="popularPosts.length > 0 && !searchProblemNumber" class="bg-white rounded-3xl p-6 shadow-sm border border-slate-200 animate-fade-in-up">
             <h2 class="text-lg font-bold text-slate-800 mb-6 flex items-center gap-2">
@@ -169,8 +163,28 @@
               </div>
             </div>
           </div>
+
+          <!-- 검색 UI -->
+          <div class="bg-slate-50/90 backdrop-blur-md p-6 rounded-3xl border border-slate-100 shadow-sm">
+            <label class="block text-sm font-bold text-slate-500 mb-3 ml-1 flex items-center justify-between">
+               <span>문제 번호 검색</span>
+               <span v-if="searchProblemNumber" class="text-brand-600 cursor-pointer hover:underline" @click="clearSearch">
+                  전체 목록 보기
+               </span>
+            </label>
+            <div class="relative">
+              <input 
+                v-model="searchProblemNumber"
+                @keyup.enter="searchPosts"
+                type="number"
+                placeholder="예: 1234"
+                class="w-full bg-white border border-slate-200 rounded-2xl pl-12 pr-4 py-4 font-medium text-slate-800 focus:outline-none focus:border-brand-500 focus:ring-4 focus:ring-brand-500/10 transition-all shadow-sm placeholder:text-slate-400"
+              />
+              <Search class="w-5 h-5 text-slate-400 absolute left-4 top-1/2 -translate-y-1/2" />
+            </div>
+          </div>
           
-          <!-- 추가 정보 또는 플레이스홀더 -->
+          <!-- 가이드 정보 -->
           <div class="bg-gradient-to-br from-slate-50 to-brand-50/20 rounded-3xl p-6 border border-slate-100">
             <h3 class="font-bold text-slate-700 text-sm mb-2 flex items-center gap-2">
               <div class="w-6 h-6 bg-brand-500 rounded-lg flex items-center justify-center text-white shadow-sm">

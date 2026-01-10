@@ -8,6 +8,6 @@ export const authApi = {
     },
     // Logout - calls /logout directly (not /api/logout)
     logout() {
-        return axios.post('/logout', null, { withCredentials: true });
+        return axios.post('/api/logout', null, { withCredentials: true });
     },
 };

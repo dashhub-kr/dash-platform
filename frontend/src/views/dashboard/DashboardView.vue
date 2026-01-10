@@ -276,7 +276,7 @@
             </main>
 
             <!-- 3. 우측 사이드바 컬럼 (통계 + 활동 + 분석 패널) -->
-            <aside class="hidden xl:flex w-[380px] shrink-0 flex-col gap-6 sticky top-8 h-[calc(100vh-4rem)]">
+            <aside class="hidden lg:flex w-[380px] shrink-0 flex-col gap-6 sticky top-8 h-[calc(100vh-4rem)]">
                 
                 <!-- 1. 통계 열 (이동됨) -->
                 <!-- 1. 통계 열 (UserQuickStats) -->

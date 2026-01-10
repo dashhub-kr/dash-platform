@@ -192,10 +192,39 @@ public class StudyAnalysisService {
                     break;
 
                 String pNum = p.getProblemId();
-                boolean allSolved = memberSolvedSets.stream().allMatch(set -> set.contains(pNum));
 
-                if (!allSolved) {
-                    newProblems.add(p);
+                // 해당 문제를 푼 멤버 식별 (N+1 문제 해결을 위해 memberSolvedSets 사용)
+                List<ProblemRecommendationResponse.SolvedMember> solvedBy = new ArrayList<>();
+                for (int i = 0; i < members.size(); i++) {
+                    User m = members.get(i);
+                    java.util.Set<String> solvedSet = memberSolvedSets.get(i);
+                    if (solvedSet.contains(pNum)) {
+                        solvedBy.add(new ProblemRecommendationResponse.SolvedMember(
+                                m.getId(),
+                                m.getUsername(),
+                                m.getAvatarUrl()));
+                    }
+                }
+
+                int solvedCount = solvedBy.size();
+                int teamSize = members.size();
+
+                // 필터링 로직:
+                // 1. 과반수 미만이 푼 문제만 추천 (solvedCount < teamSize / 2.0)
+                // - 예: 5명 중 0~2명 (O), 3명 (X)
+                // - 예: 4명 중 0~1명 (O), 2명 (X - 딱 절반도 제외)
+                // 2. 당연히 전원이 푼 문제는 제외
+                boolean isMinoritySolved = solvedCount < (teamSize / 2.0);
+
+                if (isMinoritySolved && solvedCount < teamSize) {
+                    // Response 객체 재생성 (solvedMembers 추가)
+                    ProblemRecommendationResponse updatedResponse = new ProblemRecommendationResponse(
+                            p.getProblemId(),
+                            p.getTitle(),
+                            p.getLevel(),
+                            p.getTags(),
+                            solvedBy);
+                    newProblems.add(updatedResponse);
                 }
             }
 

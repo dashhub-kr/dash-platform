@@ -207,10 +207,10 @@ public class GitHubPushEventWorker {
                 now);
 
         LocalDateTime committedAt = metadataExtractor.parseCommittedAt(file.committedAt());
-        // Docker 타임존이 Asia/Seoul로 설정되어 있으므로 수동 오프셋이 필요하지 않음
-        // if (committedAt != null) {
-        //     committedAt = committedAt.plusHours(9);
-        // }
+        // GitHub timestamp는 UTC로 오므로 KST로 변환 (9시간 추가)
+        if (committedAt != null) {
+            committedAt = committedAt.plusHours(9);
+        }
 
         record.enrichMetadata(
                 metadata.platform(),

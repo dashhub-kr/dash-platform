@@ -23,23 +23,24 @@ import java.util.Collections;
 @EnableMethodSecurity
 public class SecurityConfig {
 
-    private final CustomOAuth2UserService customOAuth2UserService;
-    private final com.ssafy.dash.common.ratelimit.GlobalRateLimitFilter globalRateLimitFilter;
-    
-    @Value("${app.frontend.url:http://localhost:5173}")
-    private String frontendUrl;
+        private final CustomOAuth2UserService customOAuth2UserService;
+        private final com.ssafy.dash.common.ratelimit.GlobalRateLimitFilter globalRateLimitFilter;
 
-    public SecurityConfig(CustomOAuth2UserService customOAuth2UserService,
-                          com.ssafy.dash.common.ratelimit.GlobalRateLimitFilter globalRateLimitFilter) {
-        this.customOAuth2UserService = customOAuth2UserService;
-        this.globalRateLimitFilter = globalRateLimitFilter;
-    }
+        @Value("${app.frontend.url:http://localhost:5173}")
+        private String frontendUrl;
 
-    @Bean
-    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-        http
-                .addFilterBefore(globalRateLimitFilter, org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter.class)
-                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+        public SecurityConfig(CustomOAuth2UserService customOAuth2UserService,
+                        com.ssafy.dash.common.ratelimit.GlobalRateLimitFilter globalRateLimitFilter) {
+                this.customOAuth2UserService = customOAuth2UserService;
+                this.globalRateLimitFilter = globalRateLimitFilter;
+        }
+
+        @Bean
+        public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+                http
+                                .addFilterBefore(globalRateLimitFilter,
+                                                org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter.class)
+                                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                                 .csrf(AbstractHttpConfigurer::disable)
                                 .authorizeHttpRequests(auth -> auth
                                                 .requestMatchers(
@@ -72,10 +73,13 @@ public class SecurityConfig {
                                                                 .userService(customOAuth2UserService))
                                                 .defaultSuccessUrl(frontendUrl + "/oauth2/redirect", true))
                                 .logout(logout -> logout
-                                                .logoutUrl("/logout")
+                                                .logoutUrl("/api/logout")
                                                 .invalidateHttpSession(true)
+                                                .clearAuthentication(true)
                                                 .deleteCookies("JSESSIONID")
                                                 .logoutSuccessHandler((request, response, authentication) -> {
+                                                        org.springframework.security.core.context.SecurityContextHolder
+                                                                        .clearContext();
                                                         response.setStatus(200);
                                                 }));
 
@@ -85,7 +89,9 @@ public class SecurityConfig {
         @Bean
         public CorsConfigurationSource corsConfigurationSource() {
                 CorsConfiguration configuration = new CorsConfiguration();
-                configuration.setAllowedOrigins(Arrays.asList("http://localhost:5173", "http://localhost:8080", frontendUrl)); // 로컬 + 운영
+                configuration.setAllowedOrigins(
+                                Arrays.asList("http://localhost:5173", "http://localhost:8080", frontendUrl)); // 로컬 +
+                                                                                                               // 운영
                 configuration.setAllowedMethods(Collections.singletonList("*"));
                 configuration.setAllowedHeaders(Collections.singletonList("*"));
                 configuration.setAllowCredentials(true);

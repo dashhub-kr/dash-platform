@@ -114,7 +114,8 @@ public class ProblemService {
                             .map(tagService::getKoreanName)
                             .toList();
                     return com.ssafy.dash.problem.presentation.dto.response.ProblemRecommendationResponse.from(problem,
-                            displayTags);
+                            displayTags,
+                            null);
                 })
                 .collect(java.util.stream.Collectors.toList());
     }

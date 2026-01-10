@@ -30,6 +30,7 @@ public class SkillGraphResponse {
         private Long familyId; // 패밀리 ID
         private Integer solved; // 사용자 푼 문제 수
         private String masteryLevel; // 마스터리 레벨
+        private Boolean isCore; // 핵심 태그 여부
     }
 
     @Getter

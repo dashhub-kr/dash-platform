@@ -77,10 +77,28 @@
                                 {{ getFormattedTierName(problem.level) }}
                            </span>
                       </div>
+
+                       <!-- 이미 푼 멤버 표시 -->
+                       <div v-if="problem.solvedMembers && problem.solvedMembers.length > 0" 
+                            class="mt-3 flex items-center gap-2 cursor-pointer group/members"
+                            @click.prevent.stop="toggleMemberPopup(problem.problemId, $event)">
+                            <div class="flex -space-x-1.5">
+                               <template v-for="member in problem.solvedMembers.slice(0, 5)" :key="member.id">
+                                   <div class="relative group/avatar">
+                                       <img :src="member.avatarUrl" :alt="member.username" class="w-5 h-5 rounded-full border border-white ring-1 ring-emerald-50 bg-slate-100 object-cover" />
+                                       <div class="absolute left-1/2 -translate-x-1/2 -top-8 bg-slate-800 text-white text-[10px] font-bold px-2 py-1 rounded-lg opacity-0 group-hover/avatar:opacity-100 transition-opacity whitespace-nowrap pointer-events-none z-50">{{ member.username }}</div>
+                                   </div>
+                               </template>
+                               <div v-if="problem.solvedMembers.length > 5" class="w-5 h-5 rounded-full bg-emerald-50 border border-white flex items-center justify-center text-[8px] font-bold text-emerald-600">
+                                   +{{ problem.solvedMembers.length - 5 }}
+                               </div>
+                           </div>
+                           <span class="text-[10px] text-emerald-600 font-bold bg-emerald-50 px-1.5 py-0.5 rounded-md">멘토 가능</span>
+                      </div>
                     </a>
                     <!-- 팀장 전용: 미션 등록 버튼 -->
                     <button v-if="isLeader"
-                            @click.stop="registerAsMission(problem)"
+                            @click.prevent.stop="registerAsMission(problem)"
                             class="absolute top-3 right-3 px-2 py-1 bg-brand-500 hover:bg-brand-600 text-white text-[10px] font-bold rounded-lg shadow-md transition-all opacity-0 group-hover:opacity-100 flex items-center gap-1">
                       <Pin class="w-3 h-3" /> 미션 등록
                     </button>
@@ -95,7 +113,7 @@
           </main>
   
           <!-- 오른쪽 칼럼: 사이드바 -->
-          <aside class="hidden xl:flex w-[380px] shrink-0 sticky top-8 h-fit">
+          <aside class="hidden lg:flex w-[380px] shrink-0 sticky top-8 h-fit">
               <StudyAnalysisSidebar :analysis="analysis" :memberColors="memberColors" />
           </aside>
       </div>
@@ -120,10 +138,28 @@
         @refresh="loadMissions"
     />
   </div>
+    <!-- Member Popup Teleport -->
+    <Teleport to="body">
+       <div v-if="currentPopupProblem" @click.stop 
+            class="fixed bg-white text-slate-800 rounded-2xl z-[9999] min-w-[200px] max-h-[300px] overflow-y-auto shadow-2xl border border-slate-100 p-3 animate-in fade-in zoom-in-95 duration-200" 
+            :style="{ 
+                top: `${popupPosition.top}px`, 
+                left: `${popupPosition.left}px`,
+                transform: 'translate(-50%, -100%) translateY(-10px)'
+            }">
+          <div class="text-slate-400 text-[10px] uppercase tracking-wider mb-2 pb-2 border-b border-slate-100 font-bold flex justify-between items-center">
+            <span>해결한 멤버</span>
+            <span class="text-slate-900">{{ currentPopupProblem.solvedMembers.length }}명</span>
+          </div>
+          <div v-for="member in currentPopupProblem.solvedMembers" :key="member.id" class="flex items-center gap-3 py-2 border-b border-slate-50 last:border-0 hover:bg-slate-50 px-2 rounded-lg transition-colors">
+             <NicknameRenderer :username="member.username" :avatar-url="member.avatarUrl" avatar-class="w-8 h-8 ring-2 ring-white shadow-sm" text-class="text-sm font-bold text-slate-700" :show-avatar="true" />
+          </div>
+       </div>
+    </Teleport>
 </template>
 
 <script setup>
-import { ref, onMounted, computed } from 'vue';
+import { ref, onMounted, onUnmounted, computed } from 'vue';
 import { useRouter } from 'vue-router';
 import axios from 'axios';
 import { Radar } from 'vue-chartjs';
@@ -143,6 +179,40 @@ const familyStats = ref([]);
 const curriculum = ref([]);
 const studyId = ref(null);
 const isLeader = ref(false);
+
+// 팝업 상태
+const openPopupProblemId = ref(null);
+const popupPosition = ref({ top: 0, left: 0 });
+
+const toggleMemberPopup = (problemId, event) => {
+    if (openPopupProblemId.value === problemId) {
+        openPopupProblemId.value = null;
+    } else {
+        const rect = event.currentTarget.getBoundingClientRect();
+        popupPosition.value = {
+            top: rect.top, // Fixed layout uses viewport coordinates, scrollY is not needed
+            left: rect.left + rect.width / 2
+        };
+        openPopupProblemId.value = problemId;
+    }
+};
+
+const closeMemberPopup = () => {
+    openPopupProblemId.value = null;
+};
+
+const currentPopupProblem = computed(() => {
+    if (!openPopupProblemId.value) return null;
+    return curriculum.value.find(p => p.problemId === openPopupProblemId.value);
+});
+
+// 외부 클릭 감지
+onMounted(() => {
+    document.addEventListener('click', closeMemberPopup);
+});
+onUnmounted(() => {
+    document.removeEventListener('click', closeMemberPopup);
+});
 
 // 모달 관련 상태
 const showCreateModal = ref(false);

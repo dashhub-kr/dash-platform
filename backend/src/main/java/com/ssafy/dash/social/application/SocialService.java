@@ -8,6 +8,7 @@ import com.ssafy.dash.social.domain.Friendship;
 import com.ssafy.dash.social.domain.FriendshipRepository;
 import com.ssafy.dash.user.domain.User;
 import com.ssafy.dash.user.domain.UserRepository;
+import com.ssafy.dash.common.encrypt.AesEncryptor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -23,7 +24,9 @@ public class SocialService {
     private final FriendshipRepository friendshipRepository;
     private final DirectMessageRepository directMessageRepository;
     private final UserRepository userRepository;
+    private final com.ssafy.dash.algorithm.domain.AlgorithmRecordRepository algorithmRecordRepository;
     private final NotificationService notificationService;
+    private final AesEncryptor aesEncryptor;
 
     // --- 친구 관계 (Friendship) ---
 
@@ -119,7 +122,8 @@ public class SocialService {
             throw new IllegalArgumentException("Cannot message yourself");
         }
 
-        DirectMessage dm = DirectMessage.create(senderId, receiverId, content);
+        String encryptedContent = aesEncryptor.encrypt(content);
+        DirectMessage dm = DirectMessage.create(senderId, receiverId, encryptedContent);
         directMessageRepository.save(dm);
 
         // 수신자에게 알림 전송
@@ -141,7 +145,18 @@ public class SocialService {
         return directMessageRepository.findConversation(userId, partnerId).stream()
                 .map(dm -> {
                     User sender = dm.getSenderId().equals(userId) ? me : partner;
-                    return com.ssafy.dash.social.application.dto.result.MessageResult.from(dm, sender, userId);
+                    String decryptedContent = aesEncryptor.decrypt(dm.getContent());
+
+                    return new com.ssafy.dash.social.application.dto.result.MessageResult(
+                            dm.getId(),
+                            sender.getId(),
+                            sender.getUsername(),
+                            sender.getAvatarUrl(),
+                            sender.getEquippedDecorationClass(),
+                            decryptedContent,
+                            dm.isRead(),
+                            dm.getCreatedAt(),
+                            sender.getId().equals(userId));
                 })
                 .collect(Collectors.toList());
     }
@@ -171,6 +186,83 @@ public class SocialService {
             }
             return com.ssafy.dash.user.application.dto.result.UserResult.from(u, status);
         }).collect(Collectors.toList());
+    }
+
+    @Transactional(readOnly = true)
+    public List<com.ssafy.dash.social.application.dto.result.ConversationResult> getConversations(Long userId) {
+        List<Long> partnerIds = directMessageRepository.findRecentChatPartners(userId);
+
+        return partnerIds.stream().map(partnerId -> {
+            User partner = userRepository.findById(partnerId).orElse(null);
+            if (partner == null)
+                return null;
+
+            List<DirectMessage> messages = directMessageRepository.findConversation(userId, partnerId);
+            DirectMessage lastMessage = messages.isEmpty() ? null : messages.get(messages.size() - 1);
+
+            String lastMessagePreview = lastMessage != null ? aesEncryptor.decrypt(lastMessage.getContent()) : null;
+            int unreadCount = (int) messages.stream()
+                    .filter(m -> m.getReceiverId().equals(userId) && !m.isRead())
+                    .count();
+
+            return com.ssafy.dash.social.application.dto.result.ConversationResult.of(
+                    partner.getId(),
+                    partner.getUsername(),
+                    partner.getAvatarUrl(),
+                    partner.getEquippedDecorationClass(),
+                    lastMessagePreview,
+                    lastMessage != null ? lastMessage.getCreatedAt() : null,
+                    unreadCount);
+        }).filter(java.util.Objects::nonNull).collect(Collectors.toList());
+    }
+
+    // --- 친구 피드 (Feed) ---
+    @Transactional(readOnly = true)
+    public List<com.ssafy.dash.social.application.dto.result.FeedResult> getFriendFeed(
+            Long userId, int page, int size) {
+
+        // 친구 목록 조회
+        List<Friendship> friendships = friendshipRepository.findByUserId(userId);
+        List<Long> friendIds = friendships.stream()
+                .filter(f -> f.getStatus() == Friendship.FriendshipStatus.ACCEPTED)
+                .map(f -> f.getRequesterId().equals(userId) ? f.getReceiverId() : f.getRequesterId())
+                .distinct()
+                .collect(Collectors.toList());
+
+        if (friendIds.isEmpty()) {
+            return java.util.Collections.emptyList();
+        }
+
+        // 친구들의 algorithm_record 조회
+        List<com.ssafy.dash.social.application.dto.result.FeedResult> allFeeds = friendIds
+                .stream().<com.ssafy.dash.social.application.dto.result.FeedResult>flatMap(friendId -> {
+                    User friend = userRepository.findById(friendId).orElse(null);
+                    if (friend == null)
+                        return java.util.stream.Stream.empty();
+
+                    return algorithmRecordRepository.findByUserId(friendId).stream()
+                            .map(record -> com.ssafy.dash.social.application.dto.result.FeedResult.solved(
+                                    record.getId(),
+                                    friend.getId(),
+                                    friend.getUsername(),
+                                    friend.getAvatarUrl(),
+                                    friend.getSolvedacTier(),
+                                    Long.parseLong(record.getProblemNumber()),
+                                    record.getTitle(),
+                                    record.getCreatedAt()));
+                })
+                .sorted((a, b) -> b.createdAt().compareTo(a.createdAt()))
+                .collect(Collectors.toList());
+
+        // 페이징 처리
+        int start = page * size;
+        int end = Math.min(start + size, allFeeds.size());
+
+        if (start >= allFeeds.size()) {
+            return java.util.Collections.emptyList();
+        }
+
+        return allFeeds.subList(start, end);
     }
 
 }

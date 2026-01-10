@@ -28,15 +28,20 @@
         UPDATE direct_messages SET is_read = #{isRead} WHERE id = #{id}
     </update>
     
-    <!-- 사용자와 대화한 고유 사용자 ID 목록 반환 -->
+    <!-- 사용자와 대화한 고유 사용자 ID 목록 반환 (최신 대화 순) -->
     <select id="findRecentChatPartners" resultType="long">
-        SELECT DISTINCT CASE 
-            WHEN sender_id = #{userId} THEN receiver_id 
-            ELSE sender_id 
-        END as partner_id
-        FROM direct_messages
-        WHERE sender_id = #{userId} OR receiver_id = #{userId}
-        ORDER BY created_at DESC
+        SELECT partner_id FROM (
+            SELECT 
+                CASE 
+                    WHEN sender_id = #{userId} THEN receiver_id 
+                    ELSE sender_id 
+                END as partner_id,
+                MAX(created_at) as last_message_time
+            FROM direct_messages
+            WHERE sender_id = #{userId} OR receiver_id = #{userId}
+            GROUP BY partner_id
+        ) AS subquery
+        ORDER BY last_message_time DESC
         LIMIT 20
     </select>
 

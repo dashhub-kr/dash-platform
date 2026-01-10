@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ssafy.dash.battle.infrastructure.BattleMapper">
+
+    <!-- Battle -->
+    <insert id="insertBattle" parameterType="com.ssafy.dash.battle.domain.Battle" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO battle (type, creator_id, status, problem_ids, created_at)
+        VALUES (#{type}, #{creatorId}, #{status}, #{problemIds}, #{createdAt})
+    </insert>
+
+    <update id="updateBattle" parameterType="com.ssafy.dash.battle.domain.Battle">
+        UPDATE battle SET
+            status = #{status},
+            started_at = #{startedAt},
+            completed_at = #{completedAt}
+        WHERE id = #{id}
+    </update>
+
+    <select id="selectById" parameterType="Long" resultType="com.ssafy.dash.battle.domain.Battle">
+        SELECT id, type, creator_id as creatorId, status, problem_ids as problemIds,
+               created_at as createdAt, started_at as startedAt, completed_at as completedAt
+        FROM battle WHERE id = #{id}
+    </select>
+
+    <select id="selectByUserId" parameterType="Long" resultType="com.ssafy.dash.battle.domain.Battle">
+        SELECT DISTINCT b.id, b.type, b.creator_id as creatorId, b.status, b.problem_ids as problemIds,
+               b.created_at as createdAt, b.started_at as startedAt, b.completed_at as completedAt
+        FROM battle b
+        JOIN battle_participant bp ON b.id = bp.battle_id
+        WHERE bp.user_id = #{userId}
+        ORDER BY b.created_at DESC
+    </select>
+
+    <select id="selectPendingBattlesForUser" parameterType="Long" resultType="com.ssafy.dash.battle.domain.Battle">
+        SELECT b.id, b.type, b.creator_id as creatorId, b.status, b.problem_ids as problemIds,
+               b.created_at as createdAt, b.started_at as startedAt, b.completed_at as completedAt
+        FROM battle b
+        JOIN battle_participant bp ON b.id = bp.battle_id
+        WHERE bp.user_id = #{userId} AND bp.status = 'INVITED' AND b.status = 'PENDING'
+        ORDER BY b.created_at DESC
+    </select>
+
+    <!-- BattleParticipant -->
+    <insert id="insertParticipant" parameterType="com.ssafy.dash.battle.domain.BattleParticipant" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO battle_participant (battle_id, user_id, status, score, problems_solved, total_time_seconds)
+        VALUES (#{battleId}, #{userId}, #{status}, #{score}, #{problemsSolved}, #{totalTimeSeconds})
+    </insert>
+
+    <update id="updateParticipant" parameterType="com.ssafy.dash.battle.domain.BattleParticipant">
+        UPDATE battle_participant SET
+            status = #{status},
+            score = #{score},
+            problems_solved = #{problemsSolved},
+            total_time_seconds = #{totalTimeSeconds},
+            started_at = #{startedAt},
+            completed_at = #{completedAt}
+        WHERE id = #{id}
+    </update>
+
+    <select id="selectParticipantsByBattleId" parameterType="Long" resultType="com.ssafy.dash.battle.domain.BattleParticipant">
+        SELECT bp.id, bp.battle_id as battleId, bp.user_id as userId, bp.status,
+               bp.score, bp.problems_solved as problemsSolved, bp.total_time_seconds as totalTimeSeconds,
+               bp.started_at as startedAt, bp.completed_at as completedAt,
+               u.username as userName, u.avatar_url as userAvatar, u.solvedac_tier as userTier
+        FROM battle_participant bp
+        JOIN user u ON bp.user_id = u.id
+        WHERE bp.battle_id = #{battleId}
+    </select>
+
+    <select id="selectParticipant" resultType="com.ssafy.dash.battle.domain.BattleParticipant">
+        SELECT bp.id, bp.battle_id as battleId, bp.user_id as userId, bp.status,
+               bp.score, bp.problems_solved as problemsSolved, bp.total_time_seconds as totalTimeSeconds,
+               bp.started_at as startedAt, bp.completed_at as completedAt
+        FROM battle_participant bp
+        WHERE bp.battle_id = #{battleId} AND bp.user_id = #{userId}
+    </select>
+
+</mapper>

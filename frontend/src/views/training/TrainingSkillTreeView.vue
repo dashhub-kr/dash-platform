@@ -21,7 +21,7 @@
         </main>
 
         <!-- 오른쪽 칼럼: 사이드바 -->
-        <aside class="hidden xl:flex w-[380px] shrink-0 flex-col gap-6 sticky top-8 h-fit">
+        <aside class="hidden lg:flex w-[380px] shrink-0 flex-col gap-6 sticky top-8 h-fit">
           
           <!-- 1. 통계 열 (UserQuickStats) -->
           <UserQuickStats 

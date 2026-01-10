@@ -73,6 +73,12 @@ public class SocialController {
 
     // --- 메시징 (Messaging) ---
 
+    @GetMapping("/conversations")
+    public ResponseEntity<List<com.ssafy.dash.social.application.dto.result.ConversationResult>> getConversations(
+            @AuthenticationPrincipal CustomOAuth2User userPrincipal) {
+        return ResponseEntity.ok(socialService.getConversations(userPrincipal.getUserId()));
+    }
+
     @GetMapping("/messages/{partnerId}")
     public ResponseEntity<List<MessageResult>> getConversation(
             @AuthenticationPrincipal CustomOAuth2User userPrincipal,
@@ -90,5 +96,14 @@ public class SocialController {
         String content = (String) payload.get("content");
         socialService.sendMessage(userPrincipal.getUserId(), receiverId, content);
         return ResponseEntity.ok().build();
+    }
+
+    // --- 친구 피드 (Feed) ---
+    @GetMapping("/feed")
+    public ResponseEntity<List<com.ssafy.dash.social.application.dto.result.FeedResult>> getFeed(
+            @AuthenticationPrincipal CustomOAuth2User userPrincipal,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "20") int size) {
+        return ResponseEntity.ok(socialService.getFriendFeed(userPrincipal.getUserId(), page, size));
     }
 }

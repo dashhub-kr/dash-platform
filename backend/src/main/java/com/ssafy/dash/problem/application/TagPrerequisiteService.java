@@ -51,12 +51,13 @@ public class TagPrerequisiteService {
 
         // 노드 생성
         List<SkillGraphResponse.Node> nodes = allTags.stream()
-                .filter(t -> !"C".equals(t.getImportanceTier())) // C티어 제외
+                // .filter(t -> !"C".equals(t.getImportanceTier())) // C티어 제외 로직 제거 (모든 태그 노출)
                 .map(tag -> SkillGraphResponse.Node.builder()
                         .id(tag.getTagKey())
                         .label(tag.getDisplayNames() != null ? tag.getDisplayNames() : tag.getTagKey())
                         .tier(tag.getImportanceTier())
                         .familyId(tag.getFamilyId())
+                        .isCore(tag.getIsCore())
                         .build())
                 .collect(Collectors.toList());
 
