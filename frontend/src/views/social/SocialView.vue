@@ -27,7 +27,7 @@
                             :class="activeTab === tab.id ? 'bg-white text-brand-600 shadow-sm' : 'text-slate-400 hover:text-slate-600'"
                         >
                             {{ tab.label }}
-                            <span v-if="tab.count > 0" class="ml-1 px-1.5 py-0.5 bg-rose-500 text-white text-[10px] rounded-full">{{ tab.count }}</span>
+                            <span v-if="tab.showBadge && tab.count > 0" class="ml-1 px-1.5 py-0.5 bg-rose-500 text-white text-[10px] rounded-full">{{ tab.count }}</span>
                         </button>
                     </div>
 
@@ -78,27 +78,31 @@
                                 <Users :size="48" class="mx-auto mb-4 opacity-20"/>
                                 <p>아직 친구가 없어요. 오른쪽에서 친구를 찾아보세요!</p>
                             </div>
-                            <div v-else class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                <div v-for="item in friends" :key="item.id" class="p-4 rounded-2xl border border-slate-100 bg-slate-50 hover:bg-white hover:border-brand-200 hover:shadow-md transition-all group">
+                            <div v-else class="space-y-3">
+                                <div v-for="item in friends" :key="item.id" 
+                                     class="flex items-center justify-between p-4 rounded-2xl border border-slate-100 hover:bg-slate-50 hover:border-slate-200 transition-all group">
                                     <div class="flex items-center gap-4">
-                                        <img :src="(item.friend.avatarUrl && !item.friend.avatarUrl.includes('dicebear')) ? item.friend.avatarUrl : '/images/profiles/default-profile.png'" class="w-12 h-12 rounded-full border border-slate-200 bg-white object-cover"/>
+                                        <img :src="(item.friend.avatarUrl && !item.friend.avatarUrl.includes('dicebear')) ? item.friend.avatarUrl : '/images/profiles/default-profile.png'" 
+                                             class="w-12 h-12 rounded-full border-2 border-white shadow-sm bg-white object-cover"/>
                                         <div class="flex-1 min-w-0">
                                             <NicknameRenderer 
                                                 :nickname="item.friend.username" 
                                                 :decorationClass="item.friend.equippedDecorationClass"
                                                 :role="item.friend.role"
                                                 :show-avatar="false"
-                                                class="text-base"
+                                                class="text-base font-semibold"
                                             />
-                                            <div class="text-xs text-slate-400 truncate">{{ item.friend.email }}</div>
+                                            <div class="text-xs text-slate-400 truncate mt-0.5">{{ item.friend.email }}</div>
                                         </div>
                                     </div>
-                                    <div class="mt-4 flex gap-2">
-                                         <button @click="openDM(item.friend.id, item.friend.username, item.friend.avatarUrl, item.friend.equippedDecorationClass)" class="flex-1 py-2 bg-brand-500 text-white rounded-xl text-sm font-bold hover:bg-brand-600 transition-colors flex items-center justify-center gap-2">
-                                            <MessageCircle :size="16"/> 쪽지
+                                    <div class="flex items-center gap-2">
+                                         <button @click="openDM(item.friend.id, item.friend.username, item.friend.avatarUrl, item.friend.equippedDecorationClass)" 
+                                                 class="p-2.5 bg-brand-500 text-white rounded-xl hover:bg-brand-600 transition-colors" title="쪽지 보내기">
+                                            <MessageCircle :size="18"/>
                                          </button>
-                                         <button @click="deleteFriend(item.friend.id)" class="px-3 py-2 bg-slate-200 text-slate-500 rounded-xl hover:bg-rose-100 hover:text-rose-500 transition-colors">
-                                            <UserMinus :size="16"/>
+                                         <button @click="deleteFriend(item.friend.id)" 
+                                                 class="p-2.5 bg-slate-100 text-slate-400 rounded-xl hover:bg-rose-100 hover:text-rose-500 transition-colors" title="친구 삭제">
+                                            <UserMinus :size="18"/>
                                          </button>
                                     </div>
                                 </div>
@@ -241,9 +245,9 @@ const requests = ref([]);
 
 // 메인 탭 (검색 제외 - 사이드바로 이동)
 const mainTabs = computed(() => [
-    { id: 'messages', label: '쪽지함', count: conversations.value.filter(c => c.unreadCount > 0).length },
-    { id: 'friends', label: '내 친구', count: friends.value.length },
-    { id: 'requests', label: '친구 요청', count: requests.value.length },
+    { id: 'messages', label: '쪽지함', count: conversations.value.filter(c => c.unreadCount > 0).length, showBadge: true },
+    { id: 'friends', label: '내 친구', count: 0, showBadge: false },
+    { id: 'requests', label: '친구 요청', count: requests.value.length, showBadge: true },
 ]);
 
 // 검색 (Search)
