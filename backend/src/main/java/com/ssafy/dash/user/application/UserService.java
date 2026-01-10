@@ -44,7 +44,7 @@ public class UserService {
 
     @Transactional(readOnly = true)
     public UserResult findById(Long id) {
-        User u = userRepository.findById(id)
+        User u = userRepository.findByIdIncludingDeleted(id)
                 .orElseThrow(() -> new UserNotFoundException(id));
 
         var onboarding = onboardingRepository.findByUserId(id).orElse(null);

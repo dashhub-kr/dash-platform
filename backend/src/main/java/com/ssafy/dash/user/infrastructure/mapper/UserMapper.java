@@ -13,6 +13,8 @@ public interface UserMapper {
 
     User selectById(Long id);
 
+    User selectByIdIncludingDeleted(Long id);
+
     List<User> selectAll();
 
     List<User> selectByKeyword(String keyword);

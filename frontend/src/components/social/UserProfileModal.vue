@@ -9,60 +9,65 @@
                     <X :size="20"/>
                 </button>
 
-                <!-- Profile Info -->
-                <div class="flex flex-col items-center mb-6">
-                    <div class="relative mb-4">
-                        <img 
-                            :src="targetUserInfo.avatarUrl || '/images/profiles/default-profile.png'" 
-                            class="w-24 h-24 rounded-full border-4 border-slate-50 shadow-md object-cover bg-white"
-                            :alt="targetUserInfo.nickname"
-                        />
-                        <div v-if="targetUserInfo.role === 'ROLE_ADMIN'" class="absolute -bottom-1 -right-1 bg-amber-500 text-white p-1.5 rounded-full border-2 border-white shadow-sm" title="Admin">
-                            <Crown :size="16" fill="currentColor"/>
-                        </div>
+            <!-- Profile Info -->
+            <div class="flex flex-col items-center mb-6">
+                <div class="relative mb-4">
+                    <img 
+                        :src="targetUserInfo.isDeleted ? 'https://avatars.githubusercontent.com/u/0' : (targetUserInfo.avatarUrl || '/images/profiles/default-profile.png')"  
+                        class="w-24 h-24 rounded-full border-4 border-slate-50 shadow-md object-cover bg-white"
+                        :class="{ 'grayscale opacity-60': targetUserInfo.isDeleted }"
+                        :alt="targetUserInfo.nickname"
+                    />
+                    <div v-if="targetUserInfo.role === 'ROLE_ADMIN' && !targetUserInfo.isDeleted" class="absolute -bottom-1 -right-1 bg-amber-500 text-white p-1.5 rounded-full border-2 border-white shadow-sm" title="Admin">
+                        <Crown :size="16" fill="currentColor"/>
                     </div>
-                    
-                    <h2 class="text-xl font-black text-slate-800 mb-1 flex items-center gap-2 justify-center">
-                        {{ targetUserInfo.nickname }}
-                        <span v-if="!targetUserInfo.nickname && targetUserInfo.username">(@{{ targetUserInfo.username }})</span>
-                    </h2>
-                    
-                    <div v-if="targetUserInfo.decorationClass" class="mb-2">
-                        <span class="px-3 py-1 bg-gradient-to-r from-brand-50 to-indigo-50 text-brand-600 text-xs font-bold rounded-full border border-brand-100 shadow-sm">
-                            {{ targetUserInfo.decorationClass }}
-                        </span>
-                    </div>
-                    
-                    <p v-if="targetUserInfo.email" class="text-xs text-slate-400 font-medium">{{ targetUserInfo.email }}</p>
+                </div>
+                
+                <h2 class="text-xl font-black mb-1 flex items-center gap-2 justify-center" :class="targetUserInfo.isDeleted ? 'text-slate-400' : 'text-slate-800'">
+                    {{ targetUserInfo.isDeleted ? '탈퇴한 회원' : (targetUserInfo.nickname || targetUserInfo.username) }}
+                </h2>
+                
+                <div v-if="targetUserInfo.decorationClass && !targetUserInfo.isDeleted" class="mb-2">
+                    <span class="px-3 py-1 bg-gradient-to-r from-brand-50 to-indigo-50 text-brand-600 text-xs font-bold rounded-full border border-brand-100 shadow-sm">
+                        {{ targetUserInfo.decorationClass }}
+                    </span>
+                </div>
+                
+                <p v-if="!targetUserInfo.isDeleted && targetUserInfo.email" class="text-xs text-slate-400 font-medium">{{ targetUserInfo.email }}</p>
+            </div>
+
+            <!-- Loading State -->
+            <div v-if="loading" class="py-4">
+                <Loader2 class="animate-spin w-6 h-6 text-brand-500 mx-auto" />
+            </div>
+
+            <!-- Actions -->
+            <div v-else class="space-y-3">
+                <!-- Case: Me -->
+                <div v-if="isMe" class="p-3 bg-slate-50 text-slate-500 rounded-xl text-sm font-bold">
+                    나의 프로필입니다
                 </div>
 
-                <!-- Loading State -->
-                <div v-if="loading" class="py-4">
-                    <Loader2 class="animate-spin w-6 h-6 text-brand-500 mx-auto" />
+                <!-- Case: Deleted User -->
+                <div v-else-if="targetUserInfo.isDeleted" class="p-3 bg-rose-50 border border-rose-100 text-rose-600 rounded-xl text-sm font-bold flex items-center justify-center gap-2">
+                    <AlertCircle :size="16"/> 탈퇴한 회원입니다
                 </div>
 
-                <!-- Actions -->
-                <div v-else class="space-y-3">
-                    <!-- Case: Me -->
-                    <div v-if="isMe" class="p-3 bg-slate-50 text-slate-500 rounded-xl text-sm font-bold">
-                        나의 프로필입니다
-                    </div>
-
-                    <!-- Case: Friend -->
-                    <template v-else-if="friendshipStatus === 'ACCEPTED'">
-                        <button 
-                            @click="openDM" 
-                            class="w-full py-3 bg-brand-500 text-white rounded-xl text-sm font-bold hover:bg-brand-600 transition-colors flex items-center justify-center gap-2 shadow-lg shadow-brand-500/20"
-                        >
-                            <MessageCircle :size="18"/> 쪽지 보내기
-                        </button>
-                        <div class="text-xs text-brand-600 font-bold flex items-center justify-center gap-1 mt-2">
-                            <Users :size="14"/> 서로 친구입니다
-                        </div>
-                    </template>
-
-                    <!-- Case: Pending / Strings attached -->
+                <!-- Case: Friend -->
+                <template v-else-if="friendshipStatus === 'ACCEPTED'">
                     <button 
+                        @click="openDM" 
+                        class="w-full py-3 bg-brand-500 text-white rounded-xl text-sm font-bold hover:bg-brand-600 transition-colors flex items-center justify-center gap-2 shadow-lg shadow-brand-500/20"
+                    >
+                        <MessageCircle :size="18"/> 쪽지 보내기
+                    </button>
+                    <div class="text-xs text-brand-600 font-bold flex items-center justify-center gap-1 mt-2">
+                        <Users :size="14"/> 서로 친구입니다
+                    </div>
+                </template>
+
+                <!-- Case: Pending / Strings attached -->
+                <button 
                         v-else-if="friendshipStatus === 'PENDING' || requested"
                         disabled
                         class="w-full py-3 bg-slate-100 text-slate-400 rounded-xl text-sm font-bold cursor-not-allowed flex items-center justify-center gap-2"
@@ -91,7 +96,7 @@ import { useUserProfileModal } from '@/composables/useUserProfileModal';
 import { useFloatingChat } from '@/composables/useFloatingChat';
 import { useAuth } from '@/composables/useAuth';
 import { socialApi } from '@/api/social';
-import { X, Crown, MessageCircle, UserPlus, CheckCircle2, Users, Loader2 } from 'lucide-vue-next';
+import { X, Crown, MessageCircle, UserPlus, CheckCircle2, Users, Loader2, AlertCircle } from 'lucide-vue-next';
 
 const { isOpen, targetUserInfo, close } = useUserProfileModal();
 const { openChat: openDirectMessage } = useFloatingChat();
@@ -156,12 +161,13 @@ const sendFriendRequest = async () => {
 
 const openDM = () => {
     // Map targetUserInfo to format expected by DirectMessageModal
-    // DirectMessageModal props: partnerId, partnerName, partnerAvatar, partnerDecoration
+    // DirectMessageModal props: partnerId, partnerName, partnerAvatar, partnerDecoration, partnerIsDeleted
     const partner = {
         partnerId: targetUserInfo.value.userId,
         partnerName: targetUserInfo.value.nickname || targetUserInfo.value.username,
         partnerAvatar: targetUserInfo.value.avatarUrl,
-        partnerDecoration: targetUserInfo.value.decorationClass
+        partnerDecoration: targetUserInfo.value.decorationClass,
+        partnerIsDeleted: targetUserInfo.value.isDeleted || false
     };
     
     close(); // Close profile modal

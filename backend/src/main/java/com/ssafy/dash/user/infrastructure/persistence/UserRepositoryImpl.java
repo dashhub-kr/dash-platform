@@ -28,6 +28,11 @@ public class UserRepositoryImpl implements UserRepository {
     }
 
     @Override
+    public Optional<User> findByIdIncludingDeleted(Long id) {
+        return Optional.ofNullable(userMapper.selectByIdIncludingDeleted(id));
+    }
+
+    @Override
     public List<User> findAll() {
         return userMapper.selectAll();
     }

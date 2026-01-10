@@ -92,6 +92,10 @@ public class User {
         this.deletedAt = null;
     }
 
+    public boolean isDeleted() {
+        return this.deletedAt != null;
+    }
+
     public static User create(String username, String email, LocalDateTime createdAt,
             String provider, String providerId, String avatarUrl) {
         return new User(null, username, email, createdAt, provider, providerId, avatarUrl);

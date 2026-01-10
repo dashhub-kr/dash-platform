@@ -28,6 +28,7 @@
                    :role="post.authorRole"
                    :user-id="post.userId"
                    :clickable="true"
+                   :is-deleted="post.authorIsDeleted"
                    avatar-class="w-8 h-8 object-cover border border-brand-100"
                    text-class="font-medium text-slate-700"
                    :icon-size="18"

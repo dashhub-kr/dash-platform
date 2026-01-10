@@ -176,20 +176,35 @@
                                     @click="openUserProfile(item.friend)"
                                 >
                                     <div class="flex items-center gap-2.5 min-w-0">
-                                        <img :src="getAvatar(item.friend.avatarUrl)" class="w-8 h-8 rounded-full border border-slate-200"/>
+                                        <img 
+                                            :src="item.friend.isDeleted ? 'https://avatars.githubusercontent.com/u/0' : getAvatar(item.friend.avatarUrl)" 
+                                            class="w-8 h-8 rounded-full border border-slate-200 object-cover"
+                                            :class="{ 'grayscale opacity-60': item.friend.isDeleted }"
+                                        />
                                         <div class="min-w-0">
                                             <div class="flex items-center gap-1">
-                                                <span class="text-sm font-bold text-slate-700 truncate">{{ item.friend.username }}</span>
-                                                <TierBadge v-if="item.friend.solvedacTier" :tier="item.friend.solvedacTier" size="xs" :show-roman="false" />
+                                                <span 
+                                                    class="text-sm font-bold truncate"
+                                                    :class="item.friend.isDeleted ? 'text-slate-400' : 'text-slate-700'"
+                                                >
+                                                    {{ item.friend.isDeleted ? '탈퇴한 회원' : item.friend.username }}
+                                                </span>
+                                                <TierBadge v-if="item.friend.solvedacTier && !item.friend.isDeleted" :tier="item.friend.solvedacTier" size="xs" :show-roman="false" />
                                             </div>
                                         </div>
                                     </div>
-                                    <button 
-                                        @click.stop="openDM(item.friend)" 
-                                        class="p-1.5 text-slate-400 hover:text-brand-500 hover:bg-brand-50 rounded-lg transition-colors opacity-0 group-hover:opacity-100"
-                                    >
-                                        <MessageCircle :size="16" />
-                                    </button>
+                                    
+                                    <div class="flex items-center gap-1">
+                                         <button 
+                                            v-if="!item.friend.isDeleted"
+                                            @click.stop="openDM(item.friend)" 
+                                            class="p-1.5 text-slate-400 hover:text-brand-500 hover:bg-brand-50 rounded-lg transition-colors opacity-0 group-hover:opacity-100"
+                                            title="쪽지 보내기"
+                                        >
+                                            <MessageCircle :size="16" />
+                                        </button>
+                                        <span v-else class="text-[10px] text-slate-300 px-2">탈퇴</span>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -202,8 +217,8 @@
 </template>
 
 <script setup>
-import { ref, onMounted, onBeforeUnmount, watch } from 'vue';
-import { useRouter } from 'vue-router';
+import { ref, watch, onMounted, onBeforeUnmount } from 'vue';
+import { useRoute, useRouter } from 'vue-router';
 import { socialApi } from '@/api/social';
 import { Loader2, Users, Search, Bell, MessageCircle, Rss, Check, X } from 'lucide-vue-next';
 import TierBadge from '@/components/common/TierBadge.vue';
@@ -211,6 +226,7 @@ import FeedItem from '@/components/social/FeedItem.vue';
 import { useFloatingChat } from '@/composables/useFloatingChat';
 import { useUserProfileModal } from '@/composables/useUserProfileModal';
 
+const route = useRoute();
 const router = useRouter();
 const { openChat: openGlobalDM } = useFloatingChat();
 const { open: openProfile } = useUserProfileModal();
@@ -336,11 +352,13 @@ const rejectRequest = async (requestId) => {
 
 // 액션
 const openDM = (friend) => {
+    if (friend.isDeleted) return; // 탈퇴 회원 클릭 방지
     openGlobalDM({
         partnerId: friend.id,
         partnerName: friend.username,
         partnerAvatar: friend.avatarUrl,
-        partnerDecoration: friend.equippedDecorationClass || ''
+        partnerDecoration: friend.equippedDecorationClass || '',
+        partnerIsDeleted: friend.isDeleted || false
     });
 };
 
@@ -354,7 +372,8 @@ const openUserProfile = (user) => {
         avatarUrl: user.avatarUrl,
         solvedacTier: user.solvedacTier,
         decorationClass: user.equippedDecorationClass, // 필드명 확인 필요
-        friendshipStatus: 'ACCEPTED' // 친구 목록에서 클릭했으므로 항상 ACCEPTED
+        friendshipStatus: 'ACCEPTED', // 친구 목록에서 클릭했으므로 항상 ACCEPTED
+        isDeleted: user.isDeleted || false 
     });
 };
 
@@ -362,9 +381,35 @@ const handleViewBattle = (item) => {
     router.push(`/battle/${item.battleId}`);
 };
 
-onMounted(() => {
+// 라우트 쿼리 핸들러 (예: 알림 클릭 시) - HEAD에서 가져옴
+const checkQueryForDM = async () => {
+    const pid = route.query.partnerId;
+    if (pid) {
+        const partnerId = parseInt(pid);
+        
+        // 1. 친구 목록 로드 대기 (이미 로드되었겠지만 확실히)
+        if (friends.value.length === 0) await loadFriends();
+
+        // 2. 친구 목록에서 찾아보기
+        const friendItem = friends.value.find(f => f.friend.id === partnerId);
+        
+        if (friendItem) {
+            // 친구인 경우 DM 모달 열기
+            openDM(friendItem.friend);
+        } else {
+            // 친구가 아닌 경우 (혹은 탈퇴)
+             alert('현재 친구 목록에 없는 사용자이거나 정보를 불러올 수 없습니다.');
+        }
+
+        // 쿼리 파라미터 제거하여 URL 정리
+        router.replace({ query: { ...route.query, partnerId: undefined } });
+    }
+};
+
+onMounted(async () => {
     loadFeed(true);
-    loadFriends();
+    await loadFriends(); // 친구 목록 먼저 로드
+    checkQueryForDM();   // 그 다음 쿼리 체크
     
     // 무한 스크롤 옵저버
     observer = new IntersectionObserver((entries) => {

@@ -99,7 +99,7 @@ public class SocialService {
                 .filter(f -> f.getStatus() == Friendship.FriendshipStatus.ACCEPTED)
                 .map(f -> {
                     Long friendId = f.getRequesterId().equals(userId) ? f.getReceiverId() : f.getRequesterId();
-                    User friend = userRepository.findById(friendId).orElseThrow();
+                    User friend = userRepository.findByIdIncludingDeleted(friendId).orElseThrow();
                     return com.ssafy.dash.social.application.dto.result.FriendResult.from(f, friend);
                 })
                 .collect(Collectors.toList());
@@ -122,6 +122,13 @@ public class SocialService {
             throw new IllegalArgumentException("Cannot message yourself");
         }
 
+        // 수신자가 탈퇴한 회원인지 확인
+        User receiver = userRepository.findById(receiverId)
+                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+        if (receiver.isDeleted()) {
+            throw new IllegalStateException("탈퇴한 회원에게는 메시지를 보낼 수 없습니다.");
+        }
+
         String encryptedContent = aesEncryptor.encrypt(content);
         DirectMessage dm = DirectMessage.create(senderId, receiverId, encryptedContent);
         directMessageRepository.save(dm);
@@ -139,7 +146,7 @@ public class SocialService {
     @Transactional(readOnly = true)
     public List<com.ssafy.dash.social.application.dto.result.MessageResult> getConversation(Long userId,
             Long partnerId) {
-        User partner = userRepository.findById(partnerId).orElseThrow();
+        User partner = userRepository.findByIdIncludingDeleted(partnerId).orElseThrow();
         User me = userRepository.findById(userId).orElseThrow();
 
         return directMessageRepository.findConversation(userId, partnerId).stream()

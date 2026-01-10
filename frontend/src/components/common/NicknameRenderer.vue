@@ -2,9 +2,11 @@
     <div class="flex items-center gap-2" :class="containerClass">
         <!-- Avatar -->
         <template v-if="showAvatar">
-            <div v-if="isUnknown" class="rounded-full flex items-center justify-center text-slate-400 bg-slate-100 border border-slate-200" :class="avatarClass">
-                <UserX :size="iconSize" />
-            </div>
+            <img v-if="isUnknown" 
+                src="https://avatars.githubusercontent.com/u/0" 
+                class="rounded-full object-cover border border-slate-200 grayscale opacity-60" 
+                :class="avatarClass"
+            />
             <img v-else-if="avatarUrl" 
                 :src="avatarUrl" 
                 class="rounded-full object-cover border border-brand-100" 
@@ -54,7 +56,8 @@ const props = defineProps({
     avatarClass: { type: String, default: 'w-6 h-6' },
     textClass: { type: String, default: 'text-xs' },
     containerClass: { type: String, default: '' },
-    iconSize: { type: Number, default: 14 }
+    iconSize: { type: Number, default: 14 },
+    isDeleted: { type: Boolean, default: false }
 });
 
 const { open } = useUserProfileModal();
@@ -68,7 +71,8 @@ const handleClick = (e) => {
             username: props.username,
             avatarUrl: props.avatarUrl,
             role: props.role,
-            decorationClass: props.decorationClass
+            decorationClass: props.decorationClass,
+            isDeleted: props.isDeleted
             // email is not usually passed here, can be fetched if needed or just omitted
         });
     }
@@ -77,6 +81,7 @@ const handleClick = (e) => {
 const effectiveNickname = computed(() => props.nickname || props.username);
 
 const isUnknown = computed(() => {
+    if (props.isDeleted) return true;
     const name = effectiveNickname.value;
     return !name || ['Unknown', 'Unknown User', '탈퇴한 회원'].includes(name);
 });
