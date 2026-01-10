@@ -1,18 +1,19 @@
 <template>
     <!-- 로그인한 사용자에게만 표시 -->
-    <div v-if="isAuthenticated" class="fixed bottom-6 right-6 z-50">
+    <div v-if="isAuthenticated" class="fixed z-50 bottom-20 right-4 md:bottom-6 md:right-6">
         <!-- 플로팅 버튼 -->
         <Transition name="scale">
             <button
                 v-if="!isOpen"
                 @click="togglePanel"
-                class="w-14 h-14 bg-brand-600 hover:bg-brand-500 text-white rounded-full shadow-lg hover:shadow-xl transition-all duration-200 flex items-center justify-center group hover:scale-105"
+                class="w-12 h-12 md:w-14 md:h-14 bg-brand-600 hover:bg-brand-500 text-white rounded-full shadow-lg hover:shadow-xl transition-all duration-200 flex items-center justify-center group hover:scale-105"
             >
-                <MessageCircle :size="24" class="group-hover:scale-110 transition-transform" />
+                <MessageCircle :size="20" class="md:hidden group-hover:scale-110 transition-transform" />
+                <MessageCircle :size="24" class="hidden md:block group-hover:scale-110 transition-transform" />
                 <!-- 안읽음 뱃지 -->
                 <div 
                     v-if="totalUnread > 0" 
-                    class="absolute -top-1 -right-1 min-w-[22px] h-[22px] bg-rose-500 text-white text-xs font-bold rounded-full flex items-center justify-center px-1 shadow-md"
+                    class="absolute -top-1 -right-1 min-w-[20px] h-[20px] md:min-w-[22px] md:h-[22px] bg-rose-500 text-white text-[10px] md:text-xs font-bold rounded-full flex items-center justify-center px-1 shadow-md"
                 >
                     {{ totalUnread > 99 ? '99+' : totalUnread }}
                 </div>
@@ -23,8 +24,8 @@
         <Transition name="slide-up">
             <div 
                 v-if="isOpen"
-                class="absolute bottom-0 right-0 w-[360px] bg-white rounded-2xl shadow-2xl border border-slate-200 overflow-hidden flex flex-col"
-                :style="{ height: viewMode === 'chat' ? '520px' : 'auto' }"
+                class="fixed bottom-0 right-0 md:absolute md:bottom-0 md:right-0 w-full md:w-[360px] h-[80vh] md:h-auto bg-white md:rounded-2xl shadow-2xl border border-slate-200 overflow-hidden flex flex-col"
+                :style="{ maxHeight: viewMode === 'chat' ? '80vh' : 'auto' }"
             >
                 <!-- 헤더 - 대화 목록 -->
                 <div v-if="viewMode === 'list'" class="flex items-center justify-between p-4 border-b border-slate-100 bg-brand-600 text-white shrink-0">

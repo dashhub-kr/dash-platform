@@ -15,8 +15,8 @@
       @close="closeDM"
     />
 
-    <!-- Floating Message Panel (Instagram-style) - hidden on mobile -->
-    <FloatingMessagePanel class="hidden md:block" />
+    <!-- Floating Message Panel (Instagram-style) -->
+    <FloatingMessagePanel />
 </template>
 
 
