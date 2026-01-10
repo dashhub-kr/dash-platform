@@ -82,18 +82,24 @@
         <!-- 오른쪽 칼럼: 사이드바 -->
         <aside class="hidden xl:flex w-[380px] shrink-0 flex-col gap-5 sticky top-8 h-fit">
           
-          <!-- 1. 통계 열 -->
-          <div class="bg-white rounded-2xl p-4 border border-slate-200 shadow-sm flex items-center justify-around">
-            <div class="flex items-center gap-2" title="Current Tier">
-              <img :src="`https://static.solved.ac/tier_small/${userTier}.svg`" class="w-7 h-7 object-contain" />
-              <span class="text-sm font-black text-slate-700">{{ userTierName }}</span>
-            </div>
-            <div class="w-px h-6 bg-slate-100"></div>
-            <div class="flex items-center gap-2" title="Solved Problems">
-              <CheckCircle class="w-5 h-5 text-leaf" stroke-width="2.5" fill="currentColor" />
-              <span class="text-lg font-black text-slate-700">{{ user?.solvedCount || 0 }}</span>
-            </div>
-          </div>
+          <!-- 1. 통계 열 (UserQuickStats) -->
+          <UserQuickStats 
+            :items="[
+              { 
+                image: `https://static.solved.ac/tier_small/${userTier}.svg`,
+                value: userTierName,
+                tooltip: 'Current Tier',
+                textClass: 'text-sm'
+              },
+              { 
+                icon: CheckCircle, 
+                value: (user?.solvedCount || 0).toLocaleString(), 
+                tooltip: 'Solved Problems',
+                iconClass: 'text-leaf',
+                fill: 'currentColor'
+              }
+            ]"
+          />
 
           <!-- 2. 레이더 차트 (간결) -->
           <div class="bg-white rounded-2xl p-4 border border-slate-200 shadow-sm">
@@ -182,6 +188,7 @@ import AlgorithmRadarChart from '@/components/charts/AlgorithmRadarChart.vue';
 import LectureModal from '@/components/lecture/LectureModal.vue';
 import { useAuth } from '@/composables/useAuth';
 import { aiApi } from '@/api/ai';
+import UserQuickStats from '@/components/common/UserQuickStats.vue';
 
 const router = useRouter();
 const route = useRoute(); // ADDED

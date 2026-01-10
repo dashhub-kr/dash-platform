@@ -226,29 +226,33 @@
             <aside class="hidden xl:flex w-[380px] shrink-0 flex-col gap-6 sticky top-8 h-[calc(100vh-4rem)]">
                 
                 <!-- 1. 통계 열 -->
-                <div class="bg-white rounded-2xl p-4 border border-slate-200 shadow-sm flex items-center justify-around">
-                     <!-- 통계 1: 도토리 -->
-                     <div class="flex items-center gap-2 group cursor-pointer" title="Acorns">
-                        <IconAcorn class="text-fox w-8 h-8" stroke-width="2.5" fill="currentColor" />
-                        <span class="text-xl font-black text-slate-700">{{ studyData?.acornCount || 0 }}</span>
-                    </div>
-
-                    <div class="w-px h-8 bg-slate-100"></div>
-
-                    <!-- 통계 2: 스트릭 -->
-                    <div class="flex items-center gap-2 group cursor-pointer" title="Streak">
-                        <Flame class="w-7 h-7" :class="currentStreak > 0 ? 'text-rose-500 fill-rose-500 animate-pulse' : 'text-slate-300'" stroke-width="2.5" />
-                        <span class="text-xl font-black text-slate-700">{{ currentStreak }}</span>
-                    </div>
-                    
-                    <div class="w-px h-8 bg-slate-100"></div>
-
-                    <!-- Stat 3: Submissions -->
-                     <div class="flex items-center gap-2 group cursor-pointer" title="Submissions">
-                        <Send class="w-6 h-6 text-sky-400 fill-sky-400" stroke-width="2.5" />
-                        <span class="text-xl font-black text-slate-700">{{ recordCount }}</span>
-                    </div>
-                </div>
+                <!-- 1. 통계 열 (UserQuickStats) -->
+                <UserQuickStats 
+                    v-if="studyData"
+                    :items="[
+                        { 
+                            icon: IconAcorn, 
+                            value: (studyData.acornCount || 0).toLocaleString(), 
+                            tooltip: 'Acorns',
+                            iconClass: 'text-fox',
+                            fill: 'currentColor'
+                        },
+                        { 
+                            icon: Flame, 
+                            value: currentStreak, 
+                            tooltip: 'Streak',
+                            iconClass: currentStreak > 0 ? 'text-rose-500 animate-pulse' : 'text-slate-300',
+                            fill: currentStreak > 0 ? 'currentColor' : 'none'
+                        },
+                        { 
+                            icon: Send, 
+                            value: recordCount.toLocaleString(), 
+                            tooltip: 'Submissions',
+                            iconClass: 'text-sky-400',
+                            fill: 'currentColor'
+                        }
+                    ]"
+                />
 
                 <!-- 2. Activity Log -->
                 <div v-if="!loading && heatmapWeeks.length > 0" class="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm">
@@ -333,6 +337,7 @@ import {
     X
 } from 'lucide-vue-next';
 import NicknameRenderer from '@/components/common/NicknameRenderer.vue';
+import UserQuickStats from '@/components/common/UserQuickStats.vue';
 
 // 관리자 관전 모드 Props
 const props = defineProps({

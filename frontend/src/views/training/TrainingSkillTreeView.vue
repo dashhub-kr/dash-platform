@@ -20,22 +20,24 @@
         <!-- 오른쪽 칼럼: 사이드바 -->
         <aside class="hidden xl:flex w-[380px] shrink-0 flex-col gap-6 sticky top-8 h-fit">
           
-          <!-- 1. 통계 열 -->
-          <div class="bg-white rounded-2xl p-4 border border-slate-200 shadow-sm flex items-center justify-around">
-            <!-- 티어 -->
-            <div class="flex items-center gap-2 group cursor-pointer" title="Current Tier">
-              <img :src="`https://static.solved.ac/tier_small/${userTier}.svg`" class="w-8 h-8 object-contain" />
-              <span class="text-sm font-black text-slate-700">{{ userTierName }}</span>
-            </div>
-
-            <div class="w-px h-8 bg-slate-100"></div>
-
-            <!-- 해결한 문제 수 -->
-            <div class="flex items-center gap-2 group cursor-pointer" title="Solved Problems">
-              <CheckCircle class="w-6 h-6 text-leaf" stroke-width="2.5" fill="currentColor" />
-              <span class="text-xl font-black text-slate-700">{{ user?.solvedCount || 0 }}</span>
-            </div>
-          </div>
+          <!-- 1. 통계 열 (UserQuickStats) -->
+          <UserQuickStats 
+            :items="[
+              { 
+                image: `https://static.solved.ac/tier_small/${userTier}.svg`,
+                value: userTierName,
+                tooltip: 'Current Tier',
+                textClass: 'text-sm'
+              },
+              { 
+                icon: CheckCircle, 
+                value: (user?.solvedCount || 0).toLocaleString(), 
+                tooltip: 'Solved Problems',
+                iconClass: 'text-leaf',
+                fill: 'currentColor'
+              }
+            ]"
+          />
 
           <!-- 2. 범례 (간결 & 아름다움) -->
           <div class="bg-slate-50 rounded-2xl p-4 border border-slate-100">
@@ -112,6 +114,7 @@ import { CheckCircle, Info, TrendingUp, Zap, Map, Sword, Network } from 'lucide-
 import SkillTreeView from '@/components/skill/SkillTreeView.vue';
 import { useAuth } from '@/composables/useAuth';
 import { tagApi } from '@/api/tags';
+import UserQuickStats from '@/components/common/UserQuickStats.vue';
 
 const router = useRouter();
 const { user } = useAuth();
