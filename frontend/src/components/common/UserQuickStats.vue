@@ -10,7 +10,7 @@
         <component 
             v-if="item.icon" 
             :is="item.icon" 
-            class="w-8 h-8 transition-colors"
+            class="w-5 h-5 transition-colors"
             :class="item.iconClass || 'text-slate-700'"
             :stroke-width="2.5" 
             :fill="item.fill || 'none'"
@@ -20,7 +20,7 @@
         <img 
             v-else-if="item.image" 
             :src="item.image" 
-            class="w-8 h-8 object-contain transition-transform group-hover:scale-110" 
+            class="w-6 h-6 object-contain transition-transform group-hover:scale-110" 
             alt="icon"
         />
 

@@ -5,6 +5,7 @@
     <div class="min-h-screen bg-white pb-20">
     <div class="flex justify-center p-4 md:p-8">
       <div class="flex gap-8 max-w-screen-xl w-full items-start">
+        <!-- Left Column: Main Content -->
         <div class="flex-1 min-w-0">
       
       <!-- Header with Currency Badge -->
@@ -17,24 +18,7 @@
           <p class="text-slate-500 font-medium">획득한 로그로 다양한 아이템을 구매해보세요</p>
         </div>
 
-        <!-- Currency Badge -->
-        <div v-if="user" class="bg-white rounded-2xl pl-3 pr-5 py-2 shadow-sm border border-slate-200 flex items-center gap-3 transition-transform hover:scale-105 select-none ring-1 ring-slate-100">
-             <div class="relative">
-                <div class="w-10 h-10 bg-slate-50 rounded-xl flex items-center justify-center border border-slate-100 shadow-inner">
-                    <img src="/images/items/log.png" class="w-6 h-6 object-contain drop-shadow-sm" alt="Logs" />
-                </div>
-                <div class="absolute -top-1 -right-1 flex h-3 w-3 items-center justify-center rounded-full bg-brand-500 ring-2 ring-white">
-                   <div class="h-1 w-1 rounded-full bg-white animate-pulse"></div>
-                </div>
-             </div>
-             
-             <div class="flex flex-col">
-                 <span class="text-[9px] font-black text-slate-400 uppercase tracking-widest leading-none mb-1">Total Logs</span>
-                 <span class="text-xl font-black text-slate-800 font-['Outfit'] leading-none tracking-tight">
-                    {{ (user.logCount || 0).toLocaleString() }}<span class="text-sm text-slate-500 ml-1 font-bold font-['Pretendard']">로그</span>
-                 </span>
-             </div>
-        </div>
+
       </div>
 
       <!-- Shop Items Grid -->
@@ -175,9 +159,42 @@
         </div>
     </Teleport>
 
-    </div>
+    <!-- Right Sidebar (Currency Widget) -->
+    <aside class="hidden xl:flex w-[380px] shrink-0 flex-col gap-6 sticky top-8 h-fit">
+        <div class="bg-white rounded-3xl p-6 border border-slate-200 shadow-sm relative overflow-hidden group">
+            <div class="flex items-center gap-4 relative z-10">
+                <div class="w-14 h-14 bg-slate-50 rounded-2xl flex items-center justify-center border border-slate-100 shadow-inner group-hover:scale-110 transition-transform duration-300">
+                    <img src="/images/items/log.png" class="w-8 h-8 object-contain drop-shadow-sm" alt="Logs" />
+                </div>
+                <div>
+                    <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest leading-none block mb-1">Total Assets</span>
+                    <div class="flex items-baseline gap-1">
+                        <span class="text-3xl font-black text-slate-800 font-['Outfit'] tracking-tight">
+                            {{ (user?.logCount || 0).toLocaleString() }}
+                        </span>
+                        <span class="text-sm font-bold text-slate-500">로그</span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Deco -->
+            <div class="absolute -right-4 -top-4 w-24 h-24 bg-brand-50 rounded-full opacity-50 blur-2xl group-hover:bg-brand-100 transition-colors"></div>
+        </div>
+
+        <!-- Info Card -->
+        <div class="bg-indigo-50 rounded-3xl p-6 border border-indigo-100">
+            <h3 class="font-bold text-indigo-900 text-sm mb-2 flex items-center gap-2">
+                <Info :size="16" class="text-indigo-600" />
+                쇼핑 팁
+            </h3>
+            <p class="text-xs text-indigo-700 leading-relaxed word-keep-all">
+                매일 문제를 풀고 얻은 로그로 프로필을 멋지게 꾸며보세요!
+            </p>
+        </div>
+    </aside>
       </div>
     </div>
+  </div>
   </div>
 </template>
 
@@ -187,7 +204,7 @@ import { useAuth } from '@/composables/useAuth';
 
 import { shopApi } from '@/api/shop'; // Need to create/update shop.js
 import { userApi } from '@/api/user'; // For searching users
-import { Loader2, ShoppingBag, Check, Gift } from 'lucide-vue-next';
+import { Loader2, ShoppingBag, Check, Gift, Info } from 'lucide-vue-next';
 import '@/assets/css/effects.css'; // Ensure effects are loaded
 
 const { user, refresh } = useAuth();
