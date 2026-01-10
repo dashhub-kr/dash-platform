@@ -1,7 +1,9 @@
 <template>
-  <div class="min-h-screen bg-white text-slate-800 font-['Pretendard']">
-
-    <!-- 메인 레이아웃 컨테이너 -->
+  <!-- Main Layout Wrapper matching DashboardView -->
+  <div class="flex h-screen overflow-hidden bg-white font-['Pretendard']">
+    <div class="w-full overflow-y-auto [scrollbar-gutter:stable]">
+      <div class="min-h-screen bg-white pb-20">
+    <!-- Main Layout Container -->
     <div class="flex justify-center p-4 md:p-8">
       <div class="flex gap-8 max-w-screen-xl w-full items-start">
 
@@ -182,6 +184,8 @@
           </div>
         </aside>
 
+      </div>
+    </div>
       </div>
     </div>
   </div>

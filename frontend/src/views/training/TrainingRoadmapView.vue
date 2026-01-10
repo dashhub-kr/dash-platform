@@ -1,5 +1,8 @@
 <template>
-  <div class="min-h-screen bg-white text-slate-800 pb-20 font-['Pretendard']">
+  <!-- Main Layout Wrapper matching DashboardView -->
+  <div class="flex h-screen overflow-hidden bg-white font-['Pretendard']">
+    <div class="w-full overflow-y-auto [scrollbar-gutter:stable]">
+      <div class="min-h-screen bg-white pb-20">
     <!-- Main Layout Container -->
     <div class="flex justify-center p-4 md:p-8">
       <div class="flex gap-8 max-w-screen-xl w-full items-start">
@@ -40,7 +43,7 @@
           </section>
 
           <!-- AI 요약 (간결하게) -->
-          <section v-if="learningPath?.aiAnalysis?.analysisSummary" class="bg-brand-50 rounded-2xl p-5 border border-brand-100">
+          <section v-if="learningPath?.aiAnalysis?.analysisSummary" class="bg-brand-50 rounded-2xl p-6 border border-brand-100">
             <div class="flex items-start gap-3">
               <div class="w-8 h-8 bg-brand-100 rounded-lg flex items-center justify-center shrink-0">
                 <Sparkles class="w-4 h-4 text-brand-600" stroke-width="2.5" />
@@ -54,7 +57,7 @@
           <!-- 주간 목표 + 추천 태그 -->
           <section class="grid grid-cols-1 md:grid-cols-2 gap-4">
             <!-- 주간 목표 -->
-            <div v-if="learningPath?.aiAnalysis?.weeklyGoal" class="bg-white rounded-2xl p-5 border border-slate-200 shadow-sm">
+            <div v-if="learningPath?.aiAnalysis?.weeklyGoal" class="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm">
               <div class="text-[10px] font-black text-brand-600 uppercase tracking-wider mb-2">이번 주 목표</div>
               <p class="text-sm font-bold text-slate-800">{{ learningPath.aiAnalysis.weeklyGoal }}</p>
               <div v-if="learningPath?.aiAnalysis?.estimatedDaysToGoal" class="mt-3 pt-3 border-t border-slate-100 flex items-center gap-2">
@@ -64,7 +67,7 @@
             </div>
 
             <!-- 추천 태그 -->
-            <div v-if="learningPath?.aiAnalysis?.recommendedTags?.length" class="bg-white rounded-2xl p-5 border border-slate-200 shadow-sm">
+            <div v-if="learningPath?.aiAnalysis?.recommendedTags?.length" class="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm">
               <div class="text-[10px] font-black text-slate-500 uppercase tracking-wider mb-3">집중 추천 태그</div>
               <div class="flex flex-wrap gap-2">
                 <span 
@@ -80,7 +83,7 @@
         </main>
 
         <!-- 오른쪽 칼럼: 사이드바 -->
-        <aside class="hidden xl:flex w-[380px] shrink-0 flex-col gap-5 sticky top-8 h-fit">
+        <aside class="hidden xl:flex w-[380px] shrink-0 flex-col gap-6 sticky top-8 h-fit">
           
           <!-- 1. 통계 열 (UserQuickStats) -->
           <UserQuickStats 
@@ -102,7 +105,7 @@
           />
 
           <!-- 2. 레이더 차트 (간결) -->
-          <div class="bg-white rounded-2xl p-4 border border-slate-200 shadow-sm">
+          <div class="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm">
             <h3 class="text-[10px] font-black text-slate-500 uppercase tracking-wide mb-3 flex items-center gap-1">
               <BarChart3 class="w-3.5 h-3.5 text-brand-500" stroke-width="2.5" />
               알고리즘 역량
@@ -115,7 +118,7 @@
           </div>
 
           <!-- 3. 오늘의 복습 -->
-          <div class="bg-white rounded-2xl p-4 shadow-sm border border-slate-200">
+          <div class="bg-white rounded-2xl p-6 shadow-sm border border-slate-200">
             <div class="flex items-center gap-3 mb-2">
               <div class="w-9 h-9 bg-brand-50 text-brand-600 rounded-lg flex items-center justify-center shrink-0">
                 <RefreshCw :size="18" stroke-width="2.5" fill="currentColor" />
@@ -136,7 +139,7 @@
           </div>
 
           <!-- 4. 오늘의 도전 -->
-          <div class="bg-white rounded-2xl p-4 shadow-sm border border-slate-200">
+          <div class="bg-white rounded-2xl p-6 shadow-sm border border-slate-200">
             <div class="flex items-center gap-3 mb-2">
               <div class="w-9 h-9 bg-rose-50 text-rose-500 rounded-lg flex items-center justify-center shrink-0">
                 <Trophy :size="18" stroke-width="2.5" fill="currentColor" />
@@ -174,6 +177,8 @@
       :boj-tag-id="lectureBojTagId"
       @close="closeLectureModal"
     />
+      </div>
+    </div>
   </div>
 </template>
 

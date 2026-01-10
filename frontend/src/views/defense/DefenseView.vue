@@ -1,5 +1,8 @@
 <template>
-  <div class="min-h-screen bg-white text-slate-800 pb-20 font-['Pretendard']">
+  <!-- Main Layout Wrapper matching DashboardView -->
+  <div class="flex h-screen overflow-hidden bg-white font-['Pretendard']">
+    <div class="w-full overflow-y-auto [scrollbar-gutter:stable]">
+      <div class="min-h-screen bg-white pb-20">
     
     <!-- 활성화된 디펜스 오버레이 (전체화면 고정) -->
     <div v-if="status.defenseProblemId && !loading" class="fixed inset-0 z-50 bg-slate-50 flex items-center justify-center p-4">
@@ -110,7 +113,7 @@
       </div>
 
       <!-- 사이드바 -->
-      <aside class="w-[380px] hidden xl:flex flex-col sticky top-8 h-fit space-y-6">
+      <aside class="w-[380px] shrink-0 hidden xl:flex flex-col gap-6 sticky top-8 h-fit">
         
         <!-- 연승 기록 -->
         <div class="bg-white rounded-3xl p-6 shadow-sm border border-slate-200">
@@ -178,6 +181,8 @@
             다음 도전 ➡
           </button>
         </div>
+      </div>
+    </div>
       </div>
     </div>
   </div>

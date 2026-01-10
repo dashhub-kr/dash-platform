@@ -1,5 +1,8 @@
 <template>
-  <div class="min-h-screen bg-white text-slate-800 pb-20 font-['Pretendard']">
+  <!-- Main Layout Wrapper matching DashboardView -->
+  <div class="flex h-screen overflow-hidden bg-white font-['Pretendard']">
+    <div class="w-full overflow-y-auto [scrollbar-gutter:stable]">
+      <div class="min-h-screen bg-white pb-20">
     
     <!-- 진행 중인 시험 오버레이 (전체화면 고정) -->
     <div v-if="status.examType && !loading" class="fixed inset-0 z-50 bg-slate-50 flex items-center justify-center p-4">
@@ -234,6 +237,8 @@
         </button>
       </div>
     </div>
+    </div>
+      </div>
     </div>
   </div>
 </template>

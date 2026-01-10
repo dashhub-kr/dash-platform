@@ -1,10 +1,13 @@
 <template>
-  <div class="min-h-screen bg-white pb-20 font-['Pretendard']">
+  <!-- Main Layout Wrapper matching DashboardView -->
+  <div class="flex h-screen overflow-hidden bg-white font-['Pretendard']">
+    <div class="w-full overflow-y-auto [scrollbar-gutter:stable]">
+    <div class="min-h-screen bg-white pb-20">
     <div class="flex justify-center p-4 md:p-8">
-      <div class="max-w-screen-xl w-full">
+      <div class="flex gap-8 max-w-screen-xl w-full items-start">
+        <div class="flex-1 min-w-0">
       
       <!-- Header with Currency Badge -->
-      <!-- Header with Currency Badge (Absolute Positioning) -->
       <div class="relative flex items-center mb-8 h-7">
         <div class="flex items-center gap-3">
           <ShoppingBag class="w-7 h-7 text-brand-500" stroke-width="2.5" fill="currentColor" />
@@ -98,6 +101,7 @@
                 </div>
             </div>
         </div>
+        </div>
       </div>
     </div>
 
@@ -168,7 +172,9 @@
         </div>
     </Teleport>
 
-  </div>
+    </div>
+      </div>
+    </div>
   </div>
 </template>
 

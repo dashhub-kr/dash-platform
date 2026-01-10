@@ -69,7 +69,7 @@
     <!-- 일반 모드: 드로어가 닫혀 있을 때 전체 대시보드 -->
     <div 
       v-else
-      class="w-full overflow-y-auto"
+      class="w-full overflow-y-auto [scrollbar-gutter:stable]"
       @click="collapseExpandedCard"
     >
       <div class="min-h-screen bg-white text-slate-800">

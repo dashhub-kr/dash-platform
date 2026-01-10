@@ -1,22 +1,25 @@
 <template>
-  <div class="min-h-screen bg-white font-['Pretendard'] pb-20">
+  <!-- Main Layout Wrapper matching DashboardView for consistency -->
+  <div class="flex h-screen overflow-hidden bg-white font-['Pretendard']">
+    <div class="w-full overflow-y-auto [scrollbar-gutter:stable]">
+      <div class="min-h-screen bg-white pb-20">
     
-    <!-- 관전 모드 배너 -->
-    <div v-if="isObserving" class="bg-slate-900 text-white px-4 py-3 flex items-center justify-between sticky top-0 z-50 shadow-md">
-        <div class="flex items-center gap-2 font-bold">
-            <div class="w-2 h-2 rounded-full bg-red-500 animate-pulse"></div>
-            <span>관리자 관전 모드</span>
-            <span class="text-slate-400 text-sm font-normal mx-2">|</span>
-            <span class="text-brand-300">{{ studyData?.name || 'Loading...' }}</span>
+        <!-- 관전 모드 배너 -->
+        <div v-if="isObserving" class="bg-slate-900 text-white px-4 py-3 flex items-center justify-between sticky top-0 z-50 shadow-md">
+            <div class="flex items-center gap-2 font-bold">
+                <div class="w-2 h-2 rounded-full bg-red-500 animate-pulse"></div>
+                <span>관리자 관전 모드</span>
+                <span class="text-slate-400 text-sm font-normal mx-2">|</span>
+                <span class="text-brand-300">{{ studyData?.name || 'Loading...' }}</span>
+            </div>
+            <button @click="exitObservation" class="text-xs bg-white/10 hover:bg-white/20 px-3 py-1.5 rounded-lg transition-colors font-bold flex items-center gap-1">
+                <X :size="14" /> 나가기
+            </button>
         </div>
-        <button @click="exitObservation" class="text-xs bg-white/10 hover:bg-white/20 px-3 py-1.5 rounded-lg transition-colors font-bold flex items-center gap-1">
-            <X :size="14" /> 나가기
-        </button>
-    </div>
 
-    <!-- 2열 레이아웃을 위한 중앙 컨테이너 -->
-    <div class="flex justify-center p-4 md:p-8">
-        <div class="flex gap-8 max-w-screen-xl w-full">
+        <!-- 2열 레이아웃을 위한 중앙 컨테이너 -->
+        <div class="flex justify-center p-4 md:p-8">
+        <div class="flex gap-8 max-w-screen-xl w-full items-start">
             
             <!-- 왼쪽 칼럼: 메인 콘텐츠 (미션) -->
             <main class="flex-1 min-w-0">
@@ -58,7 +61,7 @@
                 <!-- 미션 목록 -->
                 <div v-else class="space-y-6">
                     <div v-for="mission in missions" :key="mission.id"
-                        class="bg-white rounded-3xl p-6 md:p-8 shadow-sm transition-all hover:bg-slate-50 border border-slate-200 group relative overflow-hidden"
+                        class="bg-white rounded-3xl p-6 shadow-sm transition-all hover:bg-slate-50 border border-slate-200 group relative overflow-hidden"
                         :class="{ 'opacity-70 grayscale': mission.status === 'COMPLETED' }"
                     >
                         <!-- 상태 뱃지 (절대 위치) -->
@@ -307,6 +310,8 @@
       @refresh="loadMissions"
     />
 
+      </div>
+    </div>
   </div>
 </template>
 

@@ -24,7 +24,7 @@
              
 
              
-             <div class="bg-white border border-slate-200 shadow-sm rounded-3xl p-8">
+             <div class="bg-white border border-slate-200 shadow-sm rounded-3xl p-6">
                  <h2 class="text-lg font-bold text-slate-800 mb-6 flex items-center gap-2">
                    <Activity class="w-5 h-5 text-brand-500" stroke-width="2.5" fill="currentColor" /> 팀 스킬 분석
                  </h2>
@@ -42,7 +42,7 @@
              </div>
   
               <!-- 2. 추천 커리큘럼 -->
-              <div class="bg-white border border-slate-200 rounded-3xl p-8 shadow-sm">
+              <div class="bg-white border border-slate-200 rounded-3xl p-6 shadow-sm">
                 <div class="flex items-center justify-between mb-6">
                   <h2 class="text-lg font-bold text-slate-800 flex items-center gap-2">
                       <BookOpen class="w-5 h-5 text-brand-500" stroke-width="2.5" fill="currentColor" /> 팀 문제 추천 (커리큘럼)

@@ -1,8 +1,11 @@
 <template>
-  <div class="min-h-screen bg-white text-slate-800 pb-20">
-    <!-- 메인 레이아웃 컨테이너 -->
-    <div class="flex justify-center p-4 md:p-8">
-      <div class="flex gap-8 max-w-screen-xl w-full">
+  <!-- Main Layout Wrapper matching DashboardView -->
+  <div class="flex h-screen overflow-hidden bg-white font-['Pretendard']">
+    <div class="w-full overflow-y-auto [scrollbar-gutter:stable]">
+      <div class="min-h-screen bg-white pb-20">
+        <!-- 메인 레이아웃 컨테이너 -->
+        <div class="flex justify-center p-4 md:p-8">
+            <div class="flex gap-8 max-w-screen-xl w-full items-start">
         
         <!-- 왼쪽 컬럼: 메인 콘텐츠 -->
         <main class="flex-1 min-w-0 space-y-6">          
@@ -10,7 +13,7 @@
         </main>
 
         <!-- 오른쪽 컬럼: Honor Board (사이드바) -->
-        <aside class="hidden xl:flex w-[380px] shrink-0 flex-col gap-6 sticky top-8 h-[calc(100vh-4rem)]">
+        <aside class="hidden xl:flex w-[380px] shrink-0 flex-col gap-6 sticky top-8 h-fit">
             <div class="bg-white rounded-3xl border border-slate-200 shadow-sm p-6">
                 <div class="flex items-center justify-between mb-6">
                     <div class="flex items-center gap-2">
@@ -75,6 +78,8 @@
       <!-- Honor Board 로직 -->
     </div>
   </div>
+  </div>
+</div>
 </template>
 
 <script setup>
