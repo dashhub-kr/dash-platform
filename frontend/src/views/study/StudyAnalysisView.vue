@@ -1,8 +1,9 @@
 <template>
-  <div class="min-h-screen bg-white text-slate-800 font-['Pretendard']">
+  <div class="flex h-screen overflow-hidden bg-white font-['Pretendard']">
+    <div class="w-full overflow-y-auto [scrollbar-gutter:stable]">
 
     <!-- 메인 레이아웃 컨테이너 -->
-    <div class="flex justify-center p-4 md:p-8">
+    <div class="flex justify-center p-4 md:p-8 min-h-screen pb-20">
       
       <!-- Loading State -->
       <div v-if="loadingAnalysis" class="flex flex-col items-center justify-center py-40 w-full">
@@ -159,6 +160,8 @@
           </div>
        </div>
     </Teleport>
+    </div>
+
 </template>
 
 <script setup>
