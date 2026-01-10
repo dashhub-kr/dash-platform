@@ -16,7 +16,7 @@
                     :class="activeTab === tab.id ? 'bg-white text-brand-600 shadow-sm' : 'text-slate-400 hover:text-slate-600'"
                 >
                     {{ tab.label }}
-                    <span v-if="tab.count > 0" class="ml-1 px-1.5 py-0.5 bg-rose-500 text-white text-[10px] rounded-full">{{ tab.count }}</span>
+                    <span v-if="tab.count > 0 && tab.id !== 'friends'" class="ml-1 px-1.5 py-0.5 bg-rose-500 text-white text-[10px] rounded-full">{{ tab.count }}</span>
                 </button>
             </div>
         </div>
