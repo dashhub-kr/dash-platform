@@ -24,6 +24,7 @@ public class SocialService {
     private final FriendshipRepository friendshipRepository;
     private final DirectMessageRepository directMessageRepository;
     private final UserRepository userRepository;
+    private final com.ssafy.dash.algorithm.domain.AlgorithmRecordRepository algorithmRecordRepository;
     private final NotificationService notificationService;
     private final AesEncryptor aesEncryptor;
 
@@ -213,6 +214,55 @@ public class SocialService {
                     lastMessage != null ? lastMessage.getCreatedAt() : null,
                     unreadCount);
         }).filter(java.util.Objects::nonNull).collect(Collectors.toList());
+    }
+
+    // --- 친구 피드 (Feed) ---
+    @Transactional(readOnly = true)
+    public List<com.ssafy.dash.social.application.dto.result.FeedResult> getFriendFeed(
+            Long userId, int page, int size) {
+
+        // 친구 목록 조회
+        List<Friendship> friendships = friendshipRepository.findByUserId(userId);
+        List<Long> friendIds = friendships.stream()
+                .filter(f -> f.getStatus() == Friendship.FriendshipStatus.ACCEPTED)
+                .map(f -> f.getRequesterId().equals(userId) ? f.getReceiverId() : f.getRequesterId())
+                .distinct()
+                .collect(Collectors.toList());
+
+        if (friendIds.isEmpty()) {
+            return java.util.Collections.emptyList();
+        }
+
+        // 친구들의 algorithm_record 조회
+        List<com.ssafy.dash.social.application.dto.result.FeedResult> allFeeds = friendIds
+                .stream().<com.ssafy.dash.social.application.dto.result.FeedResult>flatMap(friendId -> {
+                    User friend = userRepository.findById(friendId).orElse(null);
+                    if (friend == null)
+                        return java.util.stream.Stream.empty();
+
+                    return algorithmRecordRepository.findByUserId(friendId).stream()
+                            .map(record -> com.ssafy.dash.social.application.dto.result.FeedResult.solved(
+                                    record.getId(),
+                                    friend.getId(),
+                                    friend.getUsername(),
+                                    friend.getAvatarUrl(),
+                                    friend.getSolvedacTier(),
+                                    Long.parseLong(record.getProblemNumber()),
+                                    record.getTitle(),
+                                    record.getCreatedAt()));
+                })
+                .sorted((a, b) -> b.createdAt().compareTo(a.createdAt()))
+                .collect(Collectors.toList());
+
+        // 페이징 처리
+        int start = page * size;
+        int end = Math.min(start + size, allFeeds.size());
+
+        if (start >= allFeeds.size()) {
+            return java.util.Collections.emptyList();
+        }
+
+        return allFeeds.subList(start, end);
     }
 
 }

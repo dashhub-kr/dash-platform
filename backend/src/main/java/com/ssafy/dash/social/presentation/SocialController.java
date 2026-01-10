@@ -97,4 +97,13 @@ public class SocialController {
         socialService.sendMessage(userPrincipal.getUserId(), receiverId, content);
         return ResponseEntity.ok().build();
     }
+
+    // --- 친구 피드 (Feed) ---
+    @GetMapping("/feed")
+    public ResponseEntity<List<com.ssafy.dash.social.application.dto.result.FeedResult>> getFeed(
+            @AuthenticationPrincipal CustomOAuth2User userPrincipal,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "20") int size) {
+        return ResponseEntity.ok(socialService.getFriendFeed(userPrincipal.getUserId(), page, size));
+    }
 }
