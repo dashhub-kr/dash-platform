@@ -6,7 +6,7 @@
             <button
                 v-if="!isOpen"
                 @click="togglePanel"
-                class="w-14 h-14 bg-gradient-to-br from-pink-500 to-violet-600 text-white rounded-full shadow-lg hover:shadow-xl transition-all duration-200 flex items-center justify-center group hover:scale-105"
+                class="w-14 h-14 bg-brand-600 hover:bg-brand-500 text-white rounded-full shadow-lg hover:shadow-xl transition-all duration-200 flex items-center justify-center group hover:scale-105"
             >
                 <MessageCircle :size="24" class="group-hover:scale-110 transition-transform" />
                 <!-- 안읽음 뱃지 -->
@@ -26,7 +26,7 @@
                 class="absolute bottom-0 right-0 w-[360px] bg-white rounded-2xl shadow-2xl border border-slate-200 overflow-hidden"
             >
                 <!-- 헤더 -->
-                <div class="flex items-center justify-between p-4 border-b border-slate-100 bg-gradient-to-r from-pink-500 to-violet-600 text-white">
+                <div class="flex items-center justify-between p-4 border-b border-slate-100 bg-brand-600 text-white">
                     <div class="flex items-center gap-2">
                         <MessageCircle :size="20" />
                         <span class="font-bold">메시지</span>
