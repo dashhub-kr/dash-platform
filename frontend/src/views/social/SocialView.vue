@@ -323,7 +323,17 @@ const openDM = (friend) => {
 };
 
 const openUserProfile = (user) => {
-    openProfile(user.id);
+    // UserProfileModal이 기대하는 포맷으로 변환
+    openProfile({
+        userId: user.id,
+        username: user.username, // 혹은 nickname
+        nickname: user.nickname || user.username,
+        email: user.email,
+        avatarUrl: user.avatarUrl,
+        solvedacTier: user.solvedacTier,
+        decorationClass: user.equippedDecorationClass, // 필드명 확인 필요
+        friendshipStatus: 'ACCEPTED' // 친구 목록에서 클릭했으므로 항상 ACCEPTED
+    });
 };
 
 const handleViewBattle = (item) => {

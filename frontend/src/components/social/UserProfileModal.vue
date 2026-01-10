@@ -106,6 +106,12 @@ const isMe = computed(() => {
 // Fetch friendship status when modal opens
 watch([isOpen, targetUserInfo], async ([newOpen, newUserInfo]) => {
     if (newOpen && newUserInfo && !isMe.value) {
+        // 이미 친구 상태 정보가 있으면 API 호출 스킵
+        if (newUserInfo.friendshipStatus) {
+            friendshipStatus.value = newUserInfo.friendshipStatus;
+            return;
+        }
+
         // Init state
         loading.value = true;
         friendshipStatus.value = null;
