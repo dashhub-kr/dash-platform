@@ -1,5 +1,5 @@
 <template>
-  <div class="min-h-screen bg-white text-slate-800">
+  <div class="min-h-screen bg-white text-slate-800 font-['Pretendard']">
 
     <!-- 메인 레이아웃 컨테이너 -->
     <div class="flex justify-center p-4 md:p-8">
@@ -14,12 +14,19 @@
       <div v-else-if="analysis" class="flex gap-8 max-w-screen-xl w-full items-start">
           
           <!-- 왼쪽 칼럼: 메인 콘텐츠 -->
-          <main class="flex-1 min-w-0 space-y-6 animate-in slide-in-from-left duration-500">
+          <main class="flex-1 min-w-0 space-y-8 animate-in slide-in-from-left duration-500">
              
-             <!-- 1. 팀 스킬 분석 (레이더 차트) -->
+             <!-- Page Header -->
+             <div class="flex items-center gap-3">
+               <PieChart class="w-7 h-7 text-brand-500" stroke-width="2.5" fill="currentColor" />
+               <h1 class="text-xl font-black text-slate-800">팀 분석</h1>
+             </div>
+             
+
+             
              <div class="bg-white border border-slate-200 shadow-sm rounded-3xl p-8">
-                 <h2 class="font-black text-slate-800 mb-6 flex items-center gap-2">
-                   <Activity class="w-6 h-6 text-brand-500" stroke-width="2.5" fill="currentColor" /> 팀 스킬 분석
+                 <h2 class="text-lg font-bold text-slate-800 mb-6 flex items-center gap-2">
+                   <Activity class="w-5 h-5 text-brand-500" stroke-width="2.5" fill="currentColor" /> 팀 스킬 분석
                  </h2>
                  <div class="flex flex-col items-center justify-center">
                     <div class="w-full max-w-[400px] aspect-square relative z-0">
@@ -37,8 +44,8 @@
               <!-- 2. 추천 커리큘럼 -->
               <div class="bg-white border border-slate-200 rounded-3xl p-8 shadow-sm">
                 <div class="flex items-center justify-between mb-6">
-                  <h2 class="font-black text-slate-900 flex items-center gap-2">
-                      <BookOpen class="w-6 h-6 text-brand-500" stroke-width="2.5" fill="currentColor" /> 팀 문제 추천 (커리큘럼)
+                  <h2 class="text-lg font-bold text-slate-800 flex items-center gap-2">
+                      <BookOpen class="w-5 h-5 text-brand-500" stroke-width="2.5" fill="currentColor" /> 팀 문제 추천 (커리큘럼)
                   </h2>
                   <div v-if="loadingCurriculum" class="flex items-center gap-2 text-brand-600">
                      <span class="animate-spin text-sm">⏳</span>
@@ -123,7 +130,7 @@ import { Radar } from 'vue-chartjs';
 import { Chart as ChartJS, RadialLinearScale, PointElement, LineElement, Filler, Tooltip, Legend } from 'chart.js';
 import StudyMissionCreateModal from '@/components/study/StudyMissionCreateModal.vue';
 import StudyAnalysisSidebar from '@/components/study/StudyAnalysisSidebar.vue';
-import { BookOpen, AlertTriangle, Pin, Users, BookMarked, Activity } from 'lucide-vue-next';
+import { BookOpen, AlertTriangle, Pin, Users, BookMarked, Activity, PieChart } from 'lucide-vue-next';
 
 ChartJS.register(RadialLinearScale, PointElement, LineElement, Filler, Tooltip, Legend);
 

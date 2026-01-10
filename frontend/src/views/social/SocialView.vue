@@ -1,9 +1,13 @@
 <template>
     <div class="p-8 max-w-7xl mx-auto space-y-6">
         <!-- Header -->
-        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
             <div>
-                <h1 class="text-3xl font-black text-slate-800 tracking-tight mb-2">소셜</h1>
+                <div class="flex items-center gap-3 mb-2">
+                    <Users class="w-7 h-7 text-brand-500" stroke-width="2.5" fill="currentColor" />
+                    <h1 class="text-xl font-black text-slate-800">소셜</h1>
+                </div>
+                <!-- <h1 class="text-3xl font-black text-slate-800 tracking-tight mb-2">소셜</h1> -->
                 <p class="text-slate-500 font-medium">친구들과 함께 공부하고 소통해보세요</p>
             </div>
             

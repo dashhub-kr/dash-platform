@@ -2,8 +2,8 @@ import http from './http';
 
 export const studyApi = {
     // Get list of all studies
-    getStudies() {
-        return http.get('/studies');
+    getStudies(params) {
+        return http.get('/studies', { params });
     },
     // Create a new study
     createStudy(name) {

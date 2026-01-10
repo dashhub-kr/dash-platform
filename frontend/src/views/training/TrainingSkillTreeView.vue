@@ -1,16 +1,16 @@
 <template>
-  <div class="min-h-screen bg-white text-slate-800 pb-20">
+  <div class="min-h-screen bg-white text-slate-800 pb-20 font-['Pretendard']">
     <!-- Main Layout Container -->
     <div class="flex justify-center p-4 md:p-8">
       <div class="flex gap-8 max-w-screen-xl w-full items-start">
         
         <!-- 왼쪽 칼럼: 메인 콘텐츠 -->
-        <main class="flex-1 min-w-0 space-y-6 animate-in slide-in-from-left duration-500">
+        <main class="flex-1 min-w-0 space-y-8 animate-in slide-in-from-left duration-500">
           
           <!-- Page Header (외부) -->
           <div class="flex items-center gap-3">
-            <Sword class="w-7 h-7 text-brand-500" stroke-width="2.5" fill="currentColor" />
-            <h1 class="text-xl font-black text-slate-800">알고리즘 스킬트리</h1>
+            <Network class="w-7 h-7 text-brand-500" stroke-width="2.5" fill="currentColor" />
+            <h1 class="text-xl font-black text-slate-800">스킬 트리</h1>
           </div>
 
           <!-- 스킬 트리 컴포넌트 -->
@@ -108,7 +108,7 @@
 <script setup>
 import { ref, computed, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
-import { CheckCircle, Info, TrendingUp, Zap, Map, Sword } from 'lucide-vue-next';
+import { CheckCircle, Info, TrendingUp, Zap, Map, Sword, Network } from 'lucide-vue-next';
 import SkillTreeView from '@/components/skill/SkillTreeView.vue';
 import { useAuth } from '@/composables/useAuth';
 import { tagApi } from '@/api/tags';

@@ -1,11 +1,19 @@
 <template>
-  <div class="min-h-screen bg-white text-slate-800 pb-20">
+  <div class="min-h-screen bg-white text-slate-800 pb-20 font-['Pretendard']">
     <!-- Main Layout Container -->
     <div class="flex justify-center p-4 md:p-8">
       <div class="flex gap-8 max-w-screen-xl w-full items-start">
         
         <!-- LEFT COLUMN: Main Content (로드맵 중심) -->
-        <main class="flex-1 min-w-0 space-y-6 animate-in slide-in-from-left duration-500">
+        <main class="flex-1 min-w-0 space-y-8 animate-in slide-in-from-left duration-500">
+          
+          <!-- Page Header (외부) -->
+          <div class="flex items-center gap-3">
+            <School class="w-7 h-7 text-brand-500" stroke-width="2.5" fill="currentColor" />
+            <h1 class="text-xl font-black text-slate-800">로드맵</h1>
+          </div>
+          
+
           
           <!-- 승인 대기 배너 -->
           <div v-if="isPendingApproval" class="bg-amber-50 border border-amber-200 rounded-2xl p-4 flex items-start gap-3 shadow-sm animate-pulse">
@@ -23,10 +31,9 @@
             </div>
           </div>
 
-          <!-- 맞춤형 학습 로드맵 -->
           <section class="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm">
-            <h2 class="text-xs font-black text-slate-500 uppercase tracking-wide mb-5 flex items-center gap-2">
-              <svg class="w-4 h-4 text-brand-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"></path></svg>
+            <h2 class="text-lg font-bold text-slate-800 mb-6 flex items-center gap-2">
+              <svg class="w-5 h-5 text-brand-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"></path></svg>
               맞춤형 학습 로드맵
             </h2>
             <LearningRoadmap :phases="learningPath?.aiAnalysis?.phases || []" class="w-full" />
@@ -168,7 +175,7 @@
 import { ref, computed, onMounted, watch } from 'vue';
 import { useRouter, useRoute } from 'vue-router'; // Updated
 import { 
-    RefreshCw, Trophy, Swords, Play, AlertTriangle, CheckCircle, BarChart3, Sparkles, Clock
+    RefreshCw, Trophy, Swords, Play, AlertTriangle, CheckCircle, BarChart3, Sparkles, Clock, School
 } from 'lucide-vue-next';
 import LearningRoadmap from '@/components/skill/LearningRoadmap.vue';
 import AlgorithmRadarChart from '@/components/charts/AlgorithmRadarChart.vue';

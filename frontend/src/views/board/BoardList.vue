@@ -1,5 +1,5 @@
 <template>
-  <div class="min-h-screen bg-white text-slate-800">
+  <div class="min-h-screen bg-white text-slate-800 font-['Pretendard']">
 
     <!-- 메인 레이아웃 컨테이너 -->
     <div class="flex justify-center p-4 md:p-8">
@@ -7,6 +7,12 @@
 
         <!-- 왼쪽 컬럼: 메인 콘텐츠 -->
         <main class="flex-1 min-w-0 space-y-6">
+
+          <!-- Header -->
+          <div class="flex items-center gap-3 mb-8">
+             <MessageSquare class="w-7 h-7 text-brand-500" stroke-width="2.5" fill="currentColor" />
+             <h1 class="text-xl font-black text-slate-800">전국 게시판</h1>
+          </div>
 
           <!-- 검색 바 -->
           <div class="animate-fade-in-up sticky top-6 z-40 bg-white/90 backdrop-blur-md p-1 -mx-1 rounded-2xl">
@@ -184,7 +190,7 @@
 <script setup>
 import { ref, computed, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
-import { PenSquare, Inbox, ThumbsUp, MessageCircle, Search, Flame, Lightbulb, Code2, UserX } from 'lucide-vue-next';
+import { PenSquare, Inbox, ThumbsUp, MessageCircle, Search, Flame, Lightbulb, Code2, UserX, MessageSquare } from 'lucide-vue-next';
 import NicknameRenderer from '@/components/common/NicknameRenderer.vue';
 import { boardApi } from '@/api/board';
 

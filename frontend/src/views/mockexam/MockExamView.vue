@@ -1,5 +1,5 @@
 <template>
-  <div class="min-h-screen bg-white text-slate-800 pb-20">
+  <div class="min-h-screen bg-white text-slate-800 pb-20 font-['Pretendard']">
     
     <!-- 진행 중인 시험 오버레이 (전체화면 고정) -->
     <div v-if="status.examType && !loading" class="fixed inset-0 z-50 bg-slate-50 flex items-center justify-center p-4">
@@ -73,12 +73,11 @@
       <div class="flex-1 min-w-0 space-y-8">
         
         <!-- 헤더 -->
-        <h1 class="text-2xl font-black text-slate-800 flex items-center gap-3">
-          <div class="w-10 h-10 bg-violet-100 rounded-xl flex items-center justify-center">
-            <FileText class="w-6 h-6 text-violet-600" fill="currentColor" />
-          </div>
-          모의고사 / 코딩테스트
-        </h1>
+        <!-- 헤더 -->
+        <div class="flex items-center gap-3">
+          <FileText class="w-7 h-7 text-brand-500" stroke-width="2.5" fill="currentColor" />
+          <h1 class="text-xl font-black text-slate-800">모의고사</h1>
+        </div>
 
         <!-- 로딩 중 -->
         <div v-if="loading" class="flex flex-col items-center justify-center py-20">

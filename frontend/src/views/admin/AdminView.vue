@@ -90,7 +90,7 @@
             <div class="bg-white rounded-3xl p-8 border border-slate-200 shadow-sm">
                 <h2 class="text-xl font-bold text-slate-800 mb-6 flex items-center gap-2">
                     <Compass class="w-6 h-6 text-brand-500" />
-                    스터디 관리/관전
+                    스터디 관리
                 </h2>
                 <div class="flex gap-4 mb-6">
                     <input 
@@ -187,24 +187,14 @@
             </div>
         </section>
 
-        <!-- Decoration Management -->
+        <!-- Decoration Management Removed (Legacy) -->
+        
+        <!-- System Settings Placeholder -->
         <section class="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div 
-                @click="$router.push('/admin/decorations')"
-                class="bg-white rounded-3xl p-8 border border-slate-200 shadow-sm hover:shadow-md transition-all cursor-pointer group"
-            >
-                <h2 class="text-xl font-bold text-slate-800 mb-2 flex items-center gap-2 group-hover:text-brand-600 transition-colors">
-                    <Sparkles class="w-6 h-6 text-purple-500" />
-                    닉네임 꾸미기 관리
-                </h2>
-                <p class="text-slate-500 text-sm">닉네임 효과를 등록하고 사용자에게 부여합니다.</p>
-            </div>
-
-            <!-- Placeholders -->
-             <div class="bg-slate-50 rounded-3xl p-6 border border-slate-200 border-dashed flex flex-col items-center justify-center text-center py-8">
+             <div class="bg-slate-50 rounded-3xl p-6 border border-slate-200 border-dashed flex flex-col items-center justify-center text-center py-8 md:col-span-2">
                 <Settings class="w-10 h-10 text-slate-300 mb-3" />
                 <h3 class="font-bold text-slate-500">시스템 설정</h3>
-                <p class="text-xs text-slate-400 mt-1">준비 중인 기능입니다</p>
+                <p class="text-xs text-slate-400 mt-1">예정된 기능입니다</p>
             </div>
         </section>
       </div>

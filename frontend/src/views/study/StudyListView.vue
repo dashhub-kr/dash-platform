@@ -15,7 +15,7 @@
                 <div class="flex items-center justify-between mb-6">
                     <div class="flex items-center gap-2">
                         <Trophy class="w-5 h-5 text-brand-500" fill="currentColor" />
-                        <h2 class="text-lg font-bold text-slate-800">Honor Board</h2>
+                        <h2 class="text-lg font-bold text-slate-800">이번주 랭킹</h2>
                     </div>
                     <span class="text-xs font-medium text-slate-400">Weekly Top 3</span>
                 </div>

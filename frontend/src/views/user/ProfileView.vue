@@ -5,7 +5,7 @@ import { userApi } from '@/api/user';
 import { studyApi } from '@/api/study';
 import { useAuth } from '@/composables/useAuth';
 import { onboardingApi } from '@/api/onboarding';
-import { Settings, LogOut, Github, Award, Users, Crown, RotateCcw, Loader2, HelpCircle, Zap as ZapIcon, Copy, Trash2, UserCheck, MoreVertical } from 'lucide-vue-next';
+import { Settings, LogOut, Github, Award, Users, Crown, RotateCcw, Loader2, HelpCircle, Zap as ZapIcon, Copy, Trash2, UserCheck, MoreVertical, AlertTriangle, ChevronDown } from 'lucide-vue-next';
 import BaseIconBadge from '@/components/common/BaseIconBadge.vue';
 
 const router = useRouter();
@@ -291,6 +291,7 @@ const handleDeleteStudy = async () => {
     }
 };
 import TroubleshootingModal from '@/components/common/TroubleshootingModal.vue';
+const showDangerZone = ref(false);
 const showFaq = ref(false);
 </script>
 
@@ -634,25 +635,50 @@ const showFaq = ref(false);
             </section>
             
             <!-- Danger Zone (Mobile only) - Moved to bottom -->
-             <button 
-                @click="handleDelete"
-                class="lg:hidden w-full py-4 rounded-2xl bg-rose-50 text-rose-500 font-bold hover:bg-rose-100 transition-colors flex items-center justify-center gap-2 mt-8"
-            >
-                <LogOut :size="18" />
-                회원 탈퇴
-            </button>
-            <div class="flex justify-end lg:block hidden">
-                 <button 
-                    @click="handleDelete"
-                    class="text-rose-400 hover:text-rose-600 font-bold text-sm flex items-center gap-2 px-4 py-2 hover:bg-rose-50 rounded-lg transition-colors"
+            <!-- Danger Zone (Collapsible) -->
+            <section class="border rounded-3xl overflow-hidden transition-all duration-300" 
+                     :class="showDangerZone ? 'border-rose-200 bg-rose-50/30' : 'border-slate-100 bg-white hover:border-slate-200'">
+                
+                <button 
+                    @click="showDangerZone = !showDangerZone"
+                    class="w-full flex items-center justify-between p-6 md:p-8 text-left focus:outline-none"
+                    :class="{ 'pb-2': showDangerZone }"
                 >
-                    <LogOut :size="16" />
-                    회원 탈퇴
+                    <div class="flex items-center gap-2">
+                         <div class="p-2 rounded-xl transition-colors" :class="showDangerZone ? 'bg-rose-100 text-rose-600' : 'bg-slate-50 text-slate-400'">
+                            <AlertTriangle :size="20" />
+                         </div>
+                         <div>
+                             <h2 class="text-lg font-bold transition-colors" :class="showDangerZone ? 'text-rose-600' : 'text-slate-600'">Danger Zone</h2>
+                             <p v-if="!showDangerZone" class="text-xs text-slate-400 font-medium">회원 탈퇴 등 되돌릴 수 없는 작업</p>
+                         </div>
+                    </div>
+                    <ChevronDown :size="20" class="text-slate-400 transition-transform duration-300" :class="{ 'rotate-180': showDangerZone }" />
                 </button>
-            </div>
+
+                <div v-show="showDangerZone" class="px-6 md:px-8 pb-8 pt-2 animate-in slide-in-from-top-2 fade-in duration-200">
+                    <div class="bg-white rounded-2xl p-5 flex flex-col md:flex-row items-center justify-between gap-4 border border-rose-100 shadow-sm">
+                        <div>
+                            <h3 class="font-bold text-slate-800 mb-1 flex items-center gap-2">
+                                회원 탈퇴
+                                <span class="text-[10px] px-1.5 py-0.5 rounded bg-rose-100 text-rose-600 font-bold uppercase tracking-wider">Irreversible</span>
+                            </h3>
+                            <p class="text-xs text-slate-500 font-medium leading-relaxed">
+                                계정의 모든 데이터(미션, 풀이 기록 등)가 영구적으로 삭제됩니다.<br>
+                                삭제된 계정은 복구할 수 없습니다.
+                            </p>
+                        </div>
+                        <button 
+                            @click="handleDelete"
+                            class="w-full md:w-auto px-5 py-3 bg-rose-50 border border-rose-200 text-rose-600 font-bold rounded-xl hover:bg-rose-600 hover:text-white transition-all shadow-sm shrink-0 whitespace-nowrap text-sm"
+                        >
+                            탈퇴하기
+                        </button>
+                    </div>
+                </div>
+            </section>
         </div>
       </div>
-
 
     <!-- 전역 모달 -->
     <TroubleshootingModal :isOpen="showFaq" @close="showFaq = false" />

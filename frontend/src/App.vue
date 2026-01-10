@@ -16,6 +16,16 @@
       :partner-decoration="dmPartnerInfo.partnerDecoration"
       @close="closeDM"
     />
+
+    <!-- Admin Floating Button -->
+    <router-link
+      v-if="user?.role === 'ROLE_ADMIN'"
+      to="/admin"
+      class="fixed bottom-6 right-6 z-50 p-4 bg-slate-900 text-white rounded-full shadow-lg shadow-slate-900/40 hover:scale-110 active:scale-95 transition-all text-sm font-bold flex items-center group"
+    >
+        <Shield :size="24" stroke-width="2.5" />
+        <span class="max-w-0 overflow-hidden whitespace-nowrap group-hover:max-w-xs group-hover:ml-2 transition-all duration-300">관리자</span>
+    </router-link>
   </template>
 </template>
 
@@ -26,6 +36,7 @@ import { useRoute } from "vue-router";
 import { useAuth } from "@/composables/useAuth";
 import Sidebar from "./components/layout/Sidebar.vue";
 import MobileRestrictionView from "@/views/MobileRestrictionView.vue";
+import { Shield } from 'lucide-vue-next';
 
 // Global Modals
 import UserProfileModal from "@/components/social/UserProfileModal.vue";
