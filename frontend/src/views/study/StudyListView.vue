@@ -10,7 +10,7 @@
         </main>
 
         <!-- 오른쪽 컬럼: Honor Board + 검색 (사이드바) -->
-        <aside class="hidden xl:flex w-[380px] shrink-0 flex-col gap-6 sticky top-8 h-fit">
+        <aside class="hidden lg:flex w-[380px] shrink-0 flex-col gap-6 sticky top-8 h-fit">
             <!-- Honor Board -->
             <div class="bg-white rounded-3xl border border-slate-200 shadow-sm p-6">
                 <div class="flex items-center justify-between mb-6">

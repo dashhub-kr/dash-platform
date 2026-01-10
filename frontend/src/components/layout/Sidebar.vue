@@ -324,10 +324,10 @@ const { user, logout, refresh } = useAuth();
 const route = useRoute();
 const router = useRouter();
 
-// Responsive: check if collapsed
+// Responsive: check if collapsed (lg breakpoint = 1024px)
 const isCollapsed = computed(() => {
     if (typeof window === 'undefined') return false;
-    // This will be reactive with a resize listener
+    // Collapsed when between 768px (md) and 1280px (xl)
     return windowWidth.value < 1280 && windowWidth.value >= 768;
 });
 

@@ -106,7 +106,7 @@
           </main>
   
           <!-- 오른쪽 칼럼: 사이드바 -->
-          <aside class="hidden xl:flex w-[380px] shrink-0 sticky top-8 h-fit">
+          <aside class="hidden lg:flex w-[380px] shrink-0 sticky top-8 h-fit">
               <StudyAnalysisSidebar :analysis="analysis" :memberColors="memberColors" />
           </aside>
       </div>

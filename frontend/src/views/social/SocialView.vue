@@ -142,7 +142,7 @@
                 </main>
 
                 <!-- 오른쪽 컬럼: 사이드바 (친구 검색) -->
-                <aside class="hidden xl:flex w-[380px] shrink-0 flex-col gap-6 sticky top-8 h-fit">
+                <aside class="hidden lg:flex w-[380px] shrink-0 flex-col gap-6 sticky top-8 h-fit">
                     <!-- 친구 검색 -->
                     <div class="bg-white rounded-3xl border border-slate-200 shadow-sm p-6">
                         <h2 class="text-lg font-bold text-slate-800 mb-4 flex items-center gap-2">
