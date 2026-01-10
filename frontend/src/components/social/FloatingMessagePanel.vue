@@ -157,16 +157,6 @@
                         </form>
                     </div>
                 </template>
-
-                <!-- 하단 (목록 뷰) -->
-                <div v-if="viewMode === 'list'" class="p-3 border-t border-slate-100 bg-slate-50 shrink-0">
-                    <button 
-                        @click="openFullView"
-                        class="w-full py-2 text-sm text-brand-600 font-bold hover:bg-brand-50 rounded-lg transition-colors"
-                    >
-                        소셜 탭에서 더보기
-                    </button>
-                </div>
             </div>
         </Transition>
     </div>
