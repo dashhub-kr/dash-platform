@@ -40,6 +40,7 @@ CREATE TABLE IF NOT EXISTS users (
     avatar_url VARCHAR(512),
     study_id BIGINT,
     equipped_decoration_id BIGINT,
+    log_count INT DEFAULT 0,
     deleted_at TIMESTAMP NULL DEFAULT NULL,
     FOREIGN KEY (study_id) REFERENCES studies(id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
@@ -483,6 +484,8 @@ CREATE TABLE IF NOT EXISTS decorations (
     description VARCHAR(255),
     css_class VARCHAR(50) NOT NULL,
     type VARCHAR(20) DEFAULT 'PUBLIC',
+    price INT DEFAULT 0,
+    is_active BOOLEAN DEFAULT TRUE,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 

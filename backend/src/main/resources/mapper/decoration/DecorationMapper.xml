@@ -3,12 +3,16 @@
 <mapper namespace="com.ssafy.dash.decoration.infrastructure.mapper.DecorationMapper">
 
     <insert id="insert" parameterType="Decoration" useGeneratedKeys="true" keyProperty="id">
-        INSERT INTO decorations (name, description, css_class, type, created_at)
-        VALUES (#{name}, #{description}, #{cssClass}, #{type}, #{createdAt})
+        INSERT INTO decorations (name, description, css_class, type, price, is_active, created_at)
+        VALUES (#{name}, #{description}, #{cssClass}, #{type}, #{price}, #{isActive}, #{createdAt})
     </insert>
 
     <select id="selectAll" resultType="Decoration">
         SELECT * FROM decorations ORDER BY id DESC
+    </select>
+
+    <select id="selectShopItems" resultType="Decoration">
+        SELECT * FROM decorations WHERE is_active = true AND type = 'PUBLIC' ORDER BY price ASC, id DESC
     </select>
 
     <select id="selectById" resultType="Decoration">

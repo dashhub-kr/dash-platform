@@ -11,12 +11,20 @@ import java.util.Optional;
 @Mapper
 public interface DecorationMapper {
     void insert(Decoration decoration);
+
     List<Decoration> selectAll();
+
+    List<Decoration> selectShopItems();
+
     Optional<Decoration> selectById(Long id);
+
     void delete(Long id);
-    
+
     void insertUserDecoration(UserDecoration userDecoration);
+
     List<UserDecoration> selectByUserId(Long userId);
+
     int countUserDecoration(@Param("userId") Long userId, @Param("decorationId") Long decorationId);
+
     void deleteUserDecoration(@Param("userId") Long userId, @Param("decorationId") Long decorationId);
 }

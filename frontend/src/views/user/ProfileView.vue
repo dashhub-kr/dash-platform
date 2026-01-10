@@ -3,10 +3,12 @@ import { ref, onMounted, computed } from 'vue';
 import { useRouter } from 'vue-router';
 import { userApi } from '@/api/user';
 import { studyApi } from '@/api/study';
+import { shopApi } from '@/api/shop';
 import { useAuth } from '@/composables/useAuth';
 import { onboardingApi } from '@/api/onboarding';
-import { Settings, LogOut, Github, Award, Users, Crown, RotateCcw, Loader2, HelpCircle, Zap as ZapIcon, Copy, Trash2, UserCheck, MoreVertical, AlertTriangle, ChevronDown } from 'lucide-vue-next';
+import { Settings, LogOut, Github, Award, Users, Crown, RotateCcw, Loader2, HelpCircle, Zap as ZapIcon, Copy, Trash2, UserCheck, MoreVertical, AlertTriangle, ChevronDown, Palette, Check, Sparkles, X } from 'lucide-vue-next';
 import BaseIconBadge from '@/components/common/BaseIconBadge.vue';
+import TroubleshootingModal from '@/components/common/TroubleshootingModal.vue';
 
 const router = useRouter();
 const { refresh, user } = useAuth();
@@ -122,7 +124,8 @@ const userData = ref({
     webhookConfigured: false,
     studyId: null,
     isStudyLeader: false,
-    studyType: null
+    studyType: null,
+    equippedDecorationClass: null
 });
 
 const studyName = ref(null);
@@ -290,7 +293,62 @@ const handleDeleteStudy = async () => {
         alert(e.response?.data?.message || "해체에 실패했습니다.");
     }
 };
-import TroubleshootingModal from '@/components/common/TroubleshootingModal.vue';
+
+
+// 칭호(장식) 관리
+const showDecorationModal = ref(false);
+const showDecorationMenu = ref(false); // 카드 내 더보기 메뉴
+const ownedDecorations = ref([]);
+const loadingDecorations = ref(false);
+
+const openDecorationModal = async () => {
+    showDecorationModal.value = true;
+    showDecorationMenu.value = false;
+    loadingDecorations.value = true;
+    try {
+        const res = await shopApi.getMyDecorations();
+        ownedDecorations.value = res.data;
+    } catch (e) {
+        console.error("Failed to load decorations", e);
+        // alert("보유한 아이템을 불러오지 못했습니다.");
+    } finally {
+        loadingDecorations.value = false;
+    }
+};
+
+const handleEquip = async (decorationId, className) => {
+    try {
+        await shopApi.equipDecoration(decorationId);
+        userData.value.equippedDecorationClass = className;
+        showDecorationModal.value = false;
+        // alert("효과가 적용되었습니다!");
+    } catch (e) {
+        console.error(e);
+        alert("착용에 실패했습니다.");
+    }
+};
+
+const handleUnequip = async () => {
+    try {
+        await shopApi.unequipDecoration();
+        userData.value.equippedDecorationClass = null;
+        showDecorationModal.value = false;
+        // alert("효과가 해제되었습니다.");
+    } catch (e) {
+        console.error(e);
+        alert("해제에 실패했습니다.");
+    }
+};
+
+const getDecorationName = computed(() => {
+    if (!userData.value.equippedDecorationClass) return '효과 없음';
+    // 클래스명에서 이름 추론은 어려우므로 일단 일반 텍스트 표시
+    // 실제로는 userDecoration -> decoration.name을 찾아서 매핑해야 하지만, 
+    // 여기서는 간단히 표시하거나, store/API에서 가져온 정보로 표시해야 함.
+    // 현재 API 구조상 UserResponse에는 ClassName만 있고 Name은 없음.
+    // 일단 "장착 중" 정도로 표시하거나, 추후 UserResponse에 decorationName 추가 필요.
+    return '효과 적용 중';
+});
 const showDangerZone = ref(false);
 const showFaq = ref(false);
 </script>
@@ -404,6 +462,59 @@ const showFaq = ref(false);
 
                         </div>
                     </div>
+                    </div>
+
+                <!-- 칭호(장식) 카드 -->
+                <div class="bg-white rounded-3xl p-5 flex items-center justify-between transition-colors relative shadow-sm">
+                    <div class="flex items-center gap-5">
+                         <BaseIconBadge 
+                            :icon="Palette" 
+                            color="violet" 
+                            size="lg"
+                        />
+                        <div class="z-10">
+                            <div class="text-xl font-black text-slate-800 tracking-tight flex items-center gap-2">
+                                <span :class="userData.equippedDecorationClass" class="transition-all">
+                                    {{ userData.equippedDecorationClass ? 'Nickname' : 'No Effect' }}
+                                </span>
+                            </div>
+                            <div class="text-xs font-bold text-slate-400 uppercase mt-0.5">
+                                Nickname Effect
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 액션 메뉴 (드롭다운) -->
+                    <div class="relative">
+                        <button 
+                            @click="showDecorationMenu = !showDecorationMenu"
+                            class="p-2 text-slate-300 hover:text-slate-600 hover:bg-slate-100 rounded-xl transition-all"
+                        >
+                            <MoreVertical :size="20" />
+                        </button>
+
+                        <!-- 백드롭 -->
+                        <div v-if="showDecorationMenu" @click="showDecorationMenu = false" class="fixed inset-0 z-10 cursor-default bg-transparent"></div>
+
+                        <!-- 메뉴 -->
+                        <div v-if="showDecorationMenu" class="absolute right-0 top-full mt-2 w-48 bg-white rounded-xl shadow-xl border border-slate-100 p-1.5 z-20 animate-in fade-in zoom-in-95 duration-200 origin-top-right flex flex-col gap-1">
+                            <button 
+                                @click="openDecorationModal"
+                                class="w-full text-left px-3 py-2.5 text-sm font-bold text-slate-600 hover:bg-slate-50 hover:text-slate-800 rounded-lg transition-colors flex items-center gap-2"
+                            >
+                                <Sparkles :size="16" />
+                                효과 변경하기
+                            </button>
+                             <button 
+                                v-if="userData.equippedDecorationClass"
+                                @click="handleUnequip(); showDecorationMenu = false"
+                                class="w-full text-left px-3 py-2.5 text-sm font-bold text-rose-500 hover:bg-rose-50 rounded-lg transition-colors flex items-center gap-2"
+                            >
+                                <X :size="16" />
+                                효과 해제
+                            </button>
+                        </div>
+                    </div>
                 </div>
             </div>
             
@@ -506,6 +617,63 @@ const showFaq = ref(false);
                         >
                             스터디 삭제
                         </button>
+                    </div>
+                </div>
+            </div>
+
+
+            <!-- Decoration Select Modal -->
+            <div v-if="showDecorationModal" class="fixed inset-0 z-[9999] flex items-center justify-center p-4">
+                <div class="absolute inset-0 bg-slate-900/40 backdrop-blur-sm" @click="showDecorationModal = false"></div>
+                
+                <div class="relative bg-white rounded-3xl w-full max-w-lg p-6 shadow-2xl animate-in fade-in zoom-in-95 duration-200 flex flex-col max-h-[85vh]">
+                    <div class="flex items-center justify-between mb-6 shrink-0">
+                        <h3 class="text-xl font-black text-slate-800 flex items-center gap-2">
+                            <Palette :size="24" class="text-violet-500" />
+                            보유 중인 효과
+                        </h3>
+                        <button @click="showDecorationModal = false" class="p-2 text-slate-400 hover:bg-slate-100 rounded-full transition-colors">
+                            <X :size="20" />
+                        </button>
+                    </div>
+
+                    <div v-if="loadingDecorations" class="flex-1 flex items-center justify-center py-20">
+                         <Loader2 class="animate-spin text-brand-500" :size="32"/>
+                    </div>
+                    
+                    <div v-else-if="ownedDecorations.length === 0" class="flex-1 py-12 text-center text-slate-400 font-bold bg-slate-50 rounded-2xl flex flex-col items-center justify-center gap-2">
+                        <span class="bg-slate-200 p-3 rounded-full"><Sparkles class="w-6 h-6 text-slate-400" /></span>
+                        보유한 효과가 없습니다.<br>
+                        <router-link to="/shop" class="text-brand-500 hover:underline text-sm mt-1">상점에서 구매하기</router-link>
+                    </div>
+
+                    <div v-else class="flex-1 overflow-y-auto custom-scrollbar p-1 -m-1">
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                            <button 
+                                v-for="item in ownedDecorations" 
+                                :key="item.id"
+                                @click="handleEquip(item.decoration.id, item.decoration.cssClass)"
+                                class="group relative p-4 rounded-2xl border-2 transition-all text-left flex flex-col gap-3 hover:-translate-y-0.5 hover:shadow-md"
+                                :class="userData.equippedDecorationClass === item.decoration.cssClass 
+                                    ? 'border-violet-500 bg-violet-50 ring-2 ring-violet-200 ring-offset-2' 
+                                    : 'border-slate-100 bg-white hover:border-violet-200'"
+                            >
+                                <!-- Preview -->
+                                <div class="h-12 flex items-center justify-center bg-slate-50 rounded-xl border border-slate-100 group-hover:bg-white transition-colors overflow-hidden">
+                                    <span class="font-black text-lg truncate px-2" :class="item.decoration.cssClass">NickName</span>
+                                </div>
+                                
+                                <div class="flex items-center justify-between">
+                                    <div class="truncate pr-2">
+                                        <div class="font-bold text-slate-700 truncate text-sm">{{ item.decoration.name }}</div>
+                                        <div class="text-[10px] text-slate-400 truncate">{{ item.decoration.description }}</div>
+                                    </div>
+                                    <div v-if="userData.equippedDecorationClass === item.decoration.cssClass" class="shrink-0 w-6 h-6 bg-violet-500 text-white rounded-full flex items-center justify-center shadow-sm">
+                                        <Check :size="14" stroke-width="3" />
+                                    </div>
+                                </div>
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>

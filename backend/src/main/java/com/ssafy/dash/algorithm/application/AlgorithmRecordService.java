@@ -40,15 +40,13 @@ public class AlgorithmRecordService {
 
     @Transactional
     public AlgorithmRecordResult create(AlgorithmRecordCreateCommand command) {
-        userRepository.findById(command.userId())
+        var user = userRepository.findById(command.userId())
                 .orElseThrow(() -> new UserNotFoundException(command.userId()));
 
         LocalDateTime now = LocalDateTime.now();
         AlgorithmRecord record = AlgorithmRecord.create(
                 command.userId(),
-                userRepository.findById(command.userId())
-                        .map(com.ssafy.dash.user.domain.User::getStudyId)
-                        .orElse(null),
+                user.getStudyId(),
                 command.problemNumber(),
                 command.title(),
                 command.language(),
@@ -56,6 +54,10 @@ public class AlgorithmRecordService {
                 now);
 
         algorithmRecordRepository.save(record);
+
+        // Log Count Increase (1 Log per solution)
+        user.addLogs(1);
+        userRepository.update(user);
 
         // 스터디 미션, 디펜스, 모의고사 완료 체크
         try {

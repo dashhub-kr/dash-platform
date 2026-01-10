@@ -152,16 +152,17 @@ const routes = [
     component: () => import("../views/admin/AdminView.vue"),
     meta: { requiresAuth: true, requiresAdmin: true }
   },
-  {
-    path: "/admin/decorations",
-    name: "DecorationAdmin",
-    component: () => import("../views/admin/DecorationAdmin.vue"),
-    meta: { requiresAuth: true, requiresAdmin: true }
-  },
+
   {
     path: "/profile/decorations",
     name: "MyDecorations",
     component: () => import("../views/user/MyDecorations.vue"),
+    meta: { requiresAuth: true }
+  },
+  {
+    path: "/shop",
+    name: "ShopView",
+    component: () => import("../views/shop/ShopView.vue"),
     meta: { requiresAuth: true }
   },
 ];

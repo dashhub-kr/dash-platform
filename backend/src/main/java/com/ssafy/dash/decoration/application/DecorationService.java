@@ -8,7 +8,6 @@ import com.ssafy.dash.user.domain.UserRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -24,7 +23,9 @@ public class DecorationService {
 
     @Transactional
     public Decoration create(String name, String description, String cssClass, String type) {
-        Decoration decoration = Decoration.create(name, description, cssClass, type);
+        // Default: Price 0, Active True (or update Service to accept these)
+        // For backwards compatibility/legacy admin:
+        Decoration decoration = Decoration.create(name, description, cssClass, type, 0, true);
         decorationRepository.save(decoration);
         return decoration;
     }
@@ -55,10 +56,10 @@ public class DecorationService {
         if (!decorationRepository.existsUserDecoration(userId, decorationId)) {
             throw new IllegalArgumentException("User does not own this decoration");
         }
-        
+
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("User not found"));
-        
+
         user.setEquippedDecorationId(decorationId);
         userRepository.update(user);
     }
@@ -67,7 +68,7 @@ public class DecorationService {
     public void unequip(Long userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("User not found"));
-        
+
         user.setEquippedDecorationId(null);
         userRepository.update(user);
     }

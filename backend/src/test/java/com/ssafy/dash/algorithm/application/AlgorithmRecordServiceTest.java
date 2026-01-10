@@ -53,12 +53,17 @@ class AlgorithmRecordServiceTest {
     @Test
     @DisplayName("사용자가 존재하면 알고리즘 기록을 생성하고 결과를 반환한다")
     void createRecord_Success() {
-        AlgorithmRecordCreateCommand command = TestFixtures.createAlgorithmRecordCreateCommand(TestFixtures.TEST_ALGORITHM_CODE);
+        AlgorithmRecordCreateCommand command = TestFixtures
+                .createAlgorithmRecordCreateCommand(TestFixtures.TEST_ALGORITHM_CODE);
         given(userRepository.findById(command.userId())).willReturn(Optional.of(user));
 
         AlgorithmRecordResult response = algorithmRecordService.create(command);
 
         verify(algorithmRecordRepository).save(any(AlgorithmRecord.class));
+        // Verify Log Earning Logic
+        verify(userRepository).update(user);
+        assertThat(user.getLogCount()).isEqualTo(1); // Initially 0, +1 per solve
+
         assertThat(response.problemNumber()).isEqualTo(command.problemNumber());
         assertThat(response.code()).isEqualTo(TestFixtures.TEST_ALGORITHM_CODE);
     }
@@ -66,7 +71,8 @@ class AlgorithmRecordServiceTest {
     @Test
     @DisplayName("존재하지 않는 사용자로 기록을 생성하면 UserNotFoundException이 발생한다")
     void createRecord_UserMissing_Throws() {
-        AlgorithmRecordCreateCommand command = TestFixtures.createAlgorithmRecordCreateCommand(TestFixtures.TEST_ALGORITHM_CODE);
+        AlgorithmRecordCreateCommand command = TestFixtures
+                .createAlgorithmRecordCreateCommand(TestFixtures.TEST_ALGORITHM_CODE);
         given(userRepository.findById(command.userId())).willReturn(Optional.empty());
 
         assertThatThrownBy(() -> algorithmRecordService.create(command))
@@ -77,7 +83,8 @@ class AlgorithmRecordServiceTest {
     @Test
     @DisplayName("ID로 알고리즘 기록을 조회하면 결과 DTO를 반환한다")
     void findById_Success() {
-        given(algorithmRecordRepository.findById(TestFixtures.TEST_ALGORITHM_RECORD_ID)).willReturn(Optional.of(record));
+        given(algorithmRecordRepository.findById(TestFixtures.TEST_ALGORITHM_RECORD_ID))
+                .willReturn(Optional.of(record));
 
         AlgorithmRecordResult response = algorithmRecordService.findById(TestFixtures.TEST_ALGORITHM_RECORD_ID);
 
@@ -124,7 +131,8 @@ class AlgorithmRecordServiceTest {
     @DisplayName("기록을 수정하면 변경된 값이 결과에 반영된다")
     void updateRecord_Success() {
         AlgorithmRecordUpdateCommand command = TestFixtures.createAlgorithmRecordUpdateCommand("updated code");
-        given(algorithmRecordRepository.findById(TestFixtures.TEST_ALGORITHM_RECORD_ID)).willReturn(Optional.of(record));
+        given(algorithmRecordRepository.findById(TestFixtures.TEST_ALGORITHM_RECORD_ID))
+                .willReturn(Optional.of(record));
 
         AlgorithmRecordResult response = algorithmRecordService.update(TestFixtures.TEST_ALGORITHM_RECORD_ID, command);
 

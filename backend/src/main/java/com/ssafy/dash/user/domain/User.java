@@ -20,6 +20,7 @@ public class User {
     private String username;
     private String email;
     private String role;
+    @Builder.Default
     private String status = "ACTIVE";
     private LocalDateTime createdAt;
     private String provider;
@@ -35,16 +36,39 @@ public class User {
     private Integer solvedacTier;
     private Integer solvedacRating;
     private Integer solvedacClass;
-    private Integer solvedCount;
+    @Builder.Default
+    private Integer solvedCount = 0;
+    @Builder.Default
+    private Integer logCount = 0; // Personal Currency
     private LocalDateTime statsLastSyncedAt;
+
+    public void addLogs(int amount) {
+        if (amount > 0) {
+            this.logCount = (this.logCount == null ? 0 : this.logCount) + amount;
+        }
+    }
+
+    public void useLogs(int amount) {
+        if (amount > 0) {
+            int current = (this.logCount == null ? 0 : this.logCount);
+            if (current < amount) {
+                throw new IllegalStateException("Not enough logs");
+            }
+            this.logCount = current - amount;
+        }
+    }
 
     // 랜덤 디펜스 필드
     private String defenseType; // "SILVER" 또는 "GOLD"
     private Integer defenseProblemId;
     private LocalDateTime defenseStartTime;
+    @Builder.Default
     private Integer silverStreak = 0;
+    @Builder.Default
     private Integer goldStreak = 0;
+    @Builder.Default
     private Integer maxSilverStreak = 0;
+    @Builder.Default
     private Integer maxGoldStreak = 0;
 
     private User(Long id, String username, String email, LocalDateTime createdAt,

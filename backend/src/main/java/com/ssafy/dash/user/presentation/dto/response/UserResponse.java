@@ -24,7 +24,8 @@ public record UserResponse(
         String pendingStudyName,
         String friendshipStatus,
         Boolean hasAnalysis,
-        String equippedDecorationClass) {
+        String equippedDecorationClass,
+        Integer logCount) {
 
     public static UserResponse from(UserResult result) {
         return new UserResponse(
@@ -47,7 +48,8 @@ public record UserResponse(
                 result.pendingStudyName(),
                 result.friendshipStatus(),
                 result.hasAnalysis(),
-                result.equippedDecorationClass());
+                result.equippedDecorationClass(),
+                result.logCount());
     }
 
 }

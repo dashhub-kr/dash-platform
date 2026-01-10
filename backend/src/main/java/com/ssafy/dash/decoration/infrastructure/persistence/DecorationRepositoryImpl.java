@@ -29,6 +29,11 @@ public class DecorationRepositoryImpl implements DecorationRepository {
     }
 
     @Override
+    public List<Decoration> selectShopItems() {
+        return decorationMapper.selectShopItems();
+    }
+
+    @Override
     public Optional<Decoration> findById(Long id) {
         return decorationMapper.selectById(id);
     }

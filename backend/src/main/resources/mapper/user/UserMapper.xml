@@ -4,8 +4,8 @@
 
   <insert id="insert" parameterType="User" useGeneratedKeys="true" keyProperty="id"> INSERT INTO
     users (username, email, role, status, created_at, provider, provider_id, avatar_url,
-    equipped_decoration_id) VALUES (#{username}, #{email}, #{role}, #{status}, #{createdAt},
-    #{provider}, #{providerId}, #{avatarUrl}, #{equippedDecorationId}) </insert>
+    equipped_decoration_id, log_count) VALUES (#{username}, #{email}, #{role}, #{status}, #{createdAt},
+    #{provider}, #{providerId}, #{avatarUrl}, #{equippedDecorationId}, #{logCount}) </insert>
 
   <select id="selectById" resultType="User" parameterType="long"> SELECT u.*, d.css_class as
     equipped_decoration_class FROM users u LEFT JOIN decorations d ON u.equipped_decoration_id =
@@ -32,8 +32,8 @@
     #{solvedCount}, stats_last_synced_at = #{statsLastSyncedAt}, defense_type = #{defenseType},
     defense_problem_id = #{defenseProblemId}, defense_start_time = #{defenseStartTime},
     silver_streak = #{silverStreak}, gold_streak = #{goldStreak}, max_silver_streak =
-    #{maxSilverStreak}, max_gold_streak = #{maxGoldStreak}, deleted_at = #{deletedAt} WHERE id =
-    #{id} </update>
+    #{maxSilverStreak}, max_gold_streak = #{maxGoldStreak}, deleted_at = #{deletedAt},
+    log_count = #{logCount} WHERE id = #{id} </update>
 
   <update id="delete" parameterType="long"> UPDATE users SET deleted_at = CURRENT_TIMESTAMP WHERE id
     = #{id} </update>

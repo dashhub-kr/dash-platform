@@ -15,14 +15,19 @@ public class Decoration {
     private String description;
     private String cssClass;
     private String type; // PUBLIC, ADMIN_ONLY
+    private Integer price;
+    private Boolean isActive;
     private LocalDateTime createdAt;
-    
-    public static Decoration create(String name, String description, String cssClass, String type) {
+
+    public static Decoration create(String name, String description, String cssClass, String type, Integer price,
+            Boolean isActive) {
         Decoration d = new Decoration();
         d.name = name;
         d.description = description;
         d.cssClass = cssClass;
         d.type = type;
+        d.price = price != null ? price : 0;
+        d.isActive = isActive != null ? isActive : true;
         d.createdAt = LocalDateTime.now();
         return d;
     }
