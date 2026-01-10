@@ -63,9 +63,13 @@
         
         <!-- Header -->
         <!-- Header -->
-        <div class="flex items-center gap-3">
-          <Shield class="w-7 h-7 text-brand-500" stroke-width="2.5" fill="currentColor" />
-          <h1 class="text-xl font-black text-slate-800">랜덤 디펜스</h1>
+        <!-- Header -->
+        <div class="mb-8">
+          <div class="flex items-center gap-3 mb-2">
+            <Shield class="w-7 h-7 text-brand-500" stroke-width="2.5" fill="currentColor" />
+            <h1 class="text-xl font-black text-slate-800">랜덤 디펜스</h1>
+          </div>
+          <p class="text-slate-500 font-medium">무작위 문제를 해결하며 최다 연승에 도전해보세요</p>
         </div>
 
         <!-- Loading -->

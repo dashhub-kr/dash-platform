@@ -8,14 +8,17 @@
         <div class="flex-1 min-w-0">
       
       <!-- Header with Currency Badge -->
-      <div class="relative flex items-center mb-8 h-7">
-        <div class="flex items-center gap-3">
-          <ShoppingBag class="w-7 h-7 text-brand-500" stroke-width="2.5" fill="currentColor" />
-          <h1 class="text-xl font-black text-slate-800">포인트 상점</h1>
+      <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
+        <div>
+          <div class="flex items-center gap-3 mb-2">
+            <ShoppingBag class="w-7 h-7 text-brand-500" stroke-width="2.5" fill="currentColor" />
+            <h1 class="text-xl font-black text-slate-800">상점</h1>
+          </div>
+          <p class="text-slate-500 font-medium">획득한 로그로 다양한 아이템을 구매해보세요</p>
         </div>
 
-        <!-- Currency Badge (Integrated & Absolute) -->
-        <div v-if="user" class="absolute right-0 top-1/2 -translate-y-1/2 bg-white rounded-2xl pl-3 pr-5 py-2 shadow-sm border border-slate-200 flex items-center gap-3 transition-transform hover:scale-105 select-none ring-1 ring-slate-100 z-10">
+        <!-- Currency Badge -->
+        <div v-if="user" class="bg-white rounded-2xl pl-3 pr-5 py-2 shadow-sm border border-slate-200 flex items-center gap-3 transition-transform hover:scale-105 select-none ring-1 ring-slate-100">
              <div class="relative">
                 <div class="w-10 h-10 bg-slate-50 rounded-xl flex items-center justify-center border border-slate-100 shadow-inner">
                     <img src="/images/items/log.png" class="w-6 h-6 object-contain drop-shadow-sm" alt="Logs" />

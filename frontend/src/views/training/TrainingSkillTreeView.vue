@@ -11,9 +11,13 @@
         <main class="flex-1 min-w-0 space-y-8 animate-in slide-in-from-left duration-500">
           
           <!-- Page Header (외부) -->
-          <div class="flex items-center gap-3">
-            <Network class="w-7 h-7 text-brand-500" stroke-width="2.5" fill="currentColor" />
-            <h1 class="text-xl font-black text-slate-800">스킬 트리</h1>
+          <!-- Page Header (외부) -->
+          <div class="mb-8">
+            <div class="flex items-center gap-3 mb-2">
+              <Network class="w-7 h-7 text-brand-500" stroke-width="2.5" fill="currentColor" />
+              <h1 class="text-xl font-black text-slate-800">스킬 트리</h1>
+            </div>
+            <p class="text-slate-500 font-medium">알고리즘 지식을 체계적으로 확장해보세요</p>
           </div>
 
           <!-- 스킬 트리 컴포넌트 -->

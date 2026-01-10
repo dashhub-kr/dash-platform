@@ -17,9 +17,12 @@
           <main class="flex-1 min-w-0 space-y-8 animate-in slide-in-from-left duration-500">
              
              <!-- Page Header -->
-             <div class="flex items-center gap-3">
-               <PieChart class="w-7 h-7 text-brand-500" stroke-width="2.5" fill="currentColor" />
-               <h1 class="text-xl font-black text-slate-800">팀 분석</h1>
+             <div class="mb-8">
+               <div class="flex items-center gap-3 mb-2">
+                 <PieChart class="w-7 h-7 text-brand-500" stroke-width="2.5" fill="currentColor" />
+                 <h1 class="text-xl font-black text-slate-800">팀 분석</h1>
+               </div>
+               <p class="text-slate-500 font-medium">팀에 맞는 추천 문제를 등록해보세요</p>
              </div>
              
 

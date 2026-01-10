@@ -23,14 +23,17 @@
             
             <!-- 왼쪽 칼럼: 메인 콘텐츠 (미션) -->
             <main class="flex-1 min-w-0">
-                <!-- 헤더 섹션 (Absolute Positioning for Button) -->
-                <div class="relative flex items-center mb-8 h-7">
-                    <div class="flex items-center gap-3">
-                        <Target class="w-7 h-7 text-brand-500" stroke-width="2.5" fill="currentColor" />
-                        <h1 class="text-xl font-black text-slate-800">팀 미션</h1>
+                <!-- 헤더 섹션 -->
+                <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
+                    <div>
+                        <div class="flex items-center gap-3 mb-2">
+                            <Target class="w-7 h-7 text-brand-500" stroke-width="2.5" fill="currentColor" />
+                            <h1 class="text-xl font-black text-slate-800">팀 미션</h1>
+                        </div>
+                        <p class="text-slate-500 font-medium">동료들과 함께 미션을 수행하고 성장하세요</p>
                     </div>
                     
-                    <div class="absolute right-0 top-1/2 -translate-y-1/2">
+                    <div>
                         <button v-if="isLeader" @click="openCreateModal"
                                 class="px-5 py-2.5 bg-brand-500 hover:bg-brand-600 text-white rounded-xl font-bold text-sm transition-all flex items-center gap-2 shadow-sm hover:translate-y-0.5 active:translate-y-1">
                         <Plus :size="18" stroke-width="3" />

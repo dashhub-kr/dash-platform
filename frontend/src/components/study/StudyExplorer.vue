@@ -3,10 +3,11 @@
     <!-- 헤더 (온보딩 여부에 따라 표시) -->
     <div v-if="!isOnboarding" class="mb-8 flex items-center justify-between">
       <div>
-        <div class="flex items-center gap-3">
+        <div class="flex items-center gap-3 mb-2">
            <Compass class="w-7 h-7 text-brand-500" stroke-width="2.5" fill="currentColor" />
            <h1 class="text-xl font-black text-slate-800">스터디 찾기</h1>
         </div>
+        <p class="text-slate-500 font-medium">관심 있는 스터디를 찾아보세요</p>
       </div>
       <button
           v-if="user?.studyType === 'PERSONAL'"

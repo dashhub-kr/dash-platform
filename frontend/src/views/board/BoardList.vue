@@ -11,34 +11,24 @@
         <main class="flex-1 min-w-0 space-y-6">
 
           <!-- Header -->
-          <div class="flex items-center gap-3 mb-8">
-             <MessageSquare class="w-7 h-7 text-brand-500" stroke-width="2.5" fill="currentColor" />
-             <h1 class="text-xl font-black text-slate-800">전국 게시판</h1>
+          <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
+             <div>
+                <div class="flex items-center gap-3 mb-2">
+                   <MessageSquare class="w-7 h-7 text-brand-500" stroke-width="2.5" fill="currentColor" />
+                   <h1 class="text-xl font-black text-slate-800">전국 게시판</h1>
+                </div>
+                <p class="text-slate-500 font-medium">자유롭게 질문하고 정보를 공유해보세요</p>
+             </div>
+             <button
+               @click="$router.push('/boards/write')"
+               class="flex items-center gap-2 px-5 py-2.5 bg-brand-600 hover:bg-brand-500 text-white rounded-xl font-bold transition-all shadow-md shadow-brand-200 hover:-translate-y-0.5 shrink-0"
+             >
+               <PenSquare :size="18" />
+               글쓰기
+             </button>
           </div>
 
-          <!-- 검색 바 -->
-          <div class="animate-fade-in-up sticky top-6 z-40 bg-white/90 backdrop-blur-md p-1 -mx-1 rounded-2xl">
-            <div class="flex gap-3">
-              <div class="flex-1 relative">
-                <Search :size="18" class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" />
-                <input 
-                  v-model="searchProblemNumber"
-                  @keyup.enter="searchPosts"
-                  type="number"
-                  placeholder="문제 번호로 검색 (예: 1234)"
-                  class="w-full pl-12 pr-4 py-3 bg-white border border-slate-200 rounded-xl text-slate-700 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-brand-400 focus:border-transparent shadow-sm"
-                />
-              </div>
-              전국 게시판
-            </h1>
-            <button
-              @click="$router.push('/boards/write')"
-              class="flex items-center gap-2 px-5 py-3 bg-brand-600 hover:bg-brand-500 text-white rounded-xl font-bold transition-all shadow-md shadow-brand-200 hover:-translate-y-0.5 shrink-0"
-            >
-              <PenSquare :size="18" />
-              글쓰기
-            </button>
-          </div>
+
 
           <!-- 게시판 목록 -->
           <div class="bg-white/80 border border-white/60 rounded-3xl overflow-hidden shadow-xl shadow-slate-200/50 backdrop-blur-md animate-fade-in-up delay-100">
@@ -192,17 +182,17 @@
               </div>
               게시판 이용 가이드
             </h3>
-            <p class="text-xs text-slate-500 leading-relaxed">
-              자유롭게 질문하고 정보를 공유해보세요.
+            <p class="text-xs text-slate-500 leading-relaxed word-keep-all">
+              커뮤니티 가이드라인을 위반하는 게시물은 제재될 수 있습니다.
             </p>
           </div>
         </aside>
 
       </div>
     </div>
-      </div>
-    </div>
   </div>
+  </div>
+</div>
 </template>
 
 <script setup>

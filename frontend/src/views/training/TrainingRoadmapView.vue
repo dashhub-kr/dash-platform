@@ -11,9 +11,13 @@
         <main class="flex-1 min-w-0 space-y-8 animate-in slide-in-from-left duration-500">
           
           <!-- Page Header (외부) -->
-          <div class="flex items-center gap-3">
-            <School class="w-7 h-7 text-brand-500" stroke-width="2.5" fill="currentColor" />
-            <h1 class="text-xl font-black text-slate-800">로드맵</h1>
+          <!-- Page Header (외부) -->
+          <div class="mb-8">
+            <div class="flex items-center gap-3 mb-2">
+              <School class="w-7 h-7 text-brand-500" stroke-width="2.5" fill="currentColor" />
+              <h1 class="text-xl font-black text-slate-800">로드맵</h1>
+            </div>
+            <p class="text-slate-500 font-medium">나에게 맞는 학습 경로를 따라가보세요</p>
           </div>
           
 

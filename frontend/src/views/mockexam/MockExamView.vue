@@ -77,9 +77,12 @@
         
         <!-- 헤더 -->
         <!-- 헤더 -->
-        <div class="flex items-center gap-3">
-          <FileText class="w-7 h-7 text-brand-500" stroke-width="2.5" fill="currentColor" />
-          <h1 class="text-xl font-black text-slate-800">모의고사</h1>
+        <div class="mb-8">
+          <div class="flex items-center gap-3 mb-2">
+            <FileText class="w-7 h-7 text-brand-500" stroke-width="2.5" fill="currentColor" />
+            <h1 class="text-xl font-black text-slate-800">모의고사</h1>
+          </div>
+          <p class="text-slate-500 font-medium">기출 문제를 풀며 실전 감각을 완성해보세요</p>
         </div>
 
         <!-- 로딩 중 -->
