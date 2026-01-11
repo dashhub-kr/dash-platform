@@ -122,3 +122,30 @@ CREATE TABLE IF NOT EXISTS comment_likes (
   FOREIGN KEY (user_id) REFERENCES users(id),
   UNIQUE (comment_id, user_id)
 );
+
+CREATE TABLE IF NOT EXISTS battle (
+    id BIGINT PRIMARY KEY AUTO_INCREMENT,
+    type VARCHAR(20) NOT NULL,
+    creator_id BIGINT NOT NULL,
+    status VARCHAR(20) NOT NULL DEFAULT 'PENDING',
+    problem_ids JSON NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    started_at TIMESTAMP,
+    completed_at TIMESTAMP,
+    FOREIGN KEY (creator_id) REFERENCES users(id)
+);
+
+CREATE TABLE IF NOT EXISTS battle_participant (
+    id BIGINT PRIMARY KEY AUTO_INCREMENT,
+    battle_id BIGINT NOT NULL,
+    user_id BIGINT NOT NULL,
+    status VARCHAR(20) NOT NULL DEFAULT 'INVITED',
+    score INT DEFAULT 0,
+    problems_solved INT DEFAULT 0,
+    total_time_seconds BIGINT DEFAULT 0,
+    started_at TIMESTAMP,
+    completed_at TIMESTAMP,
+    FOREIGN KEY (battle_id) REFERENCES battle(id) ON DELETE CASCADE,
+    FOREIGN KEY (user_id) REFERENCES users(id),
+    UNIQUE (battle_id, user_id)
+);
