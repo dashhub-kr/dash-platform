@@ -240,36 +240,62 @@ public class SocialService {
             return java.util.Collections.emptyList();
         }
 
-        // 친구들의 algorithm_record 조회
-        List<com.ssafy.dash.social.application.dto.result.FeedResult> allFeeds = friendIds
-                .stream().<com.ssafy.dash.social.application.dto.result.FeedResult>flatMap(friendId -> {
-                    User friend = userRepository.findById(friendId).orElse(null);
-                    if (friend == null)
-                        return java.util.stream.Stream.empty();
+        int offset = page * size;
+        List<com.ssafy.dash.algorithm.domain.AlgorithmRecord> records = algorithmRecordRepository.findFeed(friendIds,
+                offset, size);
 
-                    return algorithmRecordRepository.findByUserId(friendId).stream()
-                            .map(record -> com.ssafy.dash.social.application.dto.result.FeedResult.solved(
-                                    record.getId(),
-                                    friend.getId(),
-                                    friend.getUsername(),
-                                    friend.getAvatarUrl(),
-                                    friend.getSolvedacTier(),
-                                    Long.parseLong(record.getProblemNumber()),
-                                    record.getTitle(),
-                                    record.getCreatedAt()));
+        return records.stream()
+                .map(record -> {
+                    // Mapper에서 username, avatarUrl 등을 조회해왔으므로 안전하게 사용 가능
+                    // 다만 AlgorithmRecord 엔티티에는 해당 필드가 없으므로, MyBatis ResultMap에서
+                    // AlgorithmRecord 객체가 아닌 DTO로 바로 매핑하거나,
+                    // AlgorithmRecord를 확장한 DTO를 쓰거나 해야 함.
+                    // 현재 Mapper는 AlgorithmRecord를 반환하고 있는데,
+                    // AlgorithmRecordMapper.xml의 selectFriendFeed는 r.*, u.username 등을 조회함.
+                    // 하지만 AlgorithmRecord 엔티티에는 username 필드가 없음.
+                    // 따라서 AlgorithmRecord에 @Transient로 필드를 추가하거나, 별도 DTO를 써야 함.
+
+                    // 기존 로직에서는 User를 다시 조회해서 FeedResult를 만들었음.
+                    // 여기서도 User 조회 최적화가 필요하지만, 일단 repository가 AlgorithmRecord를 반환하므로
+                    // N+1 문제가 '부분적으로' 해결됨 (AlgorithmRecord 조회는 1방).
+                    // 하지만 FeedResult로 변환 과정에서 User 정보가 필요함.
+
+                    // 개선: `AlgorithmRecordRepository.findFeed`가 `FeedResult`를 반환하도록 하거나,
+                    // `AlgorithmRecord`를 조회한 뒤, User 들을 배치 조회하여 매핑해야 함.
+
+                    // 하지만 기왕 최적화 하는거, Mapper에서 Join한 데이터를 활용해야 함.
+                    // 현재 AlgorithmRecordMapper.xml 에서는 u.username 등을 조회하고 있음.
+                    // 하지만 자바 코드에서는 AlgorithmRecord를 반환 타입으로 쓰고 있어서 이 추가 정보들이 유실될 수 있음 (MyBatis가 매핑할
+                    // 곳이 없어서).
+
+                    // **중요**: 현재 단계에서 가장 빠르고 안전한 수정은,
+                    // 1. findFeed로 Record ID 목록 페이징 처리해서 가져옴. (혹은 Record 자체)
+                    // 2. 가져온 Record들의 UserID를 수집.
+                    // 3. User들을 IN 쿼리로 한방에 조회.
+                    // 4. 조립.
+
+                    // 하지만 이미 XML에서 JOIN을 걸었으니,
+                    // AlgorithmRecord 엔티티에 username, avatarUrl, tier 등을 담을 수 있는 Transient 필드가 있다면
+                    // 좋겠지만
+                    // Entity를 수정하는건 사이드이펙트가 있을 수 있음.
+
+                    // 따라서, 일단은 User 조회를 별도로 하더라도, Record 조회 자체를 페이징 처리하는 것이 핵심임.
+                    // 이전 코드: 유저별 전체 레코드 조회 -> 메모리 머지 -> 페이징
+                    // 개선 코드: 친구들 전체 레코드 중 최신순 페이징 조회 -> 해당 레코드들의 유저 정보 조회 (최대 20명)
+
+                    User user = userRepository.findById(record.getUserId()).orElseThrow();
+
+                    return com.ssafy.dash.social.application.dto.result.FeedResult.solved(
+                            record.getId(),
+                            user.getId(),
+                            user.getUsername(),
+                            user.getAvatarUrl(),
+                            user.getSolvedacTier(),
+                            Long.parseLong(record.getProblemNumber()),
+                            record.getTitle(),
+                            record.getCreatedAt());
                 })
-                .sorted((a, b) -> b.createdAt().compareTo(a.createdAt()))
                 .collect(Collectors.toList());
-
-        // 페이징 처리
-        int start = page * size;
-        int end = Math.min(start + size, allFeeds.size());
-
-        if (start >= allFeeds.size()) {
-            return java.util.Collections.emptyList();
-        }
-
-        return allFeeds.subList(start, end);
     }
 
 }

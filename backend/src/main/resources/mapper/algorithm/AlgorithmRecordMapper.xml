@@ -64,6 +64,24 @@
     ORDER BY r.id DESC
   </select>
 
+  <select id="selectFriendFeed" resultType="AlgorithmRecord">
+    SELECT r.*, u.username, u.avatar_url, u.solvedac_tier,
+           car.score, car.time_complexity, car.space_complexity, car.complexity_explanation,
+           car.patterns, car.algorithm_intuition, car.pitfalls, car.key_blocks,
+           car.refactor_provided, car.refactor_code, car.refactor_explanation, car.full_response,
+           car.counter_example_input, car.counter_example_expected, car.counter_example_predicted, car.counter_example_reason
+    FROM algorithm_records r
+    JOIN users u ON r.user_id = u.id
+    LEFT JOIN code_analysis_results car ON r.id = car.algorithm_record_id
+    WHERE r.user_id IN
+    <foreach item="userId" collection="userIds" open="(" separator="," close=")">
+      #{userId}
+    </foreach>
+    AND r.record_type = 'USER_SOLUTION'
+    ORDER BY r.created_at DESC
+    LIMIT #{size} OFFSET #{offset}
+  </select>
+
   <update id="update" parameterType="AlgorithmRecord">
     UPDATE algorithm_records
     SET problem_number = #{problemNumber}, title = #{title}, code = #{code}, language = #{language},

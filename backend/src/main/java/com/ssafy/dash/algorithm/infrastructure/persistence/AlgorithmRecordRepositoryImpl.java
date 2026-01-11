@@ -88,12 +88,17 @@ public class AlgorithmRecordRepositoryImpl implements AlgorithmRecordRepository 
     }
 
     @Override
-    public List<com.ssafy.dash.dashboard.application.dto.response.HeatmapRawData> findHeatmapDataByStudyId(Long studyId) {
+    public List<com.ssafy.dash.dashboard.application.dto.response.HeatmapRawData> findHeatmapDataByStudyId(
+            Long studyId) {
         return mapper.selectHeatmapDataByStudyId(studyId);
     }
 
-    @Override
     public List<com.ssafy.dash.dashboard.application.dto.response.HeatmapRawData> findHeatmapDataByUserId(Long userId) {
         return mapper.selectHeatmapDataByUserId(userId);
+    }
+
+    @Override
+    public List<AlgorithmRecord> findFeed(List<Long> userIds, int offset, int size) {
+        return mapper.selectFriendFeed(userIds, offset, size);
     }
 }

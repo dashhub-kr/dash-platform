@@ -3,6 +3,7 @@ package com.ssafy.dash.algorithm.infrastructure.mapper;
 import java.util.List;
 
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 
 import com.ssafy.dash.algorithm.domain.AlgorithmRecord;
 import com.ssafy.dash.algorithm.domain.StudyStats;
@@ -41,6 +42,9 @@ public interface AlgorithmRecordMapper {
     List<com.ssafy.dash.dashboard.application.dto.response.HeatmapRawData> selectHeatmapDataByStudyId(Long studyId);
 
     List<com.ssafy.dash.dashboard.application.dto.response.HeatmapRawData> selectHeatmapDataByUserId(Long userId);
+
+    List<AlgorithmRecord> selectFriendFeed(@Param("userIds") List<Long> userIds, @Param("offset") int offset,
+            @Param("size") int size);
 
     /**
      * Solved.ac에서 동기화한 푼 문제 삽입 (중복 무시)
