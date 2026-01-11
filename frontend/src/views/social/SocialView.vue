@@ -133,8 +133,8 @@
                                     <div class="space-y-2">
                                         <div v-for="req in requests" :key="req.id" class="flex items-center justify-between p-2.5 rounded-xl bg-white border border-rose-100 shadow-sm">
                                             <div class="flex items-center gap-2.5 min-w-0">
-                                                <img :src="getAvatar(req.requester.avatarUrl)" class="w-8 h-8 rounded-full border border-slate-200"/>
-                                                <span class="text-sm font-bold text-slate-700 truncate">{{ req.requester.username }}</span>
+                                                <img :src="getAvatar(req.requester?.avatarUrl)" class="w-8 h-8 rounded-full border border-slate-200"/>
+                                                <span class="text-sm font-bold text-slate-700 truncate">{{ req.requester?.username || '알 수 없음' }}</span>
                                             </div>
                                             <div class="flex items-center gap-1.5">
                                                 <button @click="acceptRequest(req.id)" class="p-1.5 bg-emerald-500 text-white rounded-lg hover:bg-emerald-600 transition-colors">
@@ -168,11 +168,11 @@
                                             @click="openUserProfile(item.friend)"
                                         >
                                             <div class="flex items-center gap-2.5 min-w-0">
-                                                <img :src="getAvatar(item.friend.avatarUrl)" class="w-8 h-8 rounded-full border border-slate-200"/>
+                                                <img :src="getAvatar(item.friend?.avatarUrl)" class="w-8 h-8 rounded-full border border-slate-200"/>
                                                 <div class="min-w-0">
                                                     <div class="flex items-center gap-1">
-                                                        <span class="text-sm font-bold text-slate-700 truncate">{{ item.friend.username }}</span>
-                                                        <TierBadge v-if="item.friend.solvedacTier" :tier="item.friend.solvedacTier" size="xs" :show-roman="false" />
+                                                        <span class="text-sm font-bold text-slate-700 truncate">{{ item.friend?.username || '알 수 없음' }}</span>
+                                                        <TierBadge v-if="item.friend?.solvedacTier" :tier="item.friend.solvedacTier" size="xs" :show-roman="false" />
                                                     </div>
                                                 </div>
                                             </div>
@@ -195,7 +195,7 @@
 </template>
 
 <script setup>
-import { ref, watch, onMounted, onBeforeUnmount } from 'vue';
+import { ref, computed, watch, onMounted, onBeforeUnmount } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { socialApi } from '@/api/social';
 import { Loader2, Users, Search, Bell, MessageCircle, Rss, Check, X } from 'lucide-vue-next';
@@ -209,6 +209,16 @@ const router = useRouter();
 const { openChat: openGlobalDM } = useFloatingChat();
 const { open: openProfile } = useUserProfileModal();
 
+// 탭 상태
+const activeTab = ref('feed');
+const requests = ref([]);
+
+// 탭 정의
+const tabs = computed(() => [
+    { id: 'feed', label: '피드', count: 0 },
+    { id: 'requests', label: '친구 요청', count: requests.value.length }
+]);
+
 // 피드 상태
 const feedItems = ref([]);
 const feedLoading = ref(false);
@@ -218,7 +228,6 @@ const page = ref(0);
 // 친구 상태
 const friends = ref([]);
 const friendsLoading = ref(false);
-const requests = ref([]);
 
 // 검색 상태
 const searchQuery = ref('');
@@ -252,13 +261,6 @@ const loadFeed = async (reset = false) => {
         }
     } catch (e) {
         console.error('Failed to load feed:', e);
-        // API 아직 없으면 mock 데이터
-        if (page.value === 0) {
-            feedItems.value = [
-                { id: 1, type: 'SOLVED', userName: '김코딩', userAvatar: null, userTier: 15, problemId: 1234, problemTitle: '토마토', createdAt: new Date().toISOString() },
-                { id: 2, type: 'STREAK', userName: '박알고', userAvatar: null, userTier: 12, streakDays: 7, createdAt: new Date().toISOString() },
-            ];
-        }
         hasMore.value = false;
     } finally {
         feedLoading.value = false;
@@ -330,6 +332,7 @@ const rejectRequest = async (requestId) => {
 
 // 액션
 const openDM = (friend) => {
+    if (!friend) return; // null/undefined 체크
     if (friend.isDeleted) return; // 탈퇴 회원 클릭 방지
     openGlobalDM({
         partnerId: friend.id,
@@ -341,6 +344,7 @@ const openDM = (friend) => {
 };
 
 const openUserProfile = (user) => {
+    if (!user) return; // null/undefined 체크
     // UserProfileModal이 기대하는 포맷으로 변환
     openProfile({
         userId: user.id,
@@ -361,6 +365,12 @@ const handleViewBattle = (item) => {
 
 // 라우트 쿼리 핸들러 (예: 알림 클릭 시) - HEAD에서 가져옴
 const checkQueryForDM = async () => {
+    // tab 쿼리 파라미터 처리 (친구 요청 알림 클릭 시)
+    const tabQuery = route.query.tab;
+    if (tabQuery && (tabQuery === 'requests' || tabQuery === 'feed')) {
+        activeTab.value = tabQuery;
+    }
+
     const pid = route.query.partnerId;
     if (pid) {
         const partnerId = parseInt(pid);
@@ -369,9 +379,9 @@ const checkQueryForDM = async () => {
         if (friends.value.length === 0) await loadFriends();
 
         // 2. 친구 목록에서 찾아보기
-        const friendItem = friends.value.find(f => f.friend.id === partnerId);
+        const friendItem = friends.value.find(f => f.friend?.id === partnerId);
         
-        if (friendItem) {
+        if (friendItem?.friend) {
             // 친구인 경우 DM 모달 열기
             openDM(friendItem.friend);
         } else {
@@ -380,7 +390,7 @@ const checkQueryForDM = async () => {
         }
 
         // 쿼리 파라미터 제거하여 URL 정리
-        router.replace({ query: { ...route.query, partnerId: undefined } });
+        router.replace({ query: { ...route.query, partnerId: undefined, tab: undefined } });
     }
 };
 
