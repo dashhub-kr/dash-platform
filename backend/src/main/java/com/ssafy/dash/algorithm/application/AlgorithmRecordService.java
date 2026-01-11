@@ -18,6 +18,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 import com.ssafy.dash.defense.application.DefenseService;
 import com.ssafy.dash.mockexam.application.MockExamService;
+import com.ssafy.dash.battle.application.BattleService;
 
 @Service
 public class AlgorithmRecordService {
@@ -27,15 +28,17 @@ public class AlgorithmRecordService {
     private final com.ssafy.dash.study.application.StudyMissionService studyMissionService;
     private final DefenseService defenseService;
     private final MockExamService mockExamService;
+    private final BattleService battleService;
 
     public AlgorithmRecordService(AlgorithmRecordRepository algorithmRecordRepository, UserRepository userRepository,
             com.ssafy.dash.study.application.StudyMissionService studyMissionService,
-            DefenseService defenseService, MockExamService mockExamService) {
+            DefenseService defenseService, MockExamService mockExamService, BattleService battleService) {
         this.algorithmRecordRepository = algorithmRecordRepository;
         this.userRepository = userRepository;
         this.studyMissionService = studyMissionService;
         this.defenseService = defenseService;
         this.mockExamService = mockExamService;
+        this.battleService = battleService;
     }
 
     @Transactional
@@ -70,6 +73,7 @@ public class AlgorithmRecordService {
                 algorithmRecordRepository.update(record);
             }
             mockExamService.verifyExam(command.userId(), problemId);
+            battleService.verifyBattleProblem(command.userId(), problemId);
         } catch (NumberFormatException e) {
             // ignore non-integer problem numbers
         }
