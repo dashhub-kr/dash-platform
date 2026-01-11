@@ -30,6 +30,7 @@ public class StudyService {
     private final AlgorithmRecordService algorithmRecordService;
     private final NotificationService notificationService;
     private final com.ssafy.dash.acorn.domain.AcornLogRepository acornLogRepository;
+    private final com.ssafy.dash.chat.application.ChatRoomService chatRoomService;
 
     @Transactional(readOnly = true)
     public List<Study> getStudies(Long userId, String keyword) {
@@ -102,11 +103,16 @@ public class StudyService {
         if (oldStudy != null && oldStudy.getStudyType() == StudyType.PERSONAL) {
             // 기존 Personal Study ID가 있으면 해당 ID의 기록을 모두 이동
             algorithmRecordService.migrateStudyId(oldStudy.getId(), study.getId());
+            // Acorn Log 삭제 (FK 제약조건 해결)
+            acornLogRepository.deleteByStudyId(oldStudy.getId());
             studyRepository.delete(oldStudy.getId());
         } else if (oldStudy == null) {
             // 이전에 스터디가 없었더라도(null -> Group), 유저의 모든 고아 기록을 새 스터디로 이동
             algorithmRecordService.migrateUserRecords(user.getId(), null, study.getId());
         }
+
+        // 스터디 채팅방 자동 생성
+        chatRoomService.createStudyRoom(study.getId(), study.getName(), userId);
 
         return study;
     }
@@ -257,6 +263,8 @@ public class StudyService {
         if (oldStudyId != null) {
             Study oldStudy = studyRepository.findById(oldStudyId).orElse(null);
             if (oldStudy != null && oldStudy.getStudyType() == StudyType.PERSONAL) {
+                // Acorn Log 삭제 (FK 제약조건 해결)
+                acornLogRepository.deleteByStudyId(oldStudyId);
                 studyRepository.delete(oldStudyId);
             }
         }
@@ -267,6 +275,9 @@ public class StudyService {
                 String.format("'%s' 스터디 가입 신청이 승인되었습니다.", study.getName()),
                 "/study/missions",
                 NotificationType.STUDY_RESULT);
+
+        // 스터디 채팅방에 멤버 추가
+        chatRoomService.addStudyMember(study.getId(), user.getId());
     }
 
     @Transactional
@@ -318,6 +329,9 @@ public class StudyService {
         // 1. Group 스터디 탈퇴
         user.updateStudy(null);
         userRepository.update(user);
+
+        // 스터디 채팅방에서 멤버 제거
+        chatRoomService.removeStudyMember(oldStudyId, userId);
 
         // 2. Personal 스터디 생성 (Fallback)
         Study personalStudy = createPersonalStudy(userId);

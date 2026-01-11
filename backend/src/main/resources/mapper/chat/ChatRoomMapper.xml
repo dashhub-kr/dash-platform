@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.ssafy.dash.chat.infrastructure.ChatRoomMapper">
+
+    <!-- ChatRoom -->
+    <insert id="insertRoom" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO chat_rooms (name, type, study_id, creator_id, created_at)
+        VALUES (#{name}, #{type}, #{studyId}, #{creatorId}, #{createdAt})
+    </insert>
+
+    <select id="selectRoomById" resultType="com.ssafy.dash.chat.domain.ChatRoom">
+        SELECT cr.id, cr.name, cr.type, cr.study_id as studyId, cr.creator_id as creatorId, cr.created_at as createdAt,
+               (SELECT COUNT(*) FROM chat_room_members WHERE room_id = cr.id) as memberCount
+        FROM chat_rooms cr
+        WHERE cr.id = #{roomId}
+    </select>
+
+    <select id="selectRoomByStudyId" resultType="com.ssafy.dash.chat.domain.ChatRoom">
+        SELECT cr.id, cr.name, cr.type, cr.study_id as studyId, cr.creator_id as creatorId, cr.created_at as createdAt,
+               (SELECT COUNT(*) FROM chat_room_members WHERE room_id = cr.id) as memberCount
+        FROM chat_rooms cr
+        WHERE cr.study_id = #{studyId}
+    </select>
+
+    <select id="selectRoomsByUserId" resultType="com.ssafy.dash.chat.domain.ChatRoom">
+        SELECT cr.id, cr.name, cr.type, cr.study_id as studyId, cr.creator_id as creatorId, cr.created_at as createdAt,
+               (SELECT COUNT(*) FROM chat_room_members WHERE room_id = cr.id) as memberCount,
+               (SELECT content FROM chat_room_messages WHERE room_id = cr.id ORDER BY created_at DESC LIMIT 1) as lastMessage,
+               (SELECT created_at FROM chat_room_messages WHERE room_id = cr.id ORDER BY created_at DESC LIMIT 1) as lastMessageAt,
+               (SELECT COUNT(*) FROM chat_room_messages m 
+                WHERE m.room_id = cr.id 
+                AND m.created_at > COALESCE(
+                    (SELECT last_read_at FROM chat_room_members WHERE room_id = cr.id AND user_id = #{userId}),
+                    '1970-01-01'
+                )) as unreadCount
+        FROM chat_rooms cr
+        INNER JOIN chat_room_members crm ON cr.id = crm.room_id
+        WHERE crm.user_id = #{userId}
+        ORDER BY COALESCE(lastMessageAt, '1970-01-01') DESC, cr.created_at DESC
+    </select>
+
+    <update id="updateRoom">
+        UPDATE chat_rooms SET name = #{name} WHERE id = #{id}
+    </update>
+
+    <delete id="deleteRoom">
+        DELETE FROM chat_rooms WHERE id = #{roomId}
+    </delete>
+
+    <!-- ChatRoomMember -->
+    <insert id="insertMember" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO chat_room_members (room_id, user_id, joined_at)
+        VALUES (#{roomId}, #{userId}, #{joinedAt})
+    </insert>
+
+    <select id="selectMember" resultType="com.ssafy.dash.chat.domain.ChatRoomMember">
+        SELECT crm.id, crm.room_id as roomId, crm.user_id as userId, crm.joined_at as joinedAt, crm.last_read_at as lastReadAt,
+               u.username, u.avatar_url as avatarUrl
+        FROM chat_room_members crm
+        LEFT JOIN users u ON crm.user_id = u.id
+        WHERE crm.room_id = #{roomId} AND crm.user_id = #{userId}
+    </select>
+
+    <select id="selectMembersByRoomId" resultType="com.ssafy.dash.chat.domain.ChatRoomMember">
+        SELECT crm.id, crm.room_id as roomId, crm.user_id as userId, crm.joined_at as joinedAt, crm.last_read_at as lastReadAt,
+               u.username, u.avatar_url as avatarUrl
+        FROM chat_room_members crm
+        LEFT JOIN users u ON crm.user_id = u.id
+        WHERE crm.room_id = #{roomId}
+        ORDER BY crm.joined_at ASC
+    </select>
+
+    <update id="updateMemberLastReadAt">
+        UPDATE chat_room_members 
+        SET last_read_at = CURRENT_TIMESTAMP 
+        WHERE room_id = #{roomId} AND user_id = #{userId}
+    </update>
+
+    <delete id="deleteMember">
+        DELETE FROM chat_room_members WHERE room_id = #{roomId} AND user_id = #{userId}
+    </delete>
+
+    <delete id="deleteMembersByRoomId">
+        DELETE FROM chat_room_members WHERE room_id = #{roomId}
+    </delete>
+
+    <!-- ChatRoomMessage -->
+    <insert id="insertMessage" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO chat_room_messages (room_id, sender_id, content, created_at)
+        VALUES (#{roomId}, #{senderId}, #{content}, #{createdAt})
+    </insert>
+
+    <select id="selectMessagesByRoomId" resultType="com.ssafy.dash.chat.domain.ChatRoomMessage">
+        SELECT m.id, m.room_id as roomId, m.sender_id as senderId, m.content, m.created_at as createdAt,
+               u.username as senderUsername, u.avatar_url as senderAvatarUrl
+        FROM chat_room_messages m
+        LEFT JOIN users u ON m.sender_id = u.id
+        WHERE m.room_id = #{roomId}
+        ORDER BY m.created_at DESC
+        LIMIT #{limit} OFFSET #{offset}
+    </select>
+
+    <select id="countUnreadMessages" resultType="int">
+        SELECT COUNT(*) 
+        FROM chat_room_messages m
+        WHERE m.room_id = #{roomId}
+        AND m.created_at > COALESCE(
+            (SELECT last_read_at FROM chat_room_members WHERE room_id = #{roomId} AND user_id = #{userId}),
+            '1970-01-01'
+        )
+    </select>
+
+    <select id="selectLastMessage" resultType="com.ssafy.dash.chat.domain.ChatRoomMessage">
+        SELECT m.id, m.room_id as roomId, m.sender_id as senderId, m.content, m.created_at as createdAt,
+               u.username as senderUsername, u.avatar_url as senderAvatarUrl
+        FROM chat_room_messages m
+        LEFT JOIN users u ON m.sender_id = u.id
+        WHERE m.room_id = #{roomId}
+        ORDER BY m.created_at DESC
+        LIMIT 1
+    </select>
+
+</mapper>
