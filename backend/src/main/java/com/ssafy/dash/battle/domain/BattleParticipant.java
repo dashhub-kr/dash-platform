@@ -27,7 +27,7 @@ public class BattleParticipant {
     private Integer userTier;
 
     public enum ParticipantStatus {
-        INVITED, ACCEPTED, DECLINED, IN_PROGRESS, COMPLETED
+        INVITED, ACCEPTED, DECLINED, IN_PROGRESS, COMPLETED, QUEUED
     }
 
     public static BattleParticipant create(Long battleId, Long userId, boolean isCreator) {
