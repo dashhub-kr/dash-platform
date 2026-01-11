@@ -617,6 +617,20 @@ const handleNotificationClick = async (notification) => {
       return;
   }
 
+  // 배틀 초대 알림 클릭 시 배틀 로비로 이동
+  if (notification.type === 'BATTLE_INVITE') {
+      notificationsOpen.value = false;
+      if (notification.relatedId) {
+          router.push(`/battle/${notification.relatedId}`);
+      } else if (notification.url && notification.url.startsWith('/battle/')) {
+          router.push(notification.url);
+      } else {
+          // 기존 알림은 /social이면 배틀 목록 또는 소셜 페이지로
+          router.push('/social');
+      }
+      return;
+  }
+
   notificationsOpen.value = false;
   
   if (notification.type === 'DIRECT_MESSAGE') {

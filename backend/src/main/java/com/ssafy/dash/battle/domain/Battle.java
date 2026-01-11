@@ -14,6 +14,7 @@ public class Battle {
 
     private Long id;
     private BattleType type;
+    private String detailType;
     private Long creatorId;
     private BattleStatus status;
     private String problemIds; // JSON string
@@ -32,10 +33,11 @@ public class Battle {
         PENDING, IN_PROGRESS, COMPLETED, CANCELLED
     }
 
-    public static Battle create(Long creatorId, BattleType type, String problemIds) {
+    public static Battle create(Long creatorId, BattleType type, String detailType, String problemIds) {
         Battle battle = new Battle();
         battle.creatorId = creatorId;
         battle.type = type;
+        battle.detailType = detailType;
         battle.problemIds = problemIds;
         battle.status = BattleStatus.PENDING;
         battle.createdAt = LocalDateTime.now();

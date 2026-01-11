@@ -20,6 +20,7 @@ import com.ssafy.dash.user.domain.User;
 import com.ssafy.dash.user.domain.UserRepository;
 import com.ssafy.dash.mockexam.application.MockExamService;
 import com.ssafy.dash.defense.application.DefenseService;
+import com.ssafy.dash.battle.application.BattleService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -57,6 +58,7 @@ public class GitHubPushEventWorker {
     private final com.ssafy.dash.study.application.StudyMissionService studyMissionService;
     private final MockExamService mockExamService;
     private final DefenseService defenseService;
+    private final BattleService battleService;
 
     public GitHubPushEventWorker(GitHubPushEventRepository pushEventRepository,
             OnboardingRepository onboardingRepository,
@@ -72,6 +74,7 @@ public class GitHubPushEventWorker {
             com.ssafy.dash.study.application.StudyMissionService studyMissionService,
             MockExamService mockExamService,
             DefenseService defenseService,
+            BattleService battleService,
             @Value("${github.push-worker.max-batch:5}") int maxBatchSize) {
         this.pushEventRepository = pushEventRepository;
         this.onboardingRepository = onboardingRepository;
@@ -88,6 +91,7 @@ public class GitHubPushEventWorker {
         this.studyMissionService = studyMissionService;
         this.mockExamService = mockExamService;
         this.defenseService = defenseService;
+        this.battleService = battleService;
     }
 
     @Scheduled(fixedDelayString = "${github.push-worker.fixed-delay:10000}")
@@ -248,6 +252,10 @@ public class GitHubPushEventWorker {
                     && user.getDefenseProblemId().equals(problemId)) {
                 tag = "DEFENSE";
             }
+            // 4. 배틀 체크
+            else if (battleService.isActiveBattleProblem(userId, problemId)) {
+                tag = "BATTLE";
+            }
         }
         record.setTag(tag);
         // ---------------------
@@ -263,6 +271,7 @@ public class GitHubPushEventWorker {
                 algorithmRecordRepository.update(record);
             }
             mockExamService.verifyExam(userId, problemId);
+            battleService.verifyBattleProblem(userId, problemId);
         }
 
         // 도토리 적립 로직

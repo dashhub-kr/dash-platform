@@ -20,6 +20,7 @@ public class BattleParticipant {
     private Long totalTimeSeconds;
     private LocalDateTime startedAt;
     private LocalDateTime completedAt;
+    private String solvedProblemIds; // JSON string
 
     // Joined fields
     private String userName;
@@ -38,6 +39,7 @@ public class BattleParticipant {
         participant.score = 0;
         participant.problemsSolved = 0;
         participant.totalTimeSeconds = 0L;
+        participant.solvedProblemIds = "[]";
         return participant;
     }
 

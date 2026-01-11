@@ -21,4 +21,6 @@ public interface BattleRepository {
     List<BattleParticipant> findParticipantsByBattleId(Long battleId);
 
     Optional<BattleParticipant> findParticipant(Long battleId, Long userId);
+
+    Optional<BattleParticipant> findParticipantForUpdate(Long battleId, Long userId);
 }

@@ -17,7 +17,7 @@ import { computed } from 'vue';
 
 const props = defineProps({
   icon: {
-    type: Object,
+    type: [Object, Function],
     required: true
   },
   text: {

@@ -42,7 +42,7 @@ public class BattleRepositoryImpl implements BattleRepository {
 
     @Override
     public void saveParticipant(BattleParticipant participant) {
-        battleMapper.insertParticipant(participant);
+        battleMapper.saveParticipant(participant);
     }
 
     @Override
@@ -52,11 +52,16 @@ public class BattleRepositoryImpl implements BattleRepository {
 
     @Override
     public List<BattleParticipant> findParticipantsByBattleId(Long battleId) {
-        return battleMapper.selectParticipantsByBattleId(battleId);
+        return battleMapper.findParticipantsByBattleId(battleId);
     }
 
     @Override
     public Optional<BattleParticipant> findParticipant(Long battleId, Long userId) {
-        return battleMapper.selectParticipant(battleId, userId);
+        return battleMapper.findParticipant(battleId, userId);
+    }
+
+    @Override
+    public Optional<BattleParticipant> findParticipantForUpdate(Long battleId, Long userId) {
+        return battleMapper.findParticipantForUpdate(battleId, userId);
     }
 }

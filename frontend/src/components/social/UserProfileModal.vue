@@ -61,8 +61,16 @@
                     >
                         <MessageCircle :size="18"/> 쪽지 보내기
                     </button>
-                    <div class="text-xs text-brand-600 font-bold flex items-center justify-center gap-1 mt-2">
-                        <Users :size="14"/> 서로 친구입니다
+                    <div class="flex items-center justify-between mt-2">
+                        <div class="text-xs text-brand-600 font-bold flex items-center gap-1">
+                            <Users :size="14"/> 서로 친구입니다
+                        </div>
+                        <button 
+                            @click="handleDeleteFriend" 
+                            class="text-xs text-slate-400 hover:text-rose-500 font-bold flex items-center gap-1 transition-colors"
+                        >
+                            <UserMinus :size="14"/> 친구 끊기
+                        </button>
                     </div>
                 </template>
 
@@ -96,7 +104,7 @@ import { useUserProfileModal } from '@/composables/useUserProfileModal';
 import { useFloatingChat } from '@/composables/useFloatingChat';
 import { useAuth } from '@/composables/useAuth';
 import { socialApi } from '@/api/social';
-import { X, Crown, MessageCircle, UserPlus, CheckCircle2, Users, Loader2, AlertCircle } from 'lucide-vue-next';
+import { X, Crown, MessageCircle, UserPlus, UserMinus, CheckCircle2, Users, Loader2, AlertCircle } from 'lucide-vue-next';
 
 const { isOpen, targetUserInfo, close } = useUserProfileModal();
 const { openChat: openDirectMessage } = useFloatingChat();
@@ -172,6 +180,18 @@ const openDM = () => {
     
     close(); // Close profile modal
     openDirectMessage(partner); // Open floating chat
+};
+
+const handleDeleteFriend = async () => {
+    if (!confirm('친구를 끊으시겠습니까?')) return;
+    try {
+        await socialApi.deleteFriend(targetUserInfo.value.userId);
+        alert('친구가 삭제되었습니다.');
+        friendshipStatus.value = null; // Reset status
+        close();
+    } catch(e) {
+        alert(e.response?.data?.message || '친구 삭제에 실패했습니다.');
+    }
 };
 
 </script>

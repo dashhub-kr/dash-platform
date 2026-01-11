@@ -27,15 +27,21 @@ public class BattleController {
             @RequestBody Map<String, Object> payload) {
 
         String type = (String) payload.get("type");
-        String problemIds = (String) payload.get("problemIds");
+        String detailType = (String) payload.get("detailType");
+        Object problemIdsObj = payload.get("problemIds");
+        String problemIds = problemIdsObj != null ? (String) problemIdsObj : "[]";
         @SuppressWarnings("unchecked")
         List<Number> inviteeIds = (List<Number>) payload.get("inviteeIds");
+
+        if (type == null || inviteeIds == null || inviteeIds.isEmpty()) {
+            return ResponseEntity.badRequest().build();
+        }
 
         Battle.BattleType battleType = Battle.BattleType.valueOf(type);
         List<Long> invitees = inviteeIds.stream().map(Number::longValue).toList();
 
         Battle battle = battleService.createBattle(
-                userPrincipal.getUserId(), battleType, problemIds, invitees);
+                userPrincipal.getUserId(), battleType, detailType, problemIds, invitees);
 
         return ResponseEntity.ok(battle);
     }
@@ -94,6 +100,31 @@ public class BattleController {
     @PostMapping("/{battleId}/start")
     public ResponseEntity<Void> startBattle(@PathVariable Long battleId) {
         battleService.startBattle(battleId);
+        return ResponseEntity.ok().build();
+    }
+
+    /**
+     * 배틀 상태 조회 (폴링용)
+     */
+    @GetMapping("/{battleId}/status")
+    public ResponseEntity<Battle> getBattleStatus(@PathVariable Long battleId) {
+        return ResponseEntity.ok(battleService.getBattle(battleId));
+    }
+
+    /**
+     * 결과 제출
+     */
+    @PostMapping("/{battleId}/submit")
+    public ResponseEntity<Void> submitResult(
+            @AuthenticationPrincipal CustomOAuth2User userPrincipal,
+            @PathVariable Long battleId,
+            @RequestBody Map<String, Object> payload) {
+
+        int score = ((Number) payload.getOrDefault("score", 0)).intValue();
+        int problemsSolved = ((Number) payload.getOrDefault("problemsSolved", 0)).intValue();
+        long totalTimeSeconds = ((Number) payload.getOrDefault("totalTimeSeconds", 0L)).longValue();
+
+        battleService.submitResult(battleId, userPrincipal.getUserId(), score, problemsSolved, totalTimeSeconds);
         return ResponseEntity.ok().build();
     }
 }

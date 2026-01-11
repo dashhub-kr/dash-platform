@@ -52,7 +52,7 @@
                       <BookOpen class="w-5 h-5 text-brand-500" stroke-width="2.5" fill="currentColor" /> 팀 문제 추천 (커리큘럼)
                   </h2>
                   <div v-if="loadingCurriculum" class="flex items-center gap-2 text-brand-600">
-                     <span class="animate-spin text-sm">⏳</span>
+                     <Loader2 class="w-4 h-4 animate-spin" />
                      <span class="text-xs font-bold">맞춤 커리큘럼 생성 중...</span>
                   </div>
                 </div>
@@ -172,7 +172,7 @@ import { Radar } from 'vue-chartjs';
 import { Chart as ChartJS, RadialLinearScale, PointElement, LineElement, Filler, Tooltip, Legend } from 'chart.js';
 import StudyMissionCreateModal from '@/components/study/StudyMissionCreateModal.vue';
 import StudyAnalysisSidebar from '@/components/study/StudyAnalysisSidebar.vue';
-import { BookOpen, AlertTriangle, Pin, Users, BookMarked, Activity, PieChart } from 'lucide-vue-next';
+import { BookOpen, AlertTriangle, Pin, Users, BookMarked, Activity, PieChart, Loader2 } from 'lucide-vue-next';
 
 ChartJS.register(RadialLinearScale, PointElement, LineElement, Filler, Tooltip, Legend);
 

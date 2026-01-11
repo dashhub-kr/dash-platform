@@ -165,6 +165,19 @@ const routes = [
     component: () => import("../views/shop/ShopView.vue"),
     meta: { requiresAuth: true }
   },
+  // Battle
+  {
+    path: "/battle/:id",
+    name: "BattleLobby",
+    component: () => import("../views/battle/BattleLobbyView.vue"),
+    meta: { requiresAuth: true }
+  },
+  {
+    path: "/battle/:id/play",
+    name: "BattlePlay",
+    component: () => import("../views/battle/BattlePlayView.vue"),
+    meta: { requiresAuth: true }
+  },
 ];
 
 const router = createRouter({

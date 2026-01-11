@@ -99,39 +99,96 @@
             </h2>
             <div class="grid grid-cols-3 gap-4">
               <!-- IM -->
-              <div @click="startExam('IM')" class="group cursor-pointer flex flex-col items-center p-4 rounded-2xl hover:bg-slate-50 transition-all active:scale-95 border border-transparent hover:border-slate-200">
-                <div class="relative mb-3 transition-transform duration-300 group-hover:scale-110">
-                  <div class="w-16 h-16 bg-emerald-100 rounded-full flex items-center justify-center text-emerald-500 shadow-sm">
-                    <Sprout :size="32" stroke-width="1.5" fill="currentColor" />
+              <div class="group flex flex-col items-center p-4 rounded-2xl border border-transparent hover:border-slate-200 transition-all">
+                <div class="flex flex-col items-center w-full">
+                  <div class="relative mb-3 transition-transform duration-300 group-hover:scale-110">
+                    <div class="w-16 h-16 bg-emerald-100 rounded-full flex items-center justify-center text-emerald-500 shadow-sm">
+                      <Sprout :size="32" stroke-width="1.5" fill="currentColor" />
+                    </div>
+                    <div class="absolute -top-1 -right-1 bg-emerald-500 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full">기초</div>
                   </div>
-                  <div class="absolute -top-1 -right-1 bg-emerald-500 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full">기초</div>
+                  <h3 class="text-sm font-black text-slate-800 mb-0.5">IM</h3>
+                  <div class="text-slate-400 text-xs font-bold mb-3">1문제 · 2시간</div>
                 </div>
-                <h3 class="text-sm font-black text-slate-800 mb-0.5">IM</h3>
-                <div class="text-slate-400 text-xs font-bold">1문제 · 2시간</div>
+                <div class="flex gap-1.5 w-full">
+                  <button
+                    @click="startExam('IM')"
+                    class="flex-1 py-1.5 px-2 bg-slate-100 text-slate-700 font-bold rounded-lg
+                           hover:bg-slate-200 transition-all active:scale-95 text-xs flex items-center justify-center gap-1"
+                  >
+                    혼자하기
+                  </button>
+                  <button
+                    @click.stop="openBattleModal('IM')"
+                    class="flex-1 py-1.5 px-2 bg-violet-100 text-violet-700 font-bold rounded-lg
+                           hover:bg-violet-200 transition-all active:scale-95 text-xs flex items-center justify-center gap-1"
+                  >
+                    <Users class="w-3 h-3" />
+                    함께하기
+                  </button>
+                </div>
               </div>
 
               <!-- A -->
-              <div @click="startExam('A')" class="group cursor-pointer flex flex-col items-center p-4 rounded-2xl hover:bg-slate-50 transition-all active:scale-95 border border-transparent hover:border-slate-200">
-                <div class="relative mb-3 transition-transform duration-300 group-hover:scale-110">
-                  <div class="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center text-blue-500 shadow-sm">
-                    <Diamond :size="32" stroke-width="1.5" fill="currentColor" />
+              <div class="group flex flex-col items-center p-4 rounded-2xl border border-transparent hover:border-slate-200 transition-all">
+                <div class="flex flex-col items-center w-full">
+                  <div class="relative mb-3 transition-transform duration-300 group-hover:scale-110">
+                    <div class="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center text-blue-500 shadow-sm">
+                      <Diamond :size="32" stroke-width="1.5" fill="currentColor" />
+                    </div>
+                    <div class="absolute -top-1 -right-1 bg-blue-500 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full">중급</div>
                   </div>
-                  <div class="absolute -top-1 -right-1 bg-blue-500 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full">중급</div>
+                  <h3 class="text-sm font-black text-slate-800 mb-0.5">A형</h3>
+                  <div class="text-slate-400 text-xs font-bold mb-3">2문제 · 2시간</div>
                 </div>
-                <h3 class="text-sm font-black text-slate-800 mb-0.5">A형</h3>
-                <div class="text-slate-400 text-xs font-bold">2문제 · 2시간</div>
+                <div class="flex gap-1.5 w-full">
+                  <button
+                    @click="startExam('A')"
+                    class="flex-1 py-1.5 px-2 bg-slate-100 text-slate-700 font-bold rounded-lg
+                           hover:bg-slate-200 transition-all active:scale-95 text-xs flex items-center justify-center gap-1"
+                  >
+                    혼자하기
+                  </button>
+                  <button
+                    @click.stop="openBattleModal('A')"
+                    class="flex-1 py-1.5 px-2 bg-violet-100 text-violet-700 font-bold rounded-lg
+                           hover:bg-violet-200 transition-all active:scale-95 text-xs flex items-center justify-center gap-1"
+                  >
+                    <Users class="w-3 h-3" />
+                    함께하기
+                  </button>
+                </div>
               </div>
 
               <!-- B -->
-              <div @click="startExam('B')" class="group cursor-pointer flex flex-col items-center p-4 rounded-2xl hover:bg-slate-50 transition-all active:scale-95 border border-transparent hover:border-slate-200">
-                <div class="relative mb-3 transition-transform duration-300 group-hover:scale-110">
-                  <div class="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center text-purple-500 shadow-sm">
-                    <Crown :size="32" stroke-width="1.5" fill="currentColor" />
+              <div class="group flex flex-col items-center p-4 rounded-2xl border border-transparent hover:border-slate-200 transition-all">
+                <div class="flex flex-col items-center w-full">
+                  <div class="relative mb-3 transition-transform duration-300 group-hover:scale-110">
+                    <div class="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center text-purple-500 shadow-sm">
+                      <Crown :size="32" stroke-width="1.5" fill="currentColor" />
+                    </div>
+                    <div class="absolute -top-1 -right-1 bg-purple-500 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full">고급</div>
                   </div>
-                  <div class="absolute -top-1 -right-1 bg-purple-500 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full">고급</div>
+                  <h3 class="text-sm font-black text-slate-800 mb-0.5">B형</h3>
+                  <div class="text-slate-400 text-xs font-bold mb-3">1문제 · 4시간</div>
                 </div>
-                <h3 class="text-sm font-black text-slate-800 mb-0.5">B형</h3>
-                <div class="text-slate-400 text-xs font-bold">1문제 · 4시간</div>
+                <div class="flex gap-1.5 w-full">
+                  <button
+                    @click="startExam('B')"
+                    class="flex-1 py-1.5 px-2 bg-slate-100 text-slate-700 font-bold rounded-lg
+                           hover:bg-slate-200 transition-all active:scale-95 text-xs flex items-center justify-center gap-1"
+                  >
+                    혼자하기
+                  </button>
+                  <button
+                    @click.stop="openBattleModal('B')"
+                    class="flex-1 py-1.5 px-2 bg-violet-100 text-violet-700 font-bold rounded-lg
+                           hover:bg-violet-200 transition-all active:scale-95 text-xs flex items-center justify-center gap-1"
+                  >
+                    <Users class="w-3 h-3" />
+                    함께하기
+                  </button>
+                </div>
               </div>
             </div>
           </div>
@@ -144,25 +201,63 @@
             </h2>
             <div class="grid grid-cols-2 gap-4">
               <!-- Samsung -->
-              <div @click="startExam('SAMSUNG')" class="group cursor-pointer flex flex-col items-center p-4 rounded-2xl hover:bg-slate-50 transition-all active:scale-95 border border-transparent hover:border-slate-200">
-                <div class="relative mb-3 transition-transform duration-300 group-hover:scale-110">
-                  <div class="w-16 h-16 bg-sky-100 rounded-full flex items-center justify-center text-sky-500 shadow-sm">
-                    <Building :size="32" stroke-width="1.5" fill="currentColor" />
+              <div class="group flex flex-col items-center p-4 rounded-2xl border border-transparent hover:border-slate-200 transition-all">
+                <div class="flex flex-col items-center w-full">
+                  <div class="relative mb-3 transition-transform duration-300 group-hover:scale-110">
+                    <div class="w-16 h-16 bg-sky-100 rounded-full flex items-center justify-center text-sky-500 shadow-sm">
+                      <Building :size="32" stroke-width="1.5" fill="currentColor" />
+                    </div>
                   </div>
+                  <h3 class="text-sm font-black text-slate-800 mb-0.5">삼성 SW</h3>
+                  <div class="text-slate-400 text-xs font-bold mb-3">3문제 · 2시간</div>
                 </div>
-                <h3 class="text-sm font-black text-slate-800 mb-0.5">삼성 SW</h3>
-                <div class="text-slate-400 text-xs font-bold">3문제 · 2시간</div>
+                <div class="flex gap-1.5 w-full">
+                  <button
+                    @click="startExam('SAMSUNG')"
+                    class="flex-1 py-1.5 px-2 bg-slate-100 text-slate-700 font-bold rounded-lg
+                           hover:bg-slate-200 transition-all active:scale-95 text-xs flex items-center justify-center gap-1"
+                  >
+                    혼자하기
+                  </button>
+                  <button
+                    @click.stop="openBattleModal('SAMSUNG')"
+                    class="flex-1 py-1.5 px-2 bg-sky-100 text-sky-700 font-bold rounded-lg
+                           hover:bg-sky-200 transition-all active:scale-95 text-xs flex items-center justify-center gap-1"
+                  >
+                    <Users class="w-3 h-3" />
+                    함께하기
+                  </button>
+                </div>
               </div>
 
               <!-- Kakao -->
-              <div @click="startExam('KAKAO')" class="group cursor-pointer flex flex-col items-center p-4 rounded-2xl hover:bg-slate-50 transition-all active:scale-95 border border-transparent hover:border-slate-200">
-                <div class="relative mb-3 transition-transform duration-300 group-hover:scale-110">
-                  <div class="w-16 h-16 bg-amber-100 rounded-full flex items-center justify-center text-amber-500 shadow-sm">
-                    <MessageCircle :size="32" stroke-width="1.5" fill="currentColor" />
+              <div class="group flex flex-col items-center p-4 rounded-2xl border border-transparent hover:border-slate-200 transition-all">
+                <div class="flex flex-col items-center w-full">
+                  <div class="relative mb-3 transition-transform duration-300 group-hover:scale-110">
+                    <div class="w-16 h-16 bg-amber-100 rounded-full flex items-center justify-center text-amber-500 shadow-sm">
+                      <MessageCircle :size="32" stroke-width="1.5" fill="currentColor" />
+                    </div>
                   </div>
+                  <h3 class="text-sm font-black text-slate-800 mb-0.5">카카오</h3>
+                  <div class="text-slate-400 text-xs font-bold mb-3">3문제 · 2시간</div>
                 </div>
-                <h3 class="text-sm font-black text-slate-800 mb-0.5">카카오</h3>
-                <div class="text-slate-400 text-xs font-bold">3문제 · 2시간</div>
+                <div class="flex gap-1.5 w-full">
+                  <button
+                    @click="startExam('KAKAO')"
+                    class="flex-1 py-1.5 px-2 bg-slate-100 text-slate-700 font-bold rounded-lg
+                           hover:bg-slate-200 transition-all active:scale-95 text-xs flex items-center justify-center gap-1"
+                  >
+                    혼자하기
+                  </button>
+                  <button
+                    @click.stop="openBattleModal('KAKAO')"
+                    class="flex-1 py-1.5 px-2 bg-amber-100 text-amber-700 font-bold rounded-lg
+                           hover:bg-amber-200 transition-all active:scale-95 text-xs flex items-center justify-center gap-1"
+                  >
+                    <Users class="w-3 h-3" />
+                    함께하기
+                  </button>
+                </div>
               </div>
             </div>
           </div>
@@ -243,13 +338,22 @@
       </div>
     </div>
   </div>
+
+  <!-- Battle Invite Modal -->
+  <BattleInviteModal
+    :isOpen="showBattleModal"
+    battleType="MOCK_EXAM"
+    :battleSubType="selectedExamType"
+    @close="showBattleModal = false"
+  />
 </template>
 
 <script setup>
 import { ref, onMounted, onUnmounted, computed } from 'vue';
 import { useRouter } from 'vue-router';
 import axios from 'axios';
-import { FileText, Code, Sprout, Diamond, Crown, Building, MessageCircle, GraduationCap, Info, RefreshCw, MousePointerClick, Clock, CheckCircle } from 'lucide-vue-next';
+import { FileText, Code, Sprout, Diamond, Crown, Building, MessageCircle, GraduationCap, Info, RefreshCw, MousePointerClick, Clock, CheckCircle, Users } from 'lucide-vue-next';
+import BattleInviteModal from '@/components/battle/BattleInviteModal.vue';
 
 const router = useRouter();
 const loading = ref(true);
@@ -432,6 +536,15 @@ const cancelExam = async () => {
 
 const closeSuccessModal = () => {
     showSuccessModal.value = false;
+};
+
+// Battle Modal
+const showBattleModal = ref(false);
+const selectedExamType = ref(null);
+
+const openBattleModal = (type) => {
+    selectedExamType.value = type;
+    showBattleModal.value = true;
 };
 </script>
 

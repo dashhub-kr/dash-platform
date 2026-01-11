@@ -20,11 +20,14 @@ public interface BattleMapper {
 
     List<Battle> selectPendingBattlesForUser(Long userId);
 
-    void insertParticipant(BattleParticipant participant);
+    void saveParticipant(BattleParticipant participant);
 
     void updateParticipant(BattleParticipant participant);
 
-    List<BattleParticipant> selectParticipantsByBattleId(Long battleId);
+    List<BattleParticipant> findParticipantsByBattleId(Long battleId);
 
-    Optional<BattleParticipant> selectParticipant(@Param("battleId") Long battleId, @Param("userId") Long userId);
+    Optional<BattleParticipant> findParticipant(@Param("battleId") Long battleId, @Param("userId") Long userId);
+
+    Optional<BattleParticipant> findParticipantForUpdate(@Param("battleId") Long battleId,
+            @Param("userId") Long userId);
 }

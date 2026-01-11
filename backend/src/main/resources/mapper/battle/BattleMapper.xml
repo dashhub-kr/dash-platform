@@ -4,26 +4,27 @@
 
     <!-- Battle -->
     <insert id="insertBattle" parameterType="com.ssafy.dash.battle.domain.Battle" useGeneratedKeys="true" keyProperty="id">
-        INSERT INTO battle (type, creator_id, status, problem_ids, created_at)
-        VALUES (#{type}, #{creatorId}, #{status}, #{problemIds}, #{createdAt})
+        INSERT INTO battle (type, detail_type, creator_id, status, problem_ids, created_at)
+        VALUES (#{type}, #{detailType}, #{creatorId}, #{status}, #{problemIds}, #{createdAt})
     </insert>
 
     <update id="updateBattle" parameterType="com.ssafy.dash.battle.domain.Battle">
         UPDATE battle SET
             status = #{status},
+            problem_ids = #{problemIds},
             started_at = #{startedAt},
             completed_at = #{completedAt}
         WHERE id = #{id}
     </update>
 
     <select id="selectById" parameterType="Long" resultType="com.ssafy.dash.battle.domain.Battle">
-        SELECT id, type, creator_id as creatorId, status, problem_ids as problemIds,
+        SELECT id, type, detail_type as detailType, creator_id as creatorId, status, problem_ids as problemIds,
                created_at as createdAt, started_at as startedAt, completed_at as completedAt
         FROM battle WHERE id = #{id}
     </select>
 
     <select id="selectByUserId" parameterType="Long" resultType="com.ssafy.dash.battle.domain.Battle">
-        SELECT DISTINCT b.id, b.type, b.creator_id as creatorId, b.status, b.problem_ids as problemIds,
+        SELECT DISTINCT b.id, b.type, b.detail_type as detailType, b.creator_id as creatorId, b.status, b.problem_ids as problemIds,
                b.created_at as createdAt, b.started_at as startedAt, b.completed_at as completedAt
         FROM battle b
         JOIN battle_participant bp ON b.id = bp.battle_id
@@ -32,7 +33,7 @@
     </select>
 
     <select id="selectPendingBattlesForUser" parameterType="Long" resultType="com.ssafy.dash.battle.domain.Battle">
-        SELECT b.id, b.type, b.creator_id as creatorId, b.status, b.problem_ids as problemIds,
+        SELECT b.id, b.type, b.detail_type as detailType, b.creator_id as creatorId, b.status, b.problem_ids as problemIds,
                b.created_at as createdAt, b.started_at as startedAt, b.completed_at as completedAt
         FROM battle b
         JOIN battle_participant bp ON b.id = bp.battle_id
@@ -41,9 +42,9 @@
     </select>
 
     <!-- BattleParticipant -->
-    <insert id="insertParticipant" parameterType="com.ssafy.dash.battle.domain.BattleParticipant" useGeneratedKeys="true" keyProperty="id">
-        INSERT INTO battle_participant (battle_id, user_id, status, score, problems_solved, total_time_seconds)
-        VALUES (#{battleId}, #{userId}, #{status}, #{score}, #{problemsSolved}, #{totalTimeSeconds})
+    <insert id="saveParticipant" parameterType="com.ssafy.dash.battle.domain.BattleParticipant">
+        INSERT INTO battle_participant (battle_id, user_id, status, score, problems_solved, total_time_seconds, started_at, completed_at, solved_problem_ids)
+        VALUES (#{battleId}, #{userId}, #{status}, #{score}, #{problemsSolved}, #{totalTimeSeconds}, #{startedAt}, #{completedAt}, #{solvedProblemIds})
     </insert>
 
     <update id="updateParticipant" parameterType="com.ssafy.dash.battle.domain.BattleParticipant">
@@ -53,26 +54,40 @@
             problems_solved = #{problemsSolved},
             total_time_seconds = #{totalTimeSeconds},
             started_at = #{startedAt},
-            completed_at = #{completedAt}
-        WHERE id = #{id}
+            completed_at = #{completedAt},
+            solved_problem_ids = #{solvedProblemIds}
+        WHERE battle_id = #{battleId} AND user_id = #{userId}
     </update>
 
-    <select id="selectParticipantsByBattleId" parameterType="Long" resultType="com.ssafy.dash.battle.domain.BattleParticipant">
+    <select id="findParticipantsByBattleId" parameterType="Long" resultType="com.ssafy.dash.battle.domain.BattleParticipant">
         SELECT bp.id, bp.battle_id as battleId, bp.user_id as userId, bp.status,
                bp.score, bp.problems_solved as problemsSolved, bp.total_time_seconds as totalTimeSeconds,
-               bp.started_at as startedAt, bp.completed_at as completedAt,
+               bp.started_at as startedAt, bp.completed_at as completedAt, bp.solved_problem_ids as solvedProblemIds,
                u.username as userName, u.avatar_url as userAvatar, u.solvedac_tier as userTier
         FROM battle_participant bp
-        JOIN user u ON bp.user_id = u.id
+        JOIN users u ON bp.user_id = u.id
         WHERE bp.battle_id = #{battleId}
     </select>
 
-    <select id="selectParticipant" resultType="com.ssafy.dash.battle.domain.BattleParticipant">
-        SELECT bp.id, bp.battle_id as battleId, bp.user_id as userId, bp.status,
-               bp.score, bp.problems_solved as problemsSolved, bp.total_time_seconds as totalTimeSeconds,
-               bp.started_at as startedAt, bp.completed_at as completedAt
+    <select id="findParticipant" resultType="com.ssafy.dash.battle.domain.BattleParticipant">
+        SELECT bp.id, bp.battle_id as battleId, bp.user_id as userId, bp.status, bp.score,
+               bp.problems_solved as problemsSolved, bp.total_time_seconds as totalTimeSeconds,
+               bp.started_at as startedAt, bp.completed_at as completedAt, bp.solved_problem_ids as solvedProblemIds,
+               u.username as userName, u.avatar_url as userAvatar, u.solvedac_tier as userTier
         FROM battle_participant bp
+        JOIN users u ON bp.user_id = u.id
         WHERE bp.battle_id = #{battleId} AND bp.user_id = #{userId}
+    </select>
+
+    <select id="findParticipantForUpdate" resultType="com.ssafy.dash.battle.domain.BattleParticipant">
+        SELECT bp.id, bp.battle_id as battleId, bp.user_id as userId, bp.status, bp.score,
+               bp.problems_solved as problemsSolved, bp.total_time_seconds as totalTimeSeconds,
+               bp.started_at as startedAt, bp.completed_at as completedAt, bp.solved_problem_ids as solvedProblemIds,
+               u.username as userName, u.avatar_url as userAvatar, u.solvedac_tier as userTier
+        FROM battle_participant bp
+        JOIN users u ON bp.user_id = u.id
+        WHERE bp.battle_id = #{battleId} AND bp.user_id = #{userId}
+        FOR UPDATE
     </select>
 
 </mapper>
