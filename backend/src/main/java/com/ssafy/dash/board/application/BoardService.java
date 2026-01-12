@@ -172,7 +172,7 @@ public class BoardService {
     private BoardResult toResult(Board board, User user, boolean isLiked) {
         String authorName = (user != null) ? user.getUsername() : "Unknown";
         String authorProfileImageUrl = (user != null) ? user.getAvatarUrl() : null;
-        String authorDecorationClass = (user != null) ? user.getEquippedDecorationClass() : null;
+        String authorDecorationClass = board.getAuthorDecorationClass();
         boolean authorIsDeleted = (user == null) || user.isDeleted();
 
         // Get study name

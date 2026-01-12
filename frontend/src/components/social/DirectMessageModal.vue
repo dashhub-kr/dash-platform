@@ -15,6 +15,7 @@
                         <NicknameRenderer 
                             :nickname="partnerName" 
                             :decorationClass="partnerDecoration"
+                            :enable-decoration="true"
                             class="text-base"
                         />
                         <p class="text-xs text-brand-500 font-bold">Online</p>

@@ -29,7 +29,7 @@
                 
                 <div v-if="targetUserInfo.decorationClass && !targetUserInfo.isDeleted" class="mb-2">
                     <span class="px-3 py-1 bg-gradient-to-r from-brand-50 to-indigo-50 text-brand-600 text-xs font-bold rounded-full border border-brand-100 shadow-sm">
-                        {{ targetUserInfo.decorationClass }}
+                        {{ getDecorationName(targetUserInfo.decorationClass) }}
                     </span>
                 </div>
                 
@@ -113,6 +113,21 @@ const { user: currentUser } = useAuth();
 const loading = ref(false);
 const friendshipStatus = ref(null);
 const requested = ref(false);
+
+const getDecorationName = (className) => {
+    const map = {
+        'effect-bronze': 'Bronze Tier',
+        'effect-silver': 'Silver Tier',
+        'effect-gold': 'Gold Tier',
+        'effect-platinum': 'Platinum Tier',
+        'effect-diamond': 'Diamond Tier',
+        'effect-ruby': 'Ruby Tier',
+        'effect-legendary-gold': 'Legendary Gold'
+    };
+    if (map[className]) return map[className];
+    if (!className) return '';
+    return className.replace('effect-', '').split('-').map(s => s.charAt(0).toUpperCase() + s.slice(1)).join(' ');
+};
 
 const isMe = computed(() => {
     return currentUser.value && targetUserInfo.value && currentUser.value.id === targetUserInfo.value.userId;

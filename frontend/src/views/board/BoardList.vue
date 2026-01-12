@@ -87,6 +87,8 @@
                        :user-id="post.userId"
                        :clickable="true"
                        :is-deleted="post.authorIsDeleted"
+                       :enable-decoration="true"
+                       :decoration-class="post.authorDecorationClass"
                        avatar-class="w-6 h-6 border border-slate-200"
                        text-class="font-medium text-slate-600 truncate max-w-[80px] sm:max-w-[100px]"
                        :icon-size="16"
@@ -146,6 +148,8 @@
                     <NicknameRenderer 
                         :username="post.authorName"
                         :role="post.authorRole"
+                        :enable-decoration="true"
+                        :decoration-class="post.authorDecorationClass"
                         :show-avatar="false"
                         text-class="truncate max-w-[100px]"
                     >

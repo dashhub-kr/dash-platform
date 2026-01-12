@@ -3,6 +3,8 @@ package com.ssafy.dash.shop.application;
 import com.ssafy.dash.decoration.domain.Decoration;
 import com.ssafy.dash.decoration.domain.DecorationRepository;
 import com.ssafy.dash.decoration.domain.UserDecoration;
+import com.ssafy.dash.notification.application.NotificationService;
+import com.ssafy.dash.notification.domain.NotificationType;
 import com.ssafy.dash.user.domain.User;
 import com.ssafy.dash.user.domain.UserRepository;
 import com.ssafy.dash.user.domain.exception.UserNotFoundException;
@@ -16,10 +18,13 @@ public class ShopService {
 
     private final UserRepository userRepository;
     private final DecorationRepository decorationRepository;
+    private final NotificationService notificationService;
 
-    public ShopService(UserRepository userRepository, DecorationRepository decorationRepository) {
+    public ShopService(UserRepository userRepository, DecorationRepository decorationRepository,
+            NotificationService notificationService) {
         this.userRepository = userRepository;
         this.decorationRepository = decorationRepository;
+        this.notificationService = notificationService;
     }
 
     @Transactional(readOnly = true)
@@ -58,23 +63,42 @@ public class ShopService {
 
     @Transactional
     public void giftItem(Long senderId, Long recipientUserId, Long decorationId) {
-        // Only Admin Check should be done in Controller or here via user role check?
-        // Service should assume caller is authorized or check it.
-        // Checking sender role here for safety.
+        // 1. Validate Sender
+        User sender = userRepository.findById(senderId)
+                .orElseThrow(() -> new UserNotFoundException(senderId));
 
-        User sender = userRepository.findById(senderId).orElseThrow(() -> new UserNotFoundException(senderId));
-        if (!"ROLE_ADMIN".equals(sender.getRole())) {
-            throw new SecurityException("Only admin can gift items");
+        // 2. Validate Recipient
+        User recipient = userRepository.findById(recipientUserId)
+                .orElseThrow(() -> new UserNotFoundException(recipientUserId));
+
+        // 3. Validate Item
+        Decoration item = decorationRepository.findById(decorationId).orElse(null);
+        if (item == null || Boolean.FALSE.equals(item.getIsActive())) {
+            throw new IllegalArgumentException("Item not found or inactive");
         }
 
-        // Allow gifting to self or others
+        // 4. Check Ownership (Recipient)
         if (decorationRepository.existsUserDecoration(recipientUserId, decorationId)) {
-            // Already owned - maybe just ignore or throw?
-            // Throwing is better for feedback
-            throw new IllegalStateException("User already owns this item");
+            throw new IllegalStateException("Recipient already owns this item");
         }
 
+        // 5. Check Balance & Deduct from Sender
+        int price = item.getPrice() != null ? item.getPrice() : 0;
+        if (price > 0) {
+            if (sender.getLogCount() < price) {
+                throw new IllegalStateException("Not enough logs");
+            }
+            sender.useLogs(price);
+            userRepository.update(sender);
+        }
+
+        // 6. Grant Item to Recipient
         UserDecoration ud = UserDecoration.create(recipientUserId, decorationId);
         decorationRepository.saveUserDecoration(ud);
+
+        // 7. Notify Recipient
+        String message = sender.getUsername() + "님이 [" + item.getName() + "] 아이템을 선물했습니다!";
+        // Using SYSTEM type for now as generic notification
+        notificationService.send(recipientUserId, message, "/shop", NotificationType.SYSTEM);
     }
 }

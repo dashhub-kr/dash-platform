@@ -25,9 +25,8 @@
             class="font-medium truncate" 
             :class="[
                 textClass, 
-                decorationClass,
+                enableDecoration ? decorationClass : '',
                 isUnknown ? 'text-slate-400' : 'text-slate-700',
-                { 'admin-shining-text': isAdmin },
                 { 'cursor-pointer hover:underline hover:text-brand-600': clickable && !isUnknown }
             ]"
             @click="handleClick"
@@ -57,7 +56,8 @@ const props = defineProps({
     textClass: { type: String, default: 'text-xs' },
     containerClass: { type: String, default: '' },
     iconSize: { type: Number, default: 14 },
-    isDeleted: { type: Boolean, default: false }
+    isDeleted: { type: Boolean, default: false },
+    enableDecoration: { type: Boolean, default: false } // NEW
 });
 
 const { open } = useUserProfileModal();
@@ -90,23 +90,8 @@ const displayName = computed(() => {
     return isUnknown.value ? '탈퇴한 회원' : effectiveNickname.value;
 });
 
-const isAdmin = computed(() => props.role === 'ROLE_ADMIN');
+
 </script>
 
 <style scoped>
-.admin-shining-text {
-  background: linear-gradient(90deg, #d97706, #fbbf24, #d97706);
-  background-size: 200% auto;
-  color: transparent;
-  -webkit-background-clip: text;
-  background-clip: text;
-  animation: shine 3s linear infinite;
-  font-weight: 800;
-}
-
-@keyframes shine {
-  to {
-    background-position: 200% center;
-  }
-}
 </style>

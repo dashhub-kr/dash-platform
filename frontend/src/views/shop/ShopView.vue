@@ -26,71 +26,71 @@
           <Loader2 class="w-10 h-10 text-brand-500 animate-spin" />
       </div>
 
-      <div v-else class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+      <div v-else class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         <div 
             v-for="item in items" 
             :key="item.id" 
-            class="group bg-white rounded-3xl p-6 border border-slate-200 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 relative overflow-hidden"
-            :class="{ 'ring-2 ring-brand-500 ring-offset-2': isOwned(item.id) }"
+            class="group bg-white rounded-3xl p-4 border border-slate-200 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 relative overflow-hidden flex flex-col"
+            :class="{ 
+                'ring-2 ring-brand-500 ring-offset-2': isOwned(item.id),
+                'md:col-span-2 lg:col-span-3': item.cssClass === 'effect-legendary-gold'
+            }"
         >
             <!-- Preview Area -->
-            <div class="h-32 bg-slate-50 rounded-2xl mb-6 flex items-center justify-center relative overflow-hidden">
-                <div class="relative z-10 px-6 py-3 bg-white rounded-xl shadow-sm border border-slate-100">
+            <div class="h-36 bg-slate-50 rounded-2xl mb-4 flex items-center justify-center relative overflow-hidden shrink-0">
+                <div class="relative z-10 px-6 py-3 bg-white rounded-xl shadow-sm border border-slate-100 transform group-hover:scale-105 transition-transform duration-300">
                      <span class="font-bold text-slate-800 text-lg" :class="item.cssClass">
-                        Sample Nickname
+                        {{ item.name }}
                      </span>
                 </div>
-                <!-- Background Pattern -->
                 <div class="absolute inset-0 opacity-5 bg-[radial-gradient(#cbd5e1_1px,transparent_1px)] [background-size:16px_16px]"></div>
             </div>
 
-            <!-- Item Info -->
-            <div class="mb-6">
-                <h3 class="font-bold text-slate-900 text-lg mb-1">{{ item.name }}</h3>
-                <p class="text-sm text-slate-500 line-clamp-2 min-h-[40px]">{{ item.description }}</p>
-            </div>
-
-            <!-- Price & Action -->
-            <div class="flex items-center justify-between mt-auto">
-                <div class="flex items-center gap-1.5 font-bold text-slate-800">
-                    <img src="/images/items/log.png" class="w-5 h-5 object-contain" alt="Logs" />
-                    <span>{{ item.price }}</span>
+            <!-- Content -->
+            <div class="flex-1 flex flex-col">
+                <!-- Title & Price Row -->
+                <div class="flex items-start justify-between gap-2 mb-2">
+                    <h3 class="font-bold text-slate-900 text-lg leading-tight">{{ item.name }}</h3>
+                    <div class="flex items-center gap-1 shrink-0 bg-slate-100 px-2 py-1 rounded-lg">
+                        <img src="/images/items/log.png" class="w-4 h-4 object-contain" alt="Logs" />
+                        <span class="text-xs font-bold text-slate-700">{{ item.price }}</span>
+                    </div>
                 </div>
+                
+                <!-- Description -->
+                <p class="text-xs text-slate-500 line-clamp-2 mb-4 leading-relaxed">{{ item.description }}</p>
 
-                <div class="flex gap-2">
-                    <!-- Buy Button -->
+                <!-- Buttons (Bottom) -->
+                <div class="mt-auto flex gap-2">
                     <button 
                         v-if="!isOwned(item.id)"
                         @click="handleBuy(item)"
-                        class="px-5 py-2.5 bg-brand-500 hover:bg-brand-600 text-white text-sm font-bold rounded-xl shadow-lg shadow-brand-500/30 transition-all active:scale-95 flex items-center gap-1.5"
+                        class="flex-1 py-3 bg-brand-500 hover:bg-brand-600 text-white text-sm font-bold rounded-xl shadow-lg shadow-brand-500/20 transition-all active:scale-95 flex items-center justify-center gap-2"
                     >
-                        <ShoppingBag :size="16" />
-                        구매
+                        구매하기
                     </button>
                     <button 
                         v-else
                         disabled
-                        class="px-5 py-2.5 bg-slate-100 text-slate-400 text-sm font-bold rounded-xl cursor-not-allowed flex items-center gap-1.5"
+                        class="flex-1 py-3 bg-slate-100 text-slate-400 text-sm font-bold rounded-xl cursor-not-allowed flex items-center justify-center gap-2"
                     >
                         <Check :size="16" />
                         보유중
                     </button>
 
-                    <!-- Gift Button (Admin Only) -->
+                    <!-- Gift Button -->
                      <button 
-                        v-if="isAdmin"
                         @click="openGiftModal(item)"
-                        class="px-3 py-2.5 bg-amber-100 hover:bg-amber-200 text-amber-600 text-sm font-bold rounded-xl transition-all active:scale-95"
+                        class="w-11 h-11 flex items-center justify-center bg-amber-50 hover:bg-amber-100 text-amber-600 rounded-xl transition-all active:scale-95 border border-amber-100"
                         title="선물하기"
                     >
-                        <Gift :size="18" />
+                        <Gift :size="20" />
                     </button>
                 </div>
             </div>
         </div>
         </div>
       </div>
-    </div>
 
     <!-- Gift Modal -->
     <Teleport to="body">
@@ -104,10 +104,8 @@
                 
                 <div class="mb-6">
                     <div class="text-sm font-bold text-slate-500 mb-2">선물할 아이템</div>
-                    <div class="p-3 bg-slate-50 rounded-xl border border-slate-200 font-bold text-slate-800 flex items-center gap-3">
-                         <span :class="selectedItem?.cssClass">Sample</span>
-                         <span class="text-slate-400">|</span>
-                         {{ selectedItem?.name }}
+                    <div class="p-3 bg-slate-50 rounded-xl border border-slate-200 font-bold text-slate-800 flex items-center justify-center">
+                         <span :class="selectedItem?.cssClass" class="text-lg">{{ selectedItem?.name }}</span>
                     </div>
                 </div>
 
@@ -196,14 +194,16 @@
     </div>
   </div>
   </div>
+  </div>
 </template>
 
 <script setup>
 import { ref, onMounted, computed } from 'vue';
 import { useAuth } from '@/composables/useAuth';
 
-import { shopApi } from '@/api/shop'; // Need to create/update shop.js
+import { shopApi } from '@/api/shop'; 
 import { userApi } from '@/api/user'; // For searching users
+import { decorationApi } from '@/api/decoration'; // Import decorationApi
 import { Loader2, ShoppingBag, Check, Gift, Info } from 'lucide-vue-next';
 import '@/assets/css/effects.css'; // Ensure effects are loaded
 
@@ -226,18 +226,9 @@ const fetchItems = async () => {
     try {
         const res = await shopApi.getItems();
         items.value = res.data;
-        // In a real app, we should fetch owned items separately or check user's inventory
-        // Assuming user.value (from useAuth refresh) could populate this if we added ownedDecorations list to UserResponse
-        // But for now, let's just fetch owned items if we have an endpoint, or rely on maybe 'isOwned' flag in item list if backend supported it?
-        // Actually backend 'selectShopItems' just returns Deocration.
-        // We need to know if user owns it. 
-        // Let's assume we can fetch my decorations.
-        // Or updated UserResponse to include list of owned decoration IDs?
-        // Let's add 'fetchMyDecorations' to shopApi or use existing userApi if available.
-        // For now, let's assume we don't know (or implement fetchMyItems).
-        // Let's implement fetchMyItems in shopApi quickly or just skip "owned" check visual for now?
-        // Better: Fetch my decorations.
-        const myDecoRes = await userApi.getMyDecorations(); // Assuming this exists or create it
+        
+        // Fetch owned decorations using decorationApi
+        const myDecoRes = await decorationApi.getMyInventory(); 
         ownedItems.value = new Set(myDecoRes.data.map(d => d.decorationId)); 
     } catch (e) {
         console.error(e);

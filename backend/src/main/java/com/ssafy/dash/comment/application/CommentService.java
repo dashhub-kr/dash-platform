@@ -68,12 +68,9 @@ public class CommentService {
                 notifyBoardAuthor(user, comment, command.boardId());
             }
         }
-        String authorName = (user != null) ? user.getUsername() : "Unknown";
-        String authorProfileImageUrl = (user != null) ? user.getAvatarUrl() : null;
-        String authorRole = (user != null) ? user.getRole() : null;
-        String authorDecoration = (user != null) ? user.getEquippedDecorationClass() : null;
 
-        return CommentResult.from(comment, authorName, authorProfileImageUrl, authorRole, authorDecoration);
+        // Re-fetch to get joined data (decoration, etc.)
+        return findById(comment.getId());
     }
 
     @Transactional(readOnly = true)
@@ -97,7 +94,7 @@ public class CommentService {
         String authorName = (user != null) ? user.getUsername() : "Unknown";
         String authorProfileImageUrl = (user != null) ? user.getAvatarUrl() : null;
         String authorRole = (user != null) ? user.getRole() : null;
-        String authorDecoration = (user != null) ? user.getEquippedDecorationClass() : null;
+        String authorDecoration = comment.getAuthorDecorationClass();
 
         return CommentResult.from(comment, authorName, authorProfileImageUrl, authorRole, authorDecoration);
     }
@@ -112,13 +109,7 @@ public class CommentService {
 
         commentRepository.update(comment);
 
-        User user = userRepository.findById(comment.getUserId()).orElse(null);
-        String authorName = (user != null) ? user.getUsername() : "Unknown";
-        String authorProfileImageUrl = (user != null) ? user.getAvatarUrl() : null;
-        String authorRole = (user != null) ? user.getRole() : null;
-        String authorDecoration = (user != null) ? user.getEquippedDecorationClass() : null;
-
-        return CommentResult.from(comment, authorName, authorProfileImageUrl, authorRole, authorDecoration);
+        return findById(id);
     }
 
     @Transactional
@@ -159,10 +150,12 @@ public class CommentService {
                                 String replyProfileImageUrl = reply.getAuthorProfileImageUrl();
                                 String replyRole = reply.getAuthorRole();
                                 String replyDecoration = reply.getAuthorDecorationClass();
-                                return CommentResult.from(reply, replyAuthor, replyProfileImageUrl, replyRole, replyDecoration);
+                                return CommentResult.from(reply, replyAuthor, replyProfileImageUrl, replyRole,
+                                        replyDecoration);
                             })
                             .collect(Collectors.toList());
-                    return CommentResult.from(comment, authorName, authorProfileImageUrl, authorRole, authorDecoration, replyResults);
+                    return CommentResult.from(comment, authorName, authorProfileImageUrl, authorRole, authorDecoration,
+                            replyResults);
                 })
                 .collect(Collectors.toList());
     }

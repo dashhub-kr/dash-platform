@@ -57,20 +57,33 @@
                             @click="conv.isGroup ? openGroupChat(conv) : openChat(conv)"
                             class="p-4 bg-white hover:bg-slate-50 border-b border-slate-50 cursor-pointer transition-colors relative"
                         >
-                            <div class="flex gap-3">
+                            <div class="flex gap-3 items-center">
                                 <div class="relative shrink-0">
-                                    <img :src="getAvatar(conv.isGroup ? null : conv.partnerAvatar)" class="w-12 h-12 rounded-full object-cover border border-slate-100" />
+                                    <NicknameRenderer 
+                                        :username="conv.name"
+                                        :avatar-url="conv.isGroup ? null : conv.partnerAvatar"
+                                        :decorationClass="conv.partnerDecoration"
+                                        :enable-decoration="true"
+                                        :show-text="false"
+                                        avatar-class="w-12 h-12 rounded-full object-cover border border-slate-100"
+                                    />
                                     <div v-if="conv.isGroup" class="absolute -bottom-1 -right-1 bg-indigo-500 text-white rounded-full p-0.5 border-2 border-white">
                                         <Users :size="10" />
                                     </div>
                                 </div>
                                 <div class="flex-1 min-w-0">
                                     <div class="flex items-center justify-between mb-0.5">
-                                        <h3 class="font-bold text-slate-800 text-sm truncate flex items-center gap-1">
-                                            {{ conv.name }}
-                                            <span v-if="conv.isGroup" class="text-xs font-normal text-slate-500">({{ conv.memberCount }})</span>
-                                        </h3>
-                                        <span class="text-[10px] text-slate-400 shrink-0">{{ formatTime(conv.lastMessageTime) }}</span>
+                                        <div class="flex items-center gap-1 min-w-0">
+                                            <NicknameRenderer 
+                                                :username="conv.name"
+                                                :decorationClass="conv.partnerDecoration"
+                                                :enable-decoration="true"
+                                                :show-avatar="false"
+                                                text-class="font-bold text-slate-800 text-sm truncate"
+                                            />
+                                            <span v-if="conv.isGroup" class="text-xs font-normal text-slate-500 shrink-0">({{ conv.memberCount }})</span>
+                                        </div>
+                                        <span class="text-[10px] text-slate-400 shrink-0 ml-2">{{ formatTime(conv.lastMessageTime) }}</span>
                                     </div>
                                     <p class="text-xs text-slate-500 truncate">{{ conv.lastMessagePreview || '대화가 없습니다.' }}</p>
                                 </div>
@@ -114,10 +127,14 @@
                                     class="flex gap-2 max-w-[85%]"
                                     :class="msg.senderId === user.id ? 'ml-auto flex-row-reverse' : ''"
                                 >
-                                    <img 
-                                        v-if="msg.senderId !== user.id" 
-                                        :src="getAvatar(activeChat?.partnerAvatar, isPartnerDeleted)" 
-                                        class="w-8 h-8 rounded-full self-start border border-slate-100" 
+                                    <NicknameRenderer
+                                        v-if="msg.senderId !== user.id"
+                                        :username="activeChat?.partnerName"
+                                        :avatar-url="activeChat?.partnerAvatar"
+                                        :decorationClass="activeChat?.partnerDecoration"
+                                        :enable-decoration="true"
+                                        :show-text="false"
+                                        avatar-class="w-8 h-8 rounded-full self-start border border-slate-100"
                                     />
                                     
                                     <div class="flex flex-col gap-1" :class="msg.senderId === user.id ? 'items-end' : 'items-start'">
@@ -176,15 +193,25 @@
                             class="flex gap-2 max-w-[85%]"
                             :class="msg.senderId === user.id ? 'ml-auto flex-row-reverse' : ''"
                         >
-                            <img 
+                            <NicknameRenderer 
                                 v-if="msg.senderId !== user.id" 
-                                :src="getAvatar(msg.senderAvatarUrl)" 
-                                class="w-8 h-8 rounded-full self-start border border-slate-100" 
-                                :title="msg.senderUsername"
+                                :username="msg.senderUsername"
+                                :avatar-url="msg.senderAvatarUrl"
+                                :decorationClass="msg.senderDecoration"
+                                :enable-decoration="true"
+                                :show-text="false"
+                                avatar-class="w-8 h-8 rounded-full self-start border border-slate-100" 
                             />
                             
                             <div class="flex flex-col gap-1" :class="msg.senderId === user.id ? 'items-end' : 'items-start'">
-                                <span v-if="msg.senderId !== user.id" class="text-[10px] text-slate-500 ml-1 truncate max-w-[100px]">{{ msg.senderUsername }}</span>
+                                <NicknameRenderer
+                                     v-if="msg.senderId !== user.id"
+                                     :username="msg.senderUsername"
+                                     :decorationClass="msg.senderDecoration"
+                                     :enable-decoration="true"
+                                     :show-avatar="false" 
+                                     text-class="text-[10px] text-slate-500 ml-1 truncate max-w-[100px]"
+                                />
                                 <div 
                                     class="px-3 py-2 rounded-2xl text-sm leading-relaxed shadow-sm break-keep"
                                     :class="msg.senderId === user.id ? 'bg-indigo-500 text-white rounded-br-none' : 'bg-white border border-slate-100 text-slate-700 rounded-bl-none'"
@@ -313,6 +340,7 @@
 import { ref, computed, onMounted, onUnmounted, watch, nextTick } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
 import { MessageCircle, X, Maximize2, Loader2, ChevronLeft, Send, AlertCircle, Plus, Users, BookOpen, Check } from 'lucide-vue-next';
+import NicknameRenderer from '@/components/common/NicknameRenderer.vue'; // Added
 import { socialApi } from '@/api/social';
 import { chatApi } from '@/api/chat';
 import { userApi } from '@/api/user';

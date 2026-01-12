@@ -65,6 +65,7 @@
                       <NicknameRenderer 
                            :username="comment.authorName"
                            :avatar-url="comment.authorProfileImageUrl"
+                           :enable-decoration="true"
                            avatar-class="w-5 h-5 border-2 border-white shadow-sm text-[8px]"
                            text-class="hidden"
                            :icon-size="12"
@@ -111,6 +112,8 @@
                     <NicknameRenderer 
                          :username="comment.authorName"
                          :avatar-url="comment.authorProfileImageUrl"
+                         :enable-decoration="true"
+                         :decoration-class="comment.authorDecorationClass"
                          avatar-class="w-5 h-5 flex-shrink-0 border border-brand-200 text-[9px]"
                          text-class="hidden"
                          :icon-size="12"
@@ -120,6 +123,8 @@
                          <NicknameRenderer 
                              :username="comment.authorName"
                              :show-avatar="false"
+                             :enable-decoration="true"
+                             :decoration-class="comment.authorDecorationClass"
                              text-class="font-bold text-slate-700 text-[11px]"
                          />
                          <span class="text-[9px] text-slate-400">{{ formatDate(comment.createdAt) }}</span>
