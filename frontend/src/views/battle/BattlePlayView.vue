@@ -157,18 +157,39 @@
           <div v-if="showResultModal" class="fixed inset-0 z-50 flex items-center justify-center p-4">
             <div class="absolute inset-0 bg-black/50 backdrop-blur-sm"></div>
             <div class="relative bg-white rounded-3xl p-8 max-w-md w-full text-center animate-bounce-in">
-              <div class="text-6xl mb-4">🏆</div>
-              <h2 class="text-2xl font-black text-slate-800 mb-2">배틀 완료!</h2>
-              <p class="text-slate-500 mb-6">수고하셨습니다!</p>
+              <!-- 승리/패배 분기 -->
+              <div v-if="isWinner" class="text-6xl mb-4">🎉</div>
+              <div v-else class="text-6xl mb-4">💪</div>
+              
+              <h2 class="text-2xl font-black text-slate-800 mb-2">
+                {{ isWinner ? '축하합니다! 승리!' : '아쉽네요!' }}
+              </h2>
+              <p class="text-slate-500 mb-6">
+                {{ isWinner ? '멋진 실력이에요!' : '다음엔 꼭 이겨봐요!' }}
+              </p>
               
               <!-- Results -->
               <div class="space-y-2 mb-6">
                 <div v-for="(p, idx) in sortedParticipants" :key="p.id"
-                     class="flex items-center gap-3 p-3 rounded-xl"
-                     :class="idx === 0 ? 'bg-amber-50' : 'bg-slate-50'">
+                     class="flex items-center gap-3 p-3 rounded-xl transition-all"
+                     :class="[
+                       idx === 0 ? 'bg-amber-50 ring-2 ring-amber-300' : 'bg-slate-50',
+                       p.userId === user?.id ? 'ring-2 ring-violet-300' : ''
+                     ]">
                   <div class="text-2xl">{{ idx === 0 ? '🥇' : idx === 1 ? '🥈' : '🥉' }}</div>
-                  <div class="flex-1 text-left font-semibold">{{ p.userName }}</div>
-                  <div class="font-bold">{{ p.score || 0 }}점</div>
+                  <div class="flex-1 text-left">
+                    <div class="font-semibold">
+                      {{ p.userName }}
+                      <span v-if="p.userId === user?.id" class="text-violet-600 text-sm">(나)</span>
+                    </div>
+                    <div class="text-xs text-slate-400">
+                      {{ p.problemsSolved || 0 }}문제 · {{ formatTime(p.totalTimeSeconds) }}
+                    </div>
+                  </div>
+                  <div class="text-right">
+                    <div class="font-bold text-lg">{{ p.score || 0 }}</div>
+                    <div class="text-xs text-slate-400">점</div>
+                  </div>
                 </div>
               </div>
 
@@ -225,13 +246,37 @@ const myParticipant = computed(() =>
   battle.value?.participants?.find(p => p.userId === user.value?.id)
 );
 
-// 점수 기준 정렬된 참가자
+// 승패 판정: 문제 수 > 시간 순 정렬
 const sortedParticipants = computed(() => {
   if (!battle.value?.participants) return [];
   return [...battle.value.participants]
     .filter(p => p.status !== 'DECLINED')
-    .sort((a, b) => (b.score || 0) - (a.score || 0));
+    .sort((a, b) => {
+      // 1순위: 문제 수 (많을수록 높은 순위)
+      if ((b.problemsSolved || 0) !== (a.problemsSolved || 0)) {
+        return (b.problemsSolved || 0) - (a.problemsSolved || 0);
+      }
+      // 2순위: 시간 (짧을수록 높은 순위)
+      return (a.totalTimeSeconds || 0) - (b.totalTimeSeconds || 0);
+    });
 });
+
+// 내 순위 계산
+const myRank = computed(() => {
+  const idx = sortedParticipants.value.findIndex(p => p.userId === user.value?.id);
+  return idx >= 0 ? idx + 1 : null;
+});
+
+// 승리 여부
+const isWinner = computed(() => myRank.value === 1);
+
+// 시간 포맷 헬퍼
+const formatTime = (seconds) => {
+  if (!seconds) return '0:00';
+  const m = Math.floor(seconds / 60);
+  const s = seconds % 60;
+  return `${m}:${s.toString().padStart(2, '0')}`;
+};
 
 // 남은 시간 계산
 const formattedTimeLeft = computed(() => {
@@ -252,9 +297,13 @@ const formattedTimeLeft = computed(() => {
 });
 
 const isSolved = (problemId) => {
-  // 실제로는 서버에서 푼 문제 목록을 받아와야 함
-  // 일단 myParticipant의 problemsSolved 기준으로 표시
-  return false; // TODO: 구현 필요
+  if (!myParticipant.value?.solvedProblemIds) return false;
+  try {
+    const solvedIds = JSON.parse(myParticipant.value.solvedProblemIds);
+    return solvedIds.includes(problemId);
+  } catch {
+    return false;
+  }
 };
 
 const fetchBattle = async () => {
