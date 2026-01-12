@@ -638,8 +638,8 @@ const showFaq = ref(false);
                 
                 <div class="relative bg-white rounded-3xl w-full max-w-lg p-6 shadow-2xl animate-in fade-in zoom-in-95 duration-200 flex flex-col max-h-[85vh]">
                     <div class="flex items-center justify-between mb-6 shrink-0">
-                        <h3 class="text-xl font-black text-slate-800 flex items-center gap-2">
-                            <Palette :size="24" class="text-violet-500" />
+                        <h3 class="text-xl font-black text-slate-800 flex items-center gap-3">
+                            <BaseIconBadge :icon="Palette" color="violet" size="lg" />
                             보유 중인 효과
                         </h3>
                         <button @click="showDecorationModal = false" class="p-2 text-slate-400 hover:bg-slate-100 rounded-full transition-colors">
