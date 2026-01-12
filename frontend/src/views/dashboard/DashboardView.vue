@@ -799,27 +799,26 @@ watch(() => studyData.value, () => {
 });
 
 
-// Computed: 현재 스트릭 (연속 활동 일수)
+// Computed: 현재 스트릭 (백엔드 캐시 데이터 사용)
 const currentStreak = computed(() => {
-    if (!heatmapWeeks.value.length) return 0;
+    if (!studyData.value) return 0;
     
-    // 주간 데이터를 날짜 배열로 평탄화하고 오늘부터 시작하도록 역순 정렬
-    const allDays = heatmapWeeks.value.flat().reverse();
+    // 백엔드에서 streakUpdatedAt과 streak 값을 받아옴
+    const streak = studyData.value.streak || 0;
+    const updatedAt = studyData.value.streakUpdatedAt;
     
-    let streak = 0;
-    const today = new Date().toISOString().split('T')[0];
+    // streak 유효성 판단: updatedAt이 어제 이전이면 체인 끊김
+    if (!updatedAt) return 0;
     
-    for (const day of allDays) {
-        // 미래 날짜 건너뛰기
-        if (day.date > today) continue;
-        
-        if (day.count > 0) {
-            streak++;
-        } else if (streak > 0 || day.date === today) {
-            // 오늘 활동이 없으면 스트릭 0
-            // 이전에 활동이 있었는데 0을 만나면 카운팅 중단
-            break;
-        }
+    const yesterday = new Date();
+    yesterday.setDate(yesterday.getDate() - 1);
+    yesterday.setHours(0, 0, 0, 0);
+    
+    const updatedDate = new Date(updatedAt);
+    updatedDate.setHours(0, 0, 0, 0);
+    
+    if (updatedDate < yesterday) {
+        return 0;  // 체인 끊김
     }
     
     return streak;
