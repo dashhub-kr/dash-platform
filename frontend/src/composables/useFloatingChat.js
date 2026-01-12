@@ -3,6 +3,7 @@ import { ref } from 'vue';
 // Global state for FloatingMessagePanel
 const isOpen = ref(false);
 const activeChat = ref(null); // { partnerId, partnerName, partnerAvatar, partnerDecoration }
+const refreshTrigger = ref(0); // 채팅 목록 새로고침 트리거
 
 export function useFloatingChat() {
 
@@ -24,11 +25,18 @@ export function useFloatingChat() {
         isOpen.value = !isOpen.value;
     };
 
+    // DM 알림 수신 시 채팅 목록 새로고침 트리거
+    const triggerRefresh = () => {
+        refreshTrigger.value++;
+    };
+
     return {
         isOpen,
         activeChat,
+        refreshTrigger,
         openChat,
         closeChat,
-        toggle
+        toggle,
+        triggerRefresh
     };
 }

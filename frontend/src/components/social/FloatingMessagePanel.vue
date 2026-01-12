@@ -322,7 +322,7 @@ import { useFloatingChat } from '@/composables/useFloatingChat';
 const router = useRouter();
 const route = useRoute();
 const { user } = useAuth();
-const { isOpen, activeChat, toggle } = useFloatingChat();
+const { isOpen, activeChat, toggle, refreshTrigger } = useFloatingChat();
 
 const isAuthenticated = computed(() => !!user.value);
 
@@ -483,6 +483,10 @@ const loadAllConversations = async () => {
 };
 
 const openChat = (conv) => {
+    // 읽음 처리: 로컬에서 즉시 unreadCount 0으로 설정
+    const target = conversations.value.find(c => c.partnerId === conv.partnerId);
+    if (target) target.unreadCount = 0;
+    
     activeChat.value = {
         partnerId: conv.partnerId,
         partnerName: conv.partnerName,
@@ -496,6 +500,10 @@ const openGroupChat = async (room) => {
     activeGroupRoom.value = room;
     showGroupMembers.value = false;
     groupMessagesLoading.value = true;
+
+    // 읽음 처리: 로컬에서 즉시 unreadCount 0으로 설정
+    const target = groupRooms.value.find(r => r.id === room.id);
+    if (target) target.unreadCount = 0;
 
     try {
         const [detailRes, msgRes] = await Promise.all([
@@ -805,9 +813,12 @@ let refreshInterval = null;
 onMounted(() => {
     if (isAuthenticated.value) {
         loadAllConversations();
+        // 15초마다 새 메시지 확인 (알림 시스템과 동일한 주기)
         refreshInterval = setInterval(() => {
-            if (viewMode.value === 'list') loadAllConversations();
-        }, 60000);
+            if (viewMode.value === 'list' || !isOpen.value) {
+                loadAllConversations();
+            }
+        }, 15000);
     }
 });
 
@@ -819,6 +830,13 @@ onUnmounted(() => {
 watch(() => route.path, () => {
     isOpen.value = false;
     stopChatPolling();
+});
+
+// DM 알림 수신 시 즉시 채팅 목록 새로고침
+watch(refreshTrigger, () => {
+    if (isAuthenticated.value) {
+        loadAllConversations();
+    }
 });
 
 // Auto-focus logic using watchers on sending states

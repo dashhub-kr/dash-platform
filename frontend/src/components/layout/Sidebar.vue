@@ -335,6 +335,7 @@ import {
 } from "lucide-vue-next";
 
 import { useAuth } from "@/composables/useAuth";
+import { useFloatingChat } from "@/composables/useFloatingChat";
 import { authApi } from "@/api/auth";
 import { getNotifications, markAsRead, markAllAsRead, updateNotification } from "@/api/notification";
 import { studyApi } from "@/api/study";
@@ -342,6 +343,7 @@ import { studyApi } from "@/api/study";
 const emits = defineEmits(['scroll']);
 
 const { user, logout, refresh } = useAuth();
+const { triggerRefresh: refreshChatList } = useFloatingChat();
 const route = useRoute();
 const router = useRouter();
 
@@ -472,6 +474,10 @@ const fetchNotifications = async () => {
                 });
             }
         });
+        // DM 알림이 있으면 채팅 목록도 즉시 새로고침
+        if (newNotifications.some(n => n.type === 'DIRECT_MESSAGE')) {
+            refreshChatList();
+        }
     }
 
     notifications.value = data;
