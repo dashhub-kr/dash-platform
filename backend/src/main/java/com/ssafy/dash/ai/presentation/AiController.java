@@ -110,6 +110,14 @@ public class AiController {
                 return ResponseEntity.ok(HintChatResponseDto.from(response));
         }
 
+        @Operation(summary = "튜터 대화 내역 조회", description = "특정 기록에 대한 튜터 대화 내역을 조회합니다")
+        @GetMapping("/tutor/history/{recordId}")
+        public ResponseEntity<List<HintChatRequest.ChatMessage>> getTutorHistory(
+                        @PathVariable Long recordId,
+                        @RequestParam Long userId) {
+                return ResponseEntity.ok(tutorChatService.getChatHistory(userId, recordId));
+        }
+
         @Operation(summary = "AI 학습 경로", description = "분석 데이터 기반 개인화 학습 경로를 생성합니다")
         @GetMapping("/learning-path/{userId}")
         public ResponseEntity<LearningDashboardResponse> getLearningPath(@PathVariable Long userId) {

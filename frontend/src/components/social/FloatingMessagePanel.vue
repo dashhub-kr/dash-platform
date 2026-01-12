@@ -108,7 +108,8 @@
                 <div v-else-if="viewMode === 'chat'" class="flex-1 flex flex-col overflow-hidden bg-white">
                     <div 
                         ref="messagesContainer"
-                        class="flex-1 overflow-y-auto p-4 space-y-4 bg-slate-50/50"
+                        class="flex-1 overflow-y-auto p-4 space-y-4 bg-slate-50/50 transition-opacity duration-200"
+                        :class="chatReady ? 'opacity-100' : 'opacity-0'"
                     >
                         <div v-if="messagesLoading" class="flex justify-center py-4">
                             <Loader2 class="animate-spin text-slate-300" :size="20" />
@@ -117,7 +118,7 @@
                         <template v-else>
                             <div v-for="(msg, index) in messages" :key="msg.id">
                                 <!-- 날짜 구분선 -->
-                                <div v-if="showDateSeparator(index)" class="flex items-center justify-center my-4">
+                                <div v-if="showDateSeparator(index, messages)" class="flex items-center justify-center my-4">
                                     <span class="text-[10px] bg-slate-100 text-slate-500 px-3 py-1 rounded-full font-medium">
                                         {{ formatDate(msg.createdAt) }}
                                     </span>
@@ -187,12 +188,21 @@
                 <div v-else-if="viewMode === 'groupChat'" class="flex-1 flex flex-col overflow-hidden bg-white">
                      <div 
                         ref="groupMessagesContainer"
-                        class="flex-1 overflow-y-auto p-4 space-y-4 bg-slate-50/50"
+                        class="flex-1 overflow-y-auto p-4 space-y-4 bg-slate-50/50 transition-opacity duration-200"
+                        :class="chatReady ? 'opacity-100' : 'opacity-0'"
                     >
-                        <div v-for="msg in groupMessages" :key="msg.id" 
-                            class="flex gap-2 max-w-[85%]"
-                            :class="msg.senderId === user.id ? 'ml-auto flex-row-reverse' : ''"
-                        >
+                        <template v-for="(msg, index) in groupMessages" :key="msg.id">
+                            <!-- 날짜 구분선 -->
+                            <div v-if="showDateSeparator(index, groupMessages)" class="flex items-center justify-center my-4">
+                                <span class="text-[10px] bg-slate-100 text-slate-500 px-3 py-1 rounded-full font-medium">
+                                    {{ formatDate(msg.createdAt) }}
+                                </span>
+                            </div>
+
+                            <div 
+                                class="flex gap-2 max-w-[85%]"
+                                :class="msg.senderId === user.id ? 'ml-auto flex-row-reverse' : ''"
+                            >
                             <NicknameRenderer 
                                 v-if="msg.senderId !== user.id" 
                                 :username="msg.senderUsername"
@@ -223,6 +233,7 @@
                                 </span>
                             </div>
                         </div>
+                        </template>
                     </div>
 
                     <!-- 입력창 (그룹) -->
@@ -386,6 +397,9 @@ const creating = ref(false);
 const selectedFriendIds = ref([]);
 const groupForm = ref({ name: '', memberIds: [] }); // 호환성 유지
 
+// Chat scroll visibility state
+const chatReady = ref(false);
+
 let chatPollInterval = null;
 
 // 헤더 타이틀
@@ -528,6 +542,7 @@ const openGroupChat = async (room) => {
     activeGroupRoom.value = room;
     showGroupMembers.value = false;
     groupMessagesLoading.value = true;
+    chatReady.value = false; // Reset ready state
 
     // 읽음 처리: 로컬에서 즉시 unreadCount 0으로 설정
     const target = groupRooms.value.find(r => r.id === room.id);
@@ -541,10 +556,11 @@ const openGroupChat = async (room) => {
         activeGroupRoom.value = { ...room, ...detailRes.data };
         groupMessages.value = msgRes.data.reverse();
         await chatApi.markAsRead(room.id);
-        nextTick(() => scrollToBottomGroup());
+        nextTick(() => scrollToBottomGroup(true)); // animate = true
         startGroupPolling();
     } catch (e) {
         console.error(e);
+        chatReady.value = true; // Ensure visible on error
     } finally {
         groupMessagesLoading.value = false;
     }
@@ -563,16 +579,20 @@ const goBack = () => {
 const fetchMessages = async () => {
     if (!activeChat.value) return;
     const isInitialLoad = messages.value.length === 0;
-    if (isInitialLoad) messagesLoading.value = true;
+    if (isInitialLoad) {
+        messagesLoading.value = true;
+        chatReady.value = false; // Reset ready state
+    }
     try {
         const res = await socialApi.getConversation(activeChat.value.partnerId);
         messages.value = res.data;
     } catch (e) {
         console.error(e);
+        if(isInitialLoad) chatReady.value = true;
     } finally {
         messagesLoading.value = false;
         if (isInitialLoad) {
-            nextTick(() => scrollToBottom());
+            nextTick(() => scrollToBottom(true)); // animate = true
         }
     }
 };
@@ -616,7 +636,6 @@ const sendGroupMessage = async () => {
     }
 };
 
-
 const handleDmEnter = (e) => {
     if (e.isComposing) return;
     e.preventDefault();
@@ -629,18 +648,32 @@ const handleGroupEnter = (e) => {
     sendGroupMessage();
 };
 
-const scrollToBottom = () => {
+const scrollToBottom = (animate = false) => {
     nextTick(() => {
         if (messagesContainer.value) {
             messagesContainer.value.scrollTop = messagesContainer.value.scrollHeight;
+            if (animate) {
+                requestAnimationFrame(() => {
+                    chatReady.value = true;
+                });
+            }
+        } else if (animate) {
+             chatReady.value = true;
         }
     });
 };
 
-const scrollToBottomGroup = () => {
+const scrollToBottomGroup = (animate = false) => {
     nextTick(() => {
         if (groupMessagesContainer.value) {
             groupMessagesContainer.value.scrollTop = groupMessagesContainer.value.scrollHeight;
+            if (animate) {
+                requestAnimationFrame(() => {
+                    chatReady.value = true;
+                });
+            }
+        } else if (animate) {
+             chatReady.value = true;
         }
     });
 };
@@ -829,10 +862,11 @@ const formatDate = (iso) => {
     return d.toLocaleDateString('ko-KR', { month: 'long', day: 'numeric' });
 };
 
-const showDateSeparator = (index) => {
+const showDateSeparator = (index, list) => {
+    if (!list || list.length === 0) return false;
     if (index === 0) return true;
-    const currentMsgDate = new Date(messages.value[index].createdAt).toLocaleDateString();
-    const prevMsgDate = new Date(messages.value[index - 1].createdAt).toLocaleDateString();
+    const currentMsgDate = new Date(list[index].createdAt).toLocaleDateString();
+    const prevMsgDate = new Date(list[index - 1].createdAt).toLocaleDateString();
     return currentMsgDate !== prevMsgDate;
 };
 

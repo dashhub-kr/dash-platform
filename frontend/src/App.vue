@@ -8,7 +8,7 @@
     <UserProfileModal />
 
     <!-- Global Floating Chat Button -->
-    <FloatingMessagePanel />
+    <FloatingMessagePanel v-if="user" />
 
     <!-- Admin Floating Button -->
     <router-link

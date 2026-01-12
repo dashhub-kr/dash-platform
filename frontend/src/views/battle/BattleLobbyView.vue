@@ -39,9 +39,12 @@
 
               <!-- Status Badge -->
               <div class="flex justify-center mb-6">
-                <div :class="statusBadgeClass">
-                  {{ getStatusBadge() }}
-                </div>
+                <BaseIconBadge 
+                  :icon="getStatusIcon" 
+                  :text="getStatusText" 
+                  :color="getStatusColor" 
+                  size="lg"
+                />
               </div>
 
               <!-- Participants -->
@@ -145,9 +148,11 @@
                 </template>
 
                 <!-- 대기 중 메시지 -->
-                <div v-else-if="myParticipant?.status === 'ACCEPTED'" class="text-center py-4 text-slate-500">
-                  <Clock class="w-6 h-6 mx-auto mb-2 animate-pulse" />
-                  다른 참가자를 기다리는 중...
+                <div v-else-if="myParticipant?.status === 'ACCEPTED'" class="flex flex-col items-center py-6 text-slate-500">
+                  <div class="mb-3 animate-pulse">
+                    <BaseIconBadge :icon="Hourglass" color="orange" size="xl" />
+                  </div>
+                  <span class="font-bold text-slate-400">다른 참가자를 기다리는 중...</span>
                 </div>
               </div>
 
@@ -162,9 +167,10 @@
 <script setup>
 import { ref, computed, onMounted, onUnmounted } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
-import { Swords, Users, Crown, Check, X, Play, Clock } from 'lucide-vue-next';
+import { Swords, Users, Crown, Check, X, Play, Clock, Hourglass, AlertCircle } from 'lucide-vue-next';
 import { useAuth } from '@/composables/useAuth';
 import { battleApi } from '@/api/battle';
+import BaseIconBadge from '@/components/common/BaseIconBadge.vue';
 
 const route = useRoute();
 const router = useRouter();
@@ -187,16 +193,37 @@ const acceptedCount = computed(() =>
   battle.value?.participants?.filter(p => p.status === 'ACCEPTED').length || 0
 );
 
-const statusBadgeClass = computed(() => {
-  const base = 'px-4 py-2 rounded-full text-sm font-bold';
+const getStatusColor = computed(() => {
   switch (battle.value?.status) {
-    case 'PENDING': return `${base} bg-amber-100 text-amber-700`;
-    case 'IN_PROGRESS': return `${base} bg-green-100 text-green-700`;
-    case 'COMPLETED': return `${base} bg-slate-100 text-slate-700`;
-    case 'CANCELLED': return `${base} bg-red-100 text-red-700`;
-    default: return `${base} bg-slate-100 text-slate-700`;
+    case 'PENDING': return 'orange';
+    case 'IN_PROGRESS': return 'brand';
+    case 'COMPLETED': return 'slate';
+    case 'CANCELLED': return 'rose';
+    default: return 'slate';
   }
 });
+
+const getStatusText = computed(() => {
+  switch (battle.value?.status) {
+    case 'PENDING': return '대기 중';
+    case 'IN_PROGRESS': return '진행 중';
+    case 'COMPLETED': return '완료';
+    case 'CANCELLED': return '취소됨';
+    default: return '';
+  }
+});
+
+const getStatusIcon = computed(() => {
+  switch (battle.value?.status) {
+    case 'PENDING': return Hourglass;
+    case 'IN_PROGRESS': return Swords;
+    case 'COMPLETED': return Check;
+    case 'CANCELLED': return X;
+    default: return AlertCircle;
+  }
+});
+
+// const statusBadgeClass = computed ... (removed)
 
 const fetchBattle = async () => {
   try {
@@ -288,15 +315,7 @@ const getStatusMessage = () => {
   }
 };
 
-const getStatusBadge = () => {
-  switch (battle.value?.status) {
-    case 'PENDING': return '⏳ 대기 중';
-    case 'IN_PROGRESS': return '⚔️ 진행 중';
-    case 'COMPLETED': return '✅ 완료';
-    case 'CANCELLED': return '❌ 취소됨';
-    default: return '';
-  }
-};
+
 
 const getParticipantBgClass = (status) => {
   switch (status) {

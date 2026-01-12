@@ -1,61 +1,65 @@
 <template>
-  <div class="relative w-full h-full overflow-hidden bg-slate-900 flex items-center justify-center">
-    <!-- 배경 이미지 & 오버레이 -->
+  <div class="relative w-full h-full overflow-hidden bg-slate-50 flex items-center justify-center font-['Pretendard']">
+    
     <div class="absolute inset-0 z-0">
-      <img src="/images/background/storage.png" alt="DashHub Background" class="w-full h-full object-cover opacity-50 scale-105 animate-slow-zoom" />
-      <div class="absolute inset-0 bg-gradient-to-b from-slate-900/60 via-slate-900/80 to-slate-900"></div>
-      
-      <!-- 장식용 그라디언트 오브브 (Blur Blobs) -->
-      <div class="absolute top-1/4 left-1/4 w-96 h-96 bg-brand-500/20 rounded-full blur-[100px] animate-pulse-slow"></div>
-      <div class="absolute bottom-1/4 right-1/4 w-80 h-80 bg-leaf/10 rounded-full blur-[80px] animate-pulse-slow delay-1000"></div>
+        <div class="absolute inset-0 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:24px_24px]"></div>
+        <div class="absolute inset-0 bg-[linear-gradient(to_right,#80808020_1px,transparent_1px),linear-gradient(to_bottom,#80808020_1px,transparent_1px)] bg-[size:96px_96px]"></div>
+        
+        <div class="absolute inset-0 bg-gradient-to-b from-slate-50/0 via-slate-50/80 to-slate-50"></div>
     </div>
 
-    <!-- 메인 콘텐츠 -->
-    <div class="relative z-10 flex flex-col items-center justify-center p-6 text-center max-w-4xl mx-auto space-y-8">
+    <div class="absolute inset-0 overflow-hidden pointer-events-none">
+        <div class="absolute -top-[30%] -right-[10%] w-[1000px] h-[1000px] bg-indigo-200/20 rounded-full blur-[120px] mix-blend-multiply animate-pulse-slow"></div>
+        <div class="absolute top-[20%] -left-[20%] w-[900px] h-[900px] bg-brand-200/20 rounded-full blur-[120px] mix-blend-multiply animate-pulse-slow delay-1000"></div>
+    </div>
+
+    <div class="relative z-10 flex flex-col items-center justify-center p-6 text-center max-w-6xl mx-auto space-y-12">
       
-      <!-- 상단 뱃지 -->
       <div class="animate-in fade-in slide-in-from-bottom-4 duration-700 delay-100">
-        <span class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-white/10 bg-white/5 backdrop-blur-md text-brand-200 text-sm font-bold shadow-lg shadow-brand-500/10 hover:bg-white/10 transition-colors cursor-default">
-          <span class="w-2 h-2 rounded-full bg-brand-400 animate-pulse"></span>
-          알고리즘 스터디 자동화 플랫폼
+        <span class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white border border-slate-200 text-slate-600 text-xs font-bold tracking-wider uppercase shadow-sm selection:bg-transparent">
+          <span class="w-2 h-2 rounded-full bg-brand-500 animate-pulse"></span>
+          Automated Algorithm Study Platform
         </span>
       </div>
 
-      <!-- 헤드라인 -->
-      <h1 class="text-5xl md:text-7xl font-black text-white tracking-tight leading-tight animate-in fade-in slide-in-from-bottom-8 duration-700 delay-200 drop-shadow-2xl">
-        개발자 성장의 모든 순간에,<br />
-        <span class="text-brand-500">Dash</span><span class="text-white">Hub</span>
+      <h1 class="text-6xl md:text-8xl font-black text-slate-900 tracking-tighter leading-tight animate-in fade-in slide-in-from-bottom-8 duration-700 delay-200 selection:bg-brand-100">
+        <span class="text-slate-900">개발자 성장</span>의 모든 순간에,<br />
+        <span class="relative inline-block text-brand-600">
+            DashHub
+            <svg class="absolute -bottom-2 left-0 w-full h-3 text-brand-200/50 -z-10" viewBox="0 0 100 10" preserveAspectRatio="none">
+                <path d="M0 5 Q 50 10 100 5" stroke="currentColor" stroke-width="8" fill="none" />
+            </svg>
+        </span>
       </h1>
 
-      <!-- 서브텍스트 -->
-      <p class="text-lg md:text-xl text-slate-300 font-medium max-w-2xl leading-relaxed animate-in fade-in slide-in-from-bottom-8 duration-700 delay-300">
+      <p class="text-xl md:text-2xl text-slate-500 font-medium max-w-3xl leading-relaxed animate-in fade-in slide-in-from-bottom-8 duration-700 delay-300 selection:bg-brand-100">
         기록, 분석, 피드백까지.<br class="block md:hidden"/>
-        단 3초면 끝나는 <span class="text-white font-bold">자동화된 알고리즘 스터디</span>를 경험하세요.
+        단 3초면 끝나는 <span class="text-slate-900 font-bold decoration-4 decoration-brand-200 underline-offset-4">자동화된 알고리즘 스터디</span>를 경험하세요.
       </p>
 
-      <!-- CTA 버튼 -->
-      <div class="flex flex-col sm:flex-row gap-4 pt-4 animate-in fade-in slide-in-from-bottom-8 duration-700 delay-500">
+      <div class="flex flex-col sm:flex-row gap-5 pt-8 animate-in fade-in slide-in-from-bottom-8 duration-700 delay-500 w-full justify-center">
          <button @click="handleLogin" 
-                 class="group relative px-8 py-4 bg-white text-slate-900 rounded-2xl font-black text-lg shadow-xl shadow-brand-500/20 hover:scale-105 hover:shadow-brand-500/40 transition-all duration-300 overflow-hidden">
-            <span class="relative z-10 flex items-center justify-center gap-2">
+                 class="group relative px-9 py-5 bg-slate-900 text-white rounded-2xl font-bold text-lg shadow-2xl shadow-slate-900/20 hover:shadow-slate-900/40 hover:-translate-y-1 transition-all duration-300 overflow-hidden min-w-[220px]">
+            <span class="relative z-10 flex items-center justify-center gap-3">
                GitHub로 시작하기
                <ArrowRight class="w-5 h-5 group-hover:translate-x-1 transition-transform" />
             </span>
-            <div class="absolute inset-0 bg-gradient-to-r from-brand-500/0 via-brand-500/10 to-brand-500/0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000 ease-in-out"></div>
+            <div class="absolute inset-0 bg-gradient-to-tr from-white/0 via-white/10 to-white/0 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
          </button>
          
          <button @click="emit('next')"
-                 class="px-8 py-4 bg-white/5 text-white border border-white/10 rounded-2xl font-bold text-lg hover:bg-white/10 backdrop-blur-sm transition-all hover:scale-105">
-            더 알아보기
+                 class="group px-9 py-5 bg-white text-slate-700 border border-slate-200 rounded-2xl font-bold text-lg shadow-lg shadow-slate-200/50 hover:bg-slate-50 hover:border-slate-300 transition-all hover:-translate-y-1 min-w-[180px]">
+            <span class="flex items-center justify-center gap-2">
+                더 알아보기
+            </span>
          </button>
       </div>
 
     </div>
 
-    <!-- 하단 스크롤 유도 -->
-    <div class="absolute bottom-12 left-1/2 -translate-x-1/2 z-10 flex flex-col items-center gap-2 animate-bounce opacity-50">
-       <span class="text-xs font-bold text-slate-400 tracking-widest uppercase">Scroll</span>
-       <ChevronDown class="w-5 h-5 text-white" />
+    <div class="absolute bottom-12 left-1/2 -translate-x-1/2 z-10 flex flex-col items-center gap-3 animate-bounce">
+       <span class="text-[10px] font-extrabold text-slate-400 tracking-[0.3em] uppercase opacity-70">Scroll</span>
+       <ChevronDown class="w-5 h-5 text-slate-400 opacity-70" />
     </div>
 
   </div>
@@ -74,15 +78,12 @@ const handleLogin = () => {
 </script>
 
 <style scoped>
-.animate-slow-zoom {
-  animation: zoom 20s infinite alternate ease-in-out;
-}
 .animate-pulse-slow {
    animation: pulse 8s cubic-bezier(0.4, 0, 0.6, 1) infinite;
 }
 
-@keyframes zoom {
-  from { transform: scale(1.05); }
-  to { transform: scale(1.15); }
+@keyframes pulse {
+  0%, 100% { opacity: 0.3; transform: scale(1); }
+  50% { opacity: 0.6; transform: scale(1.05); }
 }
 </style>

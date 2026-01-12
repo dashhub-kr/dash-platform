@@ -159,6 +159,14 @@ onMounted(async () => {
                 loadingStudy.value = false;
             }
         }
+        
+        // 보유 장식 효과 로드 (장착된 효과 이름 표시용)
+        try {
+            const decoRes = await shopApi.getMyDecorations();
+            ownedDecorations.value = decoRes.data;
+        } catch (err) {
+            console.error("Failed to load decorations", err);
+        }
     } catch (e) {
         console.error("Failed to load profile", e);
     }
@@ -340,15 +348,17 @@ const handleUnequip = async () => {
     }
 };
 
-const getDecorationName = computed(() => {
-    if (!userData.value.equippedDecorationClass) return '효과 없음';
-    // 클래스명에서 이름 추론은 어려우므로 일단 일반 텍스트 표시
-    // 실제로는 userDecoration -> decoration.name을 찾아서 매핑해야 하지만, 
-    // 여기서는 간단히 표시하거나, store/API에서 가져온 정보로 표시해야 함.
-    // 현재 API 구조상 UserResponse에는 ClassName만 있고 Name은 없음.
-    // 일단 "장착 중" 정도로 표시하거나, 추후 UserResponse에 decorationName 추가 필요.
-    return '효과 적용 중';
+const equippedDecorationName = computed(() => {
+    if (!userData.value.equippedDecorationClass) return 'No Effect';
+    
+    // ownedDecorations에서 장착된 효과 찾기
+    const equipped = ownedDecorations.value.find(
+        item => item.decoration.cssClass === userData.value.equippedDecorationClass
+    );
+    
+    return equipped ? equipped.decoration.name : 'Effect';
 });
+
 const showDangerZone = ref(false);
 const showFaq = ref(false);
 </script>
@@ -475,7 +485,7 @@ const showFaq = ref(false);
                         <div class="z-10">
                             <div class="text-xl font-black text-slate-800 tracking-tight flex items-center gap-2">
                                 <span :class="userData.equippedDecorationClass" class="transition-all">
-                                    {{ userData.equippedDecorationClass ? 'Nickname' : 'No Effect' }}
+                                    {{ equippedDecorationName }}
                                 </span>
                             </div>
                             <div class="text-xs font-bold text-slate-400 uppercase mt-0.5">
@@ -628,8 +638,8 @@ const showFaq = ref(false);
                 
                 <div class="relative bg-white rounded-3xl w-full max-w-lg p-6 shadow-2xl animate-in fade-in zoom-in-95 duration-200 flex flex-col max-h-[85vh]">
                     <div class="flex items-center justify-between mb-6 shrink-0">
-                        <h3 class="text-xl font-black text-slate-800 flex items-center gap-2">
-                            <Palette :size="24" class="text-violet-500" />
+                        <h3 class="text-xl font-black text-slate-800 flex items-center gap-3">
+                            <BaseIconBadge :icon="Palette" color="violet" size="lg" />
                             보유 중인 효과
                         </h3>
                         <button @click="showDecorationModal = false" class="p-2 text-slate-400 hover:bg-slate-100 rounded-full transition-colors">
@@ -660,7 +670,7 @@ const showFaq = ref(false);
                             >
                                 <!-- Preview -->
                                 <div class="h-12 flex items-center justify-center bg-slate-50 rounded-xl border border-slate-100 group-hover:bg-white transition-colors overflow-hidden">
-                                    <span class="font-black text-lg truncate px-2" :class="item.decoration.cssClass">NickName</span>
+                                    <span class="font-black text-lg truncate px-2" :class="item.decoration.cssClass">{{ item.decoration.name }}</span>
                                 </div>
                                 
                                 <div class="flex items-center justify-between">
