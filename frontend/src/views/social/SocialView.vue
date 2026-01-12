@@ -16,20 +16,7 @@
                                     </div>
                                     <p class="text-slate-500 font-medium">친구들과 함께 공부하고 소통해보세요</p>
                                 </div>
-                                
-                                <div class="flex bg-slate-100 p-1 rounded-xl font-bold">
-                                    <button 
-                                        v-for="tab in tabs" 
-                                        :key="tab.id"
-                                        @click="activeTab = tab.id"
-                                        class="px-5 py-2.5 rounded-lg text-sm transition-all"
-                                        :class="activeTab === tab.id ? 'bg-white text-brand-600 shadow-sm' : 'text-slate-400 hover:text-slate-600'"
-                                    >
-                                        {{ tab.label }}
-                                        <span v-if="tab.count > 0" class="ml-1 px-1.5 py-0.5 bg-rose-500 text-white text-[10px] rounded-full">{{ tab.count }}</span>
-                                    </button>
                                 </div>
-                            </div>
 
                             <!-- 피드 영역 -->
                             <div class="space-y-4">
@@ -133,8 +120,8 @@
                                     <div class="space-y-2">
                                         <div v-for="req in requests" :key="req.id" class="flex items-center justify-between p-2.5 rounded-xl bg-white border border-rose-100 shadow-sm">
                                             <div class="flex items-center gap-2.5 min-w-0">
-                                                <img :src="getAvatar(req.requester?.avatarUrl)" class="w-8 h-8 rounded-full border border-slate-200"/>
-                                                <span class="text-sm font-bold text-slate-700 truncate">{{ req.requester?.username || '알 수 없음' }}</span>
+                                                <img :src="getAvatar(req.friend?.avatarUrl)" class="w-8 h-8 rounded-full border border-slate-200"/>
+                                                <span class="text-sm font-bold text-slate-700 truncate">{{ req.friend?.username || '알 수 없음' }}</span>
                                             </div>
                                             <div class="flex items-center gap-1.5">
                                                 <button @click="acceptRequest(req.id)" class="p-1.5 bg-emerald-500 text-white rounded-lg hover:bg-emerald-600 transition-colors">
@@ -209,15 +196,9 @@ const router = useRouter();
 const { openChat: openGlobalDM } = useFloatingChat();
 const { open: openProfile } = useUserProfileModal();
 
-// 탭 상태
+// 탭 상태 (더 이상 탭이 없으므로 피드만 표시)
 const activeTab = ref('feed');
 const requests = ref([]);
-
-// 탭 정의
-const tabs = computed(() => [
-    { id: 'feed', label: '피드', count: 0 },
-    { id: 'requests', label: '친구 요청', count: requests.value.length }
-]);
 
 // 피드 상태
 const feedItems = ref([]);
