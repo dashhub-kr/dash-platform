@@ -9,6 +9,7 @@ export const aiApi = {
 
   // AI 튜터 대화
   tutorChat: (request) => http.post('/ai/tutor/chat', request),
+  getTutorHistory: (recordId, userId) => http.get(`/ai/tutor/history/${recordId}`, { params: { userId } }),
 
   // 학습 경로 생성
   getLearningPath: (userId) => http.get(`/ai/learning-path/${userId}`),

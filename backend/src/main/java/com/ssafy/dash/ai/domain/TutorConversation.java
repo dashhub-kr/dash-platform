@@ -1,9 +1,10 @@
 package com.ssafy.dash.ai.domain;
 
-import lombok.AllArgsConstructor;
+import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.AllArgsConstructor;
 
 import java.time.LocalDateTime;
 
@@ -13,8 +14,7 @@ import java.time.LocalDateTime;
  * 멀티턴 대화 지원을 위해 세션 기반으로 대화를 저장합니다.
  */
 @Getter
-@Builder
-@NoArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 public class TutorConversation {
 
@@ -26,28 +26,23 @@ public class TutorConversation {
     private String problemNumber;
     private LocalDateTime createdAt;
 
-    /**
-     * 사용자 메시지 생성
-     */
-    public static TutorConversation userMessage(Long userId, String sessionId, String content, String problemNumber) {
-        return TutorConversation.builder()
-                .userId(userId)
-                .sessionId(sessionId)
-                .role("user")
-                .content(content)
-                .problemNumber(problemNumber)
-                .build();
+    @Builder
+    public TutorConversation(Long userId, String sessionId, String role, String content, String problemNumber) {
+        this.userId = userId;
+        this.sessionId = sessionId;
+        this.role = role;
+        this.content = content;
+        this.problemNumber = problemNumber;
     }
 
-    /**
-     * AI 응답 메시지 생성
-     */
-    public static TutorConversation assistantMessage(Long userId, String sessionId, String content) {
+    public static TutorConversation create(Long userId, String sessionId, String role, String content,
+            String problemNumber) {
         return TutorConversation.builder()
                 .userId(userId)
                 .sessionId(sessionId)
-                .role("assistant")
+                .role(role)
                 .content(content)
+                .problemNumber(problemNumber)
                 .build();
     }
 }

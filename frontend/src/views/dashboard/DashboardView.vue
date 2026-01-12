@@ -91,8 +91,15 @@
         <div class="flex-1 flex justify-center p-4 md:p-8">
             <div class="flex gap-8 max-w-screen-xl w-full">
             
-            <!-- 2. 중앙 메인 컬럼 -->
-            <main class="flex-1 min-w-0 space-y-6">
+            <!-- Resize Overlay: Blocks interactions during resize -->
+            <div 
+                v-if="isResizing" 
+                class="fixed inset-0 z-[9999] cursor-col-resize"
+                @click.stop
+            ></div>
+
+            <!-- 2. 메인 타임라인 컬럼 -->
+            <main class="flex-1 min-w-0 pb-16">
                 <!-- 깔끔한 지표가 있는 헤더 섹션 -->
                 <div class="animate-fade-in-down">
                     <!-- 승인 대기 배너 -->
@@ -388,8 +395,19 @@
                 </div>
             </main>
 
+            <!-- Resizer Handle -->
+            <div
+                class="hidden lg:block w-1 cursor-col-resize hover:bg-brand-400 active:bg-brand-600 transition-colors z-50 select-none relative group"
+                @mousedown="startResize"
+            >
+                <div class="absolute inset-y-0 -left-1 -right-1 group-hover:bg-brand-400/10"></div>
+            </div>
+
             <!-- 3. 우측 사이드바 컬럼 (통계 + 활동 + 분석 패널) -->
-            <aside class="hidden lg:flex w-[380px] shrink-0 flex-col gap-6 sticky top-8 h-[calc(100vh-4rem)]">
+            <aside 
+                class="hidden lg:flex shrink-0 flex-col gap-6 sticky top-8 h-[calc(100vh-4rem)]"
+                :style="{ width: sidebarWidth + 'px' }"
+            >
                 
                 <!-- 1. 통계 열 (UserQuickStats) -->
                 <UserQuickStats 
@@ -488,13 +506,7 @@
                      <AnalysisSidebar :record="activeAnalysisRecord" @scroll-to-line="handleScrollToLine" @acorn-used="handleAcornUsed" />
                 </div>
 
-                <div class="text-center text-[10px] text-slate-300 font-bold space-x-3 pb-2 uppercase tracking-wider">
-                    <span class="hover:text-slate-400 cursor-pointer transition-colors">INFO</span>
-                    <span>&bull;</span>
-                    <span class="hover:text-slate-400 cursor-pointer transition-colors">STUDY</span>
-                    <span>&bull;</span>
-                    <span class="hover:text-slate-400 cursor-pointer transition-colors">PRIVACY</span>
-                </div>
+
 
             </aside>
 
@@ -598,6 +610,56 @@ const props = defineProps({
     }
 });
 
+// Sidebar Resizing
+const sidebarWidth = ref(380);
+const isResizing = ref(false);
+
+const startResize = () => {
+    isResizing.value = true;
+    document.addEventListener('mousemove', handleResize);
+    document.addEventListener('mouseup', stopResize);
+    document.body.style.cursor = 'col-resize';
+    document.body.style.userSelect = 'none';
+};
+
+const handleResize = (e) => {
+    if (!isResizing.value) return;
+    const containerWidth = document.body.clientWidth;
+    const newWidth = containerWidth - e.clientX - 32; // 32px padding/margin adjustment
+    
+    // Constraints: Min 300px, Max 600px (reduced from 800px)
+    if (newWidth >= 300 && newWidth <= 600) {
+        sidebarWidth.value = newWidth;
+    }
+};
+
+const stopResize = () => {
+    // Delay resetting isResizing to prevent click events from firing immediately after release
+    setTimeout(() => {
+        isResizing.value = false;
+    }, 100);
+    
+    document.removeEventListener('mousemove', handleResize);
+    document.removeEventListener('mouseup', stopResize);
+    document.body.style.cursor = '';
+    document.body.style.userSelect = '';
+};
+
+const handleToggleExpand = (recordId) => {
+    // Prevent toggling if a resize operation just finished
+    if (isResizing.value) return; 
+
+    if (expandedRecordId.value === recordId) {
+        expandedRecordId.value = null;
+        activeAnalysisRecord.value = null;
+    } else {
+        expandedRecordId.value = recordId;
+        const record = records.value.find(r => r.id === recordId) || 
+                       groupedRecords.value.flatMap(g => g.records).find(r => r.id === recordId);
+        activeAnalysisRecord.value = record;
+    }
+};
+
 const { user, refresh } = useAuth();
 const router = useRouter();
 const records = ref([]);
@@ -651,6 +713,9 @@ const hideHeatmapTooltip = () => {
 
 // 빈 공간 클릭 시 확장된 카드 접기
 const collapseExpandedCard = (event) => {
+    // Resizing 중이거나 방금 종료된 경우 무시
+    if (isResizing.value) return;
+
     // Don't collapse if clicking inside a card (handled by stopPropagation on cards)
     if (expandedRecordId.value !== null) {
         expandedRecordId.value = null;
@@ -824,21 +889,7 @@ const expandedRecordId = ref(null);
 const activeAnalysisRecord = ref(null);
 const activeCardRef = ref(null);
 
-const handleToggleExpand = (recordId) => {
-    console.log('Dashboard: toggle-expand received for', recordId);
-    if (expandedRecordId.value === recordId) {
-        console.log('Dashboard: Collapsing record');
-        expandedRecordId.value = null;
-        activeAnalysisRecord.value = null;
-        activeCardRef.value = null;
-    } else {
-        console.log('Dashboard: Expanding record');
-        expandedRecordId.value = recordId;
-        const found = records.value.find(r => r.id == recordId);
-        console.log('Dashboard: Found record?', found);
-        activeAnalysisRecord.value = found;
-    }
-};
+
 
 const handleScrollToLine = ({ start, end }) => {
     console.log('Dashboard: handleScrollToLine', start, end, 'activeCardRef:', !!activeCardRef.value);

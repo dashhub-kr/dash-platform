@@ -18,6 +18,8 @@ import com.ssafy.dash.acorn.application.AcornService;
 import java.util.List;
 
 import com.ssafy.dash.ai.application.dto.HintChatCommand;
+import com.ssafy.dash.ai.domain.TutorConversation;
+import com.ssafy.dash.ai.infrastructure.TutorConversationMapper;
 
 /**
  * AI 튜터 대화 서비스
@@ -29,143 +31,170 @@ import com.ssafy.dash.ai.application.dto.HintChatCommand;
 @RequiredArgsConstructor
 public class TutorChatService {
 
-    private final AiServerClient aiClient;
-    private final UserSkillAnalysisService skillAnalysisService;
-    private final UserRepository userRepository;
-    private final AlgorithmRecordRepository algorithmRecordRepository;
-    private final AcornService acornService;
+        private final AiServerClient aiClient;
+        private final UserSkillAnalysisService skillAnalysisService;
+        private final UserRepository userRepository;
+        private final AlgorithmRecordRepository algorithmRecordRepository;
+        private final TutorConversationMapper tutorConversationMapper;
+        private final AcornService acornService;
 
-    public HintChatResponse processChat(HintChatCommand command) {
-        if (command.recordId() != null) {
-            List<HintChatRequest.ChatMessage> history = command.history() != null
-                    ? command.history().stream()
-                            .map(m -> HintChatRequest.ChatMessage.builder()
-                                    .role(m.role())
-                                    .content(m.content())
-                                    .build())
-                            .toList()
-                    : List.of();
+        public HintChatResponse processChat(HintChatCommand command) {
+                if (command.recordId() != null) {
+                        List<HintChatRequest.ChatMessage> history = command.history() != null
+                                        ? command.history().stream()
+                                                        .map(m -> HintChatRequest.ChatMessage.builder()
+                                                                        .role(m.role())
+                                                                        .content(m.content())
+                                                                        .build())
+                                                        .toList()
+                                        : List.of();
 
-            return hintChatWithRecord(
-                    command.userId(),
-                    command.recordId(),
-                    command.message(),
-                    command.solveStatus(),
-                    command.wrongReason(),
-                    history);
-        } else {
-            List<HintChatRequest.ChatMessage> history = command.history() != null ? command.history().stream()
-                    .map(m -> HintChatRequest.ChatMessage.builder()
-                            .role(m.role())
-                            .content(m.content())
-                            .build())
-                    .toList() : List.of();
+                        return hintChatWithRecord(
+                                        command.userId(),
+                                        command.recordId(),
+                                        command.message(),
+                                        command.solveStatus(),
+                                        command.wrongReason(),
+                                        history);
+                } else {
+                        List<HintChatRequest.ChatMessage> history = command.history() != null
+                                        ? command.history().stream()
+                                                        .map(m -> HintChatRequest.ChatMessage.builder()
+                                                                        .role(m.role())
+                                                                        .content(m.content())
+                                                                        .build())
+                                                        .toList()
+                                        : List.of();
 
-            HintChatRequest.UserContext userCtx = command.userContext() != null ? HintChatRequest.UserContext.builder()
-                    .tierName(command.userContext().tierName())
-                    .solvedCount(command.userContext().solvedCount())
-                    .weakTags(command.userContext().weakTags())
-                    .build() : null;
+                        HintChatRequest.UserContext userCtx = command.userContext() != null
+                                        ? HintChatRequest.UserContext.builder()
+                                                        .tierName(command.userContext().tierName())
+                                                        .solvedCount(command.userContext().solvedCount())
+                                                        .weakTags(command.userContext().weakTags())
+                                                        .build()
+                                        : null;
 
-            HintChatRequest aiRequest = HintChatRequest.builder()
-                    .message(command.message())
-                    .problemNumber(command.problemNumber())
-                    .problemTitle(command.problemTitle())
-                    .code(command.code())
-                    .language(command.language())
-                    .history(history)
-                    .userContext(userCtx)
-                    .build();
+                        HintChatRequest aiRequest = HintChatRequest.builder()
+                                        .message(command.message())
+                                        .problemNumber(command.problemNumber())
+                                        .problemTitle(command.problemTitle())
+                                        .code(command.code())
+                                        .language(command.language())
+                                        .history(history)
+                                        .userContext(userCtx)
+                                        .build();
 
-            return hintChat(aiRequest);
-        }
-    }
-
-    /**
-     * AI 튜터 대화 (recordId로 DB에서 코드/문제 정보 조회)
-     * 
-     * @param userId      사용자 ID
-     * @param recordId    알고리즘 기록 ID
-     * @param message     사용자 메시지
-     * @param solveStatus 풀이 상태 (solved / wrong)
-     * @param wrongReason 틀린 이유
-     * @param history     대화 히스토리
-     * @return AI 튜터 대화 응답
-     */
-    public HintChatResponse hintChatWithRecord(Long userId, Long recordId, String message,
-            String solveStatus, String wrongReason, List<HintChatRequest.ChatMessage> history) {
-        log.info("AI Tutor chat for record: {}, user: {}, status: {}", recordId, userId, solveStatus);
-
-        // 1. AlgorithmRecord 조회
-        AlgorithmRecord record = algorithmRecordRepository.findById(recordId)
-                .orElseThrow(() -> new IllegalArgumentException("Record not found: " + recordId));
-
-        // 2. 도토리 3개 차감
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new IllegalArgumentException("User not found: " + userId));
-
-        if (user.getStudyId() != null) {
-            acornService.use(
-                    user.getStudyId(),
-                    userId,
-                    3, // 대화 1회당 3개 차감
-                    String.format("AI 튜터 대화 - 문제 %s", record.getProblemNumber()));
+                        return hintChat(aiRequest);
+                }
         }
 
-        // 3. 사용자 컨텍스트 수집
-        HintChatRequest.UserContext userContext = collectChatUserContext(userId);
+        /**
+         * AI 튜터 대화 (recordId로 DB에서 코드/문제 정보 조회)
+         */
+        public HintChatResponse hintChatWithRecord(Long userId, Long recordId, String message,
+                        String solveStatus, String wrongReason, List<HintChatRequest.ChatMessage> history) {
+                log.info("AI Tutor chat for record: {}, user: {}, status: {}", recordId, userId, solveStatus);
 
-        // 4. AI 튜터 요청 생성
-        HintChatRequest request = HintChatRequest.builder()
-                .message(message)
-                .problemNumber(record.getProblemNumber())
-                .problemTitle(record.getTitle())
-                .code(record.getCode())
-                .language(record.getLanguage())
-                .solveStatus(solveStatus != null ? solveStatus : "wrong")
-                .wrongReason(wrongReason)
-                .history(history != null ? history : List.of())
-                .userContext(userContext)
-                .build();
+                // 1. AlgorithmRecord 조회
+                AlgorithmRecord record = algorithmRecordRepository.findById(recordId)
+                                .orElseThrow(() -> new IllegalArgumentException("Record not found: " + recordId));
 
-        return aiClient.hintChat(request);
-    }
+                // 2. 도토리 3개 차감
+                User user = userRepository.findById(userId)
+                                .orElseThrow(() -> new IllegalArgumentException("User not found: " + userId));
 
-    /**
-     * 힌트 대화 (직접 요청 - deprecated, hintChatWithRecord 사용 권장)
-     */
-    public HintChatResponse hintChat(HintChatRequest request) {
-        log.info("Hint chat for problem: {}", request.getProblemNumber());
-        return aiClient.hintChat(request);
-    }
+                if (user.getStudyId() != null) {
+                        acornService.use(
+                                        user.getStudyId(),
+                                        userId,
+                                        3, // 대화 1회당 3개 차감
+                                        String.format("AI 튜터 대화 - 문제 %s", record.getProblemNumber()));
+                }
 
-    private HintChatRequest.UserContext collectChatUserContext(Long userId) {
-        User user = userRepository.findById(userId).orElse(null);
+                // 3. 사용자 메시지 저장
+                String sessionId = "record-" + recordId;
+                tutorConversationMapper.save(TutorConversation.create(
+                                userId, sessionId, "user", message, record.getProblemNumber()));
 
-        List<String> weakTags = skillAnalysisService.getWeaknessTags(userId)
-                .stream()
-                .limit(5)
-                .map(TagWeaknessDto::getTagKey)
-                .toList();
+                // 4. 사용자 컨텍스트 수집
+                HintChatRequest.UserContext userContext = collectChatUserContext(userId);
 
-        int tier = user != null ? (user.getSolvedacTier() != null ? user.getSolvedacTier() : 0) : 0;
+                // 5. AI 튜터 요청 생성
+                HintChatRequest request = HintChatRequest.builder()
+                                .message(message)
+                                .problemNumber(record.getProblemNumber())
+                                .problemTitle(record.getTitle())
+                                .code(record.getCode())
+                                .language(record.getLanguage())
+                                .solveStatus(solveStatus != null ? solveStatus : "wrong")
+                                .wrongReason(wrongReason)
+                                .history(history != null ? history : List.of())
+                                .userContext(userContext)
+                                .build();
 
-        return HintChatRequest.UserContext.builder()
-                .tierName(getTierName(tier))
-                .solvedCount(user != null && user.getSolvedCount() != null ? user.getSolvedCount() : 0)
-                .weakTags(weakTags)
-                .build();
-    }
+                // 6. AI 호출
+                HintChatResponse response = aiClient.hintChat(request);
 
-    private String getTierName(int tier) {
-        if (tier == 0)
-            return "Unrated";
-        String[] tiers = { "Bronze", "Silver", "Gold", "Platinum", "Diamond", "Ruby" };
-        String[] levels = { "V", "IV", "III", "II", "I" };
-        int tierIndex = (tier - 1) / 5;
-        int levelIndex = (tier - 1) % 5;
-        if (tierIndex >= tiers.length)
-            return "Master";
-        return tiers[tierIndex] + " " + levels[levelIndex];
-    }
+                // 7. AI 응답 저장
+                String reply = response.getReply();
+                if (reply != null) {
+                        tutorConversationMapper.save(TutorConversation.create(
+                                        userId, sessionId, "assistant", reply, record.getProblemNumber()));
+                }
+                return response;
+        }
+
+        /**
+         * 특정 제출 기록(Record)에 대한 튜터 대화 내역 조회
+         */
+        public List<HintChatRequest.ChatMessage> getChatHistory(Long userId, Long recordId) {
+                String sessionId = "record-" + recordId;
+                List<TutorConversation> conversations = tutorConversationMapper.findByUserIdAndSessionId(userId,
+                                sessionId);
+
+                return conversations.stream()
+                                .map(c -> HintChatRequest.ChatMessage.builder()
+                                                .role(c.getRole())
+                                                .content(c.getContent())
+                                                .build())
+                                .toList();
+        }
+
+        /**
+         * 힌트 대화 (직접 요청 - deprecated, hintChatWithRecord 사용 권장)
+         */
+        public HintChatResponse hintChat(HintChatRequest request) {
+                log.info("Hint chat for problem: {}", request.getProblemNumber());
+                return aiClient.hintChat(request);
+        }
+
+        private HintChatRequest.UserContext collectChatUserContext(Long userId) {
+                User user = userRepository.findById(userId).orElse(null);
+
+                List<String> weakTags = skillAnalysisService.getWeaknessTags(userId)
+                                .stream()
+                                .limit(5)
+                                .map(TagWeaknessDto::getTagKey)
+                                .toList();
+
+                int tier = user != null ? (user.getSolvedacTier() != null ? user.getSolvedacTier() : 0) : 0;
+
+                return HintChatRequest.UserContext.builder()
+                                .tierName(getTierName(tier))
+                                .solvedCount(user != null && user.getSolvedCount() != null ? user.getSolvedCount() : 0)
+                                .weakTags(weakTags)
+                                .build();
+        }
+
+        private String getTierName(int tier) {
+                if (tier == 0)
+                        return "Unrated";
+                String[] tiers = { "Bronze", "Silver", "Gold", "Platinum", "Diamond", "Ruby" };
+                String[] levels = { "V", "IV", "III", "II", "I" };
+                int tierIndex = (tier - 1) / 5;
+                int levelIndex = (tier - 1) % 5;
+                if (tierIndex >= tiers.length)
+                        return "Master";
+                return tiers[tierIndex] + " " + levels[levelIndex];
+        }
 }
