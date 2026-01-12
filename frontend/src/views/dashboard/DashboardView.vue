@@ -233,6 +233,7 @@
 
                 <!-- 타임라인 섹션 -->
                 <div>
+                    <!-- 타임라인 헤더 -->
                     <div class="mb-4 flex items-center justify-between">
                         <h2 class="text-xl font-bold text-slate-800 flex items-center gap-2">
                             <Activity :size="20" class="text-brand-500 fill-brand-500"/>
@@ -252,16 +253,128 @@
                         </div>
                     </div>
 
+                    <!-- 날짜 네비게이터 + 추가 필터 -->
+                    <div class="bg-white rounded-2xl p-4 border border-slate-200 mb-4 shadow-sm">
+                        <!-- 날짜 탐색 -->
+                        <div class="flex items-center justify-between mb-3">
+                            <button 
+                                @click="goToPrevDate"
+                                class="p-2 bg-slate-100 hover:bg-slate-200 rounded-xl transition-all active:scale-95"
+                            >
+                                <ChevronLeft :size="20" class="text-slate-600" />
+                            </button>
+                            
+                            <div class="flex items-center gap-3">
+                                <span class="text-lg font-black text-slate-800 tracking-tight">{{ formatSelectedDate }}</span>
+                                <button 
+                                    v-if="!isToday"
+                                    @click="goToToday"
+                                    class="px-3 py-1 bg-brand-50 hover:bg-brand-100 text-brand-600 text-xs font-bold rounded-lg transition-all flex items-center gap-1"
+                                >
+                                    오늘로
+                                    <ChevronRight :size="12" />
+                                </button>
+                            </div>
+                            
+                            <button 
+                                @click="goToNextDate"
+                                :disabled="isNextDisabled"
+                                class="p-2 bg-slate-100 hover:bg-slate-200 rounded-xl transition-all active:scale-95"
+                                :class="{ 'opacity-40 cursor-not-allowed hover:bg-slate-100': isNextDisabled }"
+                            >
+                                <ChevronRight :size="20" class="text-slate-600" />
+                            </button>
+                        </div>
+                        
+                        <!-- 추가 필터 토글 -->
+                        <div class="flex items-center gap-4 pt-3 border-t border-slate-100">
+                            <label class="flex items-center gap-2 cursor-pointer group">
+                                <input 
+                                    type="checkbox" 
+                                    v-model="showSuccessOnly"
+                                    class="w-4 h-4 rounded border-slate-300 text-brand-500 focus:ring-brand-500/30"
+                                />
+                                <span class="text-sm font-medium text-slate-600 group-hover:text-slate-800 transition-colors">성공만 보기</span>
+                            </label>
+                            
+                            <label class="flex items-center gap-2 cursor-pointer group">
+                                <input 
+                                    type="checkbox" 
+                                    v-model="groupByProblem"
+                                    class="w-4 h-4 rounded border-slate-300 text-brand-500 focus:ring-brand-500/30"
+                                />
+                                <span class="text-sm font-medium text-slate-600 group-hover:text-slate-800 transition-colors">문제별 그룹</span>
+                            </label>
+                            
+                            <div class="ml-auto text-xs font-bold text-slate-400">
+                                {{ filteredRecords.length }}건
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 빈 상태 -->
                     <div v-if="filteredRecords.length === 0 && !loading" class="flex flex-col items-center justify-center py-20 bg-white rounded-3xl border-2 border-dashed border-slate-200">
                         <div class="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center mb-4">
                             <Code2 :size="32" class="text-slate-300" />
                         </div>
-                        <h3 class="text-lg font-bold text-slate-800 mb-1">알고리즘 숲이 텅 비어있습니다</h3>
+                        <h3 class="text-lg font-bold text-slate-800 mb-1">이 날의 기록이 없습니다</h3>
                         <p class="text-sm text-slate-400 mb-0 font-medium">
-                            {{ selectedFilter === 'ALL' ? '첫 번째 알고리즘 문제를 해결하고 커밋해보세요!' : '해당 카테고리의 기록이 없습니다.' }}
+                            {{ isToday ? '오늘 첫 번째 문제를 풀어보세요!' : '다른 날짜를 선택해보세요.' }}
                         </p>
                     </div>
 
+                    <!-- 문제별 그룹 뷰 -->
+                    <div v-else-if="groupByProblem && groupedRecords" class="space-y-3 pb-20">
+                        <div 
+                            v-for="group in groupedRecords" 
+                            :key="group.problemNumber"
+                            class="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm"
+                        >
+                            <!-- 그룹 헤더 -->
+                            <div 
+                                @click="toggleGroup(group.problemNumber)"
+                                class="p-4 flex items-center justify-between cursor-pointer hover:bg-slate-50 transition-colors"
+                            >
+                                <div class="flex items-center gap-3">
+                                    <span class="px-2.5 py-1 bg-brand-100 text-brand-700 text-xs font-bold rounded-lg">
+                                        #{{ group.problemNumber }}
+                                    </span>
+                                    <span class="font-bold text-slate-800 truncate max-w-[200px]">{{ group.title }}</span>
+                                    <span 
+                                        class="px-2 py-0.5 text-xs font-bold rounded-full"
+                                        :class="group.hasSuccess ? 'bg-emerald-100 text-emerald-600' : 'bg-red-100 text-red-600'"
+                                    >
+                                        {{ group.hasSuccess ? '성공' : '실패' }}
+                                    </span>
+                                </div>
+                                <div class="flex items-center gap-2">
+                                    <span class="text-xs font-bold text-slate-400">{{ group.records.length }}회 제출</span>
+                                    <ChevronRight 
+                                        :size="16" 
+                                        class="text-slate-400 transition-transform duration-200"
+                                        :class="{ 'rotate-90': isGroupExpanded(group.problemNumber) }"
+                                    />
+                                </div>
+                            </div>
+                            
+                            <!-- 그룹 내 기록들 -->
+                            <div 
+                                v-if="isGroupExpanded(group.problemNumber)"
+                                class="border-t border-slate-100 bg-slate-50/50 p-3 space-y-2"
+                            >
+                                <DashboardRecordCard 
+                                    v-for="record in group.records"
+                                    :key="record.id"
+                                    :ref="el => { if (expandedRecordId === record.id) activeCardRef = el }"
+                                    :record="record"
+                                    :is-expanded="expandedRecordId === record.id"
+                                    @toggle-expand="handleToggleExpand"
+                                />
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 일반 리스트 뷰 -->
                     <div v-else class="space-y-4 pb-20">
                         <template v-for="record in filteredRecords" :key="record.id">
                             <DashboardRecordCard 
@@ -278,7 +391,6 @@
             <!-- 3. 우측 사이드바 컬럼 (통계 + 활동 + 분석 패널) -->
             <aside class="hidden lg:flex w-[380px] shrink-0 flex-col gap-6 sticky top-8 h-[calc(100vh-4rem)]">
                 
-                <!-- 1. 통계 열 (이동됨) -->
                 <!-- 1. 통계 열 (UserQuickStats) -->
                 <UserQuickStats 
                     v-if="studyData"
@@ -377,8 +489,6 @@
                 </div>
 
                 <div class="text-center text-[10px] text-slate-300 font-bold space-x-3 pb-2 uppercase tracking-wider">
-<!-- ... (skip intermediate lines) -->
-<!-- Replace AiDrawer part separately if contiguous block is too large or risky -->
                     <span class="hover:text-slate-400 cursor-pointer transition-colors">INFO</span>
                     <span>&bull;</span>
                     <span class="hover:text-slate-400 cursor-pointer transition-colors">STUDY</span>
@@ -463,7 +573,10 @@ import {
   Hexagon,
   Send,
   UserX,
-  Clock // Added
+  Clock,
+  ChevronLeft,
+  ChevronRight,
+  Filter
 } from 'lucide-vue-next';
 import hljs from 'highlight.js';
 import 'highlight.js/styles/github.css';
@@ -471,23 +584,12 @@ import { marked } from 'marked';
 import NicknameRenderer from '@/components/common/NicknameRenderer.vue';
 import UserQuickStats from '@/components/common/UserQuickStats.vue';
 
-const profileImages = [
-    // '/profile/bag.png',
-    // '/profile/proud.png',
-    // '/profile/smart.png',
-    // '/profile/smile.png'
-];
-
 const getMemberProfileImage = (member) => {
     if (member.avatarUrl) return member.avatarUrl;
     const id = member.userId || 0;
     const index = id % profileImages.length;
     return profileImages[index];
 };
-
-// ... (other imports)
-
-// ... (other imports)
 
 const props = defineProps({
     studyId: {
@@ -594,10 +696,124 @@ const getDefaultProfileImage = (userId) => {
 };
 
 const selectedFilter = ref('ALL');
-const filteredRecords = computed(() => {
-    if (selectedFilter.value === 'ALL') return records.value;
-    return records.value.filter(r => r.tag === selectedFilter.value);
+
+// 날짜 탐색 관련 state
+const selectedDate = ref(new Date());
+const showSuccessOnly = ref(false);
+const groupByProblem = ref(false);
+const expandedGroups = ref(new Set());
+
+// 날짜 네비게이션 함수
+const goToPrevDate = () => {
+    const newDate = new Date(selectedDate.value);
+    newDate.setDate(newDate.getDate() - 1);
+    selectedDate.value = newDate;
+    expandedGroups.value.clear();
+};
+
+const goToNextDate = () => {
+    if (!isNextDisabled.value) {
+        const newDate = new Date(selectedDate.value);
+        newDate.setDate(newDate.getDate() + 1);
+        selectedDate.value = newDate;
+        expandedGroups.value.clear();
+    }
+};
+
+const goToToday = () => {
+    selectedDate.value = new Date();
+    expandedGroups.value.clear();
+};
+
+const isNextDisabled = computed(() => {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const selected = new Date(selectedDate.value);
+    selected.setHours(0, 0, 0, 0);
+    return selected >= today;
 });
+
+const isToday = computed(() => {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const selected = new Date(selectedDate.value);
+    selected.setHours(0, 0, 0, 0);
+    return selected.getTime() === today.getTime();
+});
+
+const formatSelectedDate = computed(() => {
+    const d = selectedDate.value;
+    const days = ['일', '월', '화', '수', '목', '금', '토'];
+    return `${d.getFullYear()}. ${String(d.getMonth() + 1).padStart(2, '0')}. ${String(d.getDate()).padStart(2, '0')} (${days[d.getDay()]})`;
+});
+
+// 날짜 + 카테고리 + 성공여부 복합 필터링
+const filteredRecords = computed(() => {
+    let result = records.value;
+    
+    // 1. 날짜 필터링
+    const selectedDateStr = selectedDate.value.toISOString().split('T')[0];
+    result = result.filter(r => {
+        const recordDate = new Date(r.committedAt || r.createdAt).toISOString().split('T')[0];
+        return recordDate === selectedDateStr;
+    });
+    
+    // 2. 카테고리 필터링
+    if (selectedFilter.value !== 'ALL') {
+        result = result.filter(r => r.tag === selectedFilter.value);
+    }
+    
+    // 3. 성공만 보기
+    if (showSuccessOnly.value) {
+        result = result.filter(r => r.result !== 'FAIL');
+    }
+    
+    return result;
+});
+
+// 문제별 그룹화
+const groupedRecords = computed(() => {
+    if (!groupByProblem.value) return null;
+    
+    const groups = new Map();
+    for (const record of filteredRecords.value) {
+        const key = record.problemNumber;
+        if (!groups.has(key)) {
+            groups.set(key, {
+                problemNumber: record.problemNumber,
+                title: record.title,
+                records: [],
+                hasSuccess: false,
+                latestResult: null
+            });
+        }
+        const group = groups.get(key);
+        group.records.push(record);
+        if (record.result !== 'FAIL') {
+            group.hasSuccess = true;
+        }
+        // 가장 최신 결과
+        if (!group.latestResult) {
+            group.latestResult = record.result;
+        }
+    }
+    // 시간순 정렬 (최신순)
+    return Array.from(groups.values()).map(g => ({
+        ...g,
+        records: g.records.sort((a, b) => new Date(b.committedAt || b.createdAt) - new Date(a.committedAt || a.createdAt))
+    }));
+});
+
+const toggleGroup = (problemNumber) => {
+    if (expandedGroups.value.has(problemNumber)) {
+        expandedGroups.value.delete(problemNumber);
+    } else {
+        expandedGroups.value.add(problemNumber);
+    }
+    expandedGroups.value = new Set(expandedGroups.value);
+};
+
+const isGroupExpanded = (problemNumber) => expandedGroups.value.has(problemNumber);
 
 // 필터 변경 시 확장 초기화
 watch(selectedFilter, () => {
