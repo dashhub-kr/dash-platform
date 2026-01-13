@@ -19,7 +19,7 @@ public class GitHubSubmissionMetadataExtractor {
     private static final Logger log = LoggerFactory.getLogger(GitHubSubmissionMetadataExtractor.class);
 
     private static final Pattern COMMIT_MESSAGE_PATTERN = Pattern.compile(
-            "\\[(?<difficulty>[^]]+)]\\s*Title\\s*:\\s*(?<title>[^,]+),\\s*Time\\s*:\\s*(?<time>[\\d,]+)\\s*ms,\\s*Memory\\s*:\\s*(?<memory>[\\d,]+)\\s*KB",
+            "\\[(?<difficulty>[^]]+)]\\s*Title\\s*:\\s*(?<title>[^,]+),\\s*Time\\s*:\\s*(?<time>-?[\\d,]+)\\s*ms,\\s*Memory\\s*:\\s*(?<memory>-?[\\d,]+)\\s*KB",
             Pattern.CASE_INSENSITIVE);
 
     // Pattern for "문제번호.문제이름" format (e.g., "12865.평범한배낭" or "1000.A+B")

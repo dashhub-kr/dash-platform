@@ -485,7 +485,9 @@ const hasAnyAnalysis = computed(() => {
 
 const isPassed = computed(() => {
     if (!props.record) return false;
-    return props.record.result === 'SUCCESS' || props.record.result === 'PASSED' || (props.record.runtimeMs !== undefined && props.record.runtimeMs !== -1);
+    // runtimeMs가 null이거나 -1이면 실패로 처리
+    const runtime = props.record.runtimeMs;
+    return props.record.result === 'SUCCESS' || props.record.result === 'PASSED' || (runtime !== null && runtime !== undefined && runtime !== -1);
 });
 
 // ACTIONS

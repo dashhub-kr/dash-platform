@@ -68,7 +68,7 @@
                     </span>
                     <span 
                         class="px-2.5 py-1 rounded-lg text-[10px] font-bold uppercase tracking-wider border"
-                        :class="(record.runtimeMs !== -1 && record.memoryKb > 0) ? 'bg-white border-slate-200 text-slate-600' : 'bg-rose-50 border-rose-100 text-rose-600'"
+                        :class="(record.runtimeMs !== null && record.runtimeMs !== -1 && record.memoryKb > 0) ? 'bg-white border-slate-200 text-slate-600' : 'bg-rose-50 border-rose-100 text-rose-600'"
                     >
                         {{ record.language }}
                     </span>
@@ -443,7 +443,11 @@ const parsedPitfalls = computed(() => {
 });
 
 const hasAnyAnalysis = computed(() => props.record.timeComplexity || parsedPitfalls.value.length > 0 || props.record.refactorProvided);
-const isPassed = computed(() => props.record.result === 'SUCCESS' || props.record.result === 'PASSED' || (props.record.runtimeMs !== -1 && props.record.memoryKb > 0));
+const isPassed = computed(() => {
+    const runtime = props.record.runtimeMs;
+    const memory = props.record.memoryKb;
+    return props.record.result === 'SUCCESS' || props.record.result === 'PASSED' || (runtime !== null && runtime !== undefined && runtime !== -1 && memory > 0);
+});
 
 const taskTypeLabel = computed(() => ({'MISSION':'과제','MOCK_EXAM':'모의고사','DEFENSE':'디펜스','GENERAL':'일반'}[props.record.tag]));
 const defenseStreak = computed(() => props.record.defenseStreak || 0);
