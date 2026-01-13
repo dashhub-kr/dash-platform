@@ -485,7 +485,7 @@ const hasAnyAnalysis = computed(() => {
 
 const isPassed = computed(() => {
     if (!props.record) return false;
-    return props.record.result === 'SUCCESS' || props.record.result === 'PASSED' || (props.record.runtimeMs && props.record.runtimeMs > 0);
+    return props.record.result === 'SUCCESS' || props.record.result === 'PASSED' || (props.record.runtimeMs !== undefined && props.record.runtimeMs !== -1);
 });
 
 // ACTIONS

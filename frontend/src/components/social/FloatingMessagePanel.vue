@@ -108,17 +108,16 @@
                 <div v-else-if="viewMode === 'chat'" class="flex-1 flex flex-col overflow-hidden bg-white">
                     <div 
                         ref="messagesContainer"
-                        class="flex-1 overflow-y-auto p-4 space-y-4 bg-slate-50/50 transition-opacity duration-200"
-                        :class="chatReady ? 'opacity-100' : 'opacity-0'"
+                        class="flex-1 overflow-y-auto p-4 space-y-4 bg-slate-50/50 flex flex-col-reverse"
                     >
                         <div v-if="messagesLoading" class="flex justify-center py-4">
                             <Loader2 class="animate-spin text-slate-300" :size="20" />
                         </div>
                         
                         <template v-else>
-                            <div v-for="(msg, index) in messages" :key="msg.id">
+                            <div v-for="(msg, index) in [...messages].reverse()" :key="msg.id">
                                 <!-- 날짜 구분선 -->
-                                <div v-if="showDateSeparator(index, messages)" class="flex items-center justify-center my-4">
+                                <div v-if="showDateSeparator(index)" class="flex items-center justify-center my-4">
                                     <span class="text-[10px] bg-slate-100 text-slate-500 px-3 py-1 rounded-full font-medium">
                                         {{ formatDate(msg.createdAt) }}
                                     </span>
@@ -188,12 +187,11 @@
                 <div v-else-if="viewMode === 'groupChat'" class="flex-1 flex flex-col overflow-hidden bg-white">
                      <div 
                         ref="groupMessagesContainer"
-                        class="flex-1 overflow-y-auto p-4 space-y-4 bg-slate-50/50 transition-opacity duration-200"
-                        :class="chatReady ? 'opacity-100' : 'opacity-0'"
+                        class="flex-1 overflow-y-auto p-4 space-y-4 bg-slate-50/50 flex flex-col-reverse"
                     >
-                        <template v-for="(msg, index) in groupMessages" :key="msg.id">
+                        <div v-for="(msg, index) in [...groupMessages].reverse()" :key="msg.id">
                             <!-- 날짜 구분선 -->
-                            <div v-if="showDateSeparator(index, groupMessages)" class="flex items-center justify-center my-4">
+                            <div v-if="showGroupDateSeparator(index)" class="flex items-center justify-center my-4">
                                 <span class="text-[10px] bg-slate-100 text-slate-500 px-3 py-1 rounded-full font-medium">
                                     {{ formatDate(msg.createdAt) }}
                                 </span>
@@ -203,37 +201,37 @@
                                 class="flex gap-2 max-w-[85%]"
                                 :class="msg.senderId === user.id ? 'ml-auto flex-row-reverse' : ''"
                             >
-                            <NicknameRenderer 
-                                v-if="msg.senderId !== user.id" 
-                                :username="msg.senderUsername"
-                                :avatar-url="msg.senderAvatarUrl"
-                                :decorationClass="msg.senderDecoration"
-                                :enable-decoration="true"
-                                :show-text="false"
-                                avatar-class="w-8 h-8 rounded-full self-start border border-slate-100" 
-                            />
-                            
-                            <div class="flex flex-col gap-1" :class="msg.senderId === user.id ? 'items-end' : 'items-start'">
-                                <NicknameRenderer
-                                     v-if="msg.senderId !== user.id"
-                                     :username="msg.senderUsername"
-                                     :decorationClass="msg.senderDecoration"
-                                     :enable-decoration="true"
-                                     :show-avatar="false" 
-                                     text-class="text-[10px] text-slate-500 ml-1 truncate max-w-[100px]"
+                                <NicknameRenderer 
+                                    v-if="msg.senderId !== user.id" 
+                                    :username="msg.senderUsername"
+                                    :avatar-url="msg.senderAvatarUrl"
+                                    :decorationClass="msg.senderDecoration"
+                                    :enable-decoration="true"
+                                    :show-text="false"
+                                    avatar-class="w-8 h-8 rounded-full self-start border border-slate-100" 
                                 />
-                                <div 
-                                    class="px-3 py-2 rounded-2xl text-sm leading-relaxed shadow-sm break-keep"
-                                    :class="msg.senderId === user.id ? 'bg-indigo-500 text-white rounded-br-none' : 'bg-white border border-slate-100 text-slate-700 rounded-bl-none'"
-                                >
-                                    {{ msg.content }}
+                                
+                                <div class="flex flex-col gap-1" :class="msg.senderId === user.id ? 'items-end' : 'items-start'">
+                                    <NicknameRenderer
+                                         v-if="msg.senderId !== user.id"
+                                         :username="msg.senderUsername"
+                                         :decorationClass="msg.senderDecoration"
+                                         :enable-decoration="true"
+                                         :show-avatar="false" 
+                                         text-class="text-[10px] text-slate-500 ml-1 truncate max-w-[100px]"
+                                    />
+                                    <div 
+                                        class="px-3 py-2 rounded-2xl text-sm leading-relaxed shadow-sm break-keep"
+                                        :class="msg.senderId === user.id ? 'bg-indigo-500 text-white rounded-br-none' : 'bg-white border border-slate-100 text-slate-700 rounded-bl-none'"
+                                    >
+                                        {{ msg.content }}
+                                    </div>
+                                    <span class="text-[10px] text-slate-400 px-1">
+                                        {{ formatMsgTime(msg.createdAt) }}
+                                    </span>
                                 </div>
-                                <span class="text-[10px] text-slate-400 px-1">
-                                    {{ formatMsgTime(msg.createdAt) }}
-                                </span>
                             </div>
                         </div>
-                        </template>
                     </div>
 
                     <!-- 입력창 (그룹) -->
@@ -397,9 +395,6 @@ const creating = ref(false);
 const selectedFriendIds = ref([]);
 const groupForm = ref({ name: '', memberIds: [] }); // 호환성 유지
 
-// Chat scroll visibility state
-const chatReady = ref(false);
-
 let chatPollInterval = null;
 
 // 헤더 타이틀
@@ -542,7 +537,6 @@ const openGroupChat = async (room) => {
     activeGroupRoom.value = room;
     showGroupMembers.value = false;
     groupMessagesLoading.value = true;
-    chatReady.value = false; // Reset ready state
 
     // 읽음 처리: 로컬에서 즉시 unreadCount 0으로 설정
     const target = groupRooms.value.find(r => r.id === room.id);
@@ -556,11 +550,10 @@ const openGroupChat = async (room) => {
         activeGroupRoom.value = { ...room, ...detailRes.data };
         groupMessages.value = msgRes.data.reverse();
         await chatApi.markAsRead(room.id);
-        nextTick(() => scrollToBottomGroup(true)); // animate = true
+        nextTick(() => scrollToBottomGroup());
         startGroupPolling();
     } catch (e) {
         console.error(e);
-        chatReady.value = true; // Ensure visible on error
     } finally {
         groupMessagesLoading.value = false;
     }
@@ -579,20 +572,16 @@ const goBack = () => {
 const fetchMessages = async () => {
     if (!activeChat.value) return;
     const isInitialLoad = messages.value.length === 0;
-    if (isInitialLoad) {
-        messagesLoading.value = true;
-        chatReady.value = false; // Reset ready state
-    }
+    if (isInitialLoad) messagesLoading.value = true;
     try {
         const res = await socialApi.getConversation(activeChat.value.partnerId);
         messages.value = res.data;
     } catch (e) {
         console.error(e);
-        if(isInitialLoad) chatReady.value = true;
     } finally {
         messagesLoading.value = false;
         if (isInitialLoad) {
-            nextTick(() => scrollToBottom(true)); // animate = true
+            nextTick(() => scrollToBottom());
         }
     }
 };
@@ -636,6 +625,7 @@ const sendGroupMessage = async () => {
     }
 };
 
+
 const handleDmEnter = (e) => {
     if (e.isComposing) return;
     e.preventDefault();
@@ -648,32 +638,24 @@ const handleGroupEnter = (e) => {
     sendGroupMessage();
 };
 
-const scrollToBottom = (animate = false) => {
+const scrollToBottom = () => {
     nextTick(() => {
         if (messagesContainer.value) {
-            messagesContainer.value.scrollTop = messagesContainer.value.scrollHeight;
-            if (animate) {
-                requestAnimationFrame(() => {
-                    chatReady.value = true;
-                });
-            }
-        } else if (animate) {
-             chatReady.value = true;
+            messagesContainer.value.scrollTo({
+                top: messagesContainer.value.scrollHeight,
+                behavior: 'instant'
+            });
         }
     });
 };
 
-const scrollToBottomGroup = (animate = false) => {
+const scrollToBottomGroup = () => {
     nextTick(() => {
         if (groupMessagesContainer.value) {
-            groupMessagesContainer.value.scrollTop = groupMessagesContainer.value.scrollHeight;
-            if (animate) {
-                requestAnimationFrame(() => {
-                    chatReady.value = true;
-                });
-            }
-        } else if (animate) {
-             chatReady.value = true;
+            groupMessagesContainer.value.scrollTo({
+                top: groupMessagesContainer.value.scrollHeight,
+                behavior: 'instant'
+            });
         }
     });
 };
@@ -862,12 +844,24 @@ const formatDate = (iso) => {
     return d.toLocaleDateString('ko-KR', { month: 'long', day: 'numeric' });
 };
 
-const showDateSeparator = (index, list) => {
-    if (!list || list.length === 0) return false;
-    if (index === 0) return true;
-    const currentMsgDate = new Date(list[index].createdAt).toLocaleDateString();
-    const prevMsgDate = new Date(list[index - 1].createdAt).toLocaleDateString();
-    return currentMsgDate !== prevMsgDate;
+const showDateSeparator = (index) => {
+    const reversedMessages = [...messages.value].reverse();
+    // column-reverse에서 index가 클수록 화면 상단 (오래된 메시지)
+    // 가장 오래된 메시지 (가장 큰 index = 화면 맨 위)에 separator 표시
+    if (index === reversedMessages.length - 1) return true;
+    // 현재 메시지와 그 위(더 오래된) 메시지의 날짜 비교
+    const currentMsgDate = new Date(reversedMessages[index].createdAt).toLocaleDateString();
+    const olderMsgDate = new Date(reversedMessages[index + 1].createdAt).toLocaleDateString();
+    return currentMsgDate !== olderMsgDate;
+};
+
+const showGroupDateSeparator = (index) => {
+    const reversedMessages = [...groupMessages.value].reverse();
+    // column-reverse에서 index가 클수록 화면 상단 (오래된 메시지)
+    if (index === reversedMessages.length - 1) return true;
+    const currentMsgDate = new Date(reversedMessages[index].createdAt).toLocaleDateString();
+    const olderMsgDate = new Date(reversedMessages[index + 1].createdAt).toLocaleDateString();
+    return currentMsgDate !== olderMsgDate;
 };
 
 // Lifecycle Hooks
