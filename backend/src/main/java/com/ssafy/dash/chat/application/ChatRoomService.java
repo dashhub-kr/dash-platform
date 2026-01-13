@@ -4,6 +4,7 @@ import com.ssafy.dash.chat.application.dto.ChatRoomDetailResult;
 import com.ssafy.dash.chat.application.dto.ChatRoomListResult;
 import com.ssafy.dash.chat.application.dto.ChatRoomMessageResult;
 import com.ssafy.dash.chat.domain.*;
+import com.ssafy.dash.common.encrypt.AesEncryptor;
 import com.ssafy.dash.notification.application.NotificationService;
 import com.ssafy.dash.notification.domain.NotificationType;
 import lombok.RequiredArgsConstructor;
@@ -20,6 +21,7 @@ public class ChatRoomService {
 
     private final ChatRoomRepository chatRoomRepository;
     private final NotificationService notificationService;
+    private final AesEncryptor aesEncryptor;
 
     /**
      * 그룹 채팅방 생성
@@ -88,15 +90,26 @@ public class ChatRoomService {
     @Transactional(readOnly = true)
     public List<ChatRoomListResult> getChatRooms(Long userId) {
         return chatRoomRepository.findRoomsByUserId(userId).stream()
-                .map(room -> new ChatRoomListResult(
-                        room.getId(),
-                        room.getName(),
-                        room.getType().name(),
-                        room.getStudyId(),
-                        room.getMemberCount(),
-                        room.getLastMessage(),
-                        room.getLastMessageAt(),
-                        room.getUnreadCount()))
+                .map(room -> {
+                    String decryptedLastMessage = null;
+                    if (room.getLastMessage() != null) {
+                        try {
+                            decryptedLastMessage = aesEncryptor.decrypt(room.getLastMessage());
+                        } catch (Exception e) {
+                            // 기존 평문 메시지 호환성
+                            decryptedLastMessage = room.getLastMessage();
+                        }
+                    }
+                    return new ChatRoomListResult(
+                            room.getId(),
+                            room.getName(),
+                            room.getType().name(),
+                            room.getStudyId(),
+                            room.getMemberCount(),
+                            decryptedLastMessage,
+                            room.getLastMessageAt(),
+                            room.getUnreadCount());
+                })
                 .collect(Collectors.toList());
     }
 
@@ -139,14 +152,23 @@ public class ChatRoomService {
         }
 
         return chatRoomRepository.findMessagesByRoomId(roomId, size, page * size).stream()
-                .map(m -> new ChatRoomMessageResult(
-                        m.getId(),
-                        m.getSenderId(),
-                        m.getSenderUsername(),
-                        m.getSenderAvatarUrl(),
-                        m.getContent(),
-                        m.getCreatedAt(),
-                        m.getSenderId().equals(userId)))
+                .map(m -> {
+                    String decryptedContent;
+                    try {
+                        decryptedContent = aesEncryptor.decrypt(m.getContent());
+                    } catch (Exception e) {
+                        // 기존 평문 메시지 호환성
+                        decryptedContent = m.getContent();
+                    }
+                    return new ChatRoomMessageResult(
+                            m.getId(),
+                            m.getSenderId(),
+                            m.getSenderUsername(),
+                            m.getSenderAvatarUrl(),
+                            decryptedContent,
+                            m.getCreatedAt(),
+                            m.getSenderId().equals(userId));
+                })
                 .collect(Collectors.toList());
     }
 
@@ -158,7 +180,9 @@ public class ChatRoomService {
         ChatRoomMember member = chatRoomRepository.findMember(roomId, senderId)
                 .orElseThrow(() -> new IllegalArgumentException("채팅방 멤버가 아닙니다."));
 
-        ChatRoomMessage message = ChatRoomMessage.create(roomId, senderId, content);
+        // 메시지 암호화
+        String encryptedContent = aesEncryptor.encrypt(content);
+        ChatRoomMessage message = ChatRoomMessage.create(roomId, senderId, encryptedContent);
         chatRoomRepository.saveMessage(message);
 
         // 읽음 처리
@@ -169,7 +193,7 @@ public class ChatRoomService {
                 message.getSenderId(),
                 member.getUsername(),
                 member.getAvatarUrl(),
-                message.getContent(),
+                content, // 응답에는 평문 반환
                 message.getCreatedAt(),
                 true);
     }
