@@ -108,14 +108,14 @@
                 <div v-else-if="viewMode === 'chat'" class="flex-1 flex flex-col overflow-hidden bg-white">
                     <div 
                         ref="messagesContainer"
-                        class="flex-1 overflow-y-auto p-4 space-y-4 bg-slate-50/50"
+                        class="flex-1 overflow-y-auto p-4 space-y-4 bg-slate-50/50 flex flex-col-reverse"
                     >
                         <div v-if="messagesLoading" class="flex justify-center py-4">
                             <Loader2 class="animate-spin text-slate-300" :size="20" />
                         </div>
                         
                         <template v-else>
-                            <div v-for="(msg, index) in messages" :key="msg.id">
+                            <div v-for="(msg, index) in [...messages].reverse()" :key="msg.id">
                                 <!-- 날짜 구분선 -->
                                 <div v-if="showDateSeparator(index)" class="flex items-center justify-center my-4">
                                     <span class="text-[10px] bg-slate-100 text-slate-500 px-3 py-1 rounded-full font-medium">
@@ -187,40 +187,49 @@
                 <div v-else-if="viewMode === 'groupChat'" class="flex-1 flex flex-col overflow-hidden bg-white">
                      <div 
                         ref="groupMessagesContainer"
-                        class="flex-1 overflow-y-auto p-4 space-y-4 bg-slate-50/50"
+                        class="flex-1 overflow-y-auto p-4 space-y-4 bg-slate-50/50 flex flex-col-reverse"
                     >
-                        <div v-for="msg in groupMessages" :key="msg.id" 
-                            class="flex gap-2 max-w-[85%]"
-                            :class="msg.senderId === user.id ? 'ml-auto flex-row-reverse' : ''"
-                        >
-                            <NicknameRenderer 
-                                v-if="msg.senderId !== user.id" 
-                                :username="msg.senderUsername"
-                                :avatar-url="msg.senderAvatarUrl"
-                                :decorationClass="msg.senderDecoration"
-                                :enable-decoration="true"
-                                :show-text="false"
-                                avatar-class="w-8 h-8 rounded-full self-start border border-slate-100" 
-                            />
-                            
-                            <div class="flex flex-col gap-1" :class="msg.senderId === user.id ? 'items-end' : 'items-start'">
-                                <NicknameRenderer
-                                     v-if="msg.senderId !== user.id"
-                                     :username="msg.senderUsername"
-                                     :decorationClass="msg.senderDecoration"
-                                     :enable-decoration="true"
-                                     :show-avatar="false" 
-                                     text-class="text-[10px] text-slate-500 ml-1 truncate max-w-[100px]"
-                                />
-                                <div 
-                                    class="px-3 py-2 rounded-2xl text-sm leading-relaxed shadow-sm break-keep"
-                                    :class="msg.senderId === user.id ? 'bg-indigo-500 text-white rounded-br-none' : 'bg-white border border-slate-100 text-slate-700 rounded-bl-none'"
-                                >
-                                    {{ msg.content }}
-                                </div>
-                                <span class="text-[10px] text-slate-400 px-1">
-                                    {{ formatMsgTime(msg.createdAt) }}
+                        <div v-for="(msg, index) in [...groupMessages].reverse()" :key="msg.id">
+                            <!-- 날짜 구분선 -->
+                            <div v-if="showGroupDateSeparator(index)" class="flex items-center justify-center my-4">
+                                <span class="text-[10px] bg-slate-100 text-slate-500 px-3 py-1 rounded-full font-medium">
+                                    {{ formatDate(msg.createdAt) }}
                                 </span>
+                            </div>
+
+                            <div 
+                                class="flex gap-2 max-w-[85%]"
+                                :class="msg.senderId === user.id ? 'ml-auto flex-row-reverse' : ''"
+                            >
+                                <NicknameRenderer 
+                                    v-if="msg.senderId !== user.id" 
+                                    :username="msg.senderUsername"
+                                    :avatar-url="msg.senderAvatarUrl"
+                                    :decorationClass="msg.senderDecoration"
+                                    :enable-decoration="true"
+                                    :show-text="false"
+                                    avatar-class="w-8 h-8 rounded-full self-start border border-slate-100" 
+                                />
+                                
+                                <div class="flex flex-col gap-1" :class="msg.senderId === user.id ? 'items-end' : 'items-start'">
+                                    <NicknameRenderer
+                                         v-if="msg.senderId !== user.id"
+                                         :username="msg.senderUsername"
+                                         :decorationClass="msg.senderDecoration"
+                                         :enable-decoration="true"
+                                         :show-avatar="false" 
+                                         text-class="text-[10px] text-slate-500 ml-1 truncate max-w-[100px]"
+                                    />
+                                    <div 
+                                        class="px-3 py-2 rounded-2xl text-sm leading-relaxed shadow-sm break-keep"
+                                        :class="msg.senderId === user.id ? 'bg-indigo-500 text-white rounded-br-none' : 'bg-white border border-slate-100 text-slate-700 rounded-bl-none'"
+                                    >
+                                        {{ msg.content }}
+                                    </div>
+                                    <span class="text-[10px] text-slate-400 px-1">
+                                        {{ formatMsgTime(msg.createdAt) }}
+                                    </span>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -632,7 +641,10 @@ const handleGroupEnter = (e) => {
 const scrollToBottom = () => {
     nextTick(() => {
         if (messagesContainer.value) {
-            messagesContainer.value.scrollTop = messagesContainer.value.scrollHeight;
+            messagesContainer.value.scrollTo({
+                top: messagesContainer.value.scrollHeight,
+                behavior: 'instant'
+            });
         }
     });
 };
@@ -640,7 +652,10 @@ const scrollToBottom = () => {
 const scrollToBottomGroup = () => {
     nextTick(() => {
         if (groupMessagesContainer.value) {
-            groupMessagesContainer.value.scrollTop = groupMessagesContainer.value.scrollHeight;
+            groupMessagesContainer.value.scrollTo({
+                top: groupMessagesContainer.value.scrollHeight,
+                behavior: 'instant'
+            });
         }
     });
 };
@@ -830,10 +845,23 @@ const formatDate = (iso) => {
 };
 
 const showDateSeparator = (index) => {
-    if (index === 0) return true;
-    const currentMsgDate = new Date(messages.value[index].createdAt).toLocaleDateString();
-    const prevMsgDate = new Date(messages.value[index - 1].createdAt).toLocaleDateString();
-    return currentMsgDate !== prevMsgDate;
+    const reversedMessages = [...messages.value].reverse();
+    // column-reverse에서 index가 클수록 화면 상단 (오래된 메시지)
+    // 가장 오래된 메시지 (가장 큰 index = 화면 맨 위)에 separator 표시
+    if (index === reversedMessages.length - 1) return true;
+    // 현재 메시지와 그 위(더 오래된) 메시지의 날짜 비교
+    const currentMsgDate = new Date(reversedMessages[index].createdAt).toLocaleDateString();
+    const olderMsgDate = new Date(reversedMessages[index + 1].createdAt).toLocaleDateString();
+    return currentMsgDate !== olderMsgDate;
+};
+
+const showGroupDateSeparator = (index) => {
+    const reversedMessages = [...groupMessages.value].reverse();
+    // column-reverse에서 index가 클수록 화면 상단 (오래된 메시지)
+    if (index === reversedMessages.length - 1) return true;
+    const currentMsgDate = new Date(reversedMessages[index].createdAt).toLocaleDateString();
+    const olderMsgDate = new Date(reversedMessages[index + 1].createdAt).toLocaleDateString();
+    return currentMsgDate !== olderMsgDate;
 };
 
 // Lifecycle Hooks

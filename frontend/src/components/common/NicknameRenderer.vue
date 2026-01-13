@@ -22,6 +22,7 @@
 
         <!-- Username / Nickname -->
         <span 
+            v-if="showText"
             class="font-medium truncate" 
             :class="[
                 textClass, 
@@ -51,6 +52,7 @@ const props = defineProps({
     verified: { type: Boolean, default: false },
     
     showAvatar: { type: Boolean, default: true },
+    showText: { type: Boolean, default: true }, // NEW - controls text visibility
     clickable: { type: Boolean, default: false }, // NEW
     avatarClass: { type: String, default: 'w-6 h-6' },
     textClass: { type: String, default: 'text-xs' },
