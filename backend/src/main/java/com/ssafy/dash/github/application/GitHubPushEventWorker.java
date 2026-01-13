@@ -264,6 +264,10 @@ public class GitHubPushEventWorker {
         algorithmRecordRepository.save(record);
         log.info("AlgorithmRecord saved: id={}, problem={}, tag={}", record.getId(), record.getProblemNumber(), tag);
 
+        // 로그 지급 (1 Solve = 1 Log)
+        user.addLogs(1);
+        userRepository.update(user);
+
         if (problemId != null) {
             Integer streak = defenseService.verifyDefense(userId, problemId);
             if (streak != null) {

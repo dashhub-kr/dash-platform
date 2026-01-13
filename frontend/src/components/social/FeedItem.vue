@@ -24,7 +24,7 @@
         <!-- SOLVED -->
         <div v-if="item.type === 'SOLVED'">
             <p class="text-slate-600">
-                <span class="font-bold text-slate-800">#{{ item.problemId }} {{ item.problemTitle }}</span> 문제를 풀었어요! 🎉
+                <a :href="`https://www.acmicpc.net/problem/${item.problemId}`" target="_blank" class="font-bold text-slate-800 hover:text-brand-600 hover:underline transition-colors">#{{ item.problemId }} {{ item.problemTitle }}</a> 문제를 풀었어요! 🎉
             </p>
         </div>
 

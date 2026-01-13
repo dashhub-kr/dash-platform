@@ -83,6 +83,107 @@
             </div>
         </section>
 
+        <!-- Log Gift Section -->
+        <section class="bg-white rounded-3xl border border-slate-200 shadow-sm p-8 relative overflow-hidden">
+            <div class="absolute top-0 right-0 w-32 h-32 bg-slate-100 rounded-bl-full -mr-10 -mt-10 z-0"></div>
+            
+            <div class="relative z-10">
+                <h2 class="text-xl font-bold text-slate-800 mb-6 flex items-center gap-2">
+                    <Gift class="w-6 h-6 text-amber-900" />
+                    로그 선물하기
+                </h2>
+                
+                <div class="flex flex-col gap-5">
+                    <!-- User Selector (Search) -->
+                    <div class="relative" ref="searchContainer">
+                        <label class="block text-sm font-bold text-slate-600 mb-2">대상 유저</label>
+                        <div class="relative">
+                            <Search class="absolute left-4 top-3.5 text-slate-400 w-5 h-5" />
+                            <input 
+                                v-model="userSearchQuery"
+                                @input="searchGiftUsers"
+                                @focus="showUserResults = true"
+                                type="text"
+                                placeholder="유저 닉네임 검색..."
+                                class="w-full bg-slate-50 border border-slate-200 rounded-xl pl-12 pr-4 py-3 font-medium text-slate-800 focus:outline-none focus:border-brand-500 focus:ring-4 focus:ring-brand-500/10 transition-all"
+                            />
+                            <button 
+                                v-if="selectedUser" 
+                                @click="clearSelectedUser"
+                                class="absolute right-3 top-2.5 p-1 hover:bg-slate-200 rounded-full text-slate-400 transition-colors"
+                            >
+                                <X class="w-4 h-4" />
+                            </button>
+                        </div>
+
+                        <!-- Search Results Dropdown -->
+                        <div v-if="showUserResults && userSearchResults.length > 0" class="absolute z-20 w-full mt-2 bg-white rounded-xl shadow-xl border border-slate-100 max-h-60 overflow-y-auto custom-scrollbar">
+                            <div 
+                                v-for="user in userSearchResults" 
+                                :key="user.id"
+                                @click="selectUser(user)"
+                                class="p-3 hover:bg-slate-50 cursor-pointer flex items-center gap-3 transition-colors border-b border-slate-50 last:border-0"
+                            >
+                                <img :src="user.avatarUrl" class="w-8 h-8 rounded-full bg-slate-200 object-cover" />
+                                <div>
+                                    <div class="text-sm font-bold text-slate-800">{{ user.username }}</div>
+                                    <div class="text-xs text-slate-400">{{ user.email }}</div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Selected User Badge -->
+                        <div v-if="selectedUser" class="mt-3 flex items-center gap-3 bg-brand-50 border border-brand-100 p-3 rounded-xl">
+                            <img :src="selectedUser.avatarUrl" class="w-10 h-10 rounded-full bg-white border border-brand-100 object-cover" />
+                            <div>
+                                <div class="text-xs font-bold text-brand-600 mb-0.5">선택된 유저</div>
+                                <div class="text-sm font-bold text-slate-800">{{ selectedUser.username }}</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="flex gap-5">
+                        <!-- Amount -->
+                        <div class="flex-1">
+                            <label class="block text-sm font-bold text-slate-600 mb-2">지급 수량</label>
+                            <div class="relative">
+                                <input 
+                                    v-model.number="logGiftForm.amount" 
+                                    type="number" 
+                                    placeholder="10"
+                                    class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 font-medium text-slate-800 focus:outline-none focus:border-brand-500 focus:ring-4 focus:ring-brand-500/10 transition-all"
+                                />
+                                <span class="absolute right-4 top-1/2 -translate-y-1/2 text-sm font-bold text-slate-400">개</span>
+                            </div>
+                        </div>
+                        
+                        <!-- Reason -->
+                        <div class="flex-[2]">
+                            <label class="block text-sm font-bold text-slate-600 mb-2">지급 사유</label>
+                            <input 
+                                v-model="logGiftForm.reason" 
+                                type="text" 
+                                placeholder="예: 점검 보상"
+                                class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 font-medium text-slate-800 focus:outline-none focus:border-brand-500 focus:ring-4 focus:ring-brand-500/10 transition-all"
+                            />
+                        </div>
+                    </div>
+
+                    <div class="flex justify-end mt-2">
+                        <button 
+                            @click="handleGiftLogs"
+                            :disabled="!isValidLogGiftForm || logGifting"
+                            class="px-8 py-3 bg-slate-900 hover:bg-brand-600 text-white font-bold rounded-xl shadow-lg shadow-slate-200 transition-all flex items-center gap-2 disabled:opacity-50 disabled:shadow-none"
+                        >
+                            <Loader2 v-if="logGifting" class="w-5 h-5 animate-spin" />
+                            <Send v-else class="w-5 h-5" />
+                            <span>로그 지급</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
         <!-- Other Admin Sections -->
         <section class="grid grid-cols-1 gap-6">
             
@@ -203,14 +304,17 @@
 </template>
 
 <script setup>
-import { ref, onMounted, computed } from 'vue';
+import { ref, onMounted, onUnmounted, computed } from 'vue';
 import { useRouter } from 'vue-router';
-import { ShieldAlert, Gift, Send, Loader2, UserX, Settings, Compass, Users, Eye, Sparkles } from 'lucide-vue-next';
+import { ShieldAlert, Gift, Send, Loader2, UserX, Settings, Compass, Users, Eye, Sparkles, Search, X } from 'lucide-vue-next';
 import { studyApi } from '@/api/study';
 import { adminApi } from '@/api/admin';
 import { userApi } from '@/api/user';
+import { useAuth } from '@/composables/useAuth';
 
 const router = useRouter();
+const { user } = useAuth();
+
 const studies = ref([]);
 const gifting = ref(false);
 
@@ -235,7 +339,7 @@ const goToObservation = (studyId) => {
     router.push(`/admin/study/${studyId}/dashboard`);
 };
 
-// User Search State
+// User Management Search State
 const searchKeyword = ref('');
 const searchResults = ref([]);
 const searched = ref(false);
@@ -257,7 +361,6 @@ const handleBlockUser = async (user) => {
     try {
         await adminApi.blockUser(user.id);
         alert("회원이 차단되었습니다.");
-        // Refresh search results
         searchUsers();
     } catch (e) {
         console.error("Block failed", e);
@@ -265,6 +368,7 @@ const handleBlockUser = async (user) => {
     }
 };
 
+// Acorn Gift Logic
 const giftForm = ref({
     studyId: null,
     amount: '',
@@ -277,7 +381,7 @@ const isValidGiftForm = computed(() => {
 
 const fetchStudies = async () => {
     try {
-        const res = await studyApi.getStudies(); // Assuming this returns all public studies
+        const res = await studyApi.getStudies();
         studies.value = res.data;
     } catch (e) {
         console.error("Failed to fetch studies", e);
@@ -299,7 +403,6 @@ const handleGiftAcorns = async () => {
         
         alert("도토리가 성공적으로 지급되었습니다.");
         
-        // Reset form
         giftForm.value = {
             studyId: null,
             amount: '',
@@ -313,7 +416,100 @@ const handleGiftAcorns = async () => {
     }
 };
 
+// Log Gift Logic
+const logGifting = ref(false);
+const logGiftForm = ref({
+    userId: null,
+    amount: '',
+    reason: ''
+});
+
+// Gift User Search State
+const userSearchQuery = ref('');
+const userSearchResults = ref([]);
+const showUserResults = ref(false);
+const selectedUser = ref(null);
+const searchContainer = ref(null);
+
+let searchTimeout = null;
+const searchGiftUsers = async () => {
+    if (!userSearchQuery.value.trim()) {
+        userSearchResults.value = [];
+        return;
+    }
+    
+    if (searchTimeout) clearTimeout(searchTimeout);
+    
+    searchTimeout = setTimeout(async () => {
+        try {
+            // Use existing userApi.list which supports keyword search
+            const res = await userApi.list({ keyword: userSearchQuery.value });
+            userSearchResults.value = res.data;
+        } catch (e) {
+            console.error("User search failed", e);
+        }
+    }, 300);
+};
+
+const selectUser = (user) => {
+    selectedUser.value = user;
+    logGiftForm.value.userId = user.id;
+    userSearchQuery.value = ''; 
+    showUserResults.value = false;
+};
+
+const clearSelectedUser = () => {
+    selectedUser.value = null;
+    logGiftForm.value.userId = null;
+    userSearchQuery.value = '';
+};
+
+// Close dropdown when clicking outside
+const handleDocumentClick = (e) => {
+    if (searchContainer.value && !searchContainer.value.contains(e.target)) {
+        showUserResults.value = false;
+    }
+};
+
 onMounted(() => {
+    document.addEventListener('click', handleDocumentClick);
     fetchStudies();
 });
+
+onUnmounted(() => {
+    document.removeEventListener('click', handleDocumentClick);
+});
+
+const isValidLogGiftForm = computed(() => {
+    return logGiftForm.value.userId && logGiftForm.value.amount > 0 && logGiftForm.value.reason.trim();
+});
+
+const handleGiftLogs = async () => {
+    if (!isValidLogGiftForm.value) return;
+    
+    if (!confirm(`${selectedUser.value.username}님에게 ${logGiftForm.value.amount}개의 로그를 지급하시겠습니까?`)) return;
+
+    logGifting.value = true;
+    try {
+        await adminApi.giftLogs({
+            userId: logGiftForm.value.userId,
+            amount: logGiftForm.value.amount,
+            reason: logGiftForm.value.reason
+        });
+        
+        alert("로그가 성공적으로 지급되었습니다.");
+        
+        logGiftForm.value = {
+            userId: null,
+            amount: '',
+            reason: ''
+        };
+        selectedUser.value = null;
+    } catch (e) {
+        console.error("Failed to gift logs", e);
+        alert("로그 지급에 실패했습니다. (알림 전송 오류 등)");
+    } finally {
+        logGifting.value = false;
+    }
+};
 </script>

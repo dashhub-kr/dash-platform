@@ -7,6 +7,12 @@ export const adminApi = {
         return http.post('/admin/acorns/gift', data);
     },
 
+    // Gift logs (items) to a user
+    // POST /api/admin/logs/gift
+    giftLogs(data) {
+        return http.post('/admin/logs/gift', data);
+    },
+
     // Block a user
     // POST /api/admin/users/{userId}/block
     blockUser(userId) {

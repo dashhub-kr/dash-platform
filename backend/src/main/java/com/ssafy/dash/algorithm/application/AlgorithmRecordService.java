@@ -1,14 +1,11 @@
 package com.ssafy.dash.algorithm.application;
 
-import com.ssafy.dash.algorithm.application.dto.command.AlgorithmRecordCreateCommand;
 import com.ssafy.dash.algorithm.application.dto.command.AlgorithmRecordUpdateCommand;
 import com.ssafy.dash.algorithm.application.dto.result.AlgorithmRecordResult;
 import com.ssafy.dash.algorithm.domain.AlgorithmRecord;
 import com.ssafy.dash.algorithm.domain.AlgorithmRecordRepository;
 import com.ssafy.dash.algorithm.domain.StudyStats;
 import com.ssafy.dash.algorithm.domain.exception.AlgorithmRecordNotFoundException;
-import com.ssafy.dash.user.domain.UserRepository;
-import com.ssafy.dash.user.domain.exception.UserNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -16,77 +13,14 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import java.util.stream.Collectors;
-import com.ssafy.dash.defense.application.DefenseService;
-import com.ssafy.dash.mockexam.application.MockExamService;
-import com.ssafy.dash.battle.application.BattleService;
 
 @Service
 public class AlgorithmRecordService {
 
     private final AlgorithmRecordRepository algorithmRecordRepository;
-    private final UserRepository userRepository;
-    private final com.ssafy.dash.study.application.StudyMissionService studyMissionService;
-    private final DefenseService defenseService;
-    private final MockExamService mockExamService;
-    private final BattleService battleService;
-    private final com.ssafy.dash.study.application.StudyService studyService;
 
-    public AlgorithmRecordService(AlgorithmRecordRepository algorithmRecordRepository, UserRepository userRepository,
-            com.ssafy.dash.study.application.StudyMissionService studyMissionService,
-            DefenseService defenseService, MockExamService mockExamService, BattleService battleService,
-            @org.springframework.context.annotation.Lazy com.ssafy.dash.study.application.StudyService studyService) {
+    public AlgorithmRecordService(AlgorithmRecordRepository algorithmRecordRepository) {
         this.algorithmRecordRepository = algorithmRecordRepository;
-        this.userRepository = userRepository;
-        this.studyMissionService = studyMissionService;
-        this.defenseService = defenseService;
-        this.mockExamService = mockExamService;
-        this.battleService = battleService;
-        this.studyService = studyService;
-    }
-
-    @Transactional
-    public AlgorithmRecordResult create(AlgorithmRecordCreateCommand command) {
-        var user = userRepository.findById(command.userId())
-                .orElseThrow(() -> new UserNotFoundException(command.userId()));
-
-        LocalDateTime now = LocalDateTime.now();
-        AlgorithmRecord record = AlgorithmRecord.create(
-                command.userId(),
-                user.getStudyId(),
-                command.problemNumber(),
-                command.title(),
-                command.language(),
-                command.code(),
-                now);
-
-        algorithmRecordRepository.save(record);
-
-        // Log Count Increase (1 Log per solution)
-        user.addLogs(1);
-        userRepository.update(user);
-
-        // 스터디 미션, 디펜스, 모의고사 완료 체크
-        try {
-            int problemId = Integer.parseInt(command.problemNumber());
-            studyMissionService.checkAndMarkCompleted(command.userId(), problemId);
-            Integer defenseStreak = defenseService.verifyDefense(command.userId(), problemId);
-            if (defenseStreak != null) {
-                record.setTag("DEFENSE");
-                record.setDefenseStreak(defenseStreak);
-                algorithmRecordRepository.update(record);
-            }
-            mockExamService.verifyExam(command.userId(), problemId);
-            battleService.verifyBattleProblem(command.userId(), problemId);
-        } catch (NumberFormatException e) {
-            // ignore non-integer problem numbers
-        }
-
-        // 스터디 streak 갱신 (O(1) 연산)
-        if (user.getStudyId() != null) {
-            studyService.updateStreakOnSolve(user.getStudyId());
-        }
-
-        return AlgorithmRecordResult.from(record);
     }
 
     @Transactional(readOnly = true)

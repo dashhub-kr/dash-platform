@@ -1,7 +1,6 @@
 package com.ssafy.dash.algorithm.presentation;
 
 import com.ssafy.dash.algorithm.application.AlgorithmRecordService;
-import com.ssafy.dash.algorithm.application.dto.command.AlgorithmRecordCreateCommand;
 import com.ssafy.dash.algorithm.application.dto.command.AlgorithmRecordUpdateCommand;
 import com.ssafy.dash.algorithm.application.dto.result.AlgorithmRecordResult;
 import com.ssafy.dash.algorithm.domain.exception.AlgorithmRecordNotFoundException;
@@ -11,7 +10,6 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -25,7 +23,6 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.List;
 
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
@@ -70,26 +67,6 @@ class AlgorithmRecordControllerTest {
 
     @Test
     @WithMockUser
-    @DisplayName("알고리즘 기록 생성 요청이 성공하면 201과 결과를 반환한다")
-    void createRecord_Success() throws Exception {
-        MockMultipartFile file = new MockMultipartFile("file", "Main.java", "text/plain", TestFixtures.TEST_ALGORITHM_CODE.getBytes());
-        given(algorithmRecordService.create(any(AlgorithmRecordCreateCommand.class))).willReturn(recordResult);
-
-        mockMvc.perform(multipart("/api/algorithm-records")
-                        .file(file)
-                        .param("problemNumber", TestFixtures.TEST_PROBLEM_NUMBER)
-                        .param("title", TestFixtures.TEST_ALGORITHM_TITLE)
-                        .param("language", TestFixtures.TEST_ALGORITHM_LANGUAGE))
-                .andExpect(status().isCreated())
-                .andExpect(jsonPath("$.id").value(TestFixtures.TEST_ALGORITHM_RECORD_ID));
-
-        ArgumentCaptor<AlgorithmRecordCreateCommand> captor = ArgumentCaptor.forClass(AlgorithmRecordCreateCommand.class);
-        verify(algorithmRecordService).create(captor.capture());
-        assertThat(captor.getValue().code()).contains(TestFixtures.TEST_ALGORITHM_CODE);
-    }
-
-    @Test
-    @WithMockUser
     @DisplayName("알고리즘 기록 전체를 조회하면 목록을 반환한다")
     void getAllRecords_Success() throws Exception {
         given(algorithmRecordService.findAll()).willReturn(List.of(recordResult));
@@ -128,19 +105,21 @@ class AlgorithmRecordControllerTest {
     @DisplayName("알고리즘 기록 수정 요청이 성공하면 변경된 결과를 반환한다")
     void updateRecord_Success() throws Exception {
         MockMultipartFile file = new MockMultipartFile("file", "Main.java", "text/plain", "updated".getBytes());
-        given(algorithmRecordService.update(eq(TestFixtures.TEST_ALGORITHM_RECORD_ID), any(AlgorithmRecordUpdateCommand.class))).willReturn(recordResult);
+        given(algorithmRecordService.update(eq(TestFixtures.TEST_ALGORITHM_RECORD_ID),
+                any(AlgorithmRecordUpdateCommand.class))).willReturn(recordResult);
 
         mockMvc.perform(multipart("/api/algorithm-records/" + TestFixtures.TEST_ALGORITHM_RECORD_ID)
-                        .file(file)
-                        .param("title", "Updated")
-                        .with(request -> {
-                            request.setMethod("PUT");
-                            return request;
-                        }))
+                .file(file)
+                .param("title", "Updated")
+                .with(request -> {
+                    request.setMethod("PUT");
+                    return request;
+                }))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(TestFixtures.TEST_ALGORITHM_RECORD_ID));
 
-        verify(algorithmRecordService).update(eq(TestFixtures.TEST_ALGORITHM_RECORD_ID), any(AlgorithmRecordUpdateCommand.class));
+        verify(algorithmRecordService).update(eq(TestFixtures.TEST_ALGORITHM_RECORD_ID),
+                any(AlgorithmRecordUpdateCommand.class));
     }
 
     @Test

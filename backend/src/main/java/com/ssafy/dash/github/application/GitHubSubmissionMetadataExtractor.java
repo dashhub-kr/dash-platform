@@ -40,7 +40,8 @@ public class GitHubSubmissionMetadataExtractor {
             Map.entry("rs", "RUST"),
             Map.entry("php", "PHP"),
             Map.entry("scala", "SCALA"),
-            Map.entry("dart", "DART"));
+            Map.entry("dart", "DART"),
+            Map.entry("cc", "CPP"));
 
     public SubmissionMetadata extract(String commitMessage, String filePath) {
         String message = commitMessage == null ? "" : commitMessage.trim();
@@ -123,7 +124,8 @@ public class GitHubSubmissionMetadataExtractor {
 
         // 2. Check Commit Message - Medium Priority
         // SWEA tags: [D1], [D2], ..., [Professional]
-        if (commitMessage != null && (commitMessage.contains("[Professional]") || commitMessage.matches(".*\\[D\\d+].*"))) {
+        if (commitMessage != null
+                && (commitMessage.contains("[Professional]") || commitMessage.matches(".*\\[D\\d+].*"))) {
             return "SWEA";
         }
 

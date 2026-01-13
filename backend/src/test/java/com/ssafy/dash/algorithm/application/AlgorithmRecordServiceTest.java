@@ -1,6 +1,5 @@
 package com.ssafy.dash.algorithm.application;
 
-import com.ssafy.dash.algorithm.application.dto.command.AlgorithmRecordCreateCommand;
 import com.ssafy.dash.algorithm.application.dto.command.AlgorithmRecordUpdateCommand;
 import com.ssafy.dash.algorithm.application.dto.result.AlgorithmRecordResult;
 import com.ssafy.dash.algorithm.domain.AlgorithmRecord;
@@ -9,7 +8,6 @@ import com.ssafy.dash.algorithm.domain.exception.AlgorithmRecordNotFoundExceptio
 import com.ssafy.dash.common.TestFixtures;
 import com.ssafy.dash.user.domain.User;
 import com.ssafy.dash.user.domain.UserRepository;
-import com.ssafy.dash.user.domain.exception.UserNotFoundException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -25,7 +23,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 
 @ExtendWith(MockitoExtension.class)
@@ -48,36 +45,6 @@ class AlgorithmRecordServiceTest {
     void setUp() {
         this.user = TestFixtures.createUser();
         this.record = TestFixtures.createAlgorithmRecord(user);
-    }
-
-    @Test
-    @DisplayName("사용자가 존재하면 알고리즘 기록을 생성하고 결과를 반환한다")
-    void createRecord_Success() {
-        AlgorithmRecordCreateCommand command = TestFixtures
-                .createAlgorithmRecordCreateCommand(TestFixtures.TEST_ALGORITHM_CODE);
-        given(userRepository.findById(command.userId())).willReturn(Optional.of(user));
-
-        AlgorithmRecordResult response = algorithmRecordService.create(command);
-
-        verify(algorithmRecordRepository).save(any(AlgorithmRecord.class));
-        // Verify Log Earning Logic
-        verify(userRepository).update(user);
-        assertThat(user.getLogCount()).isEqualTo(1); // Initially 0, +1 per solve
-
-        assertThat(response.problemNumber()).isEqualTo(command.problemNumber());
-        assertThat(response.code()).isEqualTo(TestFixtures.TEST_ALGORITHM_CODE);
-    }
-
-    @Test
-    @DisplayName("존재하지 않는 사용자로 기록을 생성하면 UserNotFoundException이 발생한다")
-    void createRecord_UserMissing_Throws() {
-        AlgorithmRecordCreateCommand command = TestFixtures
-                .createAlgorithmRecordCreateCommand(TestFixtures.TEST_ALGORITHM_CODE);
-        given(userRepository.findById(command.userId())).willReturn(Optional.empty());
-
-        assertThatThrownBy(() -> algorithmRecordService.create(command))
-                .isInstanceOf(UserNotFoundException.class);
-        verify(algorithmRecordRepository, never()).save(any());
     }
 
     @Test
