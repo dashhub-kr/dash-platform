@@ -830,7 +830,7 @@ const filteredRecords = computed(() => {
     
     // 3. 성공만 보기
     if (showSuccessOnly.value) {
-        result = result.filter(r => r.result !== 'FAIL');
+        result = result.filter(r => ['SUCCESS', 'PASSED'].includes(r.result));
     }
     
     return result;
