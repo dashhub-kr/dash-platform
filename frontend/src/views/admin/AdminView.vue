@@ -304,7 +304,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted, computed } from 'vue';
+import { ref, onMounted, onUnmounted, computed } from 'vue';
 import { useRouter } from 'vue-router';
 import { ShieldAlert, Gift, Send, Loader2, UserX, Settings, Compass, Users, Eye, Sparkles, Search, X } from 'lucide-vue-next';
 import { studyApi } from '@/api/study';
@@ -465,14 +465,19 @@ const clearSelectedUser = () => {
 };
 
 // Close dropdown when clicking outside
+const handleDocumentClick = (e) => {
+    if (searchContainer.value && !searchContainer.value.contains(e.target)) {
+        showUserResults.value = false;
+    }
+};
+
 onMounted(() => {
-    document.addEventListener('click', (e) => {
-        if (searchContainer.value && !searchContainer.value.contains(e.target)) {
-            showUserResults.value = false;
-        }
-    });
-    
+    document.addEventListener('click', handleDocumentClick);
     fetchStudies();
+});
+
+onUnmounted(() => {
+    document.removeEventListener('click', handleDocumentClick);
 });
 
 const isValidLogGiftForm = computed(() => {
