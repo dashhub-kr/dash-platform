@@ -427,6 +427,30 @@ const parsedFullResponse = computed(() => {
     try { return JSON.parse(props.record.fullResponse); } catch { return null; }
 });
 
+const fetchTutorHistory = async () => {
+    if (!props.record?.id || !user.value?.id) return;
+    
+    try {
+        const res = await aiApi.getTutorHistory(props.record.id, user.value.id);
+        if (Array.isArray(res.data)) {
+            tutorMessages.value = res.data.map(m => ({
+                role: m.role,
+                content: m.content
+            }));
+             // Scroll to bottom
+            nextTick(() => { if(chatContainer.value) chatContainer.value.scrollTop = chatContainer.value.scrollHeight; });
+        }
+    } catch (e) {
+        console.error("Failed to fetch tutor history", e);
+    }
+};
+
+watch(activeTab, (newTab) => {
+    if (newTab === 'tutor' && tutorMessages.value.length === 0) {
+        fetchTutorHistory();
+    }
+});
+
 const parsedStructure = computed(() => {
     if (!parsedFullResponse.value) return [];
     return Array.isArray(parsedFullResponse.value.structure) ? parsedFullResponse.value.structure : [];

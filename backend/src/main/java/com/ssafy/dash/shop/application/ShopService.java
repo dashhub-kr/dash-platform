@@ -68,7 +68,7 @@ public class ShopService {
                 .orElseThrow(() -> new UserNotFoundException(senderId));
 
         // 2. Validate Recipient
-        User recipient = userRepository.findById(recipientUserId)
+        userRepository.findById(recipientUserId)
                 .orElseThrow(() -> new UserNotFoundException(recipientUserId));
 
         // 3. Validate Item
