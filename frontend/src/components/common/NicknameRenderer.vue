@@ -23,7 +23,7 @@
         <!-- Username / Nickname -->
         <span 
             v-if="showText"
-            class="font-medium truncate" 
+            class="font-medium" 
             :class="[
                 textClass, 
                 enableDecoration ? decorationClass : '',

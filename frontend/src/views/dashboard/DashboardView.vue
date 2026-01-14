@@ -201,6 +201,7 @@
 
                                         <!-- 렌더러 -->
                                         <NicknameRenderer 
+                                            :show-text="false"
                                             :username="member.username"
                                             :avatar-url="getMemberProfileImage(member)"
                                             :class="[

@@ -58,7 +58,7 @@
         ]">
           
           <!-- 게시판 유형 & 기록 선택 (항상 표시하지만 스타일 다름) -->
-          <div class="bg-white/80 backdrop-blur-md border border-white/60 shadow-xl shadow-brand-500/5 rounded-2xl p-6">
+          <div v-if="!isEdit || isCodeReviewMode" class="bg-white/80 backdrop-blur-md border border-white/60 shadow-xl shadow-brand-500/5 rounded-2xl p-6">
              <div class="mb-6" v-if="!isEdit">
                 <label class="block text-sm font-bold text-slate-700 mb-2">게시글 유형</label>
                 <div class="flex gap-4 p-1 bg-slate-100/50 rounded-xl border border-slate-200/50">
