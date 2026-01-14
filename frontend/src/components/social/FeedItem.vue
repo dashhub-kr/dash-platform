@@ -6,7 +6,7 @@
                 <img :src="getAvatar(item.userAvatar)" class="w-10 h-10 rounded-full border border-slate-200"/>
                 <div>
                     <div class="flex items-center gap-2">
-                        <span class="font-bold text-slate-800">{{ item.userName }}</span>
+                        <span class="font-bold text-slate-800" :class="item.userDecorationClass">{{ item.userName }}</span>
                         <TierBadge v-if="item.userTier" :tier="item.userTier" size="xs" />
                     </div>
                     <span class="text-xs text-slate-400">{{ formatTimeAgo(item.createdAt) }}</span>

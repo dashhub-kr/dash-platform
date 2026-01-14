@@ -414,6 +414,7 @@ const allConversations = computed(() => {
         partnerId: c.partnerId,
         partnerName: c.partnerName,
         partnerAvatar: c.partnerAvatar,
+        partnerDecoration: c.partnerDecorationClass,
         lastMessagePreview: c.lastMessagePreview,
         lastMessageTime: c.lastMessageTime,
         unreadCount: c.unreadCount || 0
