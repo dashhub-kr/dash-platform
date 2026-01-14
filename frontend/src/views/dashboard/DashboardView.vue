@@ -857,7 +857,7 @@ const groupedRecords = computed(() => {
         }
         const group = groups.get(key);
         group.records.push(record);
-        if (record.result !== 'FAIL') {
+        if (record.result === 'SUCCESS' || record.result === 'PASSED' || (record.runtimeMs !== null && record.runtimeMs !== undefined && record.runtimeMs !== -1)) {
             group.hasSuccess = true;
         }
         // 가장 최신 결과
