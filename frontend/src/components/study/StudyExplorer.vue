@@ -81,7 +81,7 @@
                  </div>
     
                 <!-- 상단 정보 -->
-                <div class="relative z-10 mb-4 mt-2">
+                <div class="relative z-20 mb-4 mt-2">
                   <div class="flex items-center gap-2 mb-3">
                       <!-- 아바타 영역 전체 클릭 가능 -->
                       <div @click="toggleMemberPopup(study.id, $event)" class="flex items-center -space-x-2 cursor-pointer relative">
@@ -92,6 +92,31 @@
                             </div>
                          </template>
                          <div v-if="study.memberCount > 11" class="w-7 h-7 rounded-full bg-slate-200 border-2 border-white flex items-center justify-center text-[10px] font-bold text-slate-600 hover:bg-slate-300 transition-colors">···</div>
+                         
+                         <!-- Member Popup -->
+                         <div v-if="openMemberPopup === study.id" 
+                              @click.stop 
+                              class="absolute top-full left-0 mt-2 bg-white text-slate-800 rounded-2xl z-50 min-w-[200px] max-h-[300px] overflow-y-auto shadow-xl ring-1 ring-slate-900/5 p-3 animate-in fade-in zoom-in-95 duration-200 origin-top-left"
+                              style="scrollbar-width: thin;">
+                            <div class="text-slate-400 text-[10px] uppercase tracking-wider mb-2 pb-2 border-b border-slate-100 font-bold flex justify-between items-center bg-white sticky top-0">
+                                <span>스터디원 ({{ study.memberCount }}명)</span>
+                                <button @click.stop="closeMemberPopup" class="hover:bg-slate-100 p-1 rounded-full"><X :size="12" /></button>
+                            </div>
+                            <div v-for="member in (study.memberPreviews || [])" :key="member.userId" class="flex items-center gap-3 py-2 border-b border-slate-50 last:border-0 hover:bg-slate-50 rounded-lg px-2 transition-colors">
+                               <NicknameRenderer 
+                                    :username="member.username" 
+                                    :avatar-url="member.avatarUrl" 
+                                    :user-id="member.userId"
+                                    :clickable="true"
+                                    :enable-decoration="true"
+                                    :decoration-class="member.decorationClass"
+                                    avatar-class="w-8 h-8" 
+                                    text-class="text-sm font-medium text-slate-700" 
+                                    :show-avatar="true" 
+                                />
+                            </div>
+                         </div>
+
                       </div>
                       <span class="text-xs font-medium text-slate-400 ml-1">{{ study.memberCount }}명</span>
                    </div>
@@ -218,7 +243,7 @@
              </div>
 
             <!-- 상단 정보 -->
-            <div class="relative z-10 mb-4">
+            <div class="relative z-20 mb-4">
                               <div class="flex items-center gap-2 mb-3">
                   <!-- 아바타 영역 전체 클릭 가능 -->
                   <div @click="toggleMemberPopup(study.id, $event)" class="flex items-center -space-x-2 cursor-pointer relative">
@@ -229,6 +254,31 @@
                         </div>
                      </template>
                      <div v-if="study.memberCount > 5" class="w-7 h-7 rounded-full bg-slate-200 border-2 border-white flex items-center justify-center text-[10px] font-bold text-slate-600 hover:bg-slate-300 transition-colors">+{{ study.memberCount - 5 }}</div>
+                     
+                     <!-- Member Popup (Active) -->
+                     <div v-if="openMemberPopup === study.id" 
+                          @click.stop 
+                          class="absolute top-full left-0 mt-2 bg-white text-slate-800 rounded-2xl z-50 min-w-[200px] max-h-[300px] overflow-y-auto shadow-xl ring-1 ring-slate-900/5 p-3 animate-in fade-in zoom-in-95 duration-200 origin-top-left"
+                          style="scrollbar-width: thin;">
+                        <div class="text-slate-400 text-[10px] uppercase tracking-wider mb-2 pb-2 border-b border-slate-100 font-bold flex justify-between items-center bg-white sticky top-0">
+                            <span>스터디원 ({{ study.memberCount }}명)</span>
+                            <button @click.stop="closeMemberPopup" class="hover:bg-slate-100 p-1 rounded-full"><X :size="12" /></button>
+                        </div>
+                        <div v-for="member in (study.memberPreviews || [])" :key="member.userId" class="flex items-center gap-3 py-2 border-b border-slate-50 last:border-0 hover:bg-slate-50 rounded-lg px-2 transition-colors">
+                           <NicknameRenderer 
+                                :username="member.username" 
+                                :avatar-url="member.avatarUrl" 
+                                :user-id="member.userId"
+                                :clickable="true"
+                                :enable-decoration="true"
+                                :decoration-class="member.decorationClass"
+                                avatar-class="w-8 h-8" 
+                                text-class="text-sm font-medium text-slate-700" 
+                                :show-avatar="true" 
+                            />
+                        </div>
+                     </div>
+
                   </div>
                   <span class="text-xs font-medium text-slate-400 ml-1">{{ study.memberCount }}명</span>
                </div>
@@ -243,11 +293,6 @@
             </div>
 
             <!-- 통계 정보 (Horizontal Divided Layout) -->
-            <!-- 통계 정보 (Refined Horizontal Layout - No Border) -->
-            <!-- 통계 정보 (Solved.ac Tier + Solid Icon Backgrounds) -->
-            <!-- 통계 정보 (Rounded Square Solid BG + White Line Icons) -->
-            <!-- 통계 정보 (Solid Filled Icons) -->
-            <!-- 통계 정보 with Hover Tooltips -->
             <div class="flex items-center py-3 mb-6 relative z-10">
                
                <!-- Tier (Solved.ac Icon) -->
@@ -439,22 +484,6 @@
           </div>
         </div>
       </Teleport>
-
-      <!-- Member Popup Teleport -->
-      <Teleport to="body">
-       <div v-if="currentStudy" @click.stop 
-            class="fixed bg-white text-slate-800 rounded-2xl z-[9999] min-w-[180px] max-h-[300px] overflow-y-auto shadow-2xl border border-slate-100 p-3" 
-            :style="{ 
-                top: `${popupPosition.top}px`, 
-                left: `${popupPosition.left}px`,
-                transform: 'translate(-50%, -100%) translateY(-10px)'
-            }">
-          <div class="text-slate-400 text-[10px] uppercase tracking-wider mb-2 pb-2 border-b border-slate-100 font-bold">스터디원 ({{ currentStudy.memberCount }}명)</div>
-          <div v-for="member in (currentStudy.memberPreviews || [])" :key="member.userId" class="flex items-center gap-3 py-2 border-b border-slate-50 last:border-0">
-             <NicknameRenderer :username="member.username" :avatar-url="member.avatarUrl" avatar-class="w-8 h-8" text-class="text-sm font-medium text-slate-700" :show-avatar="true" />
-          </div>
-       </div>
-      </Teleport>
     </div>
   </div>
 </template>
@@ -464,7 +493,7 @@ import { ref, onMounted, onUnmounted, computed, watch } from 'vue';
 import { useRouter } from 'vue-router';
 import axios from 'axios';
 import { useAuth } from '@/composables/useAuth';
-import { Trophy, Flame, Users, Search, Activity, ArrowRight, Send, Sparkles, Compass, AlertCircle, Plus, Eye } from 'lucide-vue-next';
+import { Trophy, Flame, Users, Search, Activity, ArrowRight, Send, Sparkles, Compass, AlertCircle, Plus, Eye, X } from 'lucide-vue-next'; // added X
 import NicknameRenderer from '@/components/common/NicknameRenderer.vue';
 import { studyApi } from '@/api/study';
 
@@ -506,28 +535,15 @@ const pendingApp = ref(null);
 
 // Member popup state
 const openMemberPopup = ref(null);
-const popupPosition = ref({ top: 0, left: 0 });
 const closeMemberPopup = () => { openMemberPopup.value = null; };
 const toggleMemberPopup = (studyId, event) => {
     event.stopPropagation();
     if (openMemberPopup.value === studyId) {
         openMemberPopup.value = null;
     } else {
-        // 클릭 위치 기반으로 팝업 위치 계산
-        const rect = event.currentTarget.getBoundingClientRect();
-        popupPosition.value = {
-            top: rect.top + window.scrollY,
-            left: rect.left + rect.width / 2
-        };
         openMemberPopup.value = studyId;
     }
 };
-
-const currentStudy = computed(() => {
-    if (!openMemberPopup.value) return null;
-    const allStudies = [...(recommendedStudies.value || []), ...(studies.value || [])];
-    return allStudies.find(s => s.id === openMemberPopup.value);
-});
 
 const isAdmin = computed(() => {
     return user.value?.role === 'ROLE_ADMIN' || user.value?.role === 'ADMIN'; 
