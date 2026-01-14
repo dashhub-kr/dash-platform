@@ -6,11 +6,13 @@ package com.ssafy.dash.study.presentation.dto.response;
 public record MemberPreview(
         Long userId,
         String username,
-        String avatarUrl) {
+        String avatarUrl,
+        String decorationClass) {
     public static MemberPreview from(com.ssafy.dash.user.domain.User user) {
         return new MemberPreview(
                 user.getId(),
                 user.getUsername(),
-                user.getAvatarUrl());
+                user.getAvatarUrl(),
+                user.getEquippedDecorationClass());
     }
 }

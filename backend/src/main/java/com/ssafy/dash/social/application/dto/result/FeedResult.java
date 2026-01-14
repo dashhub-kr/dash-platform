@@ -13,6 +13,7 @@ public record FeedResult(
                 Long userId,
                 String userName,
                 String userAvatar,
+                String userDecorationClass,
                 Integer userTier,
 
                 // SOLVED 타입
@@ -31,32 +32,37 @@ public record FeedResult(
                 Integer problemCount,
 
                 LocalDateTime createdAt) {
+
         // SOLVED 피드 생성
-        public static FeedResult solved(Long id, Long userId, String userName, String userAvatar, Integer userTier,
+        public static FeedResult solved(Long id, Long userId, String userName, String userAvatar,
+                        String userDecorationClass, Integer userTier,
                         Long problemId, String problemTitle, String platform, LocalDateTime createdAt) {
-                return new FeedResult(id, "SOLVED", userId, userName, userAvatar, userTier,
+                return new FeedResult(id, "SOLVED", userId, userName, userAvatar, userDecorationClass, userTier,
                                 problemId, problemTitle, platform, null, null, null, null, null, null, createdAt);
         }
 
         // STREAK 피드 생성
-        public static FeedResult streak(Long id, Long userId, String userName, String userAvatar, Integer userTier,
+        public static FeedResult streak(Long id, Long userId, String userName, String userAvatar,
+                        String userDecorationClass, Integer userTier,
                         Integer streakDays, LocalDateTime createdAt) {
-                return new FeedResult(id, "STREAK", userId, userName, userAvatar, userTier,
+                return new FeedResult(id, "STREAK", userId, userName, userAvatar, userDecorationClass, userTier,
                                 null, null, null, streakDays, null, null, null, null, null, createdAt);
         }
 
         // BATTLE 피드 생성
-        public static FeedResult battle(Long id, Long userId, String userName, String userAvatar, Integer userTier,
+        public static FeedResult battle(Long id, Long userId, String userName, String userAvatar,
+                        String userDecorationClass, Integer userTier,
                         Long battleId, String battleType, Boolean isWinner, Boolean isDraw, LocalDateTime createdAt) {
-                return new FeedResult(id, "BATTLE", userId, userName, userAvatar, userTier,
+                return new FeedResult(id, "BATTLE", userId, userName, userAvatar, userDecorationClass, userTier,
                                 null, null, null, null, battleId, battleType, isWinner, isDraw, null, createdAt);
         }
 
         // CHALLENGE_RECEIVED 피드 생성
         public static FeedResult challengeReceived(Long id, Long userId, String userName, String userAvatar,
-                        Integer userTier,
+                        String userDecorationClass, Integer userTier,
                         Long battleId, String battleType, Integer problemCount, LocalDateTime createdAt) {
-                return new FeedResult(id, "CHALLENGE_RECEIVED", userId, userName, userAvatar, userTier,
+                return new FeedResult(id, "CHALLENGE_RECEIVED", userId, userName, userAvatar, userDecorationClass,
+                                userTier,
                                 null, null, null, null, battleId, battleType, null, null, problemCount, createdAt);
         }
 }

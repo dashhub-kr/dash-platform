@@ -15,9 +15,27 @@
       <article v-if="post" class="bg-white/80 border border-white/60 shadow-xl shadow-brand-500/5 backdrop-blur-md rounded-3xl p-8 mb-6 animate-fade-in-up delay-100">
         <!-- 헤더 -->
         <div class="border-b border-slate-100 pb-6 mb-6">
-          <div class="flex items-center gap-3 mb-4">
-            <span v-if="post.boardType === 'CODE_REVIEW'" class="px-3 py-1 text-xs font-bold rounded-full bg-emerald-100 text-emerald-700">코드리뷰</span>
-            <span v-else class="px-3 py-1 text-xs font-bold rounded-full bg-slate-100 text-slate-600">일반</span>
+          <div class="flex items-center justify-between mb-4">
+            <div class="flex items-center gap-3">
+                <span v-if="post.boardType === 'CODE_REVIEW'" class="px-3 py-1 text-xs font-bold rounded-full bg-emerald-100 text-emerald-700">코드리뷰</span>
+                <span v-else class="px-3 py-1 text-xs font-bold rounded-full bg-slate-100 text-slate-600">일반</span>
+            </div>
+            
+            <!-- 수정/삭제 버튼 (상단 이동) -->
+            <div v-if="post && isAuthor" class="flex gap-2">
+                <button 
+                  @click="$router.push(`/boards/edit/${post.id}`)"
+                  class="px-3 py-1.5 rounded-lg text-slate-500 hover:bg-slate-100 hover:text-brand-600 transition-all text-xs font-bold flex items-center gap-1"
+                >
+                  <Pencil :size="14" /> 수정
+                </button>
+                <button 
+                  @click="deletePost"
+                  class="px-3 py-1.5 rounded-lg text-slate-400 hover:bg-rose-50 hover:text-rose-500 transition-colors text-xs font-bold flex items-center gap-1"
+                >
+                  <Trash2 :size="14" /> 삭제
+                </button>
+            </div>
           </div>
           <h1 class="text-3xl font-extrabold text-slate-900 mb-4 leading-tight">{{ post.title }}</h1>
           <div class="flex flex-wrap items-center gap-4 text-sm text-slate-500">
@@ -265,22 +283,6 @@
           </div>
         </div>
       </section>
-
-      <!-- 작업 -->
-      <div v-if="post && isAuthor" class="flex justify-end gap-3 mt-6 animate-fade-in-up delay-300">
-        <button 
-          @click="deletePost"
-          class="px-4 py-2 rounded-xl text-rose-500 hover:bg-rose-50 transition-colors text-sm font-bold"
-        >
-          삭제
-        </button>
-        <button 
-          @click="$router.push(`/boards/edit/${post.id}`)"
-          class="px-5 py-2 rounded-xl bg-white text-slate-600 border border-slate-200 hover:border-brand-500 hover:text-brand-600 transition-all text-sm font-bold shadow-sm"
-        >
-          수정
-        </button>
-      </div>
     </main>
   </div>
 </template>
