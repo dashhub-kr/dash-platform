@@ -816,10 +816,15 @@ const formatSelectedDate = computed(() => {
 const filteredRecords = computed(() => {
     let result = records.value;
     
-    // 1. 날짜 필터링
-    const selectedDateStr = selectedDate.value.toISOString().split('T')[0];
+    // 로컬 타임존 기준 날짜 추출 헬퍼
+    const toLocalDateStr = (d) => {
+        return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+    };
+    
+    // 1. 날짜 필터링 (로컬 타임존 기준)
+    const selectedDateStr = toLocalDateStr(selectedDate.value);
     result = result.filter(r => {
-        const recordDate = new Date(r.committedAt || r.createdAt).toISOString().split('T')[0];
+        const recordDate = toLocalDateStr(new Date(r.committedAt || r.createdAt));
         return recordDate === selectedDateStr;
     });
     
@@ -1009,7 +1014,8 @@ const processHeatmap = (data) => {
         let currentWeek = [];
 
         for (let i = 0; i < 52 * 7; i++) {
-             const dateStr = current.toISOString().split('T')[0];
+             // 로컬 타임존 기준 날짜 문자열 생성
+             const dateStr = `${current.getFullYear()}-${String(current.getMonth()+1).padStart(2,'0')}-${String(current.getDate()).padStart(2,'0')}`;
              const activity = activityMap.get(dateStr);
              
              // --- 참여 로직 시작 ---

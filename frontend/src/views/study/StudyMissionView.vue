@@ -414,7 +414,8 @@ const processHeatmap = (data) => {
         let currentWeek = [];
 
         for (let i = 0; i < 52 * 7; i++) {
-             const dateStr = current.toISOString().split('T')[0];
+             // 로컬 타임존 기준 날짜 문자열 생성
+             const dateStr = `${current.getFullYear()}-${String(current.getMonth()+1).padStart(2,'0')}-${String(current.getDate()).padStart(2,'0')}`;
              const activity = activityMap.get(dateStr);
              
              // --- 참여 로직 시작 ---
@@ -463,7 +464,9 @@ const currentStreak = computed(() => {
     const allDays = heatmapWeeks.value.flat().reverse();
     
     let streak = 0;
-    const today = new Date().toISOString().split('T')[0];
+    // 로컬 타임존 기준 오늘 날짜
+    const now = new Date();
+    const today = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')}`;
     
     for (const day of allDays) {
         // 미래 날짜 건너뛰기
