@@ -36,10 +36,10 @@ public class StreakInitializer {
         int initialized = 0;
 
         for (Study study : studies) {
-            // 이미 초기화된 스터디는 스킵
-            if (study.getStreakUpdatedAt() != null) {
-                continue;
-            }
+            // 데이터 불일치 복구를 위해 모든 스터디에 대해 강제 재계산 수행
+            // if (study.getStreakUpdatedAt() != null) {
+            // continue;
+            // }
 
             // 활동 날짜 조회 및 streak 계산
             int streak = calculateStreakFromHistory(study.getId());
