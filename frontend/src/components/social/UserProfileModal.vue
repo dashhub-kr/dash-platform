@@ -23,15 +23,15 @@
                     </div>
                 </div>
                 
-                <h2 class="text-xl font-black mb-1 flex items-center gap-2 justify-center" :class="targetUserInfo.isDeleted ? 'text-slate-400' : 'text-slate-800'">
+                <h2 class="text-xl font-black mb-1 flex items-center gap-2 justify-center" 
+                    :class="[
+                        targetUserInfo.isDeleted ? 'text-slate-400' : 'text-slate-800',
+                        !targetUserInfo.isDeleted && targetUserInfo.decorationClass ? targetUserInfo.decorationClass : ''
+                    ]">
                     {{ targetUserInfo.isDeleted ? '탈퇴한 회원' : (targetUserInfo.nickname || targetUserInfo.username) }}
                 </h2>
                 
-                <div v-if="targetUserInfo.decorationClass && !targetUserInfo.isDeleted" class="mb-2">
-                    <span class="px-3 py-1 bg-gradient-to-r from-brand-50 to-indigo-50 text-brand-600 text-xs font-bold rounded-full border border-brand-100 shadow-sm">
-                        {{ getDecorationName(targetUserInfo.decorationClass) }}
-                    </span>
-                </div>
+
                 
                 <p v-if="!targetUserInfo.isDeleted && targetUserInfo.email" class="text-xs text-slate-400 font-medium">{{ targetUserInfo.email }}</p>
             </div>
