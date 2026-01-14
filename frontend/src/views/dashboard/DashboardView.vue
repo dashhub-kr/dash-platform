@@ -825,7 +825,8 @@ const filteredRecords = computed(() => {
     // 1. 날짜 필터링 (로컬 타임존 기준)
     const selectedDateStr = toLocalDateStr(selectedDate.value);
     result = result.filter(r => {
-        const recordDate = toLocalDateStr(new Date(r.committedAt || r.createdAt));
+        if (!r.createdAt) return false;
+        const recordDate = toLocalDateStr(new Date(r.createdAt));
         return recordDate === selectedDateStr;
     });
     
@@ -874,7 +875,7 @@ const groupedRecords = computed(() => {
     // 시간순 정렬 (최신순)
     return Array.from(groups.values()).map(g => ({
         ...g,
-        records: g.records.sort((a, b) => new Date(b.committedAt || b.createdAt) - new Date(a.committedAt || a.createdAt))
+        records: g.records.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
     }));
 });
 

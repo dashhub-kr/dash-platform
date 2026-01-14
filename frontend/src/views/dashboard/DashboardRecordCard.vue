@@ -48,7 +48,7 @@
           </div>
 
           <div class="flex items-center gap-2 text-xs opacity-60 font-medium">
-              <span>{{ formatDate(record.committedAt) }}</span>
+              <span>{{ formatDate(record.createdAt) }}</span>
           </div>
       </div>
     </div>
