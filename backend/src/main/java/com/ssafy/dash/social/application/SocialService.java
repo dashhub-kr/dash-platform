@@ -294,6 +294,7 @@ public class SocialService {
                             user.getSolvedacTier(),
                             Long.parseLong(record.getProblemNumber()),
                             record.getTitle(),
+                            record.getPlatform(),
                             record.getCreatedAt());
                 })
                 .collect(Collectors.toList());

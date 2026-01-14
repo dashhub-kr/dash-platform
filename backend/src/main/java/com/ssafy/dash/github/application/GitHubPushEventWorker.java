@@ -21,6 +21,10 @@ import com.ssafy.dash.user.domain.UserRepository;
 import com.ssafy.dash.mockexam.application.MockExamService;
 import com.ssafy.dash.defense.application.DefenseService;
 import com.ssafy.dash.battle.application.BattleService;
+import com.ssafy.dash.acorn.application.AcornService;
+import com.ssafy.dash.ai.application.CodeReviewService;
+import com.ssafy.dash.study.application.StudyMissionService;
+import com.ssafy.dash.study.application.StudyService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -54,12 +58,13 @@ public class GitHubPushEventWorker {
     private final int maxBatchSize;
     private final TransactionTemplate transactionTemplate;
     private final UserRepository userRepository;
-    private final com.ssafy.dash.acorn.application.AcornService acornService;
-    private final com.ssafy.dash.ai.application.CodeReviewService codeReviewService;
-    private final com.ssafy.dash.study.application.StudyMissionService studyMissionService;
+    private final AcornService acornService;
+    private final CodeReviewService codeReviewService;
+    private final StudyMissionService studyMissionService;
     private final MockExamService mockExamService;
     private final DefenseService defenseService;
     private final BattleService battleService;
+    private final StudyService studyService;
 
     public GitHubPushEventWorker(GitHubPushEventRepository pushEventRepository,
             OnboardingRepository onboardingRepository,
@@ -70,12 +75,13 @@ public class GitHubPushEventWorker {
             GitHubSubmissionMetadataExtractor metadataExtractor,
             PlatformTransactionManager transactionManager,
             UserRepository userRepository,
-            com.ssafy.dash.acorn.application.AcornService acornService,
-            com.ssafy.dash.ai.application.CodeReviewService codeReviewService,
-            com.ssafy.dash.study.application.StudyMissionService studyMissionService,
+            AcornService acornService,
+            CodeReviewService codeReviewService,
+            StudyMissionService studyMissionService,
             MockExamService mockExamService,
             DefenseService defenseService,
             BattleService battleService,
+            StudyService studyService,
             @Value("${github.push-worker.max-batch:5}") int maxBatchSize) {
         this.pushEventRepository = pushEventRepository;
         this.onboardingRepository = onboardingRepository;
@@ -93,6 +99,7 @@ public class GitHubPushEventWorker {
         this.mockExamService = mockExamService;
         this.defenseService = defenseService;
         this.battleService = battleService;
+        this.studyService = studyService;
     }
 
     @Scheduled(fixedDelayString = "${github.push-worker.fixed-delay:10000}")
@@ -212,10 +219,9 @@ public class GitHubPushEventWorker {
                 now);
 
         LocalDateTime committedAt = metadataExtractor.parseCommittedAt(file.committedAt());
-        // GitHub timestamp는 UTC로 오므로 KST로 변환 (9시간 추가)
-        if (committedAt != null) {
-            committedAt = committedAt.plusHours(9);
-        }
+        // GitHub timestamp는 UTC로 오지만, 프론트엔드에서 로컬 타임존 기준으로 날짜를 처리하므로
+        // 서버에서는 별도의 변환 없이 UTC 그대로 저장하거나 필요한 경우에만 변환합니다.
+        // 기존의 plusHours(9)는 삭제하여 이중 변환 문제를 방지합니다.
 
         record.enrichMetadata(
                 metadata.platform(),
@@ -277,6 +283,15 @@ public class GitHubPushEventWorker {
             }
             mockExamService.verifyExam(userId, problemId);
             battleService.verifyBattleProblem(userId, problemId);
+        }
+
+        // 스터디 스트릭 갱신
+        if (record.getStudyId() != null) {
+            try {
+                studyService.updateStreakOnSolve(record.getStudyId());
+            } catch (Exception e) {
+                log.error("Failed to update study streak for studyId: {}", record.getStudyId(), e);
+            }
         }
 
         // 도토리 적립 로직
