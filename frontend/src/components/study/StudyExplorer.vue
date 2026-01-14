@@ -105,9 +105,9 @@
                 </div>
     
                 <!-- 통계 정보 -->
-                <div class="flex items-center py-3 mb-6 relative z-10">
+                <div class="flex flex-wrap items-center py-3 mb-6 relative z-10 gap-2">
                    <!-- Tier -->
-                   <div class="flex-1 flex items-center justify-center gap-2 px-4 py-2 -my-2 rounded-xl cursor-default relative group/tier hover:bg-slate-50 transition-colors">
+                   <div class="flex-1 min-w-[80px] flex items-center justify-center gap-2 px-3 py-2 rounded-xl cursor-default relative group/tier hover:bg-slate-50 transition-colors">
                       <img :src="`https://static.solved.ac/tier_small/${Math.floor(study.averageTier || 0)}.svg`" class="w-6 h-6 object-contain" alt="Tier" />
                       <span class="text-lg font-black text-slate-800 whitespace-nowrap">{{ study.tierBadge || 'Unranked' }}</span>
                       <!-- Tooltip -->
@@ -118,7 +118,7 @@
                       </div>
                    </div>
                    <!-- Streak -->
-                   <div class="flex-1 flex items-center justify-center gap-2 px-4 py-2 -my-2 rounded-xl cursor-default relative group/streak hover:bg-slate-50 transition-colors">
+                   <div class="flex-1 min-w-[80px] flex items-center justify-center gap-2 px-3 py-2 rounded-xl cursor-default relative group/streak hover:bg-slate-50 transition-colors">
                       <Flame class="w-6 h-6 text-orange-500 fill-orange-500" stroke-width="2" />
                       <span class="text-lg font-black text-slate-800 whitespace-nowrap">{{ study.streak || 0 }}</span>
                       <!-- Tooltip -->
@@ -129,7 +129,7 @@
                       </div>
                    </div>
                    <!-- Activity -->
-                   <div class="flex-1 flex items-center justify-center gap-2 px-4 py-2 -my-2 rounded-xl cursor-default relative group/activity hover:bg-slate-50 transition-colors">
+                   <div class="flex-1 min-w-[80px] flex items-center justify-center gap-2 px-3 py-2 rounded-xl cursor-default relative group/activity hover:bg-slate-50 transition-colors">
                       <Send class="w-5 h-5 text-sky-500 fill-sky-500" stroke-width="2" />
                       <span class="text-lg font-black text-slate-800 whitespace-nowrap">{{ (study.averageSubmissionRate || 0).toFixed(0) }}</span>
                       <!-- Tooltip -->
@@ -248,10 +248,10 @@
             <!-- 통계 정보 (Rounded Square Solid BG + White Line Icons) -->
             <!-- 통계 정보 (Solid Filled Icons) -->
             <!-- 통계 정보 with Hover Tooltips -->
-            <div class="flex items-center py-3 mb-6 relative z-10">
+            <div class="flex flex-wrap items-center py-3 mb-6 relative z-10 gap-2">
                
                <!-- Tier (Solved.ac Icon) -->
-               <div class="flex-1 flex items-center justify-center gap-2 px-4 py-2 -my-2 rounded-xl cursor-default relative group/tier hover:bg-slate-50 transition-colors">
+               <div class="flex-1 min-w-[80px] flex items-center justify-center gap-2 px-3 py-2 rounded-xl cursor-default relative group/tier hover:bg-slate-50 transition-colors">
                   <img :src="`https://static.solved.ac/tier_small/${Math.floor(study.averageTier || 0)}.svg`" class="w-6 h-6 object-contain" alt="Tier" />
                   <span class="text-lg font-black text-slate-800 whitespace-nowrap">{{ study.tierBadge || 'Unranked' }}</span>
                   <!-- Tooltip -->
@@ -263,7 +263,7 @@
                </div>
 
                <!-- Streak -->
-               <div class="flex-1 flex items-center justify-center gap-2 px-4 py-2 -my-2 rounded-xl cursor-default relative group/streak hover:bg-slate-50 transition-colors">
+               <div class="flex-1 min-w-[80px] flex items-center justify-center gap-2 px-3 py-2 rounded-xl cursor-default relative group/streak hover:bg-slate-50 transition-colors">
                   <Flame class="w-6 h-6 text-orange-500 fill-orange-500" stroke-width="2" />
                   <span class="text-lg font-black text-slate-800 whitespace-nowrap">{{ study.streak || 0 }}</span>
                   <!-- Tooltip -->
@@ -275,7 +275,7 @@
                </div>
 
                <!-- Activity -->
-               <div class="flex-1 flex items-center justify-center gap-2 px-4 py-2 -my-2 rounded-xl cursor-default relative group/activity hover:bg-slate-50 transition-colors">
+               <div class="flex-1 min-w-[80px] flex items-center justify-center gap-2 px-3 py-2 rounded-xl cursor-default relative group/activity hover:bg-slate-50 transition-colors">
                   <Send class="w-5 h-5 text-sky-500 fill-sky-500" stroke-width="2" />
                   <span class="text-lg font-black text-slate-800 whitespace-nowrap">{{ (study.averageSubmissionRate || 0).toFixed(0) }}</span>
                   <!-- Tooltip -->
