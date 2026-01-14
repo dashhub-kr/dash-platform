@@ -118,46 +118,62 @@
 
         <!-- 오른쪽 컬럼: 사이드바 (인기글 + 검색) -->
         <aside class="hidden lg:flex w-[380px] shrink-0 flex-col gap-6 sticky top-8 h-fit">
-          <!-- 인기글 섹션 -->
+          <!-- 인기글 섹션 (간소화된 스타일) -->
           <div v-if="popularPosts.length > 0 && !searchProblemNumber" class="bg-white rounded-3xl p-6 shadow-sm border border-slate-200 animate-fade-in-up">
-            <h2 class="text-lg font-bold text-slate-800 mb-6 flex items-center gap-2">
-              <div class="w-8 h-8 bg-orange-500 rounded-lg flex items-center justify-center text-white shadow-sm shadow-orange-200">
-                <Flame :size="18" fill="currentColor" class="text-white" />
-              </div>
-              인기글
-            </h2>
-            <div class="flex flex-col gap-4">
+            <div class="flex items-center justify-between mb-4">
+              <h2 class="text-lg font-bold text-slate-800 flex items-center gap-2">
+                <Flame class="w-5 h-5 text-orange-500" fill="currentColor" />
+                인기글
+              </h2>
+              <span class="text-xs font-medium text-slate-400">Top 3</span>
+            </div>
+            <div class="flex flex-col gap-2">
               <div 
-                v-for="post in popularPosts.slice(0, 3)" 
+                v-for="(post, idx) in popularPosts.slice(0, 3)" 
                 :key="'popular-' + post.id"
                 @click="$router.push(`/boards/${post.id}`)"
-                class="bg-gradient-to-br from-orange-50 to-amber-50 border border-orange-200 rounded-2xl p-5 cursor-pointer hover:shadow-lg hover:-translate-y-1 transition-all"
+                class="group relative bg-white border border-slate-100 rounded-xl p-3 transition-all hover:border-orange-200 hover:shadow-md cursor-pointer"
+                :class="{
+                  'bg-gradient-to-br from-orange-50/50 to-white border-orange-200/60': idx === 0,
+                  'bg-gradient-to-br from-slate-50/50 to-white': idx === 1,
+                  'bg-gradient-to-br from-amber-50/50 to-white border-amber-200/60': idx === 2
+                }"
               >
-                <div class="flex items-center gap-2 mb-2">
-                  <span v-if="post.problemNumber" class="px-2.5 py-1 bg-white/80 backdrop-blur-sm border border-orange-200 text-orange-700 text-xs font-bold rounded-lg shadow-sm">P{{ post.problemNumber }}</span>
-                  <span v-else class="px-2.5 py-1 bg-white/80 backdrop-blur-sm border border-slate-200 text-slate-500 text-xs font-bold rounded-lg shadow-sm">자유</span>
-                  <div class="flex items-center gap-1.5 ml-auto">
-                    <div class="w-6 h-6 bg-rose-500 rounded-full flex items-center justify-center text-white shadow-sm shadow-rose-200">
-                       <ThumbsUp :size="12" stroke-width="3" />
+                <div class="flex items-center gap-3">
+                  <!-- 순위 뱃지 -->
+                  <div class="flex-shrink-0 w-7 h-7 flex items-center justify-center rounded-lg font-black text-xs shadow-sm"
+                       :class="{
+                         'bg-orange-100 text-orange-600': idx === 0,
+                         'bg-slate-100 text-slate-500': idx === 1,
+                         'bg-amber-100 text-amber-600': idx === 2
+                       }">
+                    {{ idx + 1 }}
+                  </div>
+                  
+                  <!-- 콘텐츠 -->
+                  <div class="flex-1 min-w-0">
+                    <h3 class="font-bold text-slate-800 text-sm truncate group-hover:text-orange-600 transition-colors">
+                      {{ post.title }}
+                    </h3>
+                    <div class="flex items-center gap-2 text-xs text-slate-500 mt-0.5">
+                      <span v-if="post.problemNumber" class="text-blue-600 font-bold">P{{ post.problemNumber }}</span>
+                      <span class="truncate">{{ post.authorName }}</span>
                     </div>
-                    <span class="text-rose-600 text-sm font-bold">{{ post.likeCount }}</span>
+                  </div>
+                  
+                  <!-- 추천수 -->
+                  <div class="flex items-center gap-1 text-xs">
+                    <ThumbsUp :size="12" class="text-rose-500" />
+                    <span class="font-bold text-rose-500">{{ post.likeCount || 0 }}</span>
                   </div>
                 </div>
-                <h3 class="font-bold text-slate-800 truncate mb-1">{{ post.title }}</h3>
-                  <div class="flex items-center gap-2 text-xs text-slate-500">
-                    <NicknameRenderer 
-                        :username="post.authorName"
-                        :role="post.authorRole"
-                        :enable-decoration="true"
-                        :decoration-class="post.authorDecorationClass"
-                        :show-avatar="false"
-                        text-class="truncate max-w-[100px]"
-                    >
-                    </NicknameRenderer>
-                  </div>
+                
+                <!-- 1위 왕관 -->
+                <Flame v-if="idx === 0" class="w-4 h-4 text-orange-400 absolute top-0 right-2 -translate-y-1/2 drop-shadow-sm" fill="currentColor" />
               </div>
             </div>
           </div>
+
 
           <!-- 검색 UI -->
           <div class="bg-slate-50/90 backdrop-blur-md p-6 rounded-3xl border border-slate-100 shadow-sm">

@@ -543,7 +543,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted, computed, watch, nextTick } from 'vue';
+import { ref, onMounted, onUnmounted, computed, watch, nextTick } from 'vue';
 import { useRouter } from 'vue-router';
 import { dashboardApi } from '@/api/dashboard';
 import { studyApi } from '@/api/study';
@@ -1222,6 +1222,18 @@ onMounted(async () => {
   } finally {
       loading.value = false;
   }
+});
+
+// 페이지 포커스 시 스터디 데이터 새로고침 (스트릭 위젯 갱신)
+const handleVisibilityChange = () => {
+    if (document.visibilityState === 'visible' && currentStudyId.value) {
+        fetchStudyData();
+    }
+};
+document.addEventListener('visibilitychange', handleVisibilityChange);
+
+onUnmounted(() => {
+    document.removeEventListener('visibilitychange', handleVisibilityChange);
 });
 
 const getProblemLink = (problemId) => `https://www.acmicpc.net/problem/${problemId}`;

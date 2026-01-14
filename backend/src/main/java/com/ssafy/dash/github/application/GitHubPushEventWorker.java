@@ -60,6 +60,7 @@ public class GitHubPushEventWorker {
     private final MockExamService mockExamService;
     private final DefenseService defenseService;
     private final BattleService battleService;
+    private final com.ssafy.dash.study.application.StudyService studyService;
 
     public GitHubPushEventWorker(GitHubPushEventRepository pushEventRepository,
             OnboardingRepository onboardingRepository,
@@ -76,6 +77,7 @@ public class GitHubPushEventWorker {
             MockExamService mockExamService,
             DefenseService defenseService,
             BattleService battleService,
+            com.ssafy.dash.study.application.StudyService studyService,
             @Value("${github.push-worker.max-batch:5}") int maxBatchSize) {
         this.pushEventRepository = pushEventRepository;
         this.onboardingRepository = onboardingRepository;
@@ -93,6 +95,7 @@ public class GitHubPushEventWorker {
         this.mockExamService = mockExamService;
         this.defenseService = defenseService;
         this.battleService = battleService;
+        this.studyService = studyService;
     }
 
     @Scheduled(fixedDelayString = "${github.push-worker.fixed-delay:10000}")
@@ -212,10 +215,9 @@ public class GitHubPushEventWorker {
                 now);
 
         LocalDateTime committedAt = metadataExtractor.parseCommittedAt(file.committedAt());
-        // GitHub timestamp는 UTC로 오므로 KST로 변환 (9시간 추가)
-        if (committedAt != null) {
-            committedAt = committedAt.plusHours(9);
-        }
+        // GitHub timestamp는 UTC로 오지만, 프론트엔드에서 로컬 타임존 기준으로 날짜를 처리하므로
+        // 서버에서는 별도의 변환 없이 UTC 그대로 저장하거나 필요한 경우에만 변환합니다.
+        // 기존의 plusHours(9)는 삭제하여 이중 변환 문제를 방지합니다.
 
         record.enrichMetadata(
                 metadata.platform(),
@@ -277,6 +279,15 @@ public class GitHubPushEventWorker {
             }
             mockExamService.verifyExam(userId, problemId);
             battleService.verifyBattleProblem(userId, problemId);
+        }
+
+        // 스터디 스트릭 갱신
+        if (record.getStudyId() != null) {
+            try {
+                studyService.updateStreakOnSolve(record.getStudyId());
+            } catch (Exception e) {
+                log.error("Failed to update study streak for studyId: {}", record.getStudyId(), e);
+            }
         }
 
         // 도토리 적립 로직
