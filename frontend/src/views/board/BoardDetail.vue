@@ -66,9 +66,16 @@
 
         <!-- 코드 뷰어 (코드 리뷰 게시글용) -->
         <div v-if="post.boardType === 'CODE_REVIEW' && algorithmRecord" class="mb-6">
-          <h3 class="text-lg font-bold text-slate-800 mb-4 flex items-center gap-2">
+          <h3 class="text-lg font-bold text-slate-800 mb-4 flex items-center gap-2 flex-wrap">
             <Code2 :size="20" class="text-emerald-500" />
             코드
+            <a v-if="algorithmRecord" 
+               :href="getProblemLink(algorithmRecord.problemNumber, algorithmRecord.platform)" 
+               target="_blank"
+               class="text-sm font-medium text-brand-600 hover:text-brand-700 hover:underline transition-colors"
+            >
+              [{{ getPlatformLabel(algorithmRecord.platform) }}] {{ algorithmRecord.problemNumber }}-{{ algorithmRecord.title }}
+            </a>
           </h3>
           <!-- CodeViewer는 보통 어둡게 유지됨. 기본 컴포넌트가 잘 작동한다고 가정. -->
           <CodeViewer
@@ -334,6 +341,21 @@ const getExtension = (lang) => {
         'c': 'c'
     };
     return map[lang?.toLowerCase()] || 'txt';
+};
+
+const getProblemLink = (problemNumber, platform) => {
+    const p = platform?.toLowerCase();
+    if (p === 'swea') {
+        return `https://swexpertacademy.com/main/searchAll/searchMore.do?category=CODE&pageIndex=1&keyword=${problemNumber}`;
+    }
+    // 기본: 백준
+    return `https://www.acmicpc.net/problem/${problemNumber}`;
+};
+
+const getPlatformLabel = (platform) => {
+    const p = platform?.toLowerCase();
+    if (p === 'swea') return 'SWEA';
+    return '백준';
 };
 
 onMounted(async () => {
