@@ -133,7 +133,7 @@
                 <div class="flex flex-wrap items-center py-3 mb-6 relative z-10 gap-2">
                    <!-- Tier -->
                    <div class="flex-1 min-w-[80px] flex items-center justify-center gap-2 px-3 py-2 rounded-xl cursor-default relative group/tier hover:bg-slate-50 transition-colors">
-                      <img :src="`https://static.solved.ac/tier_small/${Math.floor(study.averageTier || 0)}.svg`" class="w-6 h-6 object-contain" alt="Tier" />
+                      <img :src="`https://static.solved.ac/tier_small/${Math.round(study.averageTier || 0)}.svg`" class="w-6 h-6 object-contain" alt="Tier" />
                       <span class="text-lg font-black text-slate-800 whitespace-nowrap">{{ study.tierBadge || 'Unranked' }}</span>
                       <!-- Tooltip -->
                       <div class="absolute left-1/2 -translate-x-1/2 bottom-full mb-2 bg-slate-800 text-white text-xs font-medium px-4 py-3 rounded-2xl opacity-0 group-hover/tier:opacity-100 transition-all pointer-events-none z-[9999] shadow-xl min-w-[160px]">
@@ -297,7 +297,7 @@
                
                <!-- Tier (Solved.ac Icon) -->
                <div class="flex-1 min-w-[80px] flex items-center justify-center gap-2 px-3 py-2 rounded-xl cursor-default relative group/tier hover:bg-slate-50 transition-colors">
-                  <img :src="`https://static.solved.ac/tier_small/${Math.floor(study.averageTier || 0)}.svg`" class="w-6 h-6 object-contain" alt="Tier" />
+                  <img :src="`https://static.solved.ac/tier_small/${Math.round(study.averageTier || 0)}.svg`" class="w-6 h-6 object-contain" alt="Tier" />
                   <span class="text-lg font-black text-slate-800 whitespace-nowrap">{{ study.tierBadge || 'Unranked' }}</span>
                   <!-- Tooltip -->
                   <div class="absolute left-1/2 -translate-x-1/2 bottom-full mb-2 bg-slate-800 text-white text-xs font-medium px-4 py-3 rounded-2xl opacity-0 group-hover/tier:opacity-100 transition-all pointer-events-none z-50 shadow-xl min-w-[160px]">
