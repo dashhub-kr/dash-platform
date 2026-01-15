@@ -825,6 +825,7 @@ const filteredRecords = computed(() => {
     // 1. 날짜 필터링 (로컬 타임존 기준)
     const selectedDateStr = toLocalDateStr(selectedDate.value);
     result = result.filter(r => {
+        if (!r.createdAt) return false;
         const recordDate = toLocalDateStr(new Date(r.createdAt));
         return recordDate === selectedDateStr;
     });

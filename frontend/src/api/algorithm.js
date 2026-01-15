@@ -2,11 +2,11 @@ import http from './http';
 
 export const algorithmApi = {
     // Create a new algorithm record
-    // POST /api/algorithm-records
+    // POST /api/algorithm
     create(data) {
         // data should be FormData if it involves file uploads, or JSON otherwise.
         // Controller consumes Multipart/form-data.
-        return http.post('/algorithm-records', data, {
+        return http.post('/algorithm', data, {
             headers: {
                 'Content-Type': 'multipart/form-data',
             },
@@ -14,22 +14,22 @@ export const algorithmApi = {
     },
 
     // Get all algorithm records
-    // GET /api/algorithm-records
+    // GET /api/algorithm
     findAll() {
-        return http.get('/algorithm-records');
+        return http.get('/algorithm');
     },
 
     // Get a specific algorithm record by ID
-    // GET /api/algorithm-records/{id}
+    // GET /api/algorithm/{id}
     findById(id) {
-        return http.get(`/algorithm-records/${id}`);
+        return http.get(`/algorithm/${id}`);
     },
 
     // Update an algorithm record
-    // PUT /api/algorithm-records/{id}
+    // PUT /api/algorithm/{id}
     update(id, data) {
         // Controller consumes Multipart/form-data.
-        return http.put(`/algorithm-records/${id}`, data, {
+        return http.put(`/algorithm/${id}`, data, {
             headers: {
                 'Content-Type': 'multipart/form-data',
             },
@@ -37,20 +37,20 @@ export const algorithmApi = {
     },
 
     // Delete an algorithm record
-    // DELETE /api/algorithm-records/{id}
+    // DELETE /api/algorithm/{id}
     delete(id) {
-        return http.delete(`/algorithm-records/${id}`);
+        return http.delete(`/algorithm/${id}`);
     },
 
     // Get algorithm records by study ID
-    // GET /api/algorithm-records/study/{studyId}
+    // GET /api/algorithm/study/{studyId}
     findByStudyId(studyId) {
-        return http.get(`/algorithm-records/study/${studyId}`);
+        return http.get(`/algorithm/study/${studyId}`);
     },
 
     // Get algorithm records by user ID
-    // GET /api/algorithm-records/user/{userId}
+    // GET /api/algorithm/user/{userId}
     findByUserId(userId) {
-        return http.get(`/algorithm-records/user/${userId}`);
+        return http.get(`/algorithm/user/${userId}`);
     },
 };

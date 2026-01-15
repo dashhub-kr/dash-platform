@@ -40,6 +40,7 @@
                   :language="selectedRecord.language || 'java'"
                   :filename="`${selectedRecord.title}.${getExtension(selectedRecord.language)}`"
                   :comments="draftComments"
+                  :read-only="true"
                   @submit-comment="submitLineComment"
                   class="bg-[#1e293b]" 
                   style="max-height: 75vh; height: 75vh;" 
@@ -90,23 +91,52 @@
 
                 <div v-else>
                     <div v-if="loadingRecords" class="py-3 text-sm text-slate-500 flex items-center gap-2">
-                    <div class="w-4 h-4 border-2 border-brand-500 border-t-transparent rounded-full animate-spin"></div>
-                    불러오는 중...
+                        <div class="w-4 h-4 border-2 border-brand-500 border-t-transparent rounded-full animate-spin"></div>
+                        불러오는 중...
                     </div>
                     <div v-else-if="studyRecords.length === 0" class="text-sm text-slate-400 py-2">
-                    내가 작성한 풀이가 없습니다.
+                        내가 작성한 풀이가 없습니다.
                     </div>
-                    <select
-                    v-else
-                    v-model="form.algorithmRecordId"
-                    class="w-full bg-white border border-slate-200 rounded-xl px-4 py-3 text-slate-800 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all shadow-sm cursor-pointer hover:bg-slate-50"
-                    :class="{'ring-2 ring-emerald-500 border-transparent': form.algorithmRecordId}"
-                    >
-                    <option :value="null">리뷰할 풀이를 선택하세요</option>
-                    <option v-for="record in studyRecords" :key="record.id" :value="record.id">
-                        [#{{ record.problemNumber }}] {{ record.title }} ({{ record.language }})
-                    </option>
-                    </select>
+                    
+                    <div v-else class="space-y-2">
+                        <!-- 검색 입력 -->
+                        <div class="relative">
+                            <input 
+                                v-model="searchQuery" 
+                                type="text"
+                                placeholder="문제 번호 또는 제목으로 검색..."
+                                class="w-full pl-9 pr-4 py-2 bg-white border border-slate-200 rounded-lg text-sm text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all"
+                            />
+                            <Search :size="16" class="absolute left-3 top-2.5 text-slate-400" />
+                        </div>
+
+                        <!-- 검색 결과 리스트 (최대 높이 제한) -->
+                        <div class="max-h-60 overflow-y-auto border border-slate-200 rounded-xl bg-white shadow-sm custom-scrollbar">
+                           <template v-if="filteredRecords.length > 0">
+                                <div 
+                                    v-for="record in filteredRecords" 
+                                    :key="record.id" 
+                                    @click="selectRecord(record)"
+                                    class="px-4 py-3 flex items-center justify-between cursor-pointer hover:bg-slate-50 transition-colors border-b border-slate-100 last:border-0"
+                                    :class="{'bg-emerald-50 hover:bg-emerald-100': form.algorithmRecordId === record.id}"
+                                >
+                                    <div class="flex items-center gap-3">
+                                        <span class="px-2 py-0.5 bg-slate-100 text-slate-500 text-xs font-bold rounded">#{{ record.problemNumber }}</span>
+                                        <div class="flex flex-col">
+                                            <span class="text-sm font-bold text-slate-700" :class="{'text-emerald-700': form.algorithmRecordId === record.id}">{{ record.title }}</span>
+                                            <span class="text-xs text-slate-400">{{ record.language }} · {{ formatDate(record.createdAt) }}</span>
+                                        </div>
+                                    </div>
+                                    <div v-if="form.algorithmRecordId === record.id" class="text-emerald-600">
+                                        <CheckCircle2 :size="18" class="fill-current" />
+                                    </div>
+                                </div>
+                           </template>
+                           <div v-else class="p-4 text-center text-sm text-slate-400">
+                               검색 결과가 없습니다.
+                           </div>
+                        </div>
+                    </div>
                 </div>
              </div>
           </div>
@@ -163,7 +193,7 @@
 <script setup>
 import { ref, onMounted, computed, watch, nextTick } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
-import { ArrowLeft, Code2 } from 'lucide-vue-next';
+import { ArrowLeft, Code2, Search, CheckCircle2 } from 'lucide-vue-next';
 import { boardApi } from '@/api/board';
 import { algorithmApi } from '@/api/algorithm';
 import { useAuth } from '@/composables/useAuth';
@@ -177,6 +207,7 @@ const isEdit = computed(() => !!route.params.id);
 const submitting = ref(false);
 const loadingRecords = ref(false);
 const studyRecords = ref([]);
+const searchQuery = ref('');
 const codeViewerRef = ref(null);
 const draftComments = ref([]); // { lineNumber, content, authorName, createdAt, id } 저장
 
@@ -200,6 +231,15 @@ const selectedRecord = computed(() => {
     return studyRecords.value.find(r => r.id === form.value.algorithmRecordId) || null;
 });
 
+const filteredRecords = computed(() => {
+    if (!searchQuery.value) return studyRecords.value;
+    const q = searchQuery.value.toLowerCase();
+    return studyRecords.value.filter(r => 
+        (r.problemNumber ?? '').toString().includes(q) || 
+        r.title.toLowerCase().includes(q)
+    );
+});
+
 // 헬퍼
 const getExtension = (lang) => {
     const map = {
@@ -212,9 +252,19 @@ const getExtension = (lang) => {
     return map[lang?.toLowerCase()] || 'txt';
 };
 
+const formatDate = (dateString) => {
+    if (!dateString) return '';
+    return new Date(dateString).toLocaleDateString();
+};
+
+const selectRecord = (record) => {
+    form.value.algorithmRecordId = record.id;
+    searchQuery.value = ''; // 선택 후 검색어를 초기화하여 전체 목록을 다시 보여줌 (의도된 동작)
+};
+
 // 게시판 유형 변경 감지하여 스터디 기록 로드
 watch(() => form.value.boardType, async (newType) => {
-    if (newType === 'CODE_REVIEW' && user.value?.studyId) {
+    if (newType === 'CODE_REVIEW') {
         await loadStudyRecords();
     }
 });
@@ -329,5 +379,16 @@ const handleSubmit = async () => {
 .delay-100 { animation-delay: 0.1s; }
 @keyframes fade-in-up {
   to { opacity: 1; transform: translateY(0); }
+}
+
+.custom-scrollbar::-webkit-scrollbar {
+    width: 6px;
+}
+.custom-scrollbar::-webkit-scrollbar-track {
+    background: #f1f5f9;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb {
+    background-color: #cbd5e1;
+    border-radius: 3px;
 }
 </style>

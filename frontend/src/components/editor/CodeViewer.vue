@@ -46,8 +46,9 @@
               
               <!-- 코드 -->
               <td 
-                class="pl-2 pr-4 py-0.5 font-mono text-sm whitespace-pre text-slate-700 relative cursor-pointer"
-                @click="toggleLine(index + 1)"
+                class="pl-2 pr-4 py-0.5 font-mono text-sm whitespace-pre text-slate-700 relative"
+                :class="{ 'cursor-pointer': !readOnly || filteredCommentsByLine[index + 1]?.length > 0 }"
+                @click="(!readOnly || filteredCommentsByLine[index + 1]?.length > 0) && toggleLine(index + 1)"
                 @mouseenter="handleLineHover(index + 1, $event)"
                 @mouseleave="handleLineLeave"
               >
@@ -88,7 +89,7 @@
                 </button>
                 <!-- 댓글 없음: 호버 시 추가 버튼 표시 -->
                 <button
-                   v-else
+                   v-else-if="!readOnly"
                    @click="toggleLine(index + 1)"
                    class="text-slate-300 hover:text-slate-500 opacity-0 group-hover:opacity-100 transition-all font-bold text-lg leading-none"
                    title="댓글 작성"
@@ -135,10 +136,10 @@
                 </div>
 
                 <!-- 기존 댓글과 새 입력 사이의 구분선 -->
-                <div v-if="filteredCommentsByLine[index + 1]?.length > 0 && expandedLine === index + 1" class="border-t border-dashed border-slate-200 my-2"></div>
+                <div v-if="!readOnly && filteredCommentsByLine[index + 1]?.length > 0 && expandedLine === index + 1" class="border-t border-dashed border-slate-200 my-2"></div>
 
                 <!-- 새 댓글 양식 (명시적으로 토글/선택된 경우만) -->
-                <div v-if="expandedLine === index + 1" class="flex items-center gap-2 pl-7 animate-fade-in">
+                <div v-if="!readOnly && expandedLine === index + 1" class="flex items-center gap-2 pl-7 animate-fade-in">
                     <input
                       v-model="newCommentContent"
                       placeholder="이 라인에 대한 리뷰..."
@@ -247,8 +248,19 @@ const keyBlocksByLine = computed(() => {
         else if (block.code) {
            const lines = codeLines.value;
            const targetCode = block.code.trim();
+           
+           // Escape special regex characters
+           const escaped = targetCode.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+           
+           // Add word boundaries if valid identifier characters are at edges
+           const startBoundary = /^\w/.test(targetCode) ? '\\b' : '';
+           const endBoundary = /\w$/.test(targetCode) ? '\\b' : '';
+           
+           // Create regex pattern
+           const pattern = new RegExp(`${startBoundary}${escaped}${endBoundary}`);
+
            for(let i=0; i<lines.length; i++) {
-               if(lines[i].includes(targetCode)) {
+               if(pattern.test(lines[i])) {
                    if (!map[i+1]) map[i+1] = [];
                    map[i+1].push({...block, startLine: i+1});
                }
