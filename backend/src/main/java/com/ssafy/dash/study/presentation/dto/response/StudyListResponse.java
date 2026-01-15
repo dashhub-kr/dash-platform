@@ -51,7 +51,7 @@ public record StudyListResponse(
         if (tier == null || tier == 0)
             return "Unranked";
 
-        int t = tier.intValue();
+        int t = (int) Math.round(tier);
         if (t < 1)
             return "Unranked";
         if (t >= 31)
