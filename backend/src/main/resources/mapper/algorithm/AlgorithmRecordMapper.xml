@@ -95,17 +95,17 @@
 
   <select id="selectHeatmapDataByStudyId"
     resultType="com.ssafy.dash.dashboard.application.dto.response.HeatmapRawData"> SELECT
-    DATE_FORMAT(r.committed_at, '%Y-%m-%d') as date, u.id as userId, u.username, u.avatar_url as
+    DATE_FORMAT(r.created_at, '%Y-%m-%d') as date, u.id as userId, u.username, u.avatar_url as
     avatarUrl, COUNT(*) as dailyCount FROM algorithm_records r JOIN users u ON r.user_id = u.id
     WHERE r.study_id = #{studyId} AND r.record_type = 'USER_SOLUTION' GROUP BY
-    DATE_FORMAT(r.committed_at, '%Y-%m-%d'), u.id ORDER BY date ASC </select>
+    DATE_FORMAT(r.created_at, '%Y-%m-%d'), u.id ORDER BY date ASC </select>
 
   <select id="selectHeatmapDataByUserId"
     resultType="com.ssafy.dash.dashboard.application.dto.response.HeatmapRawData"> SELECT
-    DATE_FORMAT(r.committed_at, '%Y-%m-%d') as date, u.id as userId, u.username, u.avatar_url as
+    DATE_FORMAT(r.created_at, '%Y-%m-%d') as date, u.id as userId, u.username, u.avatar_url as
     avatarUrl, COUNT(*) as dailyCount FROM algorithm_records r JOIN users u ON r.user_id = u.id
     WHERE r.user_id = #{userId} AND r.record_type = 'USER_SOLUTION' GROUP BY
-    DATE_FORMAT(r.committed_at, '%Y-%m-%d'), u.id ORDER BY date ASC </select>
+    DATE_FORMAT(r.created_at, '%Y-%m-%d'), u.id ORDER BY date ASC </select>
 
   <insert id="insertSolvedProblemIfNotExists"> INSERT IGNORE INTO algorithm_records (user_id,
     problem_number, title, difficulty, record_type, created_at, updated_at) VALUES (#{userId},
@@ -113,9 +113,9 @@
 
   <!-- 스터디의 활동 날짜 목록 조회 (streak 계산용) -->
   <select id="selectActivityDatesByStudyId" resultType="string" parameterType="long"> SELECT
-    DISTINCT DATE_FORMAT(r.committed_at, '%Y-%m-%d') as activity_date FROM algorithm_records r JOIN
+    DISTINCT DATE_FORMAT(r.created_at, '%Y-%m-%d') as activity_date FROM algorithm_records r JOIN
     users u ON r.user_id = u.id WHERE u.study_id = #{studyId} AND u.deleted_at IS NULL AND
-    r.record_type = 'USER_SOLUTION' AND r.committed_at >= DATE_SUB(CURDATE(), INTERVAL 60 DAY) ORDER
+    r.record_type = 'USER_SOLUTION' AND r.created_at >= DATE_SUB(CURDATE(), INTERVAL 60 DAY) ORDER
     BY activity_date DESC </select>
 
 </mapper>
