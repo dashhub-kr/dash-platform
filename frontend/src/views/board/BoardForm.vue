@@ -124,7 +124,7 @@
                                         <span class="px-2 py-0.5 bg-slate-100 text-slate-500 text-xs font-bold rounded">#{{ record.problemNumber }}</span>
                                         <div class="flex flex-col">
                                             <span class="text-sm font-bold text-slate-700" :class="{'text-emerald-700': form.algorithmRecordId === record.id}">{{ record.title }}</span>
-                                            <span class="text-xs text-slate-400">{{ record.language }} · {{ formatDate(record.createdAt || record.committedAt) }}</span>
+                                            <span class="text-xs text-slate-400">{{ record.language }} · {{ formatDate(record.createdAt) }}</span>
                                         </div>
                                     </div>
                                     <div v-if="form.algorithmRecordId === record.id" class="text-emerald-600">
@@ -235,7 +235,7 @@ const filteredRecords = computed(() => {
     if (!searchQuery.value) return studyRecords.value;
     const q = searchQuery.value.toLowerCase();
     return studyRecords.value.filter(r => 
-        r.problemNumber.toLowerCase().includes(q) || 
+        (r.problemNumber ?? '').toString().includes(q) || 
         r.title.toLowerCase().includes(q)
     );
 });
@@ -259,7 +259,7 @@ const formatDate = (dateString) => {
 
 const selectRecord = (record) => {
     form.value.algorithmRecordId = record.id;
-    searchQuery.value = ''; // 선택 후 검색어 초기화 (선택 사항)
+    searchQuery.value = ''; // 선택 후 검색어를 초기화하여 전체 목록을 다시 보여줌 (의도된 동작)
 };
 
 // 게시판 유형 변경 감지하여 스터디 기록 로드
