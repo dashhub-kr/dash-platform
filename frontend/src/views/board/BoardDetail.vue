@@ -72,7 +72,7 @@
             <a v-if="algorithmRecord" 
                :href="getProblemLink(algorithmRecord.problemNumber, algorithmRecord.platform)" 
                target="_blank"
-               class="text-sm font-medium text-brand-600 hover:text-brand-700 hover:underline transition-colors"
+               class="text-sm font-medium text-slate-600 hover:text-slate-900 hover:underline transition-colors"
             >
               [{{ getPlatformLabel(algorithmRecord.platform) }}] {{ algorithmRecord.problemNumber }}-{{ algorithmRecord.title }}
             </a>
