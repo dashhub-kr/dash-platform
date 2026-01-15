@@ -40,6 +40,7 @@
                   :language="selectedRecord.language || 'java'"
                   :filename="`${selectedRecord.title}.${getExtension(selectedRecord.language)}`"
                   :comments="draftComments"
+                  :read-only="true"
                   @submit-comment="submitLineComment"
                   class="bg-[#1e293b]" 
                   style="max-height: 75vh; height: 75vh;" 
