@@ -140,6 +140,7 @@ class BoardServiceTest {
     @DisplayName("게시글을 삭제하면 저장소에 삭제 명령을 전달한다")
     void deleteBoard_Success() {
         given(boardRepository.findById(board.getId())).willReturn(Optional.of(board));
+        given(userRepository.findById(user.getId())).willReturn(Optional.of(user)); // validateOwnership에서 필요
 
         boardService.delete(board.getId(), user.getId());
 

@@ -36,6 +36,9 @@ class UserServiceTest {
     @Mock
     private com.ssafy.dash.study.domain.StudyRepository studyRepository;
 
+    @Mock
+    private com.ssafy.dash.ai.infrastructure.persistence.LearningPathCacheMapper learningPathCacheMapper;
+
     @InjectMocks
     private UserService userService;
 
@@ -58,18 +61,21 @@ class UserServiceTest {
     @DisplayName("ID로 유저를 조회하면 UserResult로 변환한다")
     void findByIdReturnsResult() {
         User user = TestFixtures.createUser();
-        given(userRepository.findById(TestFixtures.TEST_USER_ID)).willReturn(Optional.of(user));
+        given(userRepository.findByIdIncludingDeleted(TestFixtures.TEST_USER_ID)).willReturn(Optional.of(user));
+        given(onboardingRepository.findByUserId(TestFixtures.TEST_USER_ID)).willReturn(Optional.empty());
+        given(studyRepository.findPendingApplicationByUserId(TestFixtures.TEST_USER_ID)).willReturn(Optional.empty());
+        given(learningPathCacheMapper.findByUserId(TestFixtures.TEST_USER_ID)).willReturn(null);
 
         UserResult result = userService.findById(TestFixtures.TEST_USER_ID);
 
         assertThat(result.id()).isEqualTo(user.getId());
-        verify(userRepository).findById(TestFixtures.TEST_USER_ID);
+        verify(userRepository).findByIdIncludingDeleted(TestFixtures.TEST_USER_ID);
     }
 
     @Test
     @DisplayName("조회 시 ID가 존재하지 않으면 UserNotFoundException이 발생한다")
     void findByIdThrowsWhenMissing() {
-        given(userRepository.findById(TestFixtures.TEST_USER_ID)).willReturn(Optional.empty());
+        given(userRepository.findByIdIncludingDeleted(TestFixtures.TEST_USER_ID)).willReturn(Optional.empty());
 
         assertThatThrownBy(() -> userService.findById(TestFixtures.TEST_USER_ID))
                 .isInstanceOf(UserNotFoundException.class);
@@ -125,8 +131,10 @@ class UserServiceTest {
         User user = TestFixtures.createUser();
         com.ssafy.dash.onboarding.domain.Onboarding onboarding = TestFixtures.createOnboarding(user.getId(), true);
 
-        given(userRepository.findById(user.getId())).willReturn(Optional.of(user));
+        given(userRepository.findByIdIncludingDeleted(user.getId())).willReturn(Optional.of(user));
         given(onboardingRepository.findByUserId(user.getId())).willReturn(Optional.of(onboarding));
+        given(studyRepository.findPendingApplicationByUserId(user.getId())).willReturn(Optional.empty());
+        given(learningPathCacheMapper.findByUserId(user.getId())).willReturn(null);
 
         UserResult result = userService.findById(user.getId());
 
