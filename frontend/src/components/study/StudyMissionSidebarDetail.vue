@@ -12,13 +12,13 @@
           <table class="w-full text-xs text-left">
              <thead class="text-xs text-slate-500 uppercase">
                 <tr>
-                   <th class="px-2 py-2 font-bold w-12 sticky left-0 bg-white z-10 text-center">팀원</th>
+                   <th class="px-2 py-2 font-bold w-12 min-w-[3rem] sticky left-0 bg-white z-10 text-center">팀원</th>
                    <th v-for="pid in mission.problemIds" :key="pid" class="px-2 py-2 text-center min-w-[40px]">
                       <a :href="`https://www.acmicpc.net/problem/${pid}`" target="_blank" class="hover:text-emerald-600 hover:underline font-bold">
                         {{ pid }}
                       </a>
                    </th>
-                   <th class="px-2 py-2 text-center w-12 font-bold text-[10px]">진행률</th>
+                   <th class="px-2 py-2 text-center w-12 font-bold text-[10px] sticky right-0 bg-white z-10">진행률</th>
                 </tr>
              </thead>
               <tbody class="divide-y divide-slate-50">
@@ -27,9 +27,9 @@
                      :class="{ 'bg-emerald-50/30': isCurrentUser(member.userId) }">
                    
                    <!-- 팀원 이름 (아바타만 표시) -->
-                   <td class="px-2 py-2 font-medium flex justify-center sticky left-0 z-10 group relative"
+                   <td class="px-2 py-2 font-medium sticky left-0 z-10 group relative"
                        :class="isCurrentUser(member.userId) ? 'bg-emerald-50/30' : 'bg-white'">
-                      <div class="relative">
+                      <div class="relative flex justify-center">
                         <NicknameRenderer 
                             :username="member.username"
                             :avatar-url="member.avatarUrl"
@@ -90,8 +90,8 @@
                     </td>
                    
                    <!-- 진행률 -->
-                   <td class="px-2 py-2 text-center font-bold text-[10px]"
-                        :class="isCurrentUser(member.userId) ? 'text-emerald-600' : 'text-slate-400'">
+                   <td class="px-2 py-2 text-center font-bold text-[10px] sticky right-0 z-10"
+                        :class="isCurrentUser(member.userId) ? 'text-emerald-600 bg-emerald-50/30' : 'text-slate-400 bg-white'">
                        {{ Math.round((member.completedCount / Math.max(mission.totalProblems, 1)) * 100) }}%
                     </td>
                 </tr>
