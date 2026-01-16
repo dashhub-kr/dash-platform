@@ -63,6 +63,23 @@ public class DefenseService {
         // 참고: 연승은 실패하거나 타임아웃 될 때까지 유지됨
     }
 
+    public void quitDefense(Long userId) {
+        User user = getUser(userId);
+        if (user.getDefenseStartTime() != null) {
+            // 포기 시 해당 등급 연승 초기화
+            if ("GOLD".equalsIgnoreCase(user.getDefenseType())) {
+                user.setGoldStreak(0);
+            } else {
+                user.setSilverStreak(0);
+            }
+
+            user.setDefenseProblemId(null);
+            user.setDefenseStartTime(null);
+            user.setDefenseType(null);
+            userRepository.update(user);
+        }
+    }
+
     public DefenseStatusResult getDefenseStatus(Long userId) {
         User user = getUser(userId);
         checkTimeout(user);
@@ -140,9 +157,11 @@ public class DefenseService {
     private void checkTimeout(User user) {
         if (user.getDefenseStartTime() != null) {
             if (user.getDefenseStartTime().plusHours(1).isBefore(LocalDateTime.now())) {
-                // 시간 초과! 연승 초기화
-                user.setSilverStreak(0);
-                user.setGoldStreak(0);
+                if ("GOLD".equals(user.getDefenseType())) {
+                    user.setGoldStreak(0);
+                } else {
+                    user.setSilverStreak(0);
+                }
                 user.setDefenseProblemId(null);
                 user.setDefenseStartTime(null);
                 user.setDefenseType(null);
@@ -168,6 +187,5 @@ public class DefenseService {
                 .filter(p -> !solvedProblemNumbers.contains(String.valueOf(p)))
                 .collect(java.util.stream.Collectors.toList());
     }
-
 
 }

@@ -89,17 +89,21 @@ public class AiLearningPathService {
                 log.info("No cache found for user: {}, generating fresh analysis", userId);
                 LearningDashboardResponse response = generateFreshAnalysis(userId);
 
-                // 4. Save new cache
-                try {
-                        String json = objectMapper.writeValueAsString(response);
-                        cacheMapper.save(LearningPathCache.builder()
-                                        .userId(userId)
-                                        .analysisJson(json)
-                                        .generatedAt(today)
-                                        .build());
-                        log.info("Created new learning path cache for user: {}", userId);
-                } catch (Exception e) {
-                        log.error("Failed to save cache: {}", e.getMessage());
+                // 4. Save new cache (fallback이 아닌 경우에만)
+                if (response.getAiAnalysis() != null && !response.getAiAnalysis().isFallback()) {
+                        try {
+                                String json = objectMapper.writeValueAsString(response);
+                                cacheMapper.save(LearningPathCache.builder()
+                                                .userId(userId)
+                                                .analysisJson(json)
+                                                .generatedAt(today)
+                                                .build());
+                                log.info("Created new learning path cache for user: {}", userId);
+                        } catch (Exception e) {
+                                log.error("Failed to save cache: {}", e.getMessage());
+                        }
+                } else {
+                        log.info("Skipping cache save for user: {} (fallback response)", userId);
                 }
 
                 // 5. Force Korean Names (Display Name)

@@ -59,6 +59,12 @@
           </p>
       </div>
 
+      <div v-if="isOnboarding" class="flex justify-end -mt-4 mb-8 pr-2">
+          <button @click="handleCreatePersonalStudy" class="text-xs text-slate-500 hover:text-brand-600 underline underline-offset-4 flex items-center gap-1 transition-colors">
+              일단 혼자 시작할래요 <ArrowRight :size="12" />
+          </button>
+      </div>
+
       <!-- 검색창 제외 나머지 영역에 스크롤 적용 -->
       <div :class="{ 'flex-1 min-h-0 overflow-y-auto custom-scrollbar px-1 -mx-1 pb-2': isOnboarding }">
       <!-- 추천 스터디 섹션 -->
@@ -130,11 +136,11 @@
                 </div>
     
                 <!-- 통계 정보 -->
-                <div class="flex flex-wrap items-center py-3 mb-6 relative z-10 gap-2">
+                <div class="flex flex-wrap items-center py-3 mb-6 relative z-30 gap-2">
                    <!-- Tier -->
-                   <div class="flex-1 min-w-[80px] flex items-center justify-center gap-2 px-3 py-2 rounded-xl cursor-default relative group/tier hover:bg-slate-50 transition-colors">
+                   <div class="flex-1 min-w-[100px] flex items-center justify-center gap-2 px-3 py-2 rounded-xl cursor-default relative group/tier hover:bg-slate-50 transition-colors">
                       <img :src="`https://static.solved.ac/tier_small/${Math.round(study.averageTier || 0)}.svg`" class="w-6 h-6 object-contain" alt="Tier" />
-                      <span class="text-lg font-black text-slate-800 whitespace-nowrap">{{ study.tierBadge || 'Unranked' }}</span>
+                      <span class="text-sm md:text-lg font-black text-slate-800 whitespace-nowrap">{{ study.tierBadge || 'Unranked' }}</span>
                       <!-- Tooltip -->
                       <div class="absolute left-1/2 -translate-x-1/2 bottom-full mb-2 bg-slate-800 text-white text-xs font-medium px-4 py-3 rounded-2xl opacity-0 group-hover/tier:opacity-100 transition-all pointer-events-none z-[9999] shadow-xl min-w-[160px]">
                          <div class="text-slate-400 text-[10px] uppercase tracking-wider mb-1">평균 티어</div>
@@ -143,7 +149,7 @@
                       </div>
                    </div>
                    <!-- Streak -->
-                   <div class="flex-1 min-w-[80px] flex items-center justify-center gap-2 px-3 py-2 rounded-xl cursor-default relative group/streak hover:bg-slate-50 transition-colors">
+                   <div class="flex-none flex items-center justify-center gap-2 px-3 py-2 rounded-xl cursor-default relative group/streak hover:bg-slate-50 transition-colors">
                       <Flame class="w-6 h-6 text-orange-500 fill-orange-500" stroke-width="2" />
                       <span class="text-lg font-black text-slate-800 whitespace-nowrap">{{ study.streak || 0 }}</span>
                       <!-- Tooltip -->
@@ -154,7 +160,7 @@
                       </div>
                    </div>
                    <!-- Activity -->
-                   <div class="flex-1 min-w-[80px] flex items-center justify-center gap-2 px-3 py-2 rounded-xl cursor-default relative group/activity hover:bg-slate-50 transition-colors">
+                   <div class="flex-none flex items-center justify-center gap-2 px-3 py-2 rounded-xl cursor-default relative group/activity hover:bg-slate-50 transition-colors">
                       <Send class="w-5 h-5 text-sky-500 fill-sky-500" stroke-width="2" />
                       <span class="text-lg font-black text-slate-800 whitespace-nowrap">{{ (study.averageSubmissionRate || 0).toFixed(0) }}</span>
                       <!-- Tooltip -->
@@ -293,12 +299,12 @@
             </div>
 
             <!-- 통계 정보 (Horizontal Divided Layout) -->
-            <div class="flex flex-wrap items-center py-3 mb-6 relative z-10 gap-2">
+            <div class="flex flex-wrap items-center py-3 mb-6 relative z-30 gap-2">
                
                <!-- Tier (Solved.ac Icon) -->
-               <div class="flex-1 min-w-[80px] flex items-center justify-center gap-2 px-3 py-2 rounded-xl cursor-default relative group/tier hover:bg-slate-50 transition-colors">
+               <div class="flex-1 min-w-[100px] flex items-center justify-center gap-2 px-3 py-2 rounded-xl cursor-default relative group/tier hover:bg-slate-50 transition-colors">
                   <img :src="`https://static.solved.ac/tier_small/${Math.round(study.averageTier || 0)}.svg`" class="w-6 h-6 object-contain" alt="Tier" />
-                  <span class="text-lg font-black text-slate-800 whitespace-nowrap">{{ study.tierBadge || 'Unranked' }}</span>
+                  <span class="text-sm md:text-lg font-black text-slate-800 whitespace-nowrap">{{ study.tierBadge || 'Unranked' }}</span>
                   <!-- Tooltip -->
                   <div class="absolute left-1/2 -translate-x-1/2 bottom-full mb-2 bg-slate-800 text-white text-xs font-medium px-4 py-3 rounded-2xl opacity-0 group-hover/tier:opacity-100 transition-all pointer-events-none z-50 shadow-xl min-w-[160px]">
                      <div class="text-slate-400 text-[10px] uppercase tracking-wider mb-1">평균 티어</div>
@@ -308,7 +314,7 @@
                </div>
 
                <!-- Streak -->
-               <div class="flex-1 min-w-[80px] flex items-center justify-center gap-2 px-3 py-2 rounded-xl cursor-default relative group/streak hover:bg-slate-50 transition-colors">
+               <div class="flex-none flex items-center justify-center gap-2 px-3 py-2 rounded-xl cursor-default relative group/streak hover:bg-slate-50 transition-colors">
                   <Flame class="w-6 h-6 text-orange-500 fill-orange-500" stroke-width="2" />
                   <span class="text-lg font-black text-slate-800 whitespace-nowrap">{{ study.streak || 0 }}</span>
                   <!-- Tooltip -->
@@ -320,7 +326,7 @@
                </div>
 
                <!-- Activity -->
-               <div class="flex-1 min-w-[80px] flex items-center justify-center gap-2 px-3 py-2 rounded-xl cursor-default relative group/activity hover:bg-slate-50 transition-colors">
+               <div class="flex-none flex items-center justify-center gap-2 px-3 py-2 rounded-xl cursor-default relative group/activity hover:bg-slate-50 transition-colors">
                   <Send class="w-5 h-5 text-sky-500 fill-sky-500" stroke-width="2" />
                   <span class="text-lg font-black text-slate-800 whitespace-nowrap">{{ (study.averageSubmissionRate || 0).toFixed(0) }}</span>
                   <!-- Tooltip -->
@@ -736,6 +742,21 @@ const handleCreateStudy = async () => {
     alert(e.response?.data?.message || '스터디 생성 중 오류가 발생했습니다.');
   } finally {
     creatingStudy.value = false;
+  }
+};
+
+const handleCreatePersonalStudy = async () => {
+  if (!confirm('나만의 연구실(개인 스터디)을 생성하시겠습니까?\n이후 다른 스터디에 가입할 수 있습니다.')) return;
+  
+  try {
+    await studyApi.createPersonalStudy();
+    await refresh();
+    alert('나만의 연구실이 생성되었습니다!');
+    // Redirect to study missions
+    window.location.href = '/study/missions';
+  } catch (e) {
+    console.error('Failed to create personal study', e);
+    alert('개인 스터디 생성에 실패했습니다.');
   }
 };
 </script>

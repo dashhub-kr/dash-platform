@@ -8,6 +8,8 @@ import com.ssafy.dash.user.application.dto.command.UserUpdateCommand;
 import com.ssafy.dash.user.application.dto.result.UserResult;
 import com.ssafy.dash.user.domain.User;
 import com.ssafy.dash.user.domain.UserRepository;
+import com.ssafy.dash.study.application.StudyService;
+import com.ssafy.dash.onboarding.domain.OnboardingRepository;
 import com.ssafy.dash.user.domain.exception.UserNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -20,17 +22,20 @@ import java.util.stream.Collectors;
 public class UserService {
 
     private final UserRepository userRepository;
-    private final com.ssafy.dash.onboarding.domain.OnboardingRepository onboardingRepository;
+    private final OnboardingRepository onboardingRepository;
     private final StudyRepository studyRepository;
+    private final StudyService studyService;
     private final LearningPathCacheMapper learningPathCacheMapper;
 
     public UserService(UserRepository userRepository,
-            com.ssafy.dash.onboarding.domain.OnboardingRepository onboardingRepository,
+            OnboardingRepository onboardingRepository,
             StudyRepository studyRepository,
+            StudyService studyService,
             LearningPathCacheMapper learningPathCacheMapper) {
         this.userRepository = userRepository;
         this.onboardingRepository = onboardingRepository;
         this.studyRepository = studyRepository;
+        this.studyService = studyService;
         this.learningPathCacheMapper = learningPathCacheMapper;
     }
 
@@ -97,6 +102,31 @@ public class UserService {
 
     @Transactional
     public void delete(Long id) {
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new UserNotFoundException(id));
+
+        // 스터디 관련 처리
+        if (user.getStudyId() != null) {
+            Study study = studyRepository.findById(user.getStudyId()).orElse(null);
+
+            // Group 스터디인 경우에만 체크 (Personal 스터디는 그냥 삭제됨)
+            if (study != null && study.getStudyType() == Study.StudyType.GROUP) {
+                if (java.util.Objects.equals(study.getCreatorId(), user.getId())) {
+                    // 스터디장인 경우
+                    int memberCount = userRepository.findByStudyId(study.getId()).size();
+                    if (memberCount > 1) {
+                        throw new IllegalStateException(
+                                "스터디장은 다른 팀원이 있는 경우 탈퇴할 수 없습니다. 모든 팀원을 내보낸 후 다시 시도해주세요.");
+                    }
+                    // 혼자 남은 경우 -> 스터디 삭제 (안전)
+                    studyService.deleteStudy(user.getId(), study.getId());
+                } else {
+                    // 일반 스터디원 -> 탈퇴 (Leave)
+                    studyService.leaveStudy(user.getId());
+                }
+            }
+        }
+
         boolean deleted = userRepository.delete(id);
         if (!deleted)
             throw new UserNotFoundException(id);

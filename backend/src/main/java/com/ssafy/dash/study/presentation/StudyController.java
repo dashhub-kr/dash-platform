@@ -90,6 +90,17 @@ public class StudyController {
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
     }
 
+    @Operation(summary = "나만의 연구실(개인 스터디) 생성", description = "혼자 학습할 수 있는 개인 스터디를 즉시 생성하고 이동합니다.")
+    @PostMapping("/personal")
+    public ResponseEntity<CreateStudyResponse> createPersonalStudy(
+            @Parameter(hidden = true) @AuthenticationPrincipal OAuth2User principal) {
+        if (principal instanceof CustomOAuth2User customUser) {
+            Study study = studyService.createPersonalStudy(customUser.getUserId());
+            return ResponseEntity.ok(CreateStudyResponse.from(study));
+        }
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+    }
+
     @Operation(summary = "스터디 가입 신청", description = "스터디에 가입 신청을 보냅니다.")
     @PostMapping("/{studyId}/apply")
     public ResponseEntity<Void> applyForStudy(

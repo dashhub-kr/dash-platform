@@ -374,13 +374,7 @@ const solvedProblems = ref(new Set());
 
 const formattedTimeLeft = computed(() => {
     if (!status.value.startTime) return "00:00:00";
-    
-    // 백엔드가 UTC 시간을 보내지만 'Z'가 없는 경우를 대비하여 처리
-    let timeStr = status.value.startTime;
-    if (!timeStr.endsWith('Z') && !timeStr.includes('+')) {
-        timeStr += 'Z';
-    }
-
+    const timeStr = status.value.startTime;
     const startTime = new Date(timeStr);
     const endTime = new Date(startTime.getTime() + status.value.timeLimitHours * 60 * 60 * 1000);
     const diff = endTime - now.value;

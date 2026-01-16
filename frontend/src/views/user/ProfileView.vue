@@ -11,7 +11,7 @@ import BaseIconBadge from '@/components/common/BaseIconBadge.vue';
 import TroubleshootingModal from '@/components/common/TroubleshootingModal.vue';
 
 const router = useRouter();
-const { refresh, user } = useAuth();
+const { refresh, user, logout } = useAuth();
 
 // 스터디 메뉴 상태
 const showStudyMenu = ref(false);
@@ -263,7 +263,7 @@ const handleDelete = async () => {
     try {
         await userApi.delete(userData.value.id);
         alert("탈퇴 처리되었습니다.");
-        window.location.href = "/";
+        await logout();
     } catch (e) {
         console.error("Delete failed", e);
         alert("실패했습니다.");

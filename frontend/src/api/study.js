@@ -9,6 +9,10 @@ export const studyApi = {
     createStudy(name) {
         return http.post('/studies', { name });
     },
+    // Create a personal study
+    createPersonalStudy() {
+        return http.post('/studies/personal');
+    },
     // Join an existing study
     joinStudy(studyId, message = '') {
         return http.post(`/studies/${studyId}/apply`, { message });

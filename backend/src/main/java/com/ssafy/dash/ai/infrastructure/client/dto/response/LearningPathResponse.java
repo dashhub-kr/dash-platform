@@ -44,6 +44,10 @@ public class LearningPathResponse {
     private String efficiencyAnalysis;
     private String personalizedAdvice;
 
+    // fallback 여부 (AI 서버 실패 시 true)
+    @Builder.Default
+    private boolean fallback = false;
+
     @Data
     @Builder
     @NoArgsConstructor

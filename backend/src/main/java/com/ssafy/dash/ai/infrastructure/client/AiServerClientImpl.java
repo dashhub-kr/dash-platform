@@ -72,6 +72,7 @@ public class AiServerClientImpl implements AiServerClient {
                     .strategicAdvice("AI 서버를 확인해주세요.")
                     .efficiencyAnalysis("분석 불가")
                     .phases(java.util.List.of())
+                    .fallback(true) // AI 서버 실패 표시
                     .build();
         }
     }

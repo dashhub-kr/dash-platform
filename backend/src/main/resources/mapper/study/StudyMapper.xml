@@ -32,7 +32,7 @@
     algorithm_records ar3 JOIN users u3 ON ar3.user_id = u3.id WHERE u3.study_id = s.id AND
     ar3.record_type = 'USER_SOLUTION' AND ar3.created_at >= DATE_SUB(NOW(), INTERVAL 7 DAY)) /
     NULLIF((SELECT COUNT(*) FROM users u4 WHERE u4.study_id = s.id), 0)) as average_submission_rate
-    FROM studies s WHERE s.study_type = 'GROUP' ORDER BY total_solved DESC, s.id </select>
+    FROM studies s WHERE s.study_type = 'GROUP' ORDER BY s.streak DESC, total_solved DESC, s.id </select>
 
   <select id="searchByKeyword" resultType="Study"> SELECT s.*, (SELECT COUNT(*) FROM users u WHERE
     u.study_id = s.id AND u.deleted_at IS NULL) as member_count, (SELECT AVG(u.solvedac_tier) FROM
@@ -46,7 +46,7 @@
     ar3.record_type = 'USER_SOLUTION' AND ar3.created_at >= DATE_SUB(NOW(), INTERVAL 7 DAY)) /
     NULLIF((SELECT COUNT(*) FROM users u4 WHERE u4.study_id = s.id), 0)) as average_submission_rate
     FROM studies s WHERE s.study_type = 'GROUP' AND s.name LIKE CONCAT('%', #{keyword}, '%') ORDER
-    BY total_solved DESC, s.id </select>
+    BY s.streak DESC, total_solved DESC, s.id </select>
 
   <update id="update" parameterType="Study"> UPDATE studies SET name = #{name}, acorn_count =
     #{acornCount}, visibility = #{visibility}, description = #{description}, streak = #{streak},

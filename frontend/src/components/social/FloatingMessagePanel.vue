@@ -315,7 +315,7 @@
                                         </div>
                                         <div class="flex-1 min-w-0">
                                             <div class="text-sm font-bold text-slate-700 truncate">{{ friend.friend?.username }}</div>
-                                            <div class="text-xs text-slate-500 truncate">{{ friend.friend?.tier || 'Unrated' }}</div>
+                                            <div class="text-xs text-slate-500 truncate">{{ getTierName(friend.friend?.solvedacTier) }}</div>
                                         </div>
                                         <div 
                                             class="w-5 h-5 rounded-full border-2 flex items-center justify-center transition-colors"
@@ -791,6 +791,24 @@ const createGroupRoom = async (name, memberIds) => {
         console.error(e);
         throw e;
     }
+};
+
+
+const toRoman = (n) => {
+    const map = { 1: 'I', 2: 'II', 3: 'III', 4: 'IV', 5: 'V' };
+    return map[n] || '';
+};
+
+const getTierName = (tier) => {
+    if (!tier) return 'Unrated';
+    if (tier >= 1 && tier <= 5) return `Bronze ${toRoman(6 - tier)}`;
+    if (tier >= 6 && tier <= 10) return `Silver ${toRoman(11 - tier)}`;
+    if (tier >= 11 && tier <= 15) return `Gold ${toRoman(16 - tier)}`;
+    if (tier >= 16 && tier <= 20) return `Platinum ${toRoman(21 - tier)}`;
+    if (tier >= 21 && tier <= 25) return `Diamond ${toRoman(26 - tier)}`;
+    if (tier >= 26 && tier <= 30) return `Ruby ${toRoman(31 - tier)}`;
+    if (tier >= 31) return 'Master';
+    return 'Unrated';
 };
 
 const startDMWithFriend = (friend) => {
