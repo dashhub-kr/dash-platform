@@ -116,7 +116,7 @@ public class UserService {
                     int memberCount = userRepository.findByStudyId(study.getId()).size();
                     if (memberCount > 1) {
                         throw new IllegalStateException(
-                                "스터디장은 다른 팀원이 있는 경우 탈퇴할 수 없습니다. 스터디장을 위임하거나 모든 팀원을 내보낸 후 다시 시도해주세요.");
+                                "스터디장은 다른 팀원이 있는 경우 탈퇴할 수 없습니다. 모든 팀원을 내보낸 후 다시 시도해주세요.");
                     }
                     // 혼자 남은 경우 -> 스터디 삭제 (안전)
                     studyService.deleteStudy(user.getId(), study.getId());

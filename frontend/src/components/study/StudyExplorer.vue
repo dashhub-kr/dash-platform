@@ -744,6 +744,21 @@ const handleCreateStudy = async () => {
     creatingStudy.value = false;
   }
 };
+
+const handleCreatePersonalStudy = async () => {
+  if (!confirm('나만의 연구실(개인 스터디)을 생성하시겠습니까?\n이후 다른 스터디에 가입할 수 있습니다.')) return;
+  
+  try {
+    await studyApi.createPersonalStudy();
+    await refresh();
+    alert('나만의 연구실이 생성되었습니다!');
+    // Redirect to study missions
+    window.location.href = '/study/missions';
+  } catch (e) {
+    console.error('Failed to create personal study', e);
+    alert('개인 스터디 생성에 실패했습니다.');
+  }
+};
 </script>
 
 <style scoped>
