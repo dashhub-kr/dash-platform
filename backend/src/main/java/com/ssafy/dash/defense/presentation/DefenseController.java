@@ -26,14 +26,13 @@ public class DefenseController {
     public ResponseEntity<DefenseStatusResponse> getStatus(@AuthenticationPrincipal CustomOAuth2User userDetails) {
         var result = defenseService.getDefenseStatus(userDetails.getUserId());
         return ResponseEntity.ok(new DefenseStatusResponse(
-            result.defenseType(),
-            result.defenseProblemId(),
-            result.defenseStartTime(),
-            result.silverStreak(),
-            result.goldStreak(),
-            result.maxSilverStreak(),
-            result.maxGoldStreak()
-        ));
+                result.defenseType(),
+                result.defenseProblemId(),
+                result.defenseStartTime(),
+                result.silverStreak(),
+                result.goldStreak(),
+                result.maxSilverStreak(),
+                result.maxGoldStreak()));
     }
 
     @PostMapping("/start")
@@ -44,5 +43,10 @@ public class DefenseController {
         return ResponseEntity.ok().build();
     }
 
-    // Inner records removed
+    @PostMapping("/quit")
+    public ResponseEntity<Void> quitDefense(@AuthenticationPrincipal CustomOAuth2User userDetails) {
+        defenseService.quitDefense(userDetails.getUserId());
+        return ResponseEntity.ok().build();
+    }
+
 }

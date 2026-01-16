@@ -40,14 +40,19 @@
             </a>
           </div>
 
-          <div class="flex flex-col items-center gap-4">
-            <button @click="refreshStatus" 
-              class="px-8 py-4 bg-brand-600 hover:bg-brand-500 text-white rounded-xl font-bold text-lg shadow-lg shadow-brand-500/30 transition-all active:scale-95 flex items-center gap-2">
-              <RefreshCw class="w-5 h-5" /> 상태 확인
-            </button>
-            <p class="text-slate-500 text-sm max-w-md leading-relaxed break-keep">
+          <div class="flex flex-col items-center gap-4 w-full">
+            <div class="flex items-center justify-center gap-4 w-full max-w-lg">
+              <button @click="refreshStatus" 
+                class="flex-1 py-4 bg-brand-600 hover:bg-brand-500 text-white rounded-xl font-bold text-lg shadow-lg shadow-brand-500/30 transition-all active:scale-95 flex items-center justify-center gap-2">
+                <RefreshCw class="w-5 h-5" /> 상태 확인
+              </button>
+              <button @click="quitDefense" 
+                class="flex-1 py-4 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl font-bold text-lg transition-all active:scale-95 flex items-center justify-center gap-2">
+                <LogOut class="w-5 h-5" /> 포기하기
+              </button>
+            </div>
+            <p class="text-slate-500 text-sm max-w-md leading-relaxed break-keep mt-2">
               문제를 제출하고 상태 확인 버튼을 눌러주세요! <br/>
-              
             </p>
           </div>
         </div>
@@ -61,6 +66,14 @@
       <!-- 메인 피드 -->
       <div class="flex-1 min-w-0 space-y-8">
         
+        <!-- Back Button -->
+        <div class="mb-4">
+           <button @click="router.back()" class="flex items-center gap-2 text-slate-400 hover:text-slate-600 transition-colors font-bold">
+              <ArrowLeft class="w-5 h-5" />
+              <span>뒤로가기</span>
+           </button>
+        </div>
+
         <!-- Header -->
         <div class="mb-8">
           <div class="flex items-center gap-3 mb-2">
@@ -242,7 +255,7 @@
 import { ref, onMounted, onUnmounted, computed } from 'vue';
 import { useRouter } from 'vue-router';
 import axios from 'axios';
-import { Shield, Sword, Flame, RefreshCw, ClipboardList, Target, Clock, Zap, Users } from 'lucide-vue-next';
+import { Shield, Sword, Flame, RefreshCw, ClipboardList, Target, Clock, Zap, Users, ArrowLeft, LogOut } from 'lucide-vue-next';
 import BattleInviteModal from '@/components/battle/BattleInviteModal.vue';
 
 const router = useRouter();
@@ -324,6 +337,17 @@ const startDefense = async (type) => {
         await fetchStatus();
     } catch (e) {
         alert("시작 실패: " + (e.response?.data?.message || e.message));
+    }
+};
+
+const quitDefense = async () => {
+    if (!confirm("정말 포기하시겠습니까? 현재 진행 중인 연승 기록이 초기화됩니다.")) return;
+    
+    try {
+        await axios.post('/api/defense/quit');
+        await fetchStatus();
+    } catch (e) {
+        alert("포기 실패: " + (e.response?.data?.message || e.message));
     }
 };
 
