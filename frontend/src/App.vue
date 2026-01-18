@@ -8,7 +8,7 @@
     <UserProfileModal />
 
     <!-- Global Floating Chat Button -->
-    <FloatingMessagePanel v-if="user" />
+    <FloatingMessagePanel v-if="user && !route.path.startsWith('/onboarding')" />
 
     <!-- Admin Floating Button -->
     <router-link
