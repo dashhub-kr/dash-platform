@@ -35,9 +35,7 @@
                         <button @click="openCreateModal" class="p-1.5 hover:bg-white/20 rounded-lg transition-colors" title="새 대화">
                             <Plus :size="16" class="text-white" />
                         </button>
-                        <button @click="openFullView" class="p-1.5 hover:bg-white/20 rounded-lg transition-colors" title="전체보기">
-                            <Maximize2 :size="16" class="text-white" />
-                        </button>
+
                         <button @click="toggle" class="p-1.5 hover:bg-white/20 rounded-lg transition-colors" title="닫기">
                             <X :size="16" class="text-white" />
                         </button>

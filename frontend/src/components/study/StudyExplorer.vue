@@ -79,7 +79,8 @@
     
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div v-for="(study, idx) in recommendedStudies" :key="'rec-'+study.id" 
-                   class="bg-white rounded-3xl p-6 border-2 border-violet-100 shadow-sm transition-all group relative overflow-visible flex flex-col h-full ring-4 ring-transparent hover:shadow-xl hover:-translate-y-1 hover:ring-violet-50">
+                   class="bg-white rounded-3xl p-6 border-2 border-violet-100 shadow-sm transition-all group relative overflow-visible flex flex-col h-full ring-4 ring-transparent hover:shadow-xl hover:-translate-y-1 hover:ring-violet-50"
+                   :class="{ 'z-50': openMemberPopup === study.id }">
                 
                 <!-- 추천 배지 -->
                  <div class="absolute top-4 right-4 bg-violet-100 text-violet-600 text-[10px] font-bold px-2 py-1 rounded-full uppercase tracking-wider">
@@ -87,7 +88,7 @@
                  </div>
     
                 <!-- 상단 정보 -->
-                <div class="relative z-20 mb-4 mt-2">
+                <div class="relative z-30 mb-4 mt-2">
                   <div class="flex items-center gap-2 mb-3">
                       <!-- 아바타 영역 전체 클릭 가능 -->
                       <div @click="toggleMemberPopup(study.id, $event)" class="flex items-center -space-x-2 cursor-pointer relative">
@@ -136,7 +137,7 @@
                 </div>
     
                 <!-- 통계 정보 -->
-                <div class="flex flex-wrap items-center py-3 mb-6 relative z-30 gap-2">
+                <div class="flex flex-wrap items-center py-3 mb-6 relative gap-2">
                    <!-- Tier -->
                    <div class="flex-1 min-w-[100px] flex items-center justify-center gap-2 px-3 py-2 rounded-xl cursor-default relative group/tier hover:bg-slate-50 transition-colors">
                       <img :src="`https://static.solved.ac/tier_small/${Math.round(study.averageTier || 0)}.svg`" class="w-6 h-6 object-contain" alt="Tier" />
@@ -241,7 +242,7 @@
              <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div v-for="(study, idx) in studies" :key="study.id" 
                class="bg-white rounded-3xl p-6 border border-slate-200 shadow-sm transition-all group relative overflow-visible flex flex-col h-full"
-               :class="openMemberPopup === study.id ? '' : 'hover:shadow-xl hover:-translate-y-1'">
+               :class="openMemberPopup === study.id ? 'z-50' : 'hover:shadow-xl hover:-translate-y-1'">
             
             <!-- 랭킹 배지 (순서) -->
              <div class="absolute top-4 right-4 text-4xl font-black text-slate-100 italic pointer-events-none group-hover:text-brand-50 transition-colors">
@@ -249,7 +250,7 @@
              </div>
 
             <!-- 상단 정보 -->
-            <div class="relative z-20 mb-4">
+            <div class="relative z-30 mb-4">
                               <div class="flex items-center gap-2 mb-3">
                   <!-- 아바타 영역 전체 클릭 가능 -->
                   <div @click="toggleMemberPopup(study.id, $event)" class="flex items-center -space-x-2 cursor-pointer relative">
@@ -299,7 +300,7 @@
             </div>
 
             <!-- 통계 정보 (Horizontal Divided Layout) -->
-            <div class="flex flex-wrap items-center py-3 mb-6 relative z-30 gap-2">
+            <div class="flex flex-wrap items-center py-3 mb-6 relative gap-2">
                
                <!-- Tier (Solved.ac Icon) -->
                <div class="flex-1 min-w-[100px] flex items-center justify-center gap-2 px-3 py-2 rounded-xl cursor-default relative group/tier hover:bg-slate-50 transition-colors">
