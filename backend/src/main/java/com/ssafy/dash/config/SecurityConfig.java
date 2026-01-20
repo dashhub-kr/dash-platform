@@ -1,6 +1,8 @@
 package com.ssafy.dash.config;
 
 import com.ssafy.dash.oauth.presentation.security.CustomOAuth2UserService;
+import com.ssafy.dash.oauth.presentation.security.OAuth2AuthenticationFailureHandler;
+import com.ssafy.dash.common.ratelimit.GlobalRateLimitFilter;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -24,15 +26,18 @@ import java.util.Collections;
 public class SecurityConfig {
 
         private final CustomOAuth2UserService customOAuth2UserService;
-        private final com.ssafy.dash.common.ratelimit.GlobalRateLimitFilter globalRateLimitFilter;
+        private final GlobalRateLimitFilter globalRateLimitFilter;
+        private final OAuth2AuthenticationFailureHandler oAuth2AuthenticationFailureHandler;
 
         @Value("${app.frontend.url:http://localhost:5173}")
         private String frontendUrl;
 
         public SecurityConfig(CustomOAuth2UserService customOAuth2UserService,
-                        com.ssafy.dash.common.ratelimit.GlobalRateLimitFilter globalRateLimitFilter) {
+                        GlobalRateLimitFilter globalRateLimitFilter,
+                        OAuth2AuthenticationFailureHandler oAuth2AuthenticationFailureHandler) {
                 this.customOAuth2UserService = customOAuth2UserService;
                 this.globalRateLimitFilter = globalRateLimitFilter;
+                this.oAuth2AuthenticationFailureHandler = oAuth2AuthenticationFailureHandler;
         }
 
         @Bean
@@ -71,7 +76,8 @@ public class SecurityConfig {
                                 .oauth2Login(oauth2 -> oauth2
                                                 .userInfoEndpoint(userInfo -> userInfo
                                                                 .userService(customOAuth2UserService))
-                                                .defaultSuccessUrl(frontendUrl + "/oauth2/redirect", true))
+                                                .defaultSuccessUrl(frontendUrl + "/oauth2/redirect", true)
+                                                .failureHandler(oAuth2AuthenticationFailureHandler)) // 실패 핸들러 추가
                                 .logout(logout -> logout
                                                 .logoutUrl("/api/logout")
                                                 .invalidateHttpSession(true)
