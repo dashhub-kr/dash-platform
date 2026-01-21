@@ -173,6 +173,7 @@ public class StudyAnalysisService {
         }
 
         List<ProblemRecommendationResponse> curriculum = new ArrayList<>();
+        List<String> excludedProblemIds = new ArrayList<>(missionProblemIds);
         int selectedTagCount = 0;
 
         for (ScoredTag tag : candidateTags) {
@@ -181,9 +182,9 @@ public class StudyAnalysisService {
                 break;
 
             // 필터링을 위해 넉넉히 20개 조회 (Mapper LIMIT 20)
-            // excludeIds에 미션 문제 목록 전달
+            // excludeIds에 미션 문제 목록 + 이미 추천된 문제 전달 (중복 방지)
             List<ProblemRecommendationResponse> problems = problemService.getRecommendedProblems(
-                    tag.tagKey(), minTier, null, missionProblemIds);
+                    tag.tagKey(), minTier, null, excludedProblemIds);
 
             List<ProblemRecommendationResponse> newProblems = new ArrayList<>();
 
@@ -231,6 +232,8 @@ public class StudyAnalysisService {
             // 안 푼 문제가 2개 이상 확보된 경우에만 이 태그를 커리큘럼에 포함
             if (newProblems.size() >= 2) {
                 curriculum.addAll(newProblems);
+                // 추가된 문제를 제외 목록에 추가하여 다른 태그에서 중복 추천 방지
+                newProblems.forEach(p -> excludedProblemIds.add(p.getProblemId()));
                 selectedTagCount++;
             }
         }
