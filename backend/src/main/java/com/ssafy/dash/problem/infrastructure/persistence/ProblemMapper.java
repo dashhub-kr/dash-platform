@@ -26,4 +26,12 @@ public interface ProblemMapper {
 
     List<Problem> findProblemsByNumbers(
             @org.apache.ibatis.annotations.Param("problemNumbers") List<String> problemNumbers);
+
+    /**
+     * 여러 문제의 태그를 한 번에 조회 (N+1 쿼리 방지)
+     * @param problemNumbers 문제 번호 목록
+     * @return 문제번호-태그 쌍 목록
+     */
+    List<ProblemTag> findTagsByProblemNumbers(
+            @org.apache.ibatis.annotations.Param("problemNumbers") List<String> problemNumbers);
 }

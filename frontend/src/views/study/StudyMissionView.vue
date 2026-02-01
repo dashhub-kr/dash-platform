@@ -184,11 +184,11 @@
                                             </span>
                                         </div>
 
-                                        <!-- 1등 완주자 -->
+                                        <!-- 완주자 -->
                                         <div v-if="getFirstCompleter(mission)" class="flex items-center gap-1.5">
                                             <span class="text-[10px] font-bold text-slate-400">·</span>
                                             <span class="px-2 py-0.5 bg-yellow-50 text-yellow-600 rounded-lg text-xs font-bold flex items-center gap-1">
-                                                👑 {{ getFirstCompleter(mission) }}
+                                                ✅ {{ getFirstCompleter(mission) }}
                                             </span>
                                         </div>
 

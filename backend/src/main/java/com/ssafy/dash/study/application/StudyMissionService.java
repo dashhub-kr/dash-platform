@@ -285,7 +285,7 @@ public class StudyMissionService {
 
     /**
      * 스터디의 미션 목록 조회 (algorithm_records와 자동 동기화)
-     * 최적화: N+1 쿼리를 방지하기 위해 배치 페칭(Batch Fetching) 적용.
+     * 수정: 동기화 후 최신 데이터 조회하여 정합성 보장
      */
     public List<MissionWithProgressResult> getMissions(Long studyId, Long requestUserId) {
         List<StudyMission> missions = missionRepository.findByStudyIdOrderByWeekDesc(studyId);
@@ -294,33 +294,29 @@ public class StudyMissionService {
         }
 
         List<User> members = userRepository.findByStudyId(studyId);
-        List<Long> missionIds = missions.stream().map(StudyMission::getId)
-                .collect(java.util.stream.Collectors.toList());
-
-        // 모든 제출 내역을 한 번에 가져오기 (Batch Fetch)
-        List<StudyMissionSubmission> allSubmissions = submissionRepository.findByMissionIds(missionIds);
-
-        // MissionID -> UserID -> List<Submission> (또는 Map<ProblemId, Submission>) 형태로
-        // 그룹화
-        // Map<MissionId, Map<UserId, List<Submission>>>
-        java.util.Map<Long, java.util.Map<Long, List<StudyMissionSubmission>>> submissionMap = allSubmissions.stream()
-                .collect(java.util.stream.Collectors.groupingBy(
-                        StudyMissionSubmission::getMissionId,
-                        java.util.stream.Collectors.groupingBy(StudyMissionSubmission::getUserId)));
-
         List<MissionWithProgressResult> result = new ArrayList<>();
 
         for (StudyMission mission : missions) {
             List<Integer> problemIds = parseProblems(mission.getProblemIds());
             int totalProblems = problemIds.size();
 
-            // 문제 상세 정보 조회
+            // 문제 상세 정보 조회 (N+1 쿼리 방지: 배치 조회)
             List<MissionProblemInfo> problems = new ArrayList<>();
             if (!problemIds.isEmpty()) {
                 List<String> problemNumberStrs = problemIds.stream().map(String::valueOf).toList();
                 List<Problem> problemEntities = problemMapper.findProblemsByNumbers(problemNumberStrs);
+                
+                // [FIX] 한 번에 모든 태그 조회 후 Map으로 그룹화
+                List<com.ssafy.dash.problem.domain.ProblemTag> allTags = problemMapper.findTagsByProblemNumbers(problemNumberStrs);
+                java.util.Map<String, List<String>> tagsByProblem = allTags.stream()
+                        .collect(java.util.stream.Collectors.groupingBy(
+                                com.ssafy.dash.problem.domain.ProblemTag::getProblemNumber,
+                                java.util.stream.Collectors.mapping(
+                                        com.ssafy.dash.problem.domain.ProblemTag::getTagKey,
+                                        java.util.stream.Collectors.toList())));
+                
                 for (Problem p : problemEntities) {
-                    List<String> tags = problemMapper.findTagsByProblemNumber(p.getProblemNumber())
+                    List<String> tags = tagsByProblem.getOrDefault(p.getProblemNumber(), List.of())
                             .stream()
                             .map(tagService::getKoreanName)
                             .toList();
@@ -328,12 +324,13 @@ public class StudyMissionService {
                 }
             }
 
-            // 현재 미션에 대한 제출 내역 가져오기
-            java.util.Map<Long, List<StudyMissionSubmission>> missionSubmissions = submissionMap
-                    .getOrDefault(mission.getId(), new java.util.HashMap<>());
-
-            // algorithm_records와 동기화 (누락된 완료 상태 업데이트)
+            // [FIX] 1. 먼저 동기화 수행 (algorithm_records -> submissions DB 업데이트)
             syncSubmissionsWithRecords(mission.getId(), members, problemIds);
+
+            // [FIX] 2. 동기화 후 최신 데이터 조회
+            List<StudyMissionSubmission> missionSubmissionList = submissionRepository.findByMissionId(mission.getId());
+            java.util.Map<Long, List<StudyMissionSubmission>> missionSubmissions = missionSubmissionList.stream()
+                    .collect(java.util.stream.Collectors.groupingBy(StudyMissionSubmission::getUserId));
 
             List<StudyMissionSubmission> mySubmissions = missionSubmissions.getOrDefault(requestUserId,
                     new ArrayList<>());
@@ -397,6 +394,7 @@ public class StudyMissionService {
 
         return result;
     }
+
 
     /**
      * algorithm_records와 study_mission_submissions 동기화

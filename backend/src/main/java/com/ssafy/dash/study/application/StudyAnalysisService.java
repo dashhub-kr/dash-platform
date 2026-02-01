@@ -154,7 +154,7 @@ public class StudyAnalysisService {
         scoredTags.sort(Comparator.comparing(ScoredTag::score).reversed());
         List<ScoredTag> candidateTags = scoredTags.stream().limit(10).toList();
 
-        // 3. 제외할 문제 ID 수집 (이미 푼 문제, 미션 문제)
+        // 3. 제외할 문제 ID 수집 (현재 미션에 포함된 문제 - 중복 추천 방지)
         List<java.util.Set<String>> memberSolvedSets = members.stream()
                 .map(m -> algorithmRecordRepository.findSolvedProblemNumbers(m.getId()))
                 .toList();

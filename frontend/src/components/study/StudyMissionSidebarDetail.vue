@@ -62,7 +62,7 @@
                            <!-- 해결됨 (클릭 시 대시보드로 이동하여 코드 보기) -->
                            <div v-if="isSolved(member, pid)" class="flex justify-center">
                               <button 
-                                  @click="goToDashboard(pid, member.userId)"
+                                  @click="goToDashboard(pid)"
                                   class="w-5 h-5 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center hover:bg-emerald-200 hover:scale-110 transition-all"
                                   title="코드 보러 가기"
                               >
@@ -361,14 +361,12 @@ const submitAddProblem = async () => {
     }
 };
 
-const goToDashboard = (problemId, userId) => {
-    // 관리자가 아닌 일반 유저의 대시보드 경로는 /dashboard 입니다.
+const goToDashboard = (problemId) => {
+    // 문제 필터링을 위해 대시보드로 이동
     router.push({
         path: '/dashboard',
         query: {
             problemNumber: problemId,
-            userId: userId,
-            // drawer: 'true' // 추후 상세 뷰 바로 열기 지원 시 활성화
         }
     });
 };
