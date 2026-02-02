@@ -95,4 +95,19 @@ class GitHubSubmissionMetadataExtractorTest {
         assertThat(metadata.memoryKb()).isEqualTo(1024);
     }
 
+    @Test
+    void extractParsesSweaCommitMessageWithCommasInTitle() {
+        // [D1] Title: 큰 놈, 작은 놈, 같은 놈, Time: 93 ms, Memory: 26752 KB - DashHub
+        String message = "[D1] Title: 큰 놈, 작은 놈, 같은 놈, Time: 93 ms, Memory: 26752 KB - DashHub";
+        String path = "SWEA/D1/2070.큰놈작은놈같은놈/Solution.java";
+
+        GitHubSubmissionMetadataExtractor.SubmissionMetadata metadata = extractor.extract(message, path);
+
+        assertThat(metadata.platform()).isEqualTo("SWEA");
+        assertThat(metadata.difficulty()).isEqualTo("D1");
+        assertThat(metadata.title()).isEqualTo("큰 놈, 작은 놈, 같은 놈");
+        assertThat(metadata.runtimeMs()).isEqualTo(93);
+        assertThat(metadata.memoryKb()).isEqualTo(26752);
+    }
+
 }
