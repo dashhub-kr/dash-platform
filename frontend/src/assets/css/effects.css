@@ -17,6 +17,17 @@
   }
 }
 
+/* Contributor's Insight (Special Reward) */
+.effect-contributor {
+  background: linear-gradient(90deg, #7c3aed, #22d3ee, #7c3aed);
+  background-size: 200% auto;
+  color: transparent;
+  -webkit-background-clip: text;
+  background-clip: text;
+  animation: shine 4s linear infinite;
+  font-weight: 800;
+}
+
 /* --- Tier System (Unified Pure Colors) --- */
 /* All tiers use simple colors without shadows/glows */
 
