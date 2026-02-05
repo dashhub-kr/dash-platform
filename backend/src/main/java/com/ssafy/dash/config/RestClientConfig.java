@@ -21,8 +21,11 @@ public class RestClientConfig {
                 .connectTimeout(java.time.Duration.ofSeconds(10))
                 .build();
 
+        var requestFactory = new org.springframework.http.client.JdkClientHttpRequestFactory(httpClient);
+        requestFactory.setReadTimeout(java.time.Duration.ofSeconds(60));
+
         return builder
-                .requestFactory(new org.springframework.http.client.JdkClientHttpRequestFactory(httpClient))
+                .requestFactory(requestFactory)
                 .defaultHeader("Accept", "application/json")
                 .defaultHeader("Content-Type", "application/json")
                 .messageConverters(converters -> {
