@@ -223,7 +223,7 @@
                  <div class="w-14 h-14 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-4 border border-slate-100">
                     <Search class="w-6 h-6 text-slate-300" />
                  </div>
-                 <p class="text-slate-600 font-bold mb-1 text-sm">내 티어(±5)와 비슷한 스터디가 존재하지 않습니다</p>
+                 <p class="text-slate-600 font-bold mb-1 text-sm">내 티어(±1)와 비슷한 스터디가 존재하지 않습니다</p>
              </div>
         </div>
       </div>
@@ -648,9 +648,9 @@ const recommendedStudies = computed(() => {
     // 내 스터디 제외
     if (study.id === user.value.studyId) return false;
 
-    // 내 티어 기준 ±5 범위 내
+    // 내 티어 기준 ±1 범위 내
     const diff = Math.abs(study.averageTier - userTier);
-    return diff <= 5;
+    return diff <= 1;
   });
 });
 

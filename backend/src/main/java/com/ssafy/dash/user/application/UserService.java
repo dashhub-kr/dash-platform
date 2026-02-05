@@ -154,9 +154,9 @@ public class UserService {
         if (user.getSolvedacHandle() == null || user.getSolvedacHandle().isBlank()) {
             return false;
         }
-        // 1시간(60분)이 지났으면 갱신
+        // 12시간이 지났으면 갱신
         return user.getStatsLastSyncedAt() == null ||
-                user.getStatsLastSyncedAt().isBefore(LocalDateTime.now().minusMinutes(60));
+                user.getStatsLastSyncedAt().isBefore(LocalDateTime.now().minusHours(12));
     }
 
 }
