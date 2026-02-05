@@ -77,15 +77,15 @@
 
   <select id="countSuccessfulSubmissionByUserIdAndProblemNumber" resultType="int"> SELECT COUNT(*)
     FROM algorithm_records WHERE user_id = #{userId} AND record_type = 'USER_SOLUTION' AND
-    problem_number = #{problemNumber} AND runtime_ms IS NOT NULL AND memory_kb IS NOT NULL </select>
+    problem_number = #{problemNumber} AND runtime_ms >= 0 AND memory_kb >= 0 </select>
 
   <select id="selectSolvedProblemNumbersByUserId" resultType="string" parameterType="long"> SELECT
     DISTINCT problem_number FROM algorithm_records WHERE user_id = #{userId} AND (record_type =
-    'SOLVED_AC_SYNC' OR (runtime_ms IS NOT NULL AND memory_kb IS NOT NULL)) </select>
+    'SOLVED_AC_SYNC' OR (runtime_ms >= 0 AND memory_kb >= 0)) </select>
 
   <select id="selectLatestSuccessfulByUserAndProblem" resultType="AlgorithmRecord"> SELECT * FROM
     algorithm_records WHERE user_id = #{userId} AND problem_number = #{problemNumber} AND runtime_ms
-    IS NOT NULL AND memory_kb IS NOT NULL ORDER BY created_at DESC LIMIT 1 </select>
+    >= 0 AND memory_kb >= 0 ORDER BY created_at DESC LIMIT 1 </select>
 
   <update id="migrateStudyId"> UPDATE algorithm_records SET study_id = #{newStudyId} WHERE study_id
     = #{oldStudyId} </update>

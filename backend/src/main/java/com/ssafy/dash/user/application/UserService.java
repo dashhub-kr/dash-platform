@@ -11,6 +11,7 @@ import com.ssafy.dash.user.domain.UserRepository;
 import com.ssafy.dash.study.application.StudyService;
 import com.ssafy.dash.onboarding.domain.OnboardingRepository;
 import com.ssafy.dash.user.domain.exception.UserNotFoundException;
+import com.ssafy.dash.analytics.application.SolvedacSyncService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -26,17 +27,20 @@ public class UserService {
     private final StudyRepository studyRepository;
     private final StudyService studyService;
     private final LearningPathCacheMapper learningPathCacheMapper;
+    private final SolvedacSyncService solvedacSyncService;
 
     public UserService(UserRepository userRepository,
             OnboardingRepository onboardingRepository,
             StudyRepository studyRepository,
             StudyService studyService,
-            LearningPathCacheMapper learningPathCacheMapper) {
+            LearningPathCacheMapper learningPathCacheMapper,
+            SolvedacSyncService solvedacSyncService) {
         this.userRepository = userRepository;
         this.onboardingRepository = onboardingRepository;
         this.studyRepository = studyRepository;
         this.studyService = studyService;
         this.learningPathCacheMapper = learningPathCacheMapper;
+        this.solvedacSyncService = solvedacSyncService;
     }
 
     @Transactional
@@ -71,6 +75,12 @@ public class UserService {
 
         // 분석 데이터 존재 여부 확인
         boolean hasAnalysis = learningPathCacheMapper.findByUserId(id) != null;
+
+        // [Lazy Sync] Solved.ac 연동 정보가 있고, 마지막 동기화 후 1시간이 지났으면 갱신
+        if (shouldUpdateSolvedacStats(u)) {
+            solvedacSyncService.updateTierAndStats(id);
+            u = userRepository.findById(id).orElse(u);
+        }
 
         return UserResult.from(u, onboarding, study, pendingStudyName, hasAnalysis);
     }
@@ -138,6 +148,15 @@ public class UserService {
                 .orElseThrow(() -> new UserNotFoundException(id));
         u.block();
         userRepository.update(u);
+    }
+
+    private boolean shouldUpdateSolvedacStats(User user) {
+        if (user.getSolvedacHandle() == null || user.getSolvedacHandle().isBlank()) {
+            return false;
+        }
+        // 1시간(60분)이 지났으면 갱신
+        return user.getStatsLastSyncedAt() == null ||
+                user.getStatsLastSyncedAt().isBefore(LocalDateTime.now().minusMinutes(60));
     }
 
 }

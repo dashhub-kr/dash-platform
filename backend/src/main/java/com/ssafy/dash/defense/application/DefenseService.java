@@ -111,45 +111,61 @@ public class DefenseService {
         }
 
         if (user.getDefenseProblemId().equals(solvedProblemId)) {
-            // 실제 정답 제출이 있는지 확인 (runtime_ms, memory_kb가 있는 기록)
+            // 실제 정답 제출이 있는지 확인 (runtime_ms >= 0, memory_kb >= 0 인 기록)
+            // -1 등은 실패/오류로 간주하여 제외
             if (!algorithmRecordRepository.existsSuccessfulSubmission(userId, String.valueOf(solvedProblemId))) {
-                return null; // 성공적인 제출 기록이 없음 (오답 또는 컴파일 에러)
+                return null;
             }
 
             Integer currentStreak = 0;
 
             // 성공! 풀이 시간 계산 및 저장
-            algorithmRecordRepository.findLatestSuccessfulByUserAndProblem(userId, String.valueOf(solvedProblemId))
-                    .ifPresent(record -> {
-                        LocalDateTime startTime = user.getDefenseStartTime();
-                        LocalDateTime endTime = record.getCreatedAt() != null ? record.getCreatedAt()
-                                : LocalDateTime.now();
-                        long elapsedSeconds = java.time.Duration.between(startTime, endTime).getSeconds();
-                        record.setElapsedTimeSeconds(elapsedSeconds);
-                        algorithmRecordRepository.update(record);
-                    });
+            // 가장 최근의 성공 기록을 가져와서, 그 기록이 *현재 디펜스 시작 이후*에 생성된 것인지 확인
+            var latestRecordOpt = algorithmRecordRepository.findLatestSuccessfulByUserAndProblem(userId,
+                    String.valueOf(solvedProblemId));
 
-            if ("GOLD".equals(user.getDefenseType())) {
-                user.setGoldStreak(user.getGoldStreak() + 1);
-                currentStreak = user.getGoldStreak();
-                if (user.getGoldStreak() > user.getMaxGoldStreak()) {
-                    user.setMaxGoldStreak(user.getGoldStreak());
+            if (latestRecordOpt.isPresent()) {
+                var record = latestRecordOpt.get();
+
+                // CRITICAL: 과거에 푼 기록이 아니라, "지금" 푼 기록이어야 함
+                if (record.getCreatedAt().isBefore(user.getDefenseStartTime())) {
+                    return null;
                 }
-            } else {
-                user.setSilverStreak(user.getSilverStreak() + 1);
-                currentStreak = user.getSilverStreak();
-                if (user.getSilverStreak() > user.getMaxSilverStreak()) {
-                    user.setMaxSilverStreak(user.getSilverStreak());
+
+                // CRITICAL: 런타임/메모리가 유효한 값이어야 함 (0ms 포함, -1 제외)
+                if (record.getRuntimeMs() < 0 || record.getMemoryKb() < 0) {
+                    return null;
                 }
+
+                LocalDateTime startTime = user.getDefenseStartTime();
+                LocalDateTime endTime = record.getCreatedAt() != null ? record.getCreatedAt()
+                        : LocalDateTime.now();
+                long elapsedSeconds = java.time.Duration.between(startTime, endTime).getSeconds();
+                record.setElapsedTimeSeconds(elapsedSeconds);
+                algorithmRecordRepository.update(record);
+
+                if ("GOLD".equalsIgnoreCase(user.getDefenseType())) {
+                    user.setGoldStreak(user.getGoldStreak() + 1);
+                    currentStreak = user.getGoldStreak();
+                    if (user.getGoldStreak() > user.getMaxGoldStreak()) {
+                        user.setMaxGoldStreak(user.getGoldStreak());
+                    }
+                } else {
+                    user.setSilverStreak(user.getSilverStreak() + 1);
+                    currentStreak = user.getSilverStreak();
+                    if (user.getSilverStreak() > user.getMaxSilverStreak()) {
+                        user.setMaxSilverStreak(user.getSilverStreak());
+                    }
+                }
+
+                // 다음 디펜스를 위해 현재 상태 초기화
+                user.setDefenseProblemId(null);
+                user.setDefenseStartTime(null);
+                user.setDefenseType(null);
+
+                userRepository.update(user);
+                return currentStreak;
             }
-
-            // 다음 디펜스를 위해 현재 상태 초기화
-            user.setDefenseProblemId(null);
-            user.setDefenseStartTime(null);
-            user.setDefenseType(null);
-
-            userRepository.update(user);
-            return currentStreak;
         }
         return null;
     }
@@ -157,7 +173,7 @@ public class DefenseService {
     private void checkTimeout(User user) {
         if (user.getDefenseStartTime() != null) {
             if (user.getDefenseStartTime().plusHours(1).isBefore(LocalDateTime.now())) {
-                if ("GOLD".equals(user.getDefenseType())) {
+                if ("GOLD".equalsIgnoreCase(user.getDefenseType())) {
                     user.setGoldStreak(0);
                 } else {
                     user.setSilverStreak(0);

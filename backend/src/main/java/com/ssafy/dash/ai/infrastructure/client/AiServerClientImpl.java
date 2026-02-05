@@ -36,7 +36,7 @@ public class AiServerClientImpl implements AiServerClient {
                     .retrieve()
                     .body(CodeReviewResponse.class);
         } catch (Exception e) {
-            log.warn("Failed to analyze code: {}. Using fallback.", e.getMessage());
+            log.warn("Failed to analyze code at {}/review: {}. Using fallback.", baseUrl, e.getMessage());
             return CodeReviewResponse.builder()
                     .summary("AI 서버 연결에 실패했습니다. (임시 응답)")
                     .complexity(CodeReviewResponse.ComplexityInfo.builder()
@@ -64,7 +64,8 @@ public class AiServerClientImpl implements AiServerClient {
                     .retrieve()
                     .body(LearningPathResponse.class);
         } catch (Exception e) {
-            log.warn("Failed to generate learning path: {}. Using fallback.", e.getMessage());
+            log.warn("Failed to generate learning path at {}/learning-path: {}. Using fallback.", baseUrl,
+                    e.getMessage());
             return LearningPathResponse.builder()
                     .analysisSummary("AI 서버 연결 실패")
                     .personalizedAdvice("현재 AI 분석을 이용할 수 없습니다.")
@@ -90,7 +91,7 @@ public class AiServerClientImpl implements AiServerClient {
                     .retrieve()
                     .body(CodingStyleResponse.class);
         } catch (Exception e) {
-            log.warn("Failed to analyze coding style: {}. Using fallback.", e.getMessage());
+            log.warn("Failed to analyze coding style at {}/coding-style: {}. Using fallback.", baseUrl, e.getMessage());
             return CodingStyleResponse.builder()
                     .mbtiCode("NONE")
                     .nickname("연결되지 않은 코더")
@@ -111,7 +112,8 @@ public class AiServerClientImpl implements AiServerClient {
                     .retrieve()
                     .body(AiCounterExampleResponse.class);
         } catch (Exception e) {
-            log.warn("Failed to generate counter example: {}. Using fallback.", e.getMessage());
+            log.warn("Failed to generate counter example at {}/debug/counter-example: {}. Using fallback.", baseUrl,
+                    e.getMessage());
             return new AiCounterExampleResponse(
                     "Error",
                     "Error",
@@ -132,7 +134,7 @@ public class AiServerClientImpl implements AiServerClient {
                     .retrieve()
                     .body(AiSimulatorResponse.class);
         } catch (Exception e) {
-            log.warn("Failed to simulate code: {}. Using fallback.", e.getMessage());
+            log.warn("Failed to simulate code at {}/simulator/run: {}. Using fallback.", baseUrl, e.getMessage());
             return AiSimulatorResponse.builder()
                     .stdout("")
                     .stderr("AI 서버 연결 실패: " + e.getMessage())
@@ -155,7 +157,7 @@ public class AiServerClientImpl implements AiServerClient {
                     .retrieve()
                     .body(HintChatResponse.class);
         } catch (Exception e) {
-            log.warn("Failed to hint chat: {}. Using fallback.", e.getMessage());
+            log.warn("Failed to hint chat at {}/tutor/chat: {}. Using fallback.", baseUrl, e.getMessage());
             return HintChatResponse.builder()
                     .reply("죄송해요, AI 튜터가 잠시 자리를 비웠어요. 다시 시도해주세요.")
                     .teachingStyle("socratic")
