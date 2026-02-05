@@ -184,4 +184,38 @@ public class SolvedacSyncService {
         }
     }
 
+    /**
+     * 사용자 티어 및 기본 스탯 경량 동기화 (Lazy Sync용)
+     * Bio 인증 없이 API 정보만 가져와서 갱신
+     */
+    @Transactional
+    public void updateTierAndStats(Long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("User not found: " + userId));
+
+        String handle = user.getSolvedacHandle();
+        if (handle == null || handle.isBlank()) {
+            return;
+        }
+
+        try {
+            SolvedacUser userInfo = solvedacClient.getUserInfo(handle);
+
+            // 티어, 레이팅, 클래스, 푼 문제 수 등 갱신
+            user.updateSolvedacProfile(
+                    handle,
+                    userInfo.tier(),
+                    userInfo.rating(),
+                    userInfo.classLevel(),
+                    userInfo.solvedCount());
+
+            userRepository.update(user);
+
+            log.info("Lazy synced Solved.ac tier for user {}: Tier {}", userId, userInfo.tier());
+        } catch (Exception e) {
+            log.warn("Failed to lazy sync Solved.ac tiers for user {}: {}", userId, e.getMessage());
+            // 예외를 던지지 않고 로그만 남겨서 프로필 조회 자체는 성공하게 함
+        }
+    }
+
 }
