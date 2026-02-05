@@ -11,13 +11,13 @@ import com.ssafy.dash.solvedac.domain.TagStat;
 import com.ssafy.dash.solvedac.domain.Top100Problem;
 import com.ssafy.dash.user.domain.User;
 import com.ssafy.dash.user.domain.UserRepository;
+import com.ssafy.dash.ai.infrastructure.persistence.LearningPathCacheMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
-
-import com.ssafy.dash.ai.infrastructure.persistence.LearningPathCacheMapper;
 
 @Slf4j
 @Service
@@ -188,7 +188,7 @@ public class SolvedacSyncService {
      * 사용자 티어 및 기본 스탯 경량 동기화 (Lazy Sync용)
      * Bio 인증 없이 API 정보만 가져와서 갱신
      */
-    @Transactional
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
     public void updateTierAndStats(Long userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("User not found: " + userId));
