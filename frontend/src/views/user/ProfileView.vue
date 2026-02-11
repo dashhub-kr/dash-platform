@@ -13,70 +13,12 @@ import TroubleshootingModal from '@/components/common/TroubleshootingModal.vue';
 const router = useRouter();
 const { refresh, user, logout } = useAuth();
 
+const goToStudyManage = () => {
+    router.push('/study/manage');
+};
+
 // 스터디 메뉴 상태
 const showStudyMenu = ref(false);
-
-// 위임 모달 상태
-const showDelegateModal = ref(false);
-const memberList = ref([]);
-const loadingMembers = ref(false);
-const selectedMemberId = ref(null);
-
-const openDelegateModal = async () => {
-    showDelegateModal.value = true;
-    loadingMembers.value = true;
-    selectedMemberId.value = null; // reset selection
-    try {
-        const res = await studyApi.getMembers(userData.value.studyId);
-        // Exclude self
-        memberList.value = res.data.filter(m => m.id !== userData.value.id);
-    } catch (e) {
-        console.error(e);
-        alert("멤버 목록을 불러오지 못했습니다.");
-        showDelegateModal.value = false;
-    } finally {
-        loadingMembers.value = false;
-    }
-};
-
-const handleDelegate = async () => {
-    if (!selectedMemberId.value) return;
-    if (!confirm("정말로 스터디장 권한을 위임하시겠습니까?\n위임 후에는 일반 멤버로 전환됩니다.")) return;
-    try {
-        await studyApi.delegateLeader(userData.value.studyId, selectedMemberId.value);
-        alert("스터디장이 변경되었습니다.");
-        window.location.reload();
-    } catch(e) {
-        console.error(e);
-        alert("위임에 실패했습니다.");
-    }
-};
-
-// 삭제 모달 상태
-const showDeleteConfirmModal = ref(false);
-const deleteInput = ref('');
-
-const openDeleteModal = () => {
-    if (userData.value.studyType === 'PERSONAL') {
-        alert("임시 스터디(Personal Study)는 직접 삭제할 수 없습니다.\n새로운 스터디를 생성하거나 다른 스터디에 가입하면 자동으로 정리됩니다.");
-        return;
-    }
-    deleteInput.value = '';
-    showDeleteConfirmModal.value = true;
-};
-
-const handleConfirmDelete = async () => {
-    if (deleteInput.value !== studyName.value) return;
-    
-    try {
-        await studyApi.deleteStudy(userData.value.studyId);
-        alert("스터디가 해체되었습니다.");
-        window.location.reload();
-    } catch (e) {
-        console.error(e);
-        alert(e.response?.data?.message || "해체에 실패했습니다.");
-    }
-};
 
 // ... (userData definition)
 
@@ -270,6 +212,7 @@ const handleDelete = async () => {
     }
 };
 
+// 스터디 탈퇴는 남겨둠 (일반 멤버용)
 const handleLeaveStudy = async () => {
     if (!confirm("정말로 스터디를 탈퇴하시겠습니까?")) return;
     try {
@@ -279,26 +222,6 @@ const handleLeaveStudy = async () => {
     } catch (e) {
         console.error(e);
         alert(e.response?.data?.message || "탈퇴에 실패했습니다.");
-    }
-};
-
-const handleDeleteStudy = async () => {
-    if (userData.value.studyType === 'PERSONAL') {
-        alert("임시 스터디(Personal Study)는 직접 삭제할 수 없습니다.\n새로운 스터디를 생성하거나 다른 스터디에 가입하면 자동으로 정리됩니다.");
-        return;
-    }
-
-    if (!confirm("정말로 스터디를 해체하시겠습니까?\n\n이 작업은 되돌릴 수 없으며, 모든 미션과 기록이 삭제됩니다.")) return;
-    // 이중 확인 (안전을 위해)
-    if (!confirm("모든 스터디원이 탈퇴 처리되며, 스터디 정보가 영구적으로 삭제됩니다. 계속하시겠습니까?")) return;
-    
-    try {
-        await studyApi.deleteStudy(userData.value.studyId);
-        alert("스터디가 해체되었습니다.");
-        window.location.reload();
-    } catch (e) {
-        console.error(e);
-        alert(e.response?.data?.message || "해체에 실패했습니다.");
     }
 };
 
@@ -444,18 +367,11 @@ const showFaq = ref(false);
                             <!-- 스터디장 전용 -->
                             <template v-if="userData.isStudyLeader">
                                 <button 
-                                    @click="openDelegateModal(); showStudyMenu = false"
+                                    @click="goToStudyManage(); showStudyMenu = false"
                                     class="w-full text-left px-3 py-2.5 text-sm font-bold text-slate-600 hover:bg-slate-50 hover:text-slate-800 rounded-lg transition-colors flex items-center gap-2"
                                 >
-                                    <UserCheck :size="16" />
-                                    스터디장 위임
-                                </button>
-                                <button 
-                                    @click="openDeleteModal(); showStudyMenu = false"
-                                    class="w-full text-left px-3 py-2.5 text-sm font-bold text-rose-500 hover:bg-rose-50 rounded-lg transition-colors flex items-center gap-2"
-                                >
-                                    <Trash2 :size="16" />
-                                    스터디 해체
+                                    <Settings :size="16" />
+                                    스터디 설정 및 관리
                                 </button>
                             </template>
 
@@ -535,103 +451,7 @@ const showFaq = ref(false);
         <!-- ... (skipped for brevity) ... -->
         
         <!-- (At the end of template before styles) -->
-        <!-- Delegation Modal -->
         <Teleport to="body">
-            <div v-if="showDelegateModal" class="fixed inset-0 z-[9999] flex items-center justify-center p-4">
-                <div class="absolute inset-0 bg-slate-900/40 backdrop-blur-sm" @click="showDelegateModal = false"></div>
-                <!-- ... Content ... -->
-                <div class="relative bg-white rounded-3xl w-full max-w-md p-6 shadow-2xl animate-in fade-in zoom-in-95 duration-200">
-                    <h3 class="text-xl font-bold text-slate-800 mb-2">스터디장 위임</h3>
-                    <p class="text-sm text-slate-500 mb-6">새로운 스터디장을 선택해주세요.</p>
-                    
-                    <div v-if="loadingMembers" class="py-8 flex justify-center">
-                        <Loader2 class="animate-spin text-brand-500" :size="32"/>
-                    </div>
-                    
-                    <div v-else-if="memberList.length === 0" class="py-10 text-center text-slate-400 font-bold bg-slate-50 rounded-2xl">
-                        위임할 수 있는 다른 멤버가 없습니다.<br>
-                        <span class="text-xs font-normal mt-1 block">혼자라면 스터디 삭제만 가능합니다.</span>
-                    </div>
-
-                    <div v-else class="space-y-2 max-h-[300px] overflow-y-auto mb-6 custom-scrollbar">
-                        <label 
-                            v-for="member in memberList" 
-                            :key="member.id"
-                            class="flex items-center gap-3 p-3 rounded-xl border-2 cursor-pointer transition-all"
-                            :class="selectedMemberId === member.id ? 'border-brand-500 bg-brand-50' : 'border-slate-100 hover:border-slate-300'"
-                        >
-                            <input type="radio" :value="member.id" v-model="selectedMemberId" class="hidden">
-                            <img :src="member.avatarUrl || '/images/profiles/default-profile.png'" class="w-10 h-10 rounded-full bg-slate-200 object-cover" />
-                            <div class="flex-1">
-                                <div class="font-bold text-slate-700">{{ member.username }}</div>
-                                <div class="text-xs text-slate-400">Tier: {{ member.solvedacTier }}</div>
-                            </div>
-                            <div v-if="selectedMemberId === member.id" class="text-brand-600">
-                                <Crown :size="20" fill="currentColor" />
-                            </div>
-                        </label>
-                    </div>
-
-                    <div class="flex gap-3">
-                        <button 
-                            @click="showDelegateModal = false"
-                            class="flex-1 py-3.5 rounded-xl font-bold text-slate-500 hover:bg-slate-100 transition-colors"
-                        >
-                            취소
-                        </button>
-                        <button 
-                            @click="handleDelegate"
-                            :disabled="!selectedMemberId"
-                            class="flex-1 py-3.5 rounded-xl font-bold text-white bg-brand-500 hover:bg-brand-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed shadow-lg shadow-brand-500/30"
-                        >
-                            위임하기
-                        </button>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Delete Confirmation Modal -->
-            <div v-if="showDeleteConfirmModal" class="fixed inset-0 z-[9999] flex items-center justify-center p-4">
-                <div class="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" @click="showDeleteConfirmModal = false"></div>
-                
-                <div class="relative bg-white rounded-3xl w-full max-w-md p-6 shadow-2xl animate-in fade-in zoom-in-95 duration-200 border-2 border-slate-100">
-                    <div class="mb-4">
-                        <h3 class="text-xl font-black text-slate-800 mb-2">스터디 삭제</h3>
-                        <p class="text-sm text-slate-500 leading-relaxed">
-                            정말 <span class="text-slate-800 font-bold">'{{ studyName }}'</span> 스터디를 삭제하시겠습니까?<br>
-                            이 작업은 되돌릴 수 없으며, 모든 미션과 기록이 영구적으로 삭제됩니다.
-                        </p>
-                    </div>
-                    
-                    <div class="mb-6">
-                        <label class="block text-xs font-bold text-slate-400 mb-2 uppercase">스터디 이름을 입력하세요</label>
-                        <input 
-                            v-model="deleteInput"
-                            type="text"
-                            class="w-full bg-slate-50 border-2 border-slate-200 rounded-xl px-4 py-3 font-bold text-slate-700 focus:outline-none focus:border-rose-500 focus:bg-white transition-all placeholder:text-slate-300"
-                            :placeholder="studyName"
-                        />
-                    </div>
-
-                    <div class="flex gap-3">
-                        <button 
-                            @click="showDeleteConfirmModal = false"
-                            class="flex-1 py-3.5 rounded-xl font-bold text-slate-500 hover:bg-slate-100 transition-colors"
-                        >
-                            취소
-                        </button>
-                        <button 
-                            @click="handleConfirmDelete"
-                            :disabled="deleteInput !== studyName"
-                            class="flex-1 py-3.5 rounded-xl font-bold text-white bg-rose-500 hover:bg-rose-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed shadow-lg shadow-rose-500/30"
-                        >
-                            스터디 삭제
-                        </button>
-                    </div>
-                </div>
-            </div>
-
-
             <!-- Decoration Select Modal -->
             <div v-if="showDecorationModal" class="fixed inset-0 z-[9999] flex items-center justify-center p-4">
                 <div class="absolute inset-0 bg-slate-900/40 backdrop-blur-sm" @click="showDecorationModal = false"></div>

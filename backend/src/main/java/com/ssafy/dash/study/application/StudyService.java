@@ -383,6 +383,25 @@ public class StudyService {
     }
 
     @Transactional
+    public void updateStudy(Long userId, Long studyId, String name, String description) {
+        Study study = studyRepository.findById(studyId)
+                .orElseThrow(() -> new IllegalArgumentException("Study not found"));
+
+        if (!java.util.Objects.equals(study.getCreatorId(), userId)) {
+            throw new SecurityException("Only creator can update the study");
+        }
+
+        if (name != null && !name.isBlank()) {
+            study.setName(name);
+        }
+        if (description != null) {
+            study.setDescription(description);
+        }
+
+        studyRepository.update(study);
+    }
+
+    @Transactional
     public void deleteStudy(Long userId, Long studyId) {
         Study study = studyRepository.findById(studyId)
                 .orElseThrow(() -> new IllegalArgumentException("Study not found"));

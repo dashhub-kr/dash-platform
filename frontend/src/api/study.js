@@ -25,6 +25,10 @@ export const studyApi = {
     get(studyId) {
         return http.get(`/studies/${studyId}`);
     },
+    // Update study details
+    update(studyId, data) {
+        return http.patch(`/studies/${studyId}`, data);
+    },
     // Get acorn logs
     getAcornLogs(studyId) {
         return http.get(`/studies/${studyId}/acorns`);
