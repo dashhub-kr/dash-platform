@@ -6,12 +6,12 @@ import { studyApi } from '@/api/study';
 import { shopApi } from '@/api/shop';
 import { useAuth } from '@/composables/useAuth';
 import { onboardingApi } from '@/api/onboarding';
-import { Settings, LogOut, Github, Award, Users, Crown, RotateCcw, Loader2, HelpCircle, Zap as ZapIcon, Copy, Trash2, UserCheck, MoreVertical, AlertTriangle, ChevronDown, Palette, Check, Sparkles, X } from 'lucide-vue-next';
+import { Settings, LogOut, Github, Award, Users, Crown, RotateCcw, Loader2, HelpCircle, Zap as ZapIcon, Copy, MoreVertical, AlertTriangle, ChevronDown, Palette, Check, Sparkles, X } from 'lucide-vue-next';
 import BaseIconBadge from '@/components/common/BaseIconBadge.vue';
 import TroubleshootingModal from '@/components/common/TroubleshootingModal.vue';
 
 const router = useRouter();
-const { refresh, user, logout } = useAuth();
+const { logout } = useAuth();
 
 const goToStudyManage = () => {
     router.push('/study/manage');
@@ -365,7 +365,7 @@ const showFaq = ref(false);
                         <div v-if="showStudyMenu" class="absolute right-0 top-full mt-2 w-48 bg-white rounded-xl shadow-xl border border-slate-100 p-1.5 z-20 animate-in fade-in zoom-in-95 duration-200 origin-top-right flex flex-col gap-1">
                             
                             <!-- 스터디장 전용 -->
-                            <template v-if="userData.isStudyLeader">
+                            <template v-if="userData.isStudyLeader && userData.studyType !== 'PERSONAL'">
                                 <button 
                                     @click="goToStudyManage(); showStudyMenu = false"
                                     class="w-full text-left px-3 py-2.5 text-sm font-bold text-slate-600 hover:bg-slate-50 hover:text-slate-800 rounded-lg transition-colors flex items-center gap-2"

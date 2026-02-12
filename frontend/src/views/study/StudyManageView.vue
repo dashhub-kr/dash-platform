@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted, computed } from 'vue';
+import { ref, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
 import { studyApi } from '@/api/study';
 import { useAuth } from '@/composables/useAuth';
@@ -7,7 +7,6 @@ import {
   Settings, Users, Crown, Trash2, UserCheck, 
   ChevronLeft, Loader2, Save, AlertTriangle, X, Check
 } from 'lucide-vue-next';
-import BaseIconBadge from '@/components/common/BaseIconBadge.vue';
 
 const router = useRouter();
 const { user, refresh } = useAuth();
@@ -46,6 +45,14 @@ onMounted(async () => {
     if (study.value.creatorId !== user.value.id && user.value.role !== 'ROLE_ADMIN') {
       alert("스터디장만 접근 가능합니다.");
       router.replace('/dashboard');
+      return;
+    }
+
+    // Block personal study management
+    if (study.value.studyType === 'PERSONAL') {
+      alert("개인 연구실은 관리할 수 없습니다.");
+      router.replace('/dashboard');
+      return;
     }
   } catch (e) {
     console.error("Failed to load study info", e);
@@ -98,6 +105,7 @@ const handleDelegate = async () => {
   
   try {
     await studyApi.delegateLeader(study.value.id, selectedMemberId.value);
+    await refresh();
     alert("스터디장이 변경되었습니다.");
     router.replace('/profile');
   } catch(e) {
@@ -118,6 +126,7 @@ const handleConfirmDelete = async () => {
   
   try {
     await studyApi.deleteStudy(study.value.id);
+    await refresh();
     alert("스터디가 해체되었습니다.");
     router.replace('/training/roadmap');
   } catch (e) {
