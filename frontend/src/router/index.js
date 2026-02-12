@@ -127,6 +127,12 @@ const routes = [
     meta: { requiresAuth: true }
   },
   {
+    path: "/study/manage",
+    name: "StudyManage",
+    component: () => import("../views/study/StudyManageView.vue"),
+    meta: { requiresAuth: true }
+  },
+  {
     path: "/admin/study/:id/dashboard",
     name: "AdminStudyDashboard",
     component: Dashboard,
