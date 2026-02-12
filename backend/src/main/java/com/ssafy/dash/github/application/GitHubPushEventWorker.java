@@ -65,6 +65,7 @@ public class GitHubPushEventWorker {
     private final DefenseService defenseService;
     private final BattleService battleService;
     private final StudyService studyService;
+    private final GitHubAppService gitHubAppService;
 
     public GitHubPushEventWorker(GitHubPushEventRepository pushEventRepository,
             OnboardingRepository onboardingRepository,
@@ -82,6 +83,7 @@ public class GitHubPushEventWorker {
             DefenseService defenseService,
             BattleService battleService,
             StudyService studyService,
+            GitHubAppService gitHubAppService,
             @Value("${github.push-worker.max-batch:5}") int maxBatchSize) {
         this.pushEventRepository = pushEventRepository;
         this.onboardingRepository = onboardingRepository;
@@ -100,6 +102,7 @@ public class GitHubPushEventWorker {
         this.defenseService = defenseService;
         this.battleService = battleService;
         this.studyService = studyService;
+        this.gitHubAppService = gitHubAppService;
     }
 
     @Scheduled(fixedDelayString = "${github.push-worker.fixed-delay:10000}")
@@ -147,7 +150,7 @@ public class GitHubPushEventWorker {
             Onboarding onboarding = onboardingRepository.findByRepositoryName(event.getRepositoryName())
                     .orElseThrow(() -> new GitHubWebhookException("해당 저장소의 온보딩 정보가 없습니다."));
 
-            UserOAuthToken token = oauthTokenService.requireValidAccessToken(onboarding.getUserId());
+            String accessToken = resolveAccessToken(event, onboarding.getUserId());
             List<QueuedPushFile> files = readFiles(event.getFilesJson());
 
             boolean processed = false;
@@ -155,7 +158,7 @@ public class GitHubPushEventWorker {
                 if (!file.isProcessable()) {
                     continue;
                 }
-                AlgorithmRecord record = storeAlgorithmRecord(event, onboarding.getUserId(), token.getAccessToken(),
+                AlgorithmRecord record = storeAlgorithmRecord(event, onboarding.getUserId(), accessToken,
                         file);
                 createdRecords.add(record);
                 processed = true;
@@ -193,6 +196,34 @@ public class GitHubPushEventWorker {
         } catch (JsonProcessingException ex) {
             throw new GitHubWebhookException("files_json 파싱에 실패했습니다.", ex);
         }
+    }
+
+    private String resolveAccessToken(GitHubPushEvent event, Long userId) {
+        if (StringUtils.hasText(event.getRawPayload())) {
+            try {
+                Long installationId = parseInstallationId(event.getRawPayload());
+                if (installationId != null) {
+                    return gitHubAppService.getInstallationAccessToken(installationId);
+                }
+            } catch (Exception e) {
+                log.warn("Failed to parse installation ID from raw payload for event: {}", event.getDeliveryId(), e);
+            }
+        }
+
+        UserOAuthToken token = oauthTokenService.requireValidAccessToken(userId);
+        return token.getAccessToken();
+    }
+
+    private Long parseInstallationId(String rawPayload) {
+        try {
+            var node = objectMapper.readTree(rawPayload);
+            if (node.has("installation") && node.get("installation").has("id")) {
+                return node.get("installation").get("id").asLong();
+            }
+        } catch (JsonProcessingException e) {
+            log.warn("Error parsing raw payload for installation ID", e);
+        }
+        return null;
     }
 
     private AlgorithmRecord storeAlgorithmRecord(GitHubPushEvent event,
