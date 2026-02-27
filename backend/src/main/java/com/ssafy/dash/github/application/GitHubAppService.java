@@ -25,10 +25,15 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 
 import org.springframework.http.ResponseEntity;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
 @Service
 public class GitHubAppService {
+
+    private static final Logger log = LoggerFactory.getLogger(GitHubAppService.class);
 
     private final GitHubAppProperties properties;
     private final ResourceLoader resourceLoader;
@@ -44,13 +49,14 @@ public class GitHubAppService {
         try {
             long now = Instant.now().getEpochSecond();
             // JWT 유효기간: 10분
+            long iat = now - 30;
             long exp = now + (10 * 60);
 
             return Jwts.builder()
-                    .issuedAt(new Date(now * 1000))
+                    .issuedAt(new Date(iat * 1000))
                     .expiration(new Date(exp * 1000))
                     .issuer(properties.getId())
-                    .signWith(loadPrivateKey())
+                    .signWith(loadPrivateKey(), Jwts.SIG.RS256)
                     .compact();
         } catch (Exception e) {
             throw new RuntimeException("Failed to generate GitHub App JWT", e);
@@ -67,15 +73,50 @@ public class GitHubAppService {
         HttpEntity<Void> entity = new HttpEntity<>(headers);
 
         try {
-            ResponseEntity<Map> response = restTemplate.exchange(
+            ResponseEntity<Map<String, Object>> response = restTemplate.exchange(
                     "https://api.github.com/app/installations/" + installationId + "/access_tokens",
                     HttpMethod.POST,
                     entity,
-                    Map.class);
+                    new org.springframework.core.ParameterizedTypeReference<Map<String, Object>>() {
+                    });
 
             return (String) response.getBody().get("token");
         } catch (Exception e) {
             throw new RuntimeException("Failed to retrieve installation access token", e);
+        }
+    }
+
+    public boolean isAppInstalledOnRepo(String fullName) {
+        String jwt = generateJwt();
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.set("Authorization", "Bearer " + jwt);
+        headers.set("Accept", "application/vnd.github+json");
+        headers.set("User-Agent", "DashHub-App");
+
+        HttpEntity<Void> entity = new HttpEntity<>(headers);
+
+        try {
+            log.debug("Checking GitHub App installation for repo: {} using App ID: {}", fullName, properties.getId());
+            ResponseEntity<Map<String, Object>> response = restTemplate.exchange(
+                    "https://api.github.com/repos/" + fullName + "/installation",
+                    HttpMethod.GET,
+                    entity,
+                    new org.springframework.core.ParameterizedTypeReference<Map<String, Object>>() {
+                    });
+
+            log.info("GitHub App installation check for {}: Status {}", fullName, response.getStatusCode());
+            return response.getStatusCode().is2xxSuccessful();
+        } catch (HttpClientErrorException.NotFound e) {
+            log.warn("GitHub App (ID: {}) is not installed on repository: {}", properties.getId(), fullName);
+            return false;
+        } catch (HttpClientErrorException e) {
+            log.error("GitHub API error checking installation: {} - {}", e.getStatusCode(),
+                    e.getResponseBodyAsString());
+            return false;
+        } catch (Exception e) {
+            log.error("Unexpected error checking GitHub App installation for repository: {}", fullName, e);
+            throw new RuntimeException("Failed to check GitHub App installation", e);
         }
     }
 
@@ -86,6 +127,8 @@ public class GitHubAppService {
         String privateKeyPEM = privateKeyContent
                 .replace("-----BEGIN RSA PRIVATE KEY-----", "")
                 .replace("-----END RSA PRIVATE KEY-----", "")
+                .replace("-----BEGIN PRIVATE KEY-----", "")
+                .replace("-----END PRIVATE KEY-----", "")
                 .replaceAll("\\s", "");
 
         byte[] encoded = Base64.getDecoder().decode(privateKeyPEM);

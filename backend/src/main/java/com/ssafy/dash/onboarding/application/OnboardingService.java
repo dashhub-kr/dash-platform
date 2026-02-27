@@ -1,15 +1,11 @@
 package com.ssafy.dash.onboarding.application;
 
-import com.ssafy.dash.github.application.GitHubWebhookService;
-import com.ssafy.dash.github.domain.exception.GitHubWebhookException;
-import com.ssafy.dash.oauth.application.OAuthTokenService;
-import com.ssafy.dash.oauth.domain.UserOAuthToken;
-import com.ssafy.dash.oauth.domain.exception.OAuthAccessTokenUnavailableException;
 import com.ssafy.dash.onboarding.application.dto.command.RepositorySetupCommand;
 import com.ssafy.dash.onboarding.application.dto.result.RepositorySetupResult;
 import com.ssafy.dash.onboarding.domain.Onboarding;
 import com.ssafy.dash.onboarding.domain.OnboardingRepository;
-import com.ssafy.dash.onboarding.domain.exception.WebhookRegistrationException;
+import com.ssafy.dash.onboarding.domain.exception.GitHubAppNotInstalledException;
+import com.ssafy.dash.github.application.GitHubAppService;
 import com.ssafy.dash.study.application.StudyService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -20,21 +16,25 @@ import java.time.LocalDateTime;
 public class OnboardingService {
 
     private final OnboardingRepository onboardingRepository;
-    private final GitHubWebhookService gitHubWebhookService;
-    private final OAuthTokenService oauthTokenService;
     private final StudyService studyService;
+    private final GitHubAppService gitHubAppService;
 
-    public OnboardingService(OnboardingRepository onboardingRepository, GitHubWebhookService gitHubWebhookService,
-            OAuthTokenService oauthTokenService, StudyService studyService) {
+    public OnboardingService(OnboardingRepository onboardingRepository, StudyService studyService,
+            GitHubAppService gitHubAppService) {
         this.onboardingRepository = onboardingRepository;
-        this.gitHubWebhookService = gitHubWebhookService;
-        this.oauthTokenService = oauthTokenService;
         this.studyService = studyService;
+        this.gitHubAppService = gitHubAppService;
     }
 
     @Transactional
     public RepositorySetupResult setupRepository(RepositorySetupCommand command) {
         String repositoryName = command.repositoryName().trim();
+
+        // GitHub App 설치 여부 사전 검증
+        if (!gitHubAppService.isAppInstalledOnRepo(repositoryName)) {
+            throw new GitHubAppNotInstalledException(repositoryName);
+        }
+
         Long userId = command.userId();
         Onboarding repository = onboardingRepository.findByUserId(userId)
                 .map(existing -> {
@@ -44,22 +44,8 @@ public class OnboardingService {
                 .orElseGet(() -> Onboarding.create(userId, repositoryName, LocalDateTime.now()));
         onboardingRepository.save(repository);
 
-        UserOAuthToken oauthToken;
-        try {
-            oauthToken = oauthTokenService.requireValidAccessToken(userId);
-        } catch (OAuthAccessTokenUnavailableException ex) {
-            throw new WebhookRegistrationException(ex.getMessage(), ex);
-        }
-
-        try {
-            gitHubWebhookService.ensureWebhook(repositoryName, oauthToken.getAccessToken());
-            repository.markWebhookConfigured(true, LocalDateTime.now());
-            onboardingRepository.save(repository);
-        } catch (GitHubWebhookException ex) {
-            repository.markWebhookConfigured(false, LocalDateTime.now());
-            onboardingRepository.save(repository);
-            throw new WebhookRegistrationException(ex.getMessage(), ex);
-        }
+        repository.markWebhookConfigured(true, LocalDateTime.now());
+        onboardingRepository.save(repository);
 
         // Auto-create Personal Study (Personal Lab) for the user
         studyService.createPersonalStudy(userId);

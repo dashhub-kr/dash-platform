@@ -47,9 +47,9 @@
                              <RotateCcw class="w-3 h-3" /> 새로고침
                            </button>
                            <a 
-                              href="https://chromewebstore.google.com/detail/kimjgflahdmnlhilmojcoaechlgkokhc?utm_source=item-share-cb" 
-                              target="_blank"
-                              class="px-3 py-1.5 bg-slate-900 text-white text-[10px] font-bold rounded-lg hover:bg-slate-700 transition-colors flex items-center gap-1"
+                               href="https://chromewebstore.google.com/detail/kimjgflahdmnlhilmojcoaechlgkokhc?utm_source=item-share-cb" 
+                               target="_blank"
+                               class="px-3 py-1.5 bg-slate-900 text-white text-[10px] font-bold rounded-lg hover:bg-slate-700 transition-colors flex items-center gap-1"
                            >
                              설치하기
                            </a>
@@ -126,7 +126,6 @@
                </button>
            </div>
            
-           <!-- Retry Manual : Removed as requested -->
         </div>
 
       </div>

@@ -19,7 +19,7 @@
 
 <script setup>
 import { ref, computed, onMounted, watch } from 'vue';
-import { useRouter } from 'vue-router';
+import { useRoute, useRouter } from 'vue-router';
 import { useAuth } from '@/composables/useAuth';
 
 // 새로운 단계 컴포넌트 임포트
@@ -30,6 +30,7 @@ import Step4Extension from './OnboardingStep4Extension.vue';
 import Step5Repo from './OnboardingStep5Repo.vue';
 import Step6Guide from './OnboardingStep6Guide.vue';
 
+const route = useRoute();
 const router = useRouter();
 const { user, refresh } = useAuth();
 
@@ -59,6 +60,7 @@ const currentStepComponent = computed(() => {
 });
 
 const determineInitialStep = () => {
+  console.log('Determining initial step. Query:', route.query);
   if (!user.value) {
     currentStepIndex.value = 0;
     return;
@@ -69,6 +71,13 @@ const determineInitialStep = () => {
   const hasRepo = !!user.value.repositoryName;
   const hasAnalysis = !!user.value.hasAnalysis;
   const hasPendingStudy = !!user.value.pendingStudyName;
+
+  // GitHub App 설치 후 돌아온 경우 (URL 파라미터 확인)
+  if (route.query.installation_id) {
+    console.log('Found installation_id, forcing Step 5 (Repo)');
+    currentStepIndex.value = 4; // repo 단계로 강제 이동
+    return;
+  }
 
   // 1. Solved.ac 확인
   if (!hasSolvedac) {
