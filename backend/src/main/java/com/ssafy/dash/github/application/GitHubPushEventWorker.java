@@ -22,7 +22,6 @@ import com.ssafy.dash.mockexam.application.MockExamService;
 import com.ssafy.dash.defense.application.DefenseService;
 import com.ssafy.dash.battle.application.BattleService;
 import com.ssafy.dash.acorn.application.AcornService;
-import com.ssafy.dash.ai.application.CodeReviewService;
 import com.ssafy.dash.study.application.StudyMissionService;
 import com.ssafy.dash.study.application.StudyService;
 import org.slf4j.Logger;
@@ -59,7 +58,6 @@ public class GitHubPushEventWorker {
     private final TransactionTemplate transactionTemplate;
     private final UserRepository userRepository;
     private final AcornService acornService;
-    private final CodeReviewService codeReviewService;
     private final StudyMissionService studyMissionService;
     private final MockExamService mockExamService;
     private final DefenseService defenseService;
@@ -76,7 +74,6 @@ public class GitHubPushEventWorker {
             PlatformTransactionManager transactionManager,
             UserRepository userRepository,
             AcornService acornService,
-            CodeReviewService codeReviewService,
             StudyMissionService studyMissionService,
             MockExamService mockExamService,
             DefenseService defenseService,
@@ -94,7 +91,6 @@ public class GitHubPushEventWorker {
         this.transactionTemplate = new TransactionTemplate(transactionManager);
         this.userRepository = userRepository;
         this.acornService = acornService;
-        this.codeReviewService = codeReviewService;
         this.studyMissionService = studyMissionService;
         this.mockExamService = mockExamService;
         this.defenseService = defenseService;
@@ -110,25 +106,7 @@ public class GitHubPushEventWorker {
                 return;
             }
             GitHubPushEvent event = optional.get();
-            // 트랜잭션 내에서 레코드 저장 후, 생성된 레코드 목록 반환
-            List<AlgorithmRecord> newRecords = transactionTemplate.execute(status -> processEvent(event));
-
-            // 트랜잭션 커밋 후 AI 분석 실행 (별도 트랜잭션)
-            if (newRecords != null) {
-                for (AlgorithmRecord record : newRecords) {
-                    try {
-                        codeReviewService.analyzeAndSave(
-                                record.getId(),
-                                record.getCode(),
-                                record.getLanguage(),
-                                record.getProblemNumber(),
-                                record.getPlatform(),
-                                record.getTitle());
-                    } catch (Exception e) {
-                        log.error("Auto-analysis failed via worker for record: {}", record.getId(), e);
-                    }
-                }
-            }
+            transactionTemplate.execute(status -> processEvent(event));
         }
     }
 

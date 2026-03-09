@@ -6,5 +6,6 @@ public record CodeReviewRequest(
         String language,
         String problemNumber,
         String platform,
-        String problemTitle) {
+        String problemTitle,
+        Boolean force) {
 }

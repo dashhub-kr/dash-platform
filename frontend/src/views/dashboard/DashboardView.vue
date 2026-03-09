@@ -525,7 +525,7 @@
 
                 <!-- 3. 분석 사이드바 (컨텍스트) -->
                 <div class="flex-1 min-h-0 overflow-hidden rounded-2xl border border-slate-200 shadow-sm bg-white" @click.stop>
-                     <AnalysisSidebar :record="activeAnalysisRecord" @scroll-to-line="handleScrollToLine" @acorn-used="handleAcornUsed" />
+                     <AnalysisSidebar :record="activeAnalysisRecord" @scroll-to-line="handleScrollToLine" @acorn-used="handleAcornUsed" @analysis-loaded="handleAnalysisLoaded" />
                 </div>
 
 
@@ -1006,6 +1006,22 @@ const handleScrollToLine = ({ start, end }) => {
     console.log('Dashboard: handleScrollToLine', start, end, 'activeCardRef:', !!activeCardRef.value);
     if (activeCardRef.value && activeCardRef.value.scrollToLine) {
         activeCardRef.value.scrollToLine(start, end);
+    }
+};
+
+const handleAnalysisLoaded = (nextRecord) => {
+    if (!nextRecord?.id) return;
+
+    records.value = records.value.map(record => (
+        record.id === nextRecord.id ? { ...record, ...nextRecord } : record
+    ));
+
+    if (activeAnalysisRecord.value?.id === nextRecord.id) {
+        activeAnalysisRecord.value = { ...activeAnalysisRecord.value, ...nextRecord };
+    }
+
+    if (currentDrawerRecord.value?.id === nextRecord.id) {
+        currentDrawerRecord.value = { ...currentDrawerRecord.value, ...nextRecord };
     }
 };
 

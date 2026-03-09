@@ -22,7 +22,8 @@ public record StudyListResponse(
         LocalDate streakUpdatedAt, // streak 유효성 판단용
         Double averageSubmissionRate,
         List<MemberPreview> memberPreviews, // 멤버 미리보기 (프론트에서 표시 개수 조절)
-        String description) {
+        String description,
+        Long creatorId) {
 
     public static StudyListResponse from(Study study, List<User> members) {
         List<MemberPreview> previews = members != null
@@ -44,7 +45,8 @@ public record StudyListResponse(
                 study.getStreakUpdatedAt(),
                 study.getAverageSubmissionRate() != null ? study.getAverageSubmissionRate() : 0.0,
                 previews,
-                study.getDescription());
+                study.getDescription(),
+                study.getCreatorId());
     }
 
     private static String getTierBadge(Double tier) {

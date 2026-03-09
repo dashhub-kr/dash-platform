@@ -6,6 +6,7 @@ import com.ssafy.dash.study.application.StudyMissionService;
 import com.ssafy.dash.study.application.StudyService;
 import com.ssafy.dash.study.domain.Study;
 import com.ssafy.dash.study.presentation.dto.CreateStudyRequest;
+import com.ssafy.dash.study.presentation.dto.UpdateStudyRequest;
 import com.ssafy.dash.study.presentation.dto.request.ApplyStudyRequest;
 import com.ssafy.dash.study.presentation.dto.request.CreateMissionRequest;
 import com.ssafy.dash.study.presentation.dto.request.AddMissionProblemsRequest;
@@ -97,6 +98,19 @@ public class StudyController {
         if (principal instanceof CustomOAuth2User customUser) {
             Study study = studyService.createPersonalStudy(customUser.getUserId());
             return ResponseEntity.ok(CreateStudyResponse.from(study));
+        }
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+    }
+
+    @Operation(summary = "스터디 정보 수정", description = "스터디의 이름이나 소개를 수정합니다.")
+    @PatchMapping("/{studyId}")
+    public ResponseEntity<Void> updateStudy(
+            @Parameter(hidden = true) @AuthenticationPrincipal OAuth2User principal,
+            @PathVariable Long studyId,
+            @RequestBody UpdateStudyRequest request) {
+        if (principal instanceof CustomOAuth2User customUser) {
+            studyService.updateStudy(customUser.getUserId(), studyId, request.getName(), request.getDescription());
+            return ResponseEntity.ok().build();
         }
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
     }

@@ -17,13 +17,21 @@ import com.ssafy.dash.ai.presentation.dto.LearningDashboardResponse;
 import com.ssafy.dash.ai.presentation.dto.request.CodeReviewRequest;
 import com.ssafy.dash.ai.presentation.dto.request.HintChatRequestDto;
 import com.ssafy.dash.ai.presentation.dto.response.HintChatResponseDto;
+import com.ssafy.dash.oauth.presentation.security.CustomOAuth2User;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
+import java.util.NoSuchElementException;
 
 /**
  * AI API 컨트롤러
@@ -42,23 +50,49 @@ public class AiController {
 
         @Operation(summary = "코드 분석 요청", description = "알고리즘 풀이 코드를 AI로 분석합니다")
         @PostMapping("/review")
-        public ResponseEntity<CodeAnalysisResult> analyzeCode(@RequestBody CodeReviewRequest request) {
-                CodeAnalysisResult result = codeReviewService.analyzeAndSave(
-                                request.algorithmRecordId(),
-                                request.code(),
-                                request.language(),
-                                request.problemNumber(),
-                                request.platform(),
-                                request.problemTitle());
-                return ResponseEntity.ok(result);
+        public ResponseEntity<CodeAnalysisResult> analyzeCode(
+                        @Parameter(hidden = true) @AuthenticationPrincipal OAuth2User principal,
+                        @RequestBody CodeReviewRequest request) {
+                if (!(principal instanceof CustomOAuth2User customUser)) {
+                        throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "로그인이 필요합니다.");
+                }
+                if (request.algorithmRecordId() == null) {
+                        throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "algorithmRecordId는 필수입니다.");
+                }
+
+                try {
+                        CodeAnalysisResult result = codeReviewService.analyzeOnDemand(
+                                        request.algorithmRecordId(),
+                                        customUser.getUserId(),
+                                        Boolean.TRUE.equals(request.force()));
+                        return ResponseEntity.ok(result);
+                } catch (NoSuchElementException e) {
+                        throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage(), e);
+                } catch (AccessDeniedException e) {
+                        throw new ResponseStatusException(HttpStatus.FORBIDDEN, e.getMessage(), e);
+                } catch (IllegalArgumentException e) {
+                        throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage(), e);
+                }
         }
 
         @Operation(summary = "분석 결과 조회", description = "저장된 분석 결과를 조회합니다")
         @GetMapping("/review/{algorithmRecordId}")
-        public ResponseEntity<CodeAnalysisResult> getAnalysisResult(@PathVariable Long algorithmRecordId) {
-                return codeReviewService.getAnalysisResult(algorithmRecordId)
-                                .map(ResponseEntity::ok)
-                                .orElse(ResponseEntity.notFound().build());
+        public ResponseEntity<CodeAnalysisResult> getAnalysisResult(
+                        @Parameter(hidden = true) @AuthenticationPrincipal OAuth2User principal,
+                        @PathVariable Long algorithmRecordId) {
+                if (!(principal instanceof CustomOAuth2User customUser)) {
+                        throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "로그인이 필요합니다.");
+                }
+
+                try {
+                        return codeReviewService.getAnalysisResultAuthorized(algorithmRecordId, customUser.getUserId())
+                                        .map(ResponseEntity::ok)
+                                        .orElse(ResponseEntity.notFound().build());
+                } catch (NoSuchElementException e) {
+                        throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage(), e);
+                } catch (AccessDeniedException e) {
+                        throw new ResponseStatusException(HttpStatus.FORBIDDEN, e.getMessage(), e);
+                }
         }
 
         @Operation(summary = "AI 튜터 대화", description = "맞은 문제/틀린 문제 모두 지원하는 대화형 AI 튜터")

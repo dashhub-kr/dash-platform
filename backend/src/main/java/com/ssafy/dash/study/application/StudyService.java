@@ -12,6 +12,9 @@ import com.ssafy.dash.user.presentation.dto.response.UserResponse;
 import com.ssafy.dash.notification.application.NotificationService;
 import com.ssafy.dash.notification.domain.NotificationType;
 import com.ssafy.dash.study.domain.Study.StudyType;
+import com.ssafy.dash.common.exception.BusinessException;
+import com.ssafy.dash.common.exception.ErrorCode;
+import com.ssafy.dash.user.domain.exception.UserNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -101,7 +104,7 @@ public class StudyService {
     @Transactional
     public Study createStudy(Long userId, String name, String description, StudyVisibility visibility) {
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+                .orElseThrow(() -> new UserNotFoundException(userId));
 
         // 스터디 이동(Transition): 이미 다른 Group 스터디에 있다면, 탈퇴 또는 삭제 처리
         if (user.getStudyId() != null) {
@@ -151,7 +154,7 @@ public class StudyService {
     @Transactional
     public Study createPersonalStudy(Long userId) {
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+                .orElseThrow(() -> new UserNotFoundException(userId));
 
         if (user.getStudyId() != null) {
             return studyRepository.findById(user.getStudyId()).orElse(null);
@@ -172,13 +175,13 @@ public class StudyService {
     @Transactional
     public void applyForStudy(Long userId, Long studyId, String message) {
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+                .orElseThrow(() -> new UserNotFoundException(userId));
 
         // 스터디 이동 로직은 승인 시점에 처리됩니다. (applyForStudy에서는 체크하지 않음)
 
         // 스터디 존재 여부 확인
         if (studyRepository.findById(studyId).isEmpty()) {
-            throw new IllegalArgumentException("Study not found");
+            throw new BusinessException(ErrorCode.RESOURCE_NOT_FOUND);
         }
 
         // 이미 가입 신청했는지 확인
@@ -206,10 +209,10 @@ public class StudyService {
     @Transactional(readOnly = true)
     public List<StudyApplication> getPendingApplications(Long userId, Long studyId) {
         Study study = studyRepository.findById(studyId)
-                .orElseThrow(() -> new IllegalArgumentException("Study not found"));
+                .orElseThrow(() -> new BusinessException(ErrorCode.RESOURCE_NOT_FOUND));
 
         if (!Objects.equals(study.getCreatorId(), userId)) {
-            throw new SecurityException("Only creator can view applications");
+            throw new BusinessException(ErrorCode.UNAUTHORIZED_ACCESS);
         }
 
         return studyRepository.findPendingApplicationsByStudyId(studyId);
@@ -223,10 +226,10 @@ public class StudyService {
     @Transactional
     public void cancelApplication(Long userId, Long applicationId) {
         StudyApplication application = studyRepository.findApplicationById(applicationId)
-                .orElseThrow(() -> new IllegalArgumentException("Application not found"));
+                .orElseThrow(() -> new BusinessException(ErrorCode.RESOURCE_NOT_FOUND));
 
         if (!Objects.equals(application.getUserId(), userId)) {
-            throw new SecurityException("Cannot cancel other's application");
+            throw new BusinessException(ErrorCode.UNAUTHORIZED_ACCESS);
         }
 
         application.reject();
@@ -236,18 +239,18 @@ public class StudyService {
     @Transactional
     public void approveApplication(Long adminId, Long applicationId) {
         StudyApplication application = studyRepository.findApplicationById(applicationId)
-                .orElseThrow(() -> new IllegalArgumentException("Application not found"));
+                .orElseThrow(() -> new BusinessException(ErrorCode.RESOURCE_NOT_FOUND));
 
         Study study = studyRepository.findById(application.getStudyId())
-                .orElseThrow(() -> new IllegalArgumentException("Study not found"));
+                .orElseThrow(() -> new BusinessException(ErrorCode.RESOURCE_NOT_FOUND));
 
         if (!Objects.equals(study.getCreatorId(), adminId)) {
-            throw new SecurityException("Only creator can approve applications");
+            throw new BusinessException(ErrorCode.UNAUTHORIZED_ACCESS);
         }
 
         // 유저를 스터디에 추가
         User user = userRepository.findById(application.getUserId())
-                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+                .orElseThrow(() -> new UserNotFoundException(application.getUserId()));
 
         // 탈퇴한 유저인지 확인
         if (user.isDeleted()) {
@@ -314,13 +317,13 @@ public class StudyService {
     @Transactional
     public void rejectApplication(Long leaderId, Long applicationId, String reason) {
         StudyApplication application = studyRepository.findApplicationById(applicationId)
-                .orElseThrow(() -> new IllegalArgumentException("Application not found"));
+                .orElseThrow(() -> new BusinessException(ErrorCode.RESOURCE_NOT_FOUND));
 
         Study study = studyRepository.findById(application.getStudyId())
-                .orElseThrow(() -> new IllegalArgumentException("Study not found"));
+                .orElseThrow(() -> new BusinessException(ErrorCode.RESOURCE_NOT_FOUND));
 
         if (!Objects.equals(study.getCreatorId(), leaderId)) {
-            throw new SecurityException("Only creator can reject applications");
+            throw new BusinessException(ErrorCode.UNAUTHORIZED_ACCESS);
         }
 
         // DB에서 삭제하여 재가입 가능하도록 함
@@ -342,7 +345,7 @@ public class StudyService {
     @Transactional
     public void leaveStudy(Long userId) {
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+                .orElseThrow(() -> new UserNotFoundException(userId));
 
         if (user.getStudyId() == null) {
             throw new IllegalStateException("User is not in a study");
@@ -350,7 +353,7 @@ public class StudyService {
 
         Long oldStudyId = user.getStudyId();
         Study study = studyRepository.findById(oldStudyId)
-                .orElseThrow(() -> new IllegalArgumentException("Study not found"));
+                .orElseThrow(() -> new BusinessException(ErrorCode.RESOURCE_NOT_FOUND));
 
         if (Objects.equals(study.getCreatorId(), userId)) {
             // 정책: 스터디장은 탈퇴할 수 없음. 스터디를 해체하거나 권한을 위임해야 함. (아직 구현되지 않음)
@@ -383,17 +386,40 @@ public class StudyService {
     }
 
     @Transactional
-    public void deleteStudy(Long userId, Long studyId) {
+    public void updateStudy(Long userId, Long studyId, String name, String description) {
         Study study = studyRepository.findById(studyId)
-                .orElseThrow(() -> new IllegalArgumentException("Study not found"));
+                .orElseThrow(() -> new BusinessException(ErrorCode.RESOURCE_NOT_FOUND));
 
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+                .orElseThrow(() -> new UserNotFoundException(userId));
+
+        boolean isAdmin = "ROLE_ADMIN".equals(user.getRole());
+        if (!java.util.Objects.equals(study.getCreatorId(), userId) && !isAdmin) {
+            throw new BusinessException(ErrorCode.UNAUTHORIZED_ACCESS);
+        }
+
+        if (name != null && !name.isBlank()) {
+            study.setName(name);
+        }
+        if (description != null) {
+            study.setDescription(description);
+        }
+
+        studyRepository.update(study);
+    }
+
+    @Transactional
+    public void deleteStudy(Long userId, Long studyId) {
+        Study study = studyRepository.findById(studyId)
+                .orElseThrow(() -> new BusinessException(ErrorCode.RESOURCE_NOT_FOUND));
+
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new UserNotFoundException(userId));
 
         // 스터디장 또는 관리자만 삭제 가능
         boolean isAdmin = "ROLE_ADMIN".equals(user.getRole());
         if (!Objects.equals(study.getCreatorId(), userId) && !isAdmin) {
-            throw new SecurityException("Only creator or admin can delete the study");
+            throw new BusinessException(ErrorCode.UNAUTHORIZED_ACCESS);
         }
 
         // 1. 모든 멤버를 각자의 Personal 스터디로 쫓아냄
@@ -420,7 +446,7 @@ public class StudyService {
     @Transactional(readOnly = true)
     public List<UserResponse> getStudyMembers(Long studyId) {
         Study study = studyRepository.findById(studyId)
-                .orElseThrow(() -> new IllegalArgumentException("Study not found"));
+                .orElseThrow(() -> new BusinessException(ErrorCode.RESOURCE_NOT_FOUND));
 
         return userRepository.findByStudyId(studyId).stream()
                 .map(user -> UserResult.from(user, null, study))
@@ -439,17 +465,21 @@ public class StudyService {
     @Transactional
     public void delegateLeader(Long currentLeaderId, Long studyId, Long newLeaderId) {
         Study study = studyRepository.findById(studyId)
-                .orElseThrow(() -> new IllegalArgumentException("Study not found"));
+                .orElseThrow(() -> new BusinessException(ErrorCode.RESOURCE_NOT_FOUND));
 
-        if (!Objects.equals(study.getCreatorId(), currentLeaderId)) {
-            throw new SecurityException("Only creator can delegate the leader role");
+        User user = userRepository.findById(currentLeaderId)
+                .orElseThrow(() -> new UserNotFoundException(currentLeaderId));
+
+        boolean isAdmin = "ROLE_ADMIN".equals(user.getRole());
+        if (!Objects.equals(study.getCreatorId(), currentLeaderId) && !isAdmin) {
+            throw new BusinessException(ErrorCode.UNAUTHORIZED_ACCESS);
         }
 
         User newLeader = userRepository.findById(newLeaderId)
-                .orElseThrow(() -> new IllegalArgumentException("New leader not found"));
+                .orElseThrow(() -> new UserNotFoundException(newLeaderId));
 
         if (!Objects.equals(newLeader.getStudyId(), studyId)) {
-            throw new IllegalArgumentException("New leader must be a member of the study");
+            throw new BusinessException(ErrorCode.VALIDATION_FAILED);
         }
 
         study.setCreatorId(newLeaderId);
@@ -466,13 +496,13 @@ public class StudyService {
     @Transactional(readOnly = true)
     public StudyApplication getApplicationDetail(Long userId, Long applicationId) {
         StudyApplication app = studyRepository.findApplicationById(applicationId)
-                .orElseThrow(() -> new IllegalArgumentException("Application not found"));
+                .orElseThrow(() -> new BusinessException(ErrorCode.RESOURCE_NOT_FOUND));
 
         Study study = studyRepository.findById(app.getStudyId())
-                .orElseThrow(() -> new IllegalArgumentException("Study not found"));
+                .orElseThrow(() -> new BusinessException(ErrorCode.RESOURCE_NOT_FOUND));
 
         if (!Objects.equals(study.getCreatorId(), userId)) {
-            throw new SecurityException("Only creator can view application details");
+            throw new BusinessException(ErrorCode.UNAUTHORIZED_ACCESS);
         }
 
         return app;
