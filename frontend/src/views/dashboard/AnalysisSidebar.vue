@@ -4,8 +4,8 @@
       <div class="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center mb-4">
         <Activity class="w-8 h-8 opacity-20" />
       </div>
-      <p class="text-sm font-bold text-slate-500 mb-1">분석할 기록을 선택해주세요</p>
-      <p class="text-xs">타임라인에서 항목을 클릭하면<br/>상세 분석이 여기에 표시됩니다.</p>
+      <p class="text-sm font-bold text-slate-500 mb-1">분석할 기록을 선택해 주세요</p>
+      <p class="text-xs">오른쪽 카드에서 항목을 클릭하면<br/>상세 분석을 바로 확인할 수 있습니다.</p>
     </div>
 
     <template v-else>
@@ -28,16 +28,26 @@
             
             <!-- 1. OVERVIEW TAB -->
             <div v-if="activeTab === 'overview'" class="p-5 flex flex-col h-full">
-                <div v-if="!hasAnyAnalysis" class="flex-1 flex flex-col items-center justify-center text-slate-400 p-8 text-center h-full animate-pulse">
+                <div v-if="analysisStatus === 'loading'" class="flex-1 flex flex-col items-center justify-center text-slate-400 p-8 text-center h-full animate-pulse">
                     <Loader2 class="w-8 h-8 mb-4 animate-spin text-brand-500" />
-                    <p class="text-sm font-bold text-slate-600 mb-1">AI가 코드를 분석하고 있습니다</p>
-                    <p class="text-xs">잠시만 기다려주세요...</p>
+                    <p class="text-sm font-bold text-slate-600 mb-1">AI 분석을 생성하고 있습니다</p>
+                    <p class="text-xs">잠시만 기다려 주세요...</p>
+                </div>
+                <div v-else-if="analysisStatus === 'error'" class="flex-1 flex flex-col items-center justify-center text-slate-400 p-8 text-center h-full">
+                    <p class="text-sm font-bold text-rose-600 mb-2">AI 분석 생성에 실패했습니다</p>
+                    <p class="text-xs text-slate-500 mb-4">{{ analysisError || '잠시 후 다시 시도해 주세요.' }}</p>
+                    <button @click="retryAnalysis" class="px-4 py-2 bg-brand-600 hover:bg-brand-500 text-white rounded-lg text-xs font-bold">
+                        다시 시도
+                    </button>
+                </div>
+                <div v-else-if="!hasAnyAnalysis" class="flex-1 flex flex-col items-center justify-center text-slate-400 p-8 text-center h-full">
+                    <p class="text-sm font-bold text-slate-600 mb-1">표시할 AI 분석이 아직 없습니다</p>
                 </div>
                 <div v-else class="space-y-6 flex-1">
                     <!-- Structure: Variables & Functions -->
                     <div v-if="parsedVariables.length > 0 || parsedFunctions.length > 0" class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
                         <h4 class="text-xs font-bold text-slate-800 mb-3 flex items-center gap-2">
-                            <LayoutList :size="14" class="text-blue-500"/> 변수 및 함수
+                            <LayoutList :size="14" class="text-blue-500"/> 변수와 함수
                         </h4>
                         
                         <!-- Variables -->
@@ -143,10 +153,20 @@
 
             <!-- 2. ANALYSIS TAB -->
             <div v-if="activeTab === 'analysis'" class="p-5 flex flex-col h-full">
-                <div v-if="!hasAnyAnalysis" class="flex-1 flex flex-col items-center justify-center text-slate-400 p-8 text-center h-full animate-pulse">
+                <div v-if="analysisStatus === 'loading'" class="flex-1 flex flex-col items-center justify-center text-slate-400 p-8 text-center h-full animate-pulse">
                     <Loader2 class="w-8 h-8 mb-4 animate-spin text-brand-500" />
-                    <p class="text-sm font-bold text-slate-600 mb-1">AI가 코드를 분석하고 있습니다</p>
-                    <p class="text-xs">잠시만 기다려주세요...</p>
+                    <p class="text-sm font-bold text-slate-600 mb-1">AI 분석을 생성하고 있습니다</p>
+                    <p class="text-xs">잠시만 기다려 주세요...</p>
+                </div>
+                <div v-else-if="analysisStatus === 'error'" class="flex-1 flex flex-col items-center justify-center text-slate-400 p-8 text-center h-full">
+                    <p class="text-sm font-bold text-rose-600 mb-2">AI 분석 생성에 실패했습니다</p>
+                    <p class="text-xs text-slate-500 mb-4">{{ analysisError || '잠시 후 다시 시도해 주세요.' }}</p>
+                    <button @click="retryAnalysis" class="px-4 py-2 bg-brand-600 hover:bg-brand-500 text-white rounded-lg text-xs font-bold">
+                        다시 시도
+                    </button>
+                </div>
+                <div v-else-if="!hasAnyAnalysis" class="flex-1 flex flex-col items-center justify-center text-slate-400 p-8 text-center h-full">
+                    <p class="text-sm font-bold text-slate-600 mb-1">표시할 AI 분석이 아직 없습니다</p>
                 </div>
                 <!-- Complexity Cards -->
                 <div v-else class="space-y-6">
@@ -168,7 +188,7 @@
                             @click="showComplexityExplanation = !showComplexityExplanation"
                             class="text-xs text-brand-500 hover:text-brand-600 font-bold flex items-center gap-1 mx-auto transition-colors"
                         >
-                            <HelpCircle :size="12" /> 왜 이런 복잡도를 가지나요? <ChevronDown :size="12" class="transition-transform duration-300" :class="{ 'rotate-180': showComplexityExplanation }"/>
+                            <HelpCircle :size="12" /> 왜 이런 복잡도를 가지는지 보기 <ChevronDown :size="12" class="transition-transform duration-300" :class="{ 'rotate-180': showComplexityExplanation }"/>
                         </button>
                         <div v-if="showComplexityExplanation" class="mt-3 bg-slate-50 p-3 rounded-lg border border-slate-200 animate-slide-down">
                             <div class="text-xs text-slate-600 leading-relaxed whitespace-pre-line" v-html="renderMarkdown(record.complexityExplanation)"></div>
@@ -192,7 +212,7 @@
                 <!-- Refactoring -->
                 <div v-if="record.refactorProvided" class="space-y-3">
                     <h4 class="text-xs font-bold text-emerald-600 flex items-center gap-2">
-                        <Wand2 :size="14"/> 리팩토링 제안
+                        <Wand2 :size="14"/> 리팩터링 제안
                     </h4>
                     <div class="bg-emerald-50 p-3 rounded-lg border border-emerald-100">
                         <div class="text-xs text-slate-700 leading-relaxed mb-3" v-html="renderMarkdown(record.refactorExplanation)"></div>
@@ -213,16 +233,31 @@
 
             <!-- 3. COUNTER TAB -->
             <div v-if="activeTab === 'counter'" class="p-5 flex flex-col h-full">
-                <div v-if="isPassed" class="flex flex-col items-center justify-center flex-1 text-center p-6 text-slate-400 bg-slate-100 rounded-xl border border-dashed border-slate-300">
+                <div v-if="analysisStatus === 'loading'" class="flex-1 flex flex-col items-center justify-center text-slate-400 p-8 text-center h-full animate-pulse">
+                    <Loader2 class="w-8 h-8 mb-4 animate-spin text-brand-500" />
+                    <p class="text-sm font-bold text-slate-600 mb-1">AI 분석을 생성하고 있습니다</p>
+                    <p class="text-xs">분석이 완료되면 반례 생성이 가능합니다.</p>
+                </div>
+                <div v-else-if="analysisStatus === 'error'" class="flex-1 flex flex-col items-center justify-center text-slate-400 p-8 text-center h-full">
+                    <p class="text-sm font-bold text-rose-600 mb-2">AI 분석 생성에 실패했습니다</p>
+                    <p class="text-xs text-slate-500 mb-4">{{ analysisError || '잠시 후 다시 시도해 주세요.' }}</p>
+                    <button @click="retryAnalysis" class="px-4 py-2 bg-brand-600 hover:bg-brand-500 text-white rounded-lg text-xs font-bold">
+                        다시 시도
+                    </button>
+                </div>
+                <div v-else-if="!hasAnyAnalysis" class="flex-1 flex flex-col items-center justify-center text-slate-400 p-8 text-center h-full">
+                    <p class="text-sm font-bold text-slate-600 mb-1">반례 생성을 위한 분석 데이터가 아직 없습니다</p>
+                </div>
+                <div v-else-if="isPassed" class="flex flex-col items-center justify-center flex-1 text-center p-6 text-slate-400 bg-slate-100 rounded-xl border border-dashed border-slate-300">
                     <template v-if="record.tag === 'MOCK_EXAM' || record.tag === 'TEST'">
                         <Trophy :size="32" class="mb-2 text-amber-500 opacity-80"/>
                         <p class="text-xs font-bold text-slate-600 mb-1">시험 통과!</p>
-                        <p class="text-[10px]">문제 해결을 축하합니다. 훌륭한 성과입니다!</p>
+                        <p class="text-[10px]">문제 해결을 축하합니다. 좋은 결과입니다.</p>
                     </template>
                     <template v-else>
                         <CheckCircle2 :size="32" class="mb-2 text-emerald-500 opacity-50"/>
-                        <p class="text-xs font-bold text-slate-600 mb-1">이미 해결된 문제입니다!</p>
-                        <p class="text-[10px]">정답 코드는 반례 생성 기능을 사용할 수 없습니다.</p>
+                        <p class="text-xs font-bold text-slate-600 mb-1">이미 해결한 문제입니다</p>
+                        <p class="text-[10px]">정답 코드에는 반례 생성 기능을 사용할 필요가 없습니다.</p>
                     </template>
                 </div>
                 <div v-else class="flex flex-col h-full">
@@ -230,7 +265,7 @@
                         <button @click="findCounterExample" class="px-5 py-2.5 bg-rose-500 hover:brightness-90 text-white rounded-lg font-bold text-xs shadow-lg shadow-rose-500/30 transition-all flex items-center gap-2">
                             <Bug :size="14"/> 반례 생성하기
                         </button>
-                        <p class="text-[10px] text-slate-400 mt-3">AI가 코드를 분석하여 실패 원인을 찾아냅니다.</p>
+                        <p class="text-[10px] text-slate-400 mt-3">AI가 코드를 분석해 실패 원인을 찾습니다.</p>
                     </div>
                     
                     <div v-if="loadingAi" class="flex-1 flex flex-col items-center justify-center text-slate-400">
@@ -277,15 +312,25 @@
 
             <!-- 4. TUTOR TAB -->
             <div v-if="activeTab === 'tutor'" class="flex flex-col h-full relative">
-                <div v-if="!hasAnyAnalysis" class="flex-1 flex flex-col items-center justify-center text-slate-400 p-8 text-center h-full animate-pulse">
+                <div v-if="analysisStatus === 'loading'" class="flex-1 flex flex-col items-center justify-center text-slate-400 p-8 text-center h-full animate-pulse">
                     <Loader2 class="w-8 h-8 mb-4 animate-spin text-brand-500" />
-                    <p class="text-sm font-bold text-slate-600 mb-1">AI가 코드를 분석하고 있습니다</p>
-                    <p class="text-xs">분석이 완료되면 튜터 기능을 사용할 수 있습니다.</p>
+                    <p class="text-sm font-bold text-slate-600 mb-1">AI 분석을 생성하고 있습니다</p>
+                    <p class="text-xs">완료되면 튜터 기능을 사용할 수 있습니다.</p>
+                </div>
+                <div v-else-if="analysisStatus === 'error'" class="flex-1 flex flex-col items-center justify-center text-slate-400 p-8 text-center h-full">
+                    <p class="text-sm font-bold text-rose-600 mb-2">AI 분석 생성에 실패했습니다</p>
+                    <p class="text-xs text-slate-500 mb-4">{{ analysisError || '잠시 후 다시 시도해 주세요.' }}</p>
+                    <button @click="retryAnalysis" class="px-4 py-2 bg-brand-600 hover:bg-brand-500 text-white rounded-lg text-xs font-bold">
+                        다시 시도
+                    </button>
+                </div>
+                <div v-else-if="!hasAnyAnalysis" class="flex-1 flex flex-col items-center justify-center text-slate-400 p-8 text-center h-full">
+                    <p class="text-sm font-bold text-slate-600 mb-1">튜터를 위한 분석 데이터가 아직 없습니다</p>
                 </div>
                 <div v-else class="flex-1 overflow-y-auto p-4 space-y-4 custom-scrollbar" ref="chatContainer">
                     <div v-if="tutorMessages.length === 0" class="flex flex-col items-center justify-center h-full text-slate-400 text-center opacity-70">
                         <Bot :size="32" class="mb-2"/>
-                        <p class="text-xs mb-4">코드에 대해 궁금한 점을 물어보세요!</p>
+                        <p class="text-xs mb-4">코드에 대한 궁금한 점을 물어보세요</p>
                         <div class="flex flex-wrap justify-center gap-2 max-w-[80%]">
                             <button @click="sendSuggestion('코드의 핵심 로직을 설명해줘')" class="px-3 py-1.5 bg-white border border-slate-200 rounded-full text-[10px] hover:border-brand-400 hover:text-brand-600 transition-colors shadow-sm">
                                 <Brain :size="12" class="inline mr-1"/> 핵심 로직 설명
@@ -294,9 +339,9 @@
                                 <Zap :size="12" class="inline mr-1"/> 시간 복잡도 분석
                             </button>
                             <button @click="sendSuggestion('이 코드를 어떻게 개선할 수 있어?')" class="px-3 py-1.5 bg-white border border-slate-200 rounded-full text-[10px] hover:border-brand-400 hover:text-brand-600 transition-colors shadow-sm">
-                                <Sparkles :size="12" class="inline mr-1"/> 코드 개선점
+                                <Sparkles :size="12" class="inline mr-1"/> 코드 개선 질문
                             </button>
-                        </div>
+                    </div>
                     </div>
                     <div v-for="(msg, idx) in tutorMessages" :key="idx" 
                         class="flex gap-3" :class="msg.role === 'user' ? 'flex-row-reverse' : ''">
@@ -311,7 +356,7 @@
                             <div v-else-if="msg.isLoading">
                                 <div class="flex items-center gap-2 text-slate-400">
                                     <Loader2 :size="14" class="animate-spin text-brand-500"/>
-                                    <span class="text-[10px] font-bold animate-pulse">답변 생성 중...</span>
+                                    <span class="text-[10px] font-bold animate-pulse">응답 생성 중...</span>
                                 </div>
                             </div>
                             <div v-else>
@@ -373,7 +418,7 @@ const props = defineProps({
   record: { type: Object, default: null }
 });
 
-const emit = defineEmits(['scroll-to-line', 'acorn-used']);
+const emit = defineEmits(['scroll-to-line', 'acorn-used', 'analysis-loaded']);
 
 const { user } = useAuth();
 
@@ -396,16 +441,30 @@ const tutorMessages = ref([]);
 const loadingTutorResponse = ref(false);
 const chatContainer = ref(null);
 const tutorInputRef = ref(null);
+const mergedRecord = ref(null);
+const analysisStatus = ref('idle'); // idle | loading | ready | error
+const analysisError = ref('');
+const currentAnalysisRequestId = ref(0);
+const record = computed(() => mergedRecord.value);
 
 // Reset when record changes
-watch(() => props.record, (newRecord) => {
-    if (newRecord) {
+watch(
+    () => props.record,
+    async (newRecord) => {
         activeTab.value = 'overview';
         tutorMessages.value = [];
         showTrace.value = false;
         showComplexityExplanation.value = false;
-        
-        // Initialize AI Data if exists
+        analysisError.value = '';
+
+        if (!newRecord) {
+            mergedRecord.value = null;
+            aiData.value = null;
+            analysisStatus.value = 'idle';
+            return;
+        }
+
+        mergedRecord.value = { ...newRecord };
         if (newRecord.counterExampleInput) {
             aiData.value = {
                 input: newRecord.counterExampleInput,
@@ -416,22 +475,118 @@ watch(() => props.record, (newRecord) => {
         } else {
             aiData.value = null;
         }
-    } else {
-        aiData.value = null;
-    }
+
+        if (hasExistingAnalysis(newRecord)) {
+            analysisStatus.value = 'ready';
+            return;
+        }
+
+        await ensureAnalysisLoaded();
+    },
+    { immediate: true }
+);
+
+const hasExistingAnalysis = (recordLike) => {
+    if (!recordLike) return false;
+    return Boolean(
+        recordLike.summary ||
+        recordLike.timeComplexity ||
+        recordLike.spaceComplexity ||
+        recordLike.fullResponse ||
+        recordLike.pitfalls ||
+        recordLike.algorithmIntuition ||
+        recordLike.keyBlocks ||
+        recordLike.refactorProvided
+    );
+};
+
+const mapAnalysisToRecord = (analysis) => ({
+    score: analysis.score ?? null,
+    timeComplexity: analysis.timeComplexity ?? null,
+    spaceComplexity: analysis.spaceComplexity ?? null,
+    complexityExplanation: analysis.complexityExplanation ?? null,
+    patterns: analysis.patterns ?? null,
+    algorithmIntuition: analysis.algorithmIntuition ?? null,
+    pitfalls: analysis.pitfalls ?? null,
+    keyBlocks: analysis.keyBlocks ?? null,
+    refactorProvided: analysis.refactorProvided ?? false,
+    refactorCode: analysis.refactorCode ?? null,
+    refactorExplanation: analysis.refactorExplanation ?? null,
+    fullResponse: analysis.fullResponse ?? null
 });
+
+const applyAnalysisToRecord = (analysis) => {
+    const nextRecord = { ...record.value, ...mapAnalysisToRecord(analysis || {}) };
+    mergedRecord.value = nextRecord;
+    emit('analysis-loaded', nextRecord);
+    return nextRecord;
+};
+
+const ensureAnalysisLoaded = async ({ force = false } = {}) => {
+    if (!record.value?.id) return;
+    const requestId = ++currentAnalysisRequestId.value;
+    analysisStatus.value = 'loading';
+    analysisError.value = '';
+
+    try {
+        let analysis = null;
+
+        if (!force) {
+            const existing = await aiApi.getAnalysisResult(record.value.id);
+            const existingData = existing?.data ?? null;
+            analysis = hasExistingAnalysis(existingData) ? existingData : null;
+        }
+
+        if (!analysis) {
+            const created = await aiApi.analyzeCode({
+                algorithmRecordId: record.value.id,
+                force
+            });
+            analysis = created?.data ?? null;
+        }
+
+        if (requestId !== currentAnalysisRequestId.value) return;
+        applyAnalysisToRecord(analysis);
+        analysisStatus.value = 'ready';
+    } catch (error) {
+        if (requestId !== currentAnalysisRequestId.value) return;
+
+        if (error?.response?.status === 404 && !force) {
+            try {
+                const created = await aiApi.analyzeCode({
+                    algorithmRecordId: record.value.id
+                });
+                if (requestId !== currentAnalysisRequestId.value) return;
+                applyAnalysisToRecord(created?.data || {});
+                analysisStatus.value = 'ready';
+                return;
+            } catch (createError) {
+                analysisError.value = createError?.response?.data?.message || '분석 생성 요청에 실패했습니다.';
+                analysisStatus.value = 'error';
+                return;
+            }
+        }
+
+        analysisError.value = error?.response?.data?.message || '분석 조회에 실패했습니다.';
+        analysisStatus.value = 'error';
+    }
+};
+
+const retryAnalysis = async () => {
+    await ensureAnalysisLoaded({ force: true });
+};
 
 // Computed Properties (Parsing)
 const parsedFullResponse = computed(() => {
-    if (!props.record?.fullResponse) return null;
-    try { return JSON.parse(props.record.fullResponse); } catch { return null; }
+    if (!record.value?.fullResponse) return null;
+    try { return JSON.parse(record.value.fullResponse); } catch { return null; }
 });
 
 const fetchTutorHistory = async () => {
-    if (!props.record?.id || !user.value?.id) return;
+    if (!record.value?.id || !user.value?.id) return;
     
     try {
-        const res = await aiApi.getTutorHistory(props.record.id, user.value.id);
+        const res = await aiApi.getTutorHistory(record.value.id, user.value.id);
         if (Array.isArray(res.data)) {
             tutorMessages.value = res.data.map(m => ({
                 role: m.role,
@@ -460,34 +615,47 @@ const parsedVariables = computed(() => parsedStructure.value.filter(item => !ite
 const parsedFunctions = computed(() => parsedStructure.value.filter(item => item.type === 'function' || item.type === 'class'));
 
 const parsedKeyBlocks = computed(() => {
-    if (!props.record?.keyBlocks) return [];
-    try { return Array.isArray(JSON.parse(props.record.keyBlocks)) ? JSON.parse(props.record.keyBlocks) : []; } catch { return []; }
+    if (!record.value?.keyBlocks) return [];
+    try { return Array.isArray(JSON.parse(record.value.keyBlocks)) ? JSON.parse(record.value.keyBlocks) : []; } catch { return []; }
 });
 
 const parsedSummary = computed(() => parsedFullResponse.value?.summary || null);
 const parsedTraceExample = computed(() => parsedFullResponse.value?.traceExample || null);
-const parsedIntuition = computed(() => parsedFullResponse.value?.algorithm?.intuition || props.record?.algorithmIntuition || null);
+const parsedIntuition = computed(() => parsedFullResponse.value?.algorithm?.intuition || record.value?.algorithmIntuition || null);
 
 const parsedPitfalls = computed(() => {
-    if (!parsedFullResponse.value || !parsedFullResponse.value.pitfalls) return [];
-    return Array.isArray(parsedFullResponse.value.pitfalls) ? parsedFullResponse.value.pitfalls : [];
+    const fullResponsePitfalls = parsedFullResponse.value?.pitfalls;
+    if (Array.isArray(fullResponsePitfalls)) {
+        return fullResponsePitfalls;
+    }
+
+    if (record.value?.pitfalls) {
+        try {
+            const parsed = JSON.parse(record.value.pitfalls);
+            return Array.isArray(parsed) ? parsed : [];
+        } catch {
+            return [];
+        }
+    }
+
+    return [];
 });
 
 const hasAnyAnalysis = computed(() => {
-    return props.record?.timeComplexity || 
-           props.record?.spaceComplexity || 
+    return record.value?.timeComplexity || 
+           record.value?.spaceComplexity || 
            parsedPitfalls.value.length > 0 || 
-           props.record?.refactorProvided || 
+           record.value?.refactorProvided || 
            parsedVariables.value.length > 0 || 
            parsedSummary.value || 
            parsedIntuition.value;
 });
 
 const isPassed = computed(() => {
-    if (!props.record) return false;
-    // runtimeMs가 null이거나 -1이면 실패로 처리
-    const runtime = props.record.runtimeMs;
-    return props.record.result === 'SUCCESS' || props.record.result === 'PASSED' || (runtime !== null && runtime !== undefined && runtime !== -1);
+    if (!record.value) return false;
+    // runtimeMs媛 null?닿굅??-1?대㈃ ?ㅽ뙣濡?泥섎━
+    const runtime = record.value.runtimeMs;
+    return record.value.result === 'SUCCESS' || record.value.result === 'PASSED' || (runtime !== null && runtime !== undefined && runtime !== -1);
 });
 
 // ACTIONS
@@ -498,8 +666,8 @@ const emitScrollToLine = (start, end) => {
 };
 
 const viewCodeLine = (name) => {
-    if (!name || !props.record?.code) return;
-    const lines = props.record.code.split('\n');
+    if (!name || !record.value?.code) return;
+    const lines = record.value.code.split('\n');
     
     // Handle comma-separated names like "N, K" - search for each part
     const searchTerms = name.split(',').map(s => s.trim()).filter(s => s.length > 0);
@@ -552,12 +720,12 @@ const findCounterExample = async () => {
     loadingAi.value = true;
     try {
         const res = await aiApi.generateCounterExample({
-            recordId: props.record.id,
-            problemNumber: String(props.record.problemNumber),
-            code: props.record.code,
-            language: props.record.language,
-            platform: props.record.platform,
-            problemTitle: props.record.title
+            recordId: record.value.id,
+            problemNumber: String(record.value.problemNumber),
+            code: record.value.code,
+            language: record.value.language,
+            platform: record.value.platform,
+            problemTitle: record.value.title
         });
         aiData.value = res.data;
     } catch (e) {
@@ -573,60 +741,48 @@ const sendTutorMessage = async () => {
     const userMsg = tutorInput.value;
     tutorMessages.value.push({ role: 'user', content: userMsg });
     tutorInput.value = '';
-    
-    // Add temporary loading message
     const loadingMsg = { role: 'assistant', content: '', isLoading: true };
     tutorMessages.value.push(loadingMsg);
     loadingTutorResponse.value = true;
-    
-    // Auto-scroll
-    nextTick(() => { if(chatContainer.value) chatContainer.value.scrollTop = chatContainer.value.scrollHeight; });
+    nextTick(() => { if (chatContainer.value) chatContainer.value.scrollTop = chatContainer.value.scrollHeight; });
 
-    // History excludes current & loading
-    // We already pushed userMsg and loadingMsg, so slice -2 to get history before this turn
-    const history = tutorMessages.value.slice(0, -2).map(m => ({ 
-        role: m.role === 'user' ? 'user' : 'assistant', 
-        content: m.content 
+    const history = tutorMessages.value.slice(0, -2).map(m => ({
+        role: m.role === 'user' ? 'user' : 'assistant',
+        content: m.content
     }));
 
     try {
         const res = await aiApi.tutorChat({
              userId: user.value?.id,
-             recordId: props.record.id,
+             recordId: record.value.id,
              message: userMsg,
              solveStatus: isPassed.value ? 'solved' : 'wrong',
-             wrongReason: !isPassed.value ? '틀렸습니다' : null,
-             history: history
+             wrongReason: !isPassed.value ? '오답입니다' : null,
+             history
         });
 
-        // Remove loading message
         tutorMessages.value.pop();
-
         tutorMessages.value.push({ 
             role: 'assistant', 
-            content: res.data.reply || res.data.answer || "답변을 생성할 수 없습니다.",
+            content: res.data.reply || res.data.answer || '응답을 생성하지 못했습니다.',
             suggestions: res.data.followUpQuestions,
             concepts: res.data.relatedConcepts,
             encouragement: res.data.encouragement
         });
-        
+
         emit('acorn-used');
     } catch (e) {
         console.error("Tutor chat failed", e);
-        
-        // Remove loading message
         tutorMessages.value.pop();
-        
         const errorMsg = e.response?.data?.message || '';
         if (errorMsg.includes('Not enough acorns')) {
-             tutorMessages.value.push({ role: 'assistant', content: "도토리가 부족해 응답을 생성할 수 없습니다." });
+             tutorMessages.value.push({ role: 'assistant', content: '도토리가 부족해 응답을 생성할 수 없습니다.' });
         } else {
-             tutorMessages.value.push({ role: 'assistant', content: "죄송합니다, 답변을 생성하는 중 오류가 발생했습니다." });
+             tutorMessages.value.push({ role: 'assistant', content: '죄송합니다. 응답 생성 중 오류가 발생했습니다.' });
         }
     } finally {
         loadingTutorResponse.value = false;
-        // Scroll to bottom after response
-        nextTick(() => { if(chatContainer.value) chatContainer.value.scrollTop = chatContainer.value.scrollHeight; });
+        nextTick(() => { if (chatContainer.value) chatContainer.value.scrollTop = chatContainer.value.scrollHeight; });
     }
 };
 

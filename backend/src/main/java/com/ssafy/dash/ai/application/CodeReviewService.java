@@ -2,20 +2,30 @@ package com.ssafy.dash.ai.application;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.ssafy.dash.algorithm.domain.AlgorithmRecord;
+import com.ssafy.dash.algorithm.domain.AlgorithmRecordRepository;
 import com.ssafy.dash.ai.infrastructure.client.AiServerClient;
 import com.ssafy.dash.ai.infrastructure.client.dto.request.CodeReviewRequest;
 import com.ssafy.dash.ai.infrastructure.client.dto.response.CodeReviewResponse;
 import com.ssafy.dash.ai.infrastructure.client.dto.response.AiCounterExampleResponse;
 import com.ssafy.dash.ai.domain.CodeAnalysisResult;
 import com.ssafy.dash.ai.infrastructure.CodeAnalysisResultMapper;
+import com.ssafy.dash.user.domain.User;
+import com.ssafy.dash.user.domain.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.dao.DuplicateKeyException;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.annotation.Propagation;
 
 import java.time.LocalDateTime;
+import java.util.NoSuchElementException;
+import java.util.Objects;
 import java.util.Optional;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 
 /**
  * 코드 리뷰 서비스
@@ -28,6 +38,9 @@ public class CodeReviewService {
     private final AiServerClient aiClient;
     private final CodeAnalysisResultMapper resultMapper;
     private final ObjectMapper objectMapper;
+    private final AlgorithmRecordRepository algorithmRecordRepository;
+    private final UserRepository userRepository;
+    private final ConcurrentMap<Long, Object> analyzeLocks = new ConcurrentHashMap<>();
 
     /**
      * 코드 분석 요청 및 결과 저장
@@ -36,6 +49,8 @@ public class CodeReviewService {
     public CodeAnalysisResult analyzeAndSave(Long algorithmRecordId, String code, String language,
             String problemNumber, String platform, String problemTitle) {
         log.info("Analyzing code for record: {}", algorithmRecordId);
+
+        Optional<CodeAnalysisResult> existing = resultMapper.findByAlgorithmRecordId(algorithmRecordId);
 
         // 1. AI 서버에 분석 요청
         CodeReviewRequest request = CodeReviewRequest.builder()
@@ -50,6 +65,7 @@ public class CodeReviewService {
 
         // 2. 응답을 엔티티로 변환
         CodeAnalysisResult result = convertToEntity(algorithmRecordId, response);
+        existing.ifPresent(previous -> copyCounterExampleFields(previous, result));
 
         // 3. 기존 분석 결과가 있으면 삭제 후 새로 저장
         resultMapper.deleteByAlgorithmRecordId(algorithmRecordId);
@@ -57,6 +73,43 @@ public class CodeReviewService {
 
         log.info("Code analysis saved for record: {}, score: {}", algorithmRecordId, result.getScore());
         return result;
+    }
+
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    public CodeAnalysisResult analyzeOnDemand(Long algorithmRecordId, Long requesterUserId, boolean force) {
+        if (algorithmRecordId == null) {
+            throw new IllegalArgumentException("algorithmRecordId는 필수입니다.");
+        }
+        if (requesterUserId == null) {
+            throw new AccessDeniedException("로그인이 필요합니다.");
+        }
+
+        AlgorithmRecord record = requireAuthorizedRecord(algorithmRecordId, requesterUserId);
+        Object lock = analyzeLocks.computeIfAbsent(algorithmRecordId, key -> new Object());
+
+        try {
+            synchronized (lock) {
+                Optional<CodeAnalysisResult> existing = resultMapper.findByAlgorithmRecordId(algorithmRecordId);
+                if (existing.isPresent() && !force && hasReviewContent(existing.get())) {
+                    return existing.get();
+                }
+
+                try {
+                    return analyzeAndSave(
+                            algorithmRecordId,
+                            record.getCode(),
+                            record.getLanguage(),
+                            record.getProblemNumber(),
+                            record.getPlatform(),
+                            record.getTitle());
+                } catch (DuplicateKeyException duplicate) {
+                    return resultMapper.findByAlgorithmRecordId(algorithmRecordId)
+                            .orElseThrow(() -> duplicate);
+                }
+            }
+        } finally {
+            analyzeLocks.remove(algorithmRecordId, lock);
+        }
     }
 
     /**
@@ -95,6 +148,11 @@ public class CodeReviewService {
      * 저장된 분석 결과 조회
      */
     public Optional<CodeAnalysisResult> getAnalysisResult(Long algorithmRecordId) {
+        return resultMapper.findByAlgorithmRecordId(algorithmRecordId);
+    }
+
+    public Optional<CodeAnalysisResult> getAnalysisResultAuthorized(Long algorithmRecordId, Long requesterUserId) {
+        requireAuthorizedRecord(algorithmRecordId, requesterUserId);
         return resultMapper.findByAlgorithmRecordId(algorithmRecordId);
     }
 
@@ -175,5 +233,55 @@ public class CodeReviewService {
             log.warn("Failed to convert to JSON: {}", e.getMessage());
             return null;
         }
+    }
+
+    private AlgorithmRecord requireAuthorizedRecord(Long algorithmRecordId, Long requesterUserId) {
+        AlgorithmRecord record = algorithmRecordRepository.findById(algorithmRecordId)
+                .orElseThrow(() -> new NoSuchElementException("해당 풀이 기록을 찾을 수 없습니다: " + algorithmRecordId));
+
+        if (Objects.equals(record.getUserId(), requesterUserId)) {
+            return record;
+        }
+
+        User requester = userRepository.findById(requesterUserId)
+                .orElseThrow(() -> new AccessDeniedException("로그인이 필요합니다."));
+
+        if ("ROLE_ADMIN".equals(requester.getRole())) {
+            return record;
+        }
+
+        if (requester.getStudyId() != null && Objects.equals(requester.getStudyId(), record.getStudyId())) {
+            return record;
+        }
+
+        throw new AccessDeniedException("이 기록의 AI 분석을 볼 권한이 없습니다.");
+    }
+
+    private boolean hasReviewContent(CodeAnalysisResult result) {
+        return result != null && (
+                hasText(result.getSummary()) ||
+                        hasText(result.getTimeComplexity()) ||
+                        hasText(result.getSpaceComplexity()) ||
+                        hasText(result.getComplexityExplanation()) ||
+                        hasText(result.getPatterns()) ||
+                        hasText(result.getAlgorithmIntuition()) ||
+                        hasText(result.getPitfalls()) ||
+                        hasText(result.getImprovements()) ||
+                        hasText(result.getKeyBlocks()) ||
+                        hasText(result.getFullResponse()) ||
+                        result.isRefactorProvided() ||
+                        hasText(result.getRefactorCode()) ||
+                        hasText(result.getRefactorExplanation()));
+    }
+
+    private boolean hasText(String value) {
+        return value != null && !value.isBlank();
+    }
+
+    private void copyCounterExampleFields(CodeAnalysisResult source, CodeAnalysisResult target) {
+        target.setCounterExampleInput(source.getCounterExampleInput());
+        target.setCounterExampleExpected(source.getCounterExampleExpected());
+        target.setCounterExamplePredicted(source.getCounterExamplePredicted());
+        target.setCounterExampleReason(source.getCounterExampleReason());
     }
 }
