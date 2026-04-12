@@ -60,7 +60,6 @@ const currentStepComponent = computed(() => {
 });
 
 const determineInitialStep = () => {
-  console.log('Determining initial step. Query:', route.query);
   if (!user.value) {
     currentStepIndex.value = 0;
     return;
@@ -74,9 +73,16 @@ const determineInitialStep = () => {
 
   // GitHub App 설치 후 돌아온 경우 (URL 파라미터 확인)
   if (route.query.installation_id) {
-    console.log('Found installation_id, forcing Step 5 (Repo)');
-    currentStepIndex.value = 4; // repo 단계로 강제 이동
-    return;
+    // 1. 파라미터는 처리 후 즉시 제거 (새로고침 시 루프 방지)
+    const { installation_id, ...restQuery } = route.query;
+    router.replace({ path: route.path, query: restQuery });
+
+    // 2. 저장소가 아직 설정되지 않은 경우에만 5단계(repo)로 강제 이동
+    if (!hasRepo) {
+      currentStepIndex.value = 4; // repo 단계로 이동
+      return;
+    }
+    // 이미 저장소가 있다면 아래의 일반적인 단계 결정 로직을 따름
   }
 
   // 1. Solved.ac 확인

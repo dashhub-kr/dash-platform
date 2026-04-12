@@ -71,7 +71,7 @@
                </div>
 
                <a 
-                 :href="isAppInstalled ? '#' : `https://github.com/apps/${githubAppName}/installations/new`" 
+                 :href="installUrl" 
                  target="_blank"
                  class="w-full py-3 font-black rounded-xl transition-all shadow-md flex items-center justify-center gap-2"
                  :class="isAppInstalled 
@@ -91,9 +91,9 @@
                  :class="isAppInstalled 
                     ? 'bg-slate-900 hover:bg-slate-800 shadow-slate-900/20 hover:-translate-y-0.5' 
                     : pollingTimedOut 
-                      ? 'bg-amber-500 hover:bg-amber-400 shadow-amber-500/10' 
+                      ? 'bg-slate-300 opacity-70 cursor-not-allowed' 
                       : 'bg-slate-300 cursor-not-allowed opacity-70'"
-                :disabled="saving || (!isAppInstalled && !pollingTimedOut)"
+                :disabled="saving || !isAppInstalled"
               >
                  <template v-if="saving">
                    <Loader2 class="animate-spin w-5 h-5" />
@@ -145,7 +145,7 @@
                 <div class="pt-2">
                    <p class="font-bold text-brand-600 mb-1">4. GitHub App 설치 (필수)</p>
                    <a 
-                     :href="`https://github.com/apps/${githubAppName}/installations/new`" 
+                     :href="installUrl" 
                      target="_blank"
                      class="inline-flex items-center gap-2 text-xs font-extrabold text-white bg-slate-900 px-3 py-2 rounded-lg hover:bg-slate-700 transition-colors shadow-sm"
                    >
@@ -169,13 +169,21 @@
 </template>
 
 <script setup>
-import { ref, onMounted, onUnmounted } from 'vue';
+import { ref, computed, onMounted, onUnmounted } from 'vue';
 import { onboardingApi } from '@/api/onboarding';
 import { Search, Loader2, CheckCircle2, RotateCcw, AlertTriangle, Info, Chrome } from 'lucide-vue-next';
 
 const emit = defineEmits(['finish']);
 
-const githubAppName = import.meta.env.VITE_GITHUB_APP_NAME;
+const githubAppName = import.meta.env.VITE_GITHUB_APP_NAME ?? '';
+
+const isValidAppName = computed(() => /^[A-Za-z0-9-]+$/.test(githubAppName));
+
+const installUrl = computed(() => {
+    if (isAppInstalled.value || !isValidAppName.value) return '#';
+    return `https://github.com/apps/${githubAppName}/installations/new`;
+});
+
 
 const detecting = ref(true);
 const detectedRepo = ref(null);
@@ -251,7 +259,6 @@ const redetect = () => {
     stopAppInstallationPolling();
     isAppInstalled.value = false;
     pollingTimedOut.value = false;
-    detecting.value = true;
 
     setTimeout(() => {
         detectRepository();
@@ -283,7 +290,7 @@ const startAppInstallationPolling = () => {
             return;
         }
         attempts++;
-        if (attempts > 40) { // 1.5초 * 40 = 60초 폴링 후 멈춤
+        if (attempts > 30) { // 2.0초 * 30 = 60초 폴링 후 멈춤
             stopAppInstallationPolling();
             if (!isAppInstalled.value) {
                 pollingTimedOut.value = true;
@@ -291,7 +298,7 @@ const startAppInstallationPolling = () => {
             return;
         }
         checkAppStatus();
-    }, 1500);
+    }, 2000);
 };
 
 const checkAppStatus = async () => {

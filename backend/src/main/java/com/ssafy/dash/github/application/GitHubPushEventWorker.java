@@ -12,8 +12,6 @@ import com.ssafy.dash.github.domain.PushEventStatus;
 import com.ssafy.dash.github.domain.exception.GitHubClientException;
 import com.ssafy.dash.github.domain.exception.GitHubFileDownloadException;
 import com.ssafy.dash.github.domain.exception.GitHubWebhookException;
-import com.ssafy.dash.oauth.application.OAuthTokenService;
-import com.ssafy.dash.oauth.domain.UserOAuthToken;
 import com.ssafy.dash.onboarding.domain.Onboarding;
 import com.ssafy.dash.onboarding.domain.OnboardingRepository;
 import com.ssafy.dash.user.domain.User;
@@ -49,7 +47,6 @@ public class GitHubPushEventWorker {
 
     private final GitHubPushEventRepository pushEventRepository;
     private final OnboardingRepository onboardingRepository;
-    private final OAuthTokenService oauthTokenService;
     private final GitHubClient gitHubClient;
     private final AlgorithmRecordRepository algorithmRecordRepository;
     private final ObjectMapper objectMapper;
@@ -67,7 +64,6 @@ public class GitHubPushEventWorker {
 
     public GitHubPushEventWorker(GitHubPushEventRepository pushEventRepository,
             OnboardingRepository onboardingRepository,
-            OAuthTokenService oauthTokenService,
             GitHubClient gitHubClient,
             AlgorithmRecordRepository algorithmRecordRepository,
             ObjectMapper objectMapper,
@@ -84,7 +80,6 @@ public class GitHubPushEventWorker {
             @Value("${github.push-worker.max-batch:5}") int maxBatchSize) {
         this.pushEventRepository = pushEventRepository;
         this.onboardingRepository = onboardingRepository;
-        this.oauthTokenService = oauthTokenService;
         this.gitHubClient = gitHubClient;
         this.algorithmRecordRepository = algorithmRecordRepository;
         this.objectMapper = objectMapper;
@@ -186,10 +181,12 @@ public class GitHubPushEventWorker {
             } catch (Exception e) {
                 log.warn("Failed to parse installation ID from raw payload for event: {}", event.getDeliveryId(), e);
             }
+        } else {
+            log.warn("No raw payload found for event: {}", event.getDeliveryId());
         }
 
-        UserOAuthToken token = oauthTokenService.requireValidAccessToken(userId);
-        return token.getAccessToken();
+        throw new GitHubWebhookException(
+                "GitHub App 권한이 필요합니다. 저장소에 DashHub-App(또는 local APP)을 설치하고 권한을 부여한 후 다시 시도해주세요.");
     }
 
     private Long parseInstallationId(String rawPayload) {

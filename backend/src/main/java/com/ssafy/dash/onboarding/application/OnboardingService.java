@@ -44,6 +44,8 @@ public class OnboardingService {
                 .orElseGet(() -> Onboarding.create(userId, repositoryName, LocalDateTime.now()));
         onboardingRepository.save(repository);
 
+        // GitHub App 레벨에서 웹훅이 관리되므로 리포지토리별로 별도의 웹훅 등록 API 호출이 필요하지 않음.
+        // 앱이 리포지토리에 성공적으로 설치되었음을 확인했으므로, 웹훅 설정을 완료된 것으로 표시함.
         repository.markWebhookConfigured(true, LocalDateTime.now());
         onboardingRepository.save(repository);
 

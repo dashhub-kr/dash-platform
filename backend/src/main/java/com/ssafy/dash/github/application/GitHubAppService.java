@@ -48,8 +48,9 @@ public class GitHubAppService {
     public String generateJwt() {
         try {
             long now = Instant.now().getEpochSecond();
-            // JWT 유효기간: 10분
+            // GitHub 서버와의 시계 오차로 인한 인증 실패를 방지하기 위해 발행 시간을 30초 앞당겨 설정
             long iat = now - 30;
+            // JWT 유효기간: 10분
             long exp = now + (10 * 60);
 
             return Jwts.builder()
@@ -132,8 +133,30 @@ public class GitHubAppService {
                 .replaceAll("\\s", "");
 
         byte[] encoded = Base64.getDecoder().decode(privateKeyPEM);
+
+        // PKCS#1 형식(BEGIN RSA PRIVATE KEY)인 경우 PKCS#8로 변환 필요
+        if (privateKeyContent.contains("RSA PRIVATE KEY")) {
+            encoded = convertPkcs1ToPkcs8(encoded);
+        }
+
         KeyFactory keyFactory = KeyFactory.getInstance("RSA");
         return keyFactory.generatePrivate(new PKCS8EncodedKeySpec(encoded));
+    }
+
+    private byte[] convertPkcs1ToPkcs8(byte[] pkcs1Bytes) {
+        int pkcs1Length = pkcs1Bytes.length;
+        int totalLength = pkcs1Length + 22;
+        byte[] pkcs8Header = new byte[] {
+                0x30, (byte) 0x82, (byte) ((totalLength >> 8) & 0xff), (byte) (totalLength & 0xff), // Sequence
+                0x02, 0x01, 0x00, // Version
+                0x30, 0x0d, 0x06, 0x09, 0x2a, (byte) 0x86, 0x48, (byte) 0xf6, (byte) 0xf7, 0x0d, 0x01, 0x01, 0x01, 0x05,
+                0x00, // Algorithm (RSA)
+                0x04, (byte) 0x82, (byte) ((pkcs1Length >> 8) & 0xff), (byte) (pkcs1Length & 0xff) // Octet String
+        };
+        byte[] pkcs8Bytes = new byte[pkcs8Header.length + pkcs1Bytes.length];
+        System.arraycopy(pkcs8Header, 0, pkcs8Bytes, 0, pkcs8Header.length);
+        System.arraycopy(pkcs1Bytes, 0, pkcs8Bytes, pkcs8Header.length, pkcs1Bytes.length);
+        return pkcs8Bytes;
     }
 
     private String loadPrivateKeyContent() throws IOException {

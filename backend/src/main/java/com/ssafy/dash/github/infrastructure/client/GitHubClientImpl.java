@@ -107,6 +107,7 @@ public class GitHubClientImpl implements GitHubClient {
     @Override
     public String fetchFileContent(String repositoryFullName, String filePath, String reference, String accessToken) {
         RepositorySlug slug = RepositorySlug.from(repositoryFullName);
+        validateAccessToken(accessToken);
 
         HttpHeaders headers = new HttpHeaders();
         headers.setAccept(Collections.singletonList(MediaType.APPLICATION_JSON));
@@ -190,7 +191,7 @@ public class GitHubClientImpl implements GitHubClient {
 
     private void validateAccessToken(String accessToken) {
         if (!StringUtils.hasText(accessToken)) {
-            throw new GitHubWebhookException("GitHub 액세스 토큰이 유효하지 않습니다.");
+            throw new GitHubWebhookException("GitHub 인증 토큰이 존재하지 않거나 만료되었습니다. 인증 상태를 확인해주세요.");
         }
     }
 

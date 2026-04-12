@@ -39,7 +39,7 @@ services:
       GITHUB_WEBHOOK_URL: ${GITHUB_WEBHOOK_URL}
       YOUTUBE_API_KEY: ${YOUTUBE_API_KEY}
       GITHUB_APP_ID: ${GITHUB_APP_ID}
-      GITHUB_APP_PRIVATE_KEY_PATH: file:/github-app.pem
+      GITHUB_APP_PRIVATE_KEY_PATH: file:///github-app.pem
     volumes:
       - ./github-app.pem:/github-app.pem
     depends_on:
@@ -87,6 +87,8 @@ services:
     image: ghcr.io/${GITHUB_REPOSITORY}/frontend:latest
     container_name: dash-frontend
     restart: always
+    environment:
+      VITE_GITHUB_APP_NAME: ${VITE_GITHUB_APP_NAME}
     ports:
       - "80:80"
     depends_on:
