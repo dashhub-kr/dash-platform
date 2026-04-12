@@ -21,4 +21,8 @@ export const onboardingApi = {
     registerSolvedacRaw(handle) {
         return http.post('/onboarding/solvedac', { handle });
     },
+    // Check if GitHub App is installed for a repository
+    checkAppInstallation(fullName) {
+        return http.get(`/onboarding/repository/check?fullName=${encodeURIComponent(fullName)}`);
+    }
 };

@@ -201,19 +201,6 @@ const goBack = () => {
             </div>
           </section>
 
-          <!-- Integration Tips -->
-          <div class="bg-indigo-50 border border-indigo-100 rounded-3xl p-6 flex gap-4">
-            <div class="bg-indigo-100 p-3 rounded-2xl h-fit">
-              <Settings class="w-6 h-6 text-indigo-600" />
-            </div>
-            <div>
-              <h3 class="font-bold text-indigo-900 mb-1">스터디 관리 팁</h3>
-              <p class="text-sm text-indigo-700 leading-relaxed break-keep">
-                <span class="block">스터디 이름이나 소개글을 변경하면 모든 스터디원에게 즉시 반영됩니다.</span>
-                <span class="block">멋진 소개글로 새로운 팀원을 모집해보세요!</span>
-              </p>
-            </div>
-          </div>
         </div>
 
         <!-- Right Side: Leader Actions -->

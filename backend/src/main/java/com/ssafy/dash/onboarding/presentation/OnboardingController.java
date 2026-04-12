@@ -35,6 +35,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import com.ssafy.dash.analytics.application.SolvedacSyncService;
 import com.ssafy.dash.analytics.application.dto.request.RegisterHandleRequest;
+import com.ssafy.dash.github.application.GitHubAppService;
 
 @RestController
 @RequestMapping("/api/onboarding")
@@ -45,14 +46,17 @@ public class OnboardingController {
     private final SolvedacApiClient solvedacApiClient;
     private final GitHubClient gitHubClient;
     private final OAuthTokenService oAuthTokenService;
+    private final GitHubAppService gitHubAppService;
 
     public OnboardingController(OnboardingService onboardingService, SolvedacSyncService solvedacSyncService,
-            SolvedacApiClient solvedacApiClient, GitHubClient gitHubClient, OAuthTokenService oAuthTokenService) {
+            SolvedacApiClient solvedacApiClient, GitHubClient gitHubClient, OAuthTokenService oAuthTokenService,
+            GitHubAppService gitHubAppService) {
         this.onboardingService = onboardingService;
         this.solvedacSyncService = solvedacSyncService;
         this.solvedacApiClient = solvedacApiClient;
         this.gitHubClient = gitHubClient;
         this.oAuthTokenService = oAuthTokenService;
+        this.gitHubAppService = gitHubAppService;
     }
 
     @GetMapping("/solvedac/verify")
@@ -116,6 +120,18 @@ public class OnboardingController {
             return ResponseEntity.ok(RepositorySetupResponse.from(result));
         }
 
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+    }
+
+    @GetMapping("/repository/check")
+    @Operation(summary = "GitHub App 설치 여부 확인", description = "특정 저장소에 GitHub App이 올바르게 설치되어 있는지 권한을 확인합니다.")
+    public ResponseEntity<Boolean> checkAppInstallation(
+            @Parameter(hidden = true) @AuthenticationPrincipal OAuth2User principal,
+            @RequestParam String fullName) {
+        if (principal instanceof CustomOAuth2User) {
+            boolean isInstalled = gitHubAppService.isAppInstalledOnRepo(fullName);
+            return ResponseEntity.ok(isInstalled);
+        }
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
     }
 

@@ -12,8 +12,6 @@ import com.ssafy.dash.github.domain.PushEventStatus;
 import com.ssafy.dash.github.domain.exception.GitHubClientException;
 import com.ssafy.dash.github.domain.exception.GitHubFileDownloadException;
 import com.ssafy.dash.github.domain.exception.GitHubWebhookException;
-import com.ssafy.dash.oauth.application.OAuthTokenService;
-import com.ssafy.dash.oauth.domain.UserOAuthToken;
 import com.ssafy.dash.onboarding.domain.Onboarding;
 import com.ssafy.dash.onboarding.domain.OnboardingRepository;
 import com.ssafy.dash.user.domain.User;
@@ -22,7 +20,6 @@ import com.ssafy.dash.mockexam.application.MockExamService;
 import com.ssafy.dash.defense.application.DefenseService;
 import com.ssafy.dash.battle.application.BattleService;
 import com.ssafy.dash.acorn.application.AcornService;
-import com.ssafy.dash.ai.application.CodeReviewService;
 import com.ssafy.dash.study.application.StudyMissionService;
 import com.ssafy.dash.study.application.StudyService;
 import org.slf4j.Logger;
@@ -50,7 +47,6 @@ public class GitHubPushEventWorker {
 
     private final GitHubPushEventRepository pushEventRepository;
     private final OnboardingRepository onboardingRepository;
-    private final OAuthTokenService oauthTokenService;
     private final GitHubClient gitHubClient;
     private final AlgorithmRecordRepository algorithmRecordRepository;
     private final ObjectMapper objectMapper;
@@ -59,16 +55,15 @@ public class GitHubPushEventWorker {
     private final TransactionTemplate transactionTemplate;
     private final UserRepository userRepository;
     private final AcornService acornService;
-    private final CodeReviewService codeReviewService;
     private final StudyMissionService studyMissionService;
     private final MockExamService mockExamService;
     private final DefenseService defenseService;
     private final BattleService battleService;
     private final StudyService studyService;
+    private final GitHubAppService gitHubAppService;
 
     public GitHubPushEventWorker(GitHubPushEventRepository pushEventRepository,
             OnboardingRepository onboardingRepository,
-            OAuthTokenService oauthTokenService,
             GitHubClient gitHubClient,
             AlgorithmRecordRepository algorithmRecordRepository,
             ObjectMapper objectMapper,
@@ -76,16 +71,15 @@ public class GitHubPushEventWorker {
             PlatformTransactionManager transactionManager,
             UserRepository userRepository,
             AcornService acornService,
-            CodeReviewService codeReviewService,
             StudyMissionService studyMissionService,
             MockExamService mockExamService,
             DefenseService defenseService,
             BattleService battleService,
             StudyService studyService,
+            GitHubAppService gitHubAppService,
             @Value("${github.push-worker.max-batch:5}") int maxBatchSize) {
         this.pushEventRepository = pushEventRepository;
         this.onboardingRepository = onboardingRepository;
-        this.oauthTokenService = oauthTokenService;
         this.gitHubClient = gitHubClient;
         this.algorithmRecordRepository = algorithmRecordRepository;
         this.objectMapper = objectMapper;
@@ -94,12 +88,12 @@ public class GitHubPushEventWorker {
         this.transactionTemplate = new TransactionTemplate(transactionManager);
         this.userRepository = userRepository;
         this.acornService = acornService;
-        this.codeReviewService = codeReviewService;
         this.studyMissionService = studyMissionService;
         this.mockExamService = mockExamService;
         this.defenseService = defenseService;
         this.battleService = battleService;
         this.studyService = studyService;
+        this.gitHubAppService = gitHubAppService;
     }
 
     @Scheduled(fixedDelayString = "${github.push-worker.fixed-delay:10000}")
@@ -110,25 +104,7 @@ public class GitHubPushEventWorker {
                 return;
             }
             GitHubPushEvent event = optional.get();
-            // 트랜잭션 내에서 레코드 저장 후, 생성된 레코드 목록 반환
-            List<AlgorithmRecord> newRecords = transactionTemplate.execute(status -> processEvent(event));
-
-            // 트랜잭션 커밋 후 AI 분석 실행 (별도 트랜잭션)
-            if (newRecords != null) {
-                for (AlgorithmRecord record : newRecords) {
-                    try {
-                        codeReviewService.analyzeAndSave(
-                                record.getId(),
-                                record.getCode(),
-                                record.getLanguage(),
-                                record.getProblemNumber(),
-                                record.getPlatform(),
-                                record.getTitle());
-                    } catch (Exception e) {
-                        log.error("Auto-analysis failed via worker for record: {}", record.getId(), e);
-                    }
-                }
-            }
+            transactionTemplate.execute(status -> processEvent(event));
         }
     }
 
@@ -147,7 +123,7 @@ public class GitHubPushEventWorker {
             Onboarding onboarding = onboardingRepository.findByRepositoryName(event.getRepositoryName())
                     .orElseThrow(() -> new GitHubWebhookException("해당 저장소의 온보딩 정보가 없습니다."));
 
-            UserOAuthToken token = oauthTokenService.requireValidAccessToken(onboarding.getUserId());
+            String accessToken = resolveAccessToken(event, onboarding.getUserId());
             List<QueuedPushFile> files = readFiles(event.getFilesJson());
 
             boolean processed = false;
@@ -155,7 +131,7 @@ public class GitHubPushEventWorker {
                 if (!file.isProcessable()) {
                     continue;
                 }
-                AlgorithmRecord record = storeAlgorithmRecord(event, onboarding.getUserId(), token.getAccessToken(),
+                AlgorithmRecord record = storeAlgorithmRecord(event, onboarding.getUserId(), accessToken,
                         file);
                 createdRecords.add(record);
                 processed = true;
@@ -193,6 +169,36 @@ public class GitHubPushEventWorker {
         } catch (JsonProcessingException ex) {
             throw new GitHubWebhookException("files_json 파싱에 실패했습니다.", ex);
         }
+    }
+
+    private String resolveAccessToken(GitHubPushEvent event, Long userId) {
+        if (StringUtils.hasText(event.getRawPayload())) {
+            try {
+                Long installationId = parseInstallationId(event.getRawPayload());
+                if (installationId != null) {
+                    return gitHubAppService.getInstallationAccessToken(installationId);
+                }
+            } catch (Exception e) {
+                log.warn("Failed to parse installation ID from raw payload for event: {}", event.getDeliveryId(), e);
+            }
+        } else {
+            log.warn("No raw payload found for event: {}", event.getDeliveryId());
+        }
+
+        throw new GitHubWebhookException(
+                "GitHub App 권한이 필요합니다. 저장소에 DashHub-App(또는 local APP)을 설치하고 권한을 부여한 후 다시 시도해주세요.");
+    }
+
+    private Long parseInstallationId(String rawPayload) {
+        try {
+            var node = objectMapper.readTree(rawPayload);
+            if (node.has("installation") && node.get("installation").has("id")) {
+                return node.get("installation").get("id").asLong();
+            }
+        } catch (JsonProcessingException e) {
+            log.warn("Error parsing raw payload for installation ID", e);
+        }
+        return null;
     }
 
     private AlgorithmRecord storeAlgorithmRecord(GitHubPushEvent event,

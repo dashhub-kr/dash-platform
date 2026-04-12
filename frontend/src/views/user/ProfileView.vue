@@ -194,7 +194,24 @@ const handleRedetect = async () => {
         }
     } catch (e) {
         console.error(e);
-        alert("저장소 업데이트 실패. 잠시 후 다시 시도해주세요.");
+        const errorMsg = e.response?.data?.message || "";
+        
+        // GitHub App 미설치/권한 부족 케이스 특별 처리
+        if (errorMsg.includes("GitHub App is not installed")) {
+            const githubAppName = import.meta.env.VITE_GITHUB_APP_NAME;
+            
+            // 환경 변수 검증 (보안 및 디버깅용)
+            if (!githubAppName || !/^[A-Za-z0-9-]+$/.test(githubAppName)) {
+                alert("GitHub App 설정 정보가 누락되었거나 올바르지 않아 설정 페이지로 이동할 수 없습니다.\n관리자에게 문의해주세요.");
+                return;
+            }
+
+            if (confirm(`'${detectedName}' 저장소에 대한 GitHub App 권한이 없거나 설치되지 않았습니다.\n\nGitHub 설정에서 해당 저장소를 추가해주셔야 합니다.\n지금 설정하러 가시겠습니까?`)) {
+                window.open(`https://github.com/apps/${githubAppName}/installations/new`, '_blank');
+            }
+        } else {
+            alert("저장소 업데이트 실패. 익스텐션 설정과 GitHub App 설치 여부를 확인해주세요.");
+        }
     } finally {
         syncingRepo.value = false;
     }

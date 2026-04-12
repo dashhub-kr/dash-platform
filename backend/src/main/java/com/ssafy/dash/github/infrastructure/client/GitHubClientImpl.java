@@ -110,8 +110,9 @@ public class GitHubClientImpl implements GitHubClient {
         validateAccessToken(accessToken);
 
         HttpHeaders headers = new HttpHeaders();
-        headers.setBearerAuth(accessToken);
         headers.setAccept(Collections.singletonList(MediaType.APPLICATION_JSON));
+        headers.setBearerAuth(accessToken);
+
         HttpEntity<Void> requestEntity = new HttpEntity<>(headers);
 
         String ref = StringUtils.hasText(reference) ? reference : "main";
@@ -190,7 +191,7 @@ public class GitHubClientImpl implements GitHubClient {
 
     private void validateAccessToken(String accessToken) {
         if (!StringUtils.hasText(accessToken)) {
-            throw new GitHubWebhookException("GitHub 액세스 토큰이 존재하지 않습니다. 다시 로그인해주세요.");
+            throw new GitHubWebhookException("GitHub 인증 토큰이 존재하지 않거나 만료되었습니다. 인증 상태를 확인해주세요.");
         }
     }
 

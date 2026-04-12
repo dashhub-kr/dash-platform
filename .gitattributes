@@ -1,5 +1,27 @@
+.gitattributes text eol=lf
+
+# Preserve existing wrapper behavior
 /gradlew text eol=lf
-*.bat text eol=crlf
-*.jar binary
 /backend/mvnw text eol=lf
+*.bat text eol=crlf
 *.cmd text eol=crlf
+*.jar binary
+
+# Source files stay LF across platforms
+*.java text eol=lf
+*.kt text eol=lf
+*.groovy text eol=lf
+*.xml text eol=lf
+*.sql text eol=lf
+*.properties text eol=lf
+*.yml text eol=lf
+*.yaml text eol=lf
+*.sh text eol=lf
+*.js text eol=lf
+*.ts text eol=lf
+*.vue text eol=lf
+*.css text eol=lf
+*.scss text eol=lf
+*.html text eol=lf
+*.json text eol=lf
+*.md text eol=lf
