@@ -22,6 +22,22 @@
 
 Chrome Extension과 GitHub Webhook을 활용한 **Zero-Manual 파이프라인**을 구축하여, 사용자가 문제 풀이에만 집중하면 **기록, 분석, AI 피드백**까지 모든 과정이 자동으로 이루어집니다. Solved.ac 데이터를 기반으로 개인의 역량을 정밀 진단하고, RPG 게임 요소를 결합한 스킬 트리 시스템을 통해 성장의 즐거움을 제공합니다.
 
+<img width="2880" height="1704" alt="Platform-Main" src="https://github.com/user-attachments/assets/966a6d4d-31b8-46cf-b7df-0abd342b21db" />
+<img width="2880" height="1704" alt="AI-Code-Analyze" src="https://github.com/user-attachments/assets/21188c03-c744-485d-843c-80d26a5e9b84" />
+<img width="2880" height="1704" alt="Team-Mission" src="https://github.com/user-attachments/assets/d4ce73b2-c584-42cf-bda4-ca526b66d6e4" />
+<img width="2880" height="1704" alt="Team-Analyze" src="https://github.com/user-attachments/assets/1872630c-6eb7-4e80-9ce2-a877c9e90ca2" />
+<img width="2880" height="1704" alt="Challenge-1" src="https://github.com/user-attachments/assets/64c28d37-627a-440a-bf39-b2f4bd6a326b" />
+<img width="2880" height="1704" alt="Challenge-2" src="https://github.com/user-attachments/assets/9af7fdbd-910c-4b62-b234-47c932045dd0" />
+<img width="2880" height="1704" alt="Mock-Exam" src="https://github.com/user-attachments/assets/4d411cf2-0535-411d-a108-f7dc24f9edc4" />
+<img width="2880" height="1704" alt="Algorithm-Master" src="https://github.com/user-attachments/assets/d7be6290-be07-400a-a98d-d6eebc7b2e2e" />
+<img width="2880" height="1704" alt="Algorithm-Nodes-1" src="https://github.com/user-attachments/assets/2908112b-b878-48e2-9c12-eea54ae695aa" />
+<img width="2880" height="1704" alt="Algorithm-Node-2" src="https://github.com/user-attachments/assets/cf0efbaa-a1c4-48d1-b85c-085c227237e6" />
+<img width="2880" height="1704" alt="My-Roadmap" src="https://github.com/user-attachments/assets/f099a427-ff01-40aa-a910-b128070fe279" />
+<img width="2880" height="1704" alt="Algorithm-Support" src="https://github.com/user-attachments/assets/d49046d5-f8d6-460e-8218-4420abec8827" />
+<img width="2880" height="1704" alt="Post-with-Problem" src="https://github.com/user-attachments/assets/fa2cea52-96ef-4f3f-83ca-718ef319a019" />
+<img width="2880" height="1704" alt="Mypage-with-Sync" src="https://github.com/user-attachments/assets/e4e11c78-1ecb-4227-b510-6b57884b555b" />
+<img width="2880" height="1544" alt="Acorn" src="https://github.com/user-attachments/assets/ea2149cb-99a6-4224-abbb-fe217d666159" />
+
 ### 💡 Core Value
 * **Zero-Manual Automation**: 문제 풀이 제출 시 자동 커밋 ＆ 코드 분석 ＆ 대시보드 갱신까지 원스톱으로 처리합니다.
 * **Data-Driven Growth**: Solved.ac ID 입력 하나만으로 객관적 실력 지표(Radar Chart) 및 취약점을 분석합니다.
@@ -57,27 +73,6 @@ LLM을 활용한 고품질 코드 분석 및 튜터링 서비스를 제공합니
 * **Architecture**: Modular Service Layer, Pydantic Schema Validation
 
 ---
-
-## 🏗 System Architecture
-
-DASH는 **Web Client**, **Backend API**, **AI Serving**, 그리고 **Chrome Extension**이 유기적으로 연결된 구조를 가집니다.
-
-```mermaid
-graph TD
-    User[User] -->|Submit Code| Ext[Chrome Extension]
-    Ext -->|Push Code| GitHub[GitHub Repository]
-    GitHub -->|Webhook Trigger| WAS[Spring Boot Backend]
-    
-    subgraph "DASH Core System"
-        WAS -->|Analyze Request| AI["AI Server (FastAPI)"]
-        AI -->|Gemini API| LLM[Google Gemini]
-        AI -->|Analysis Result| WAS
-        WAS -->|Persist Data| DB[(MySQL)]
-    end
-    
-    User -->|View Dashboard| Web[Vue.js Client]
-    Web -->|API Call| WAS
-```
 
 ### Key Engineering Decisions
 1. **DIP(의존성 역전 원칙) 적용**: `Domain` 레이어를 외부 기술(Infra)로부터 격리하여 비즈니스 로직의 순수성을 유지했습니다.
