@@ -1,0 +1,473 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, viewport-fit=cover"
+    />
+    <title>대시허브</title>
+    <link rel="icon" href="favicon.ico" />
+    <style>
+      :root {
+        --amber-950: #451a03;
+        --amber-900: #78350f;
+        --amber-800: #92400e;
+        --amber-700: #b45309;
+        --amber-600: #d97706;
+        --amber-300: #fcd34d;
+        --amber-200: #fde68a;
+        --amber-100: #fef3c7;
+        --amber-50: #fffbeb;
+        --orange-50: #fff7ed;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      html,
+      body {
+        margin: 0;
+        padding: 0;
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+        font-family:
+          "Pretendard",
+          "Apple SD Gothic Neo",
+          "Malgun Gothic",
+          -apple-system,
+          sans-serif;
+        background: radial-gradient(
+          circle at 50% 0%,
+          #fff3da 0%,
+          #fde9c4 40%,
+          #f3d8a6 100%
+        );
+        color: var(--amber-950);
+      }
+
+      #scene {
+        position: fixed;
+        inset: 0;
+        z-index: 1;
+      }
+
+      .vignette {
+        position: fixed;
+        inset: 0;
+        z-index: 2;
+        pointer-events: none;
+        background: radial-gradient(
+          circle at 50% 38%,
+          transparent 0%,
+          transparent 38%,
+          rgba(69, 26, 3, 0.18) 100%
+        );
+      }
+
+      .wrap {
+        position: fixed;
+        inset: 0;
+        z-index: 3;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 24px;
+        pointer-events: none;
+      }
+
+      .card {
+        pointer-events: auto;
+        width: 100%;
+        max-width: 460px;
+        background: rgba(255, 255, 255, 0.72);
+        backdrop-filter: blur(22px);
+        border: 1px solid rgba(251, 191, 36, 0.35);
+        border-radius: 28px;
+        padding: 44px 36px 36px;
+        text-align: center;
+        box-shadow:
+          0 30px 60px -15px rgba(69, 26, 3, 0.25),
+          0 0 0 1px rgba(251, 191, 36, 0.08);
+        animation: riseIn 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+      }
+
+      .logo {
+        width: 64px;
+        height: 64px;
+        object-fit: contain;
+        margin: 0 auto 18px;
+        filter: drop-shadow(0 6px 14px rgba(69, 26, 3, 0.18));
+      }
+
+      .wordmark {
+        font-size: 13px;
+        font-weight: 800;
+        letter-spacing: 0.22em;
+        color: var(--amber-700);
+        text-transform: uppercase;
+        margin-bottom: 6px;
+      }
+
+      .period {
+        font-size: 12px;
+        font-weight: 600;
+        color: var(--amber-800);
+        opacity: 0.75;
+        margin-bottom: 22px;
+        font-family: ui-monospace, "SF Mono", Menlo, monospace;
+        letter-spacing: 0.02em;
+      }
+
+      h1 {
+        font-size: 24px;
+        font-weight: 900;
+        color: var(--amber-950);
+        margin: 0 0 14px;
+        line-height: 1.35;
+      }
+
+      .lead {
+        font-size: 16px;
+        font-weight: 800;
+        color: var(--amber-950);
+        margin: 0 0 12px;
+      }
+
+      .detail {
+        font-size: 13.5px;
+        font-weight: 500;
+        color: var(--amber-900);
+        opacity: 0.85;
+        line-height: 1.7;
+        margin: 0 0 26px;
+      }
+
+      .contact {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        margin-top: 20px;
+        font-size: 13px;
+        font-weight: 700;
+        color: var(--amber-700);
+        text-decoration: none;
+      }
+
+      .contact svg {
+        width: 15px;
+        height: 15px;
+        flex-shrink: 0;
+      }
+
+      .contact:hover {
+        color: var(--amber-600);
+      }
+
+      .stat-box {
+        background: var(--amber-50);
+        border: 1px solid var(--amber-200);
+        border-radius: 20px;
+        padding: 22px 20px;
+        box-shadow: inset 0 2px 4px rgba(69, 26, 3, 0.04);
+      }
+
+      .stat-box .label {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+        font-size: 11px;
+        font-weight: 800;
+        color: var(--amber-800);
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        margin-bottom: 8px;
+      }
+
+      .stat-box .label img {
+        width: 16px;
+        height: 16px;
+        object-fit: contain;
+      }
+
+      .stat-box .value-row {
+        display: flex;
+        align-items: baseline;
+        justify-content: center;
+        gap: 6px;
+      }
+
+      .stat-box .value {
+        font-family: ui-monospace, "SF Mono", Menlo, monospace;
+        font-size: 44px;
+        font-weight: 900;
+        color: var(--amber-950);
+        letter-spacing: -0.03em;
+        line-height: 1;
+        min-width: 6ch;
+        text-align: right;
+      }
+
+      .stat-box .unit {
+        font-size: 14px;
+        font-weight: 700;
+        color: var(--amber-700);
+      }
+
+      footer {
+        position: fixed;
+        bottom: 16px;
+        left: 0;
+        right: 0;
+        z-index: 3;
+        text-align: center;
+        font-size: 11px;
+        font-weight: 600;
+        color: var(--amber-800);
+        opacity: 0.55;
+        pointer-events: none;
+      }
+
+      @keyframes riseIn {
+        from {
+          opacity: 0;
+          transform: translateY(24px) scale(0.97);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0) scale(1);
+        }
+      }
+
+      @media (max-width: 420px) {
+        .card {
+          padding: 36px 24px 28px;
+          border-radius: 22px;
+        }
+        h1 {
+          font-size: 22px;
+        }
+        .stat-box .value {
+          font-size: 38px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div id="scene"></div>
+    <div class="vignette"></div>
+
+    <div class="wrap">
+      <div class="card">
+        <img class="logo" src="images/icon-192.png" alt="DASH" />
+        <div class="wordmark">대시허브 서비스 종료 안내</div>
+        <div class="period">2026.01.08 — 2026.04.28</div>
+
+        <p class="lead">이용해 주셔서 감사합니다</p>
+        <p class="detail">
+          내부적인 사정으로 인해 서비스를 종료하게 되었습니다.<br />더 나은
+          서비스로 돌아오겠습니다.
+        </p>
+
+        <div class="stat-box">
+          <div class="label">
+            <img src="images/acorn-2.png" alt="" />우리가 함께 모은 도토리
+          </div>
+          <div class="value-row">
+            <span class="value" id="acornCount">0</span
+            ><span class="unit">개</span>
+          </div>
+        </div>
+
+        <a class="contact" href="mailto:dev.utact@gmail.com">
+          <svg
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <rect x="2" y="4" width="20" height="16" rx="2.5" />
+            <path d="m22 6-9.5 7L3 6" />
+          </svg>
+          dev.utact@gmail.com
+        </a>
+      </div>
+    </div>
+
+    <footer>© 2026 DASH</footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/matter-js@0.19.0/build/matter.min.js"></script>
+    <script>
+      const TOTAL_ACORNS = 27490;
+
+      (function animateCount() {
+        const el = document.getElementById("acornCount");
+        const duration = 1800;
+        const start = performance.now();
+        function tick(now) {
+          const p = Math.min(1, (now - start) / duration);
+          if (p < 1) {
+            const grow = Math.min(1, p + 0.18);
+            const upper = Math.max(
+              10,
+              Math.round(TOTAL_ACORNS * (1 - Math.pow(1 - grow, 2))),
+            );
+            const rolled = Math.floor(Math.random() * upper);
+            el.textContent = rolled.toLocaleString("ko-KR");
+            requestAnimationFrame(tick);
+          } else {
+            el.textContent = TOTAL_ACORNS.toLocaleString("ko-KR");
+          }
+        }
+        requestAnimationFrame(tick);
+      })();
+
+      (function acornFall() {
+        const scene = document.getElementById("scene");
+        if (!scene || !window.Matter) return;
+
+        const { Engine, Render, World, Bodies, Body, Runner, Composite } =
+          Matter;
+
+        const ACORN_META = {
+          bronze: {
+            texture: "images/acorn-1.png",
+            contentWidth: 600,
+            contentHeight: 608,
+          },
+          silver: {
+            texture: "images/acorn-2.png",
+            contentWidth: 664,
+            contentHeight: 768,
+          },
+        };
+
+        const silverCount = 270;
+        const bronzeCount = 49;
+
+        const TARGET_VISUAL_HEIGHT = 64;
+        const SPAWN_GAP = TARGET_VISUAL_HEIGHT * 0.8;
+
+        const engine = Engine.create();
+        engine.world.gravity.y = 1.1;
+        engine.positionIterations = 8;
+        engine.velocityIterations = 6;
+
+        const render = Render.create({
+          element: scene,
+          engine,
+          options: {
+            width: window.innerWidth,
+            height: window.innerHeight,
+            wireframes: false,
+            background: "transparent",
+          },
+        });
+
+        const wallOpts = {
+          isStatic: true,
+          render: { fillStyle: "transparent" },
+        };
+        const ground = Bodies.rectangle(
+          window.innerWidth / 2,
+          window.innerHeight + 30,
+          window.innerWidth * 2,
+          60,
+          wallOpts,
+        );
+        const leftWall = Bodies.rectangle(
+          -30,
+          window.innerHeight / 2,
+          60,
+          window.innerHeight * 2,
+          wallOpts,
+        );
+        const rightWall = Bodies.rectangle(
+          window.innerWidth + 30,
+          window.innerHeight / 2,
+          60,
+          window.innerHeight * 2,
+          wallOpts,
+        );
+        Composite.add(engine.world, [ground, leftWall, rightWall]);
+
+        const cardEl = document.querySelector(".card");
+        const isUnderCard = (x) => {
+          if (!cardEl) return false;
+          const r = cardEl.getBoundingClientRect();
+          return x > r.left - 40 && x < r.right + 40;
+        };
+
+        const spawnX = () => {
+          const margin = 60;
+          let x;
+          let guard = 0;
+          do {
+            x = margin + Math.random() * (window.innerWidth - margin * 2);
+            guard++;
+          } while (isUnderCard(x) && guard < 12);
+          return x;
+        };
+
+        const makeAcorn = (type, y) => {
+          const meta = ACORN_META[type];
+          const scale = TARGET_VISUAL_HEIGHT / meta.contentHeight;
+          const displayWidth = meta.contentWidth * scale;
+          const bodySide = displayWidth * 0.5;
+          return Bodies.rectangle(spawnX(), y, bodySide, bodySide, {
+            chamfer: { radius: bodySide * 0.45 },
+            restitution: 0,
+            friction: 0.8,
+            frictionStatic: 1,
+            frictionAir: 0.02,
+            render: {
+              sprite: { texture: meta.texture, xScale: scale, yScale: scale },
+            },
+          });
+        };
+
+        const order = [];
+        for (let i = 0; i < silverCount; i++) order.push("silver");
+        for (let i = 0; i < bronzeCount; i++) order.push("bronze");
+        for (let i = order.length - 1; i > 0; i--) {
+          const j = Math.floor(Math.random() * (i + 1));
+          [order[i], order[j]] = [order[j], order[i]];
+        }
+
+        const runner = Runner.create();
+        Runner.run(runner, engine);
+        Render.run(render);
+
+        let i = 0;
+        let dropY = -SPAWN_GAP;
+        const dropNext = () => {
+          if (i >= order.length) return;
+          const body = makeAcorn(order[i], dropY);
+          Composite.add(engine.world, body);
+          dropY -= 6;
+          i++;
+          setTimeout(dropNext, 55);
+        };
+        setTimeout(dropNext, 600);
+
+        window.addEventListener("resize", () => {
+          render.canvas.width = window.innerWidth;
+          render.canvas.height = window.innerHeight;
+          Body.setPosition(ground, {
+            x: window.innerWidth / 2,
+            y: window.innerHeight + 30,
+          });
+          Body.setPosition(rightWall, {
+            x: window.innerWidth + 30,
+            y: window.innerHeight / 2,
+          });
+        });
+      })();
+    </script>
+  </body>
+</html>
