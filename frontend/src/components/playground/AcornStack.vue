@@ -73,7 +73,6 @@ const BODY_SQUARE_SCALE = 0.5;
 // 스폰 간격
 const SPAWN_GAP = TARGET_VISUAL_HEIGHT * 0.75;
 // 디버그 드로잉 활성화 여부
-const DEBUG_DRAW = true;
 
 const Engine = Matter.Engine,
   Render = Matter.Render,
@@ -335,32 +334,6 @@ const initMatter = () => {
       // 무시
     }
   });
-
-//   if (DEBUG_DRAW) {
-//     Events.on(render, "afterRender", () => {
-//       const ctx = render.context;
-//       const bodies = Composite.allBodies(engine.world);
-//       ctx.save();
-//       ctx.lineWidth = 1;
-//       bodies.forEach((body) => {
-//         if (body.isStatic) return;
-//         ctx.beginPath();
-//         ctx.moveTo(body.vertices[0].x, body.vertices[0].y);
-//         for (let i = 1; i < body.vertices.length; i++) {
-//           ctx.lineTo(body.vertices[i].x, body.vertices[i].y);
-//         }
-//         ctx.closePath();
-//         ctx.strokeStyle = "rgba(0, 200, 255, 0.8)";
-//         ctx.stroke();
-//
-//         ctx.beginPath();
-//         ctx.arc(body.position.x, body.position.y, 3, 0, Math.PI * 2);
-//         ctx.fillStyle = "rgba(255, 80, 80, 0.9)";
-//         ctx.fill();
-//       });
-//       ctx.restore();
-//     });
-//   }
 
   try {
     const allNow = Composite.allBodies(engine.world);

@@ -487,8 +487,7 @@ const solveProblem = (tag) => {
     const url = `https://www.acmicpc.net/problemset?sort=ac_desc&submit=pac%2Cfa%2Cus&tier=${tierRange}&algo=${tag.bojTagId}&algo_if=and`;
     window.open(url, '_blank');
   } else {
-    // Solved.ac 대체 (tagKey 기반 검색)
-    // 사용자 요청에 따라 로드맵의 Today's Review와 동일한 로직 적용
+    // Solved.ac 태그 검색 (로드맵 Today's Review와 같은 조건)
     const query = `*tag:${tag.key} tier:${tierStart}..${tierEnd} -s@${user.value?.solvedacHandle || ''}`;
     window.open(`https://solved.ac/search?query=${encodeURIComponent(query)}`, '_blank');
   }

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted, watch, nextTick } from 'vue'
-import { ArrowUp, ArrowDown } from 'lucide-vue-next' // 아이콘 변경됨
+import { ArrowUp, ArrowDown } from 'lucide-vue-next'
 import { useAuth } from '@/composables/useAuth'
 import { useRouter } from 'vue-router'
 import { useMouseInElement, useDebounceFn } from '@vueuse/core'

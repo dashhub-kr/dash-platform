@@ -320,10 +320,7 @@ const resetConfirmation = () => {
   handle.value = '';
 };
 
-// 이미지 경로 매핑 대신 SVG 활용도 가능하지만, 일단 기존 로직 참고하여 아이콘/이미지 사용
-// 여기서는 간단히 Tier 번호를 받아 이미지 URL을 생성한다고 가정
-// 만약 이미지가 없다면 뱃지 컴포넌트 사용 권장. 여기선 예시로 svg 아이콘으로 대체 가능하나, 
-// 사용자 요청이 'Senior Design'이므로 가능한 시각적 요소를 풍부하게.
+// Tier 번호로 티어 이미지 URL 생성
 const getTierImage = (tier) => {
     // 실제 구현시엔 tier 숫자에 맞는 이미지 경로 반환
     // 예: https://static.solved.ac/tier_small/1.svg
@@ -339,11 +336,7 @@ const processVerification = async () => {
   verifyError.value = null;
 
   try {
-    // 프로필 이미지 선택 로직 개선
-    // 사용자가 이미 프로필 이미지를 가지고 있다면 그것을 사용, 없다면 기본 이미지
-    // 단, Solved.ac 연동 시에는 Solved.ac 이미지가 우선순위가 높을 수 있으나,
-    // 현재 API는 registerSolvedac에 profileImage를 보내면 그것으로 User Avatar를 업데이트함.
-    // 여기서는 "User의 현재 Avatar가 없으면 Default를 보낸다"는 로직 유지.
+    // 기존 아바타가 없으면 기본 이미지를 보낸다 (registerSolvedac이 이 값으로 아바타를 갱신)
     let profileImage = user.value?.avatarUrl || null;
     
     // 만약 user.avatarUrl도 없고, null을 보내면 백엔드에서 처리가 안될 수도 있으니 기본값 설정

@@ -141,7 +141,7 @@ const props = defineProps({
   isOpen: Boolean,
   studyId: Number,
   initialProblemIds: String,
-  initialTitle: String, // Note: duplicate prop definition in original, removed implicitly
+  initialTitle: String,
   preSelectedMissionId: Number,
   forceNew: Boolean,
   isEditMode: Boolean,

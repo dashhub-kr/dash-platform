@@ -46,9 +46,7 @@ public record AlgorithmRecordResult(
         String counterExampleReason) {
 
     public static AlgorithmRecordResult from(AlgorithmRecord record) {
-        // NOTE: Analysis result is not directly on AlgorithmRecord entity yet (OneToOne
-        // relation needed or fetch join)
-        // For now, initializing null. Service layer must populate this.
+        // 분석 결과는 엔티티에 없으므로 null로 두고 서비스 계층에서 채운다
         return new AlgorithmRecordResult(
                 record.getId(),
                 record.getUserId(),

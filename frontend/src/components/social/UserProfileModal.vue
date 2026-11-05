@@ -151,12 +151,7 @@ watch([isOpen, targetUserInfo], async ([newOpen, newUserInfo]) => {
         requested.value = false;
 
         try {
-            // Check via Search API using nickname or username
-            // Note: Ideally backend should provide a checkStatus API by ID. 
-            // Using search as a workaround if direct check isn't available, 
-            // BUT board/comment writers might not have nickname exposed correctly or duplicates?
-            // Actually, best way is to try to 'get friends' and find them, OR assuming I can search by ID? NO.
-            // Let's rely on search for now as planned.
+            // ID로 친구 상태를 조회하는 API가 없어 닉네임(또는 사용자명) 검색 결과로 확인
             const query = newUserInfo.nickname || newUserInfo.username;
             if (query) {
                 const res = await socialApi.searchUsers(query);

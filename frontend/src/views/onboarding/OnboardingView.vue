@@ -102,11 +102,7 @@ const determineInitialStep = () => {
     return;
   }
 
-  // 4. 모두 완료 -> 가이드(5) 또는 대시보드
-  // 사용자가 여기 도착했지만 이미 완료된 경우, 가이드를 보여주거나 리다이렉트할까요?
-  // 루프를 피하기 위해 대시보드로 리다이렉트하거나, 요청된 경우 가이드로 이동합니다.
-  // 하지만 보통 OnboardingView는 가드되어 있습니다. 가드된 경우 강제로 머무르지 않는 한 리다이렉트될 수 있습니다.
-  // 멋진 마무리를 위해 가이드로 가거나 대시보드로 이동합니다.
+  // 4. 모두 완료 → 가이드 또는 대시보드
   router.replace('/dashboard');
 };
 
@@ -141,17 +137,7 @@ const finishOnboarding = async (repoName) => {
       user.value.repositoryName = repoName;
   }
   
-  // Step 5에서 호출하는 경우, 단계가 하나 더 남았습니다: 가이드(5)
-  // 잠시만요, currentStepIndex 로직은 5(Guide)까지 처리합니다.
-  // Step 5 Repo가 'finish'를 호출하면 repoName과 함께 호출합니까? 
-  // Step5Repo 내부를 보면 Step6Guide로 가고 싶어 합니다.
-  
-  // 따라서 Step 5의 'finish' 이벤트는 실제로 'nextStep' 로직을 트리거하여 가이드로 가야 합니다.
-  // 아니면 'finishOnboarding'이 최종 리다이렉트를 처리합니까?
-  
-  // 로직 수정:
-  // Step 5 (Repo) -> 'finish' 방출 -> 부모가 처리.
-  // 'repo' 단계(인덱스 4)에 있다면, 'finish'는 'guide'(인덱스 5)로 가는 것을 의미합니다.
+  // Step 5(저장소)의 'finish'는 가이드 단계로 이동
   if (steps[currentStepIndex.value] === 'repo') {
       if (repoName && user.value) user.value.repositoryName = repoName;
       currentStepIndex.value++; // 가이드로 이동

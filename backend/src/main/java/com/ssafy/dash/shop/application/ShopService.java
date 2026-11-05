@@ -98,7 +98,6 @@ public class ShopService {
 
         // 7. Notify Recipient
         String message = sender.getUsername() + "님이 [" + item.getName() + "] 아이템을 선물했습니다!";
-        // Using SYSTEM type for now as generic notification
         notificationService.send(recipientUserId, message, "/shop", NotificationType.SYSTEM);
     }
 }

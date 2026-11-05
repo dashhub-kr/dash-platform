@@ -17,8 +17,7 @@ export function useFloatingChat() {
 
     const closeChat = () => {
         isOpen.value = false;
-        // activeChat.value = null; // Do not clear activeChat so we can return to it? No, maybe better to clear or keep.
-        // Let's keep existing logic: usually distinct from minimize.
+        // 다시 열었을 때 이어서 볼 수 있도록 activeChat은 유지
     };
 
     const toggle = () => {

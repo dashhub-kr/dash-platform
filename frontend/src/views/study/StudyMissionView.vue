@@ -443,12 +443,6 @@ const modalWeek = ref(null);
 // 사이드바 선택 상태
 const selectedMission = ref(null);
 
-// ... (existing helper methods: processHeatmap, currentStreak) 
-// (For brevity, assuming they are unchanged, but I must provide full replacement chunk if they are inside the block)
-// I will just replace the setup block start up to onMounted to insert my logic.
-
-// ... (Helper methods omitted from this block, assuming they are below)
-
 const processHeatmap = (data) => {
     try {
         const activityMap = new Map();
@@ -536,7 +530,6 @@ const currentStreak = computed(() => {
     return streak;
 });
 
-
 onMounted(async () => {
   try {
     const userRes = await axios.get('/api/users/me');
@@ -565,8 +558,7 @@ onMounted(async () => {
       const statsRes = await studyApi.get(studyId.value);
       studyData.value = statsRes.data;
 
-      // 관전 모드 시 해당 스터디의 기록을 조회해야 함
-      // dashboardApi.getRecords에 studyId를 전달하도록 수정됨
+      // 관전 모드에서도 해당 스터디의 기록을 조회
       const recordsRes = await dashboardApi.getRecords(studyId.value);
       recordCount.value = recordsRes.data?.length || 0;
 
@@ -630,7 +622,6 @@ const getDaysLeft = (deadline) => {
     const diff = end - today;
     return Math.ceil(diff / (1000 * 60 * 60 * 24));
 };
-
 
 const openCreateModal = () => {
     forceNewMission.value = true;

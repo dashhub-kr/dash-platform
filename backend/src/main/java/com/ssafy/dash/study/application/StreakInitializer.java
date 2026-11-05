@@ -36,12 +36,7 @@ public class StreakInitializer {
         int initialized = 0;
 
         for (Study study : studies) {
-            // 데이터 불일치 복구를 위해 모든 스터디에 대해 강제 재계산 수행
-            // if (study.getStreakUpdatedAt() != null) {
-            // continue;
-            // }
-
-            // 활동 날짜 조회 및 streak 계산
+            // 데이터 불일치 복구를 위해 모든 스터디의 streak을 재계산
             int streak = calculateStreakFromHistory(study.getId());
 
             // 오늘 또는 어제 활동이 있으면 해당 날짜로 설정

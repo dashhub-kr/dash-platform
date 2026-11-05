@@ -67,12 +67,6 @@ onMounted(async () => {
     const res = await authApi.getSession();
     const data = res.data;
     
-    // API 응답 구조에 따라 user 객체 확인
-    // data 자체가 user 정보를 담고 있다고 가정하거나 data.user 사용
-    // 기존 코드는 data.flowType을 사용했음. getSession의 정확한 응답 구조가 중요함.
-    // useAuth.js를 보면 getSession 응답이 user 객체(또는 user를 포함)라고 유추됨.
-    
-    // 안전하게 데이터 확보
     const user = data.user || data; 
 
     // 온보딩 완료 여부 확인 로직 (Router Guard와 동일한 기준 적용)
