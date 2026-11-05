@@ -52,7 +52,7 @@
 
             <!-- 콘텐츠 -->
             <div class="p-5">
-              <h3 class="font-bold text-lg mb-2 line-clamp-2 leading-snug group-hover:text-red-400 transition-colors" v-html="video.title"></h3>
+              <h3 class="font-bold text-lg mb-2 line-clamp-2 leading-snug group-hover:text-red-400 transition-colors" v-html="sanitizeHtml(video.title)"></h3>
               <div class="flex items-center gap-2 text-sm text-slate-400 mb-3">
                 <span class="font-medium text-slate-300">{{ video.channelTitle }}</span>
                 <span class="w-1 h-1 rounded-full bg-slate-600"></span>
@@ -81,6 +81,7 @@
 </template>
 
 <script setup>
+import { sanitizeHtml } from '@/utils/sanitize';
 import { ref } from 'vue';
 import { Youtube, Search, Play } from 'lucide-vue-next';
 import { youtubeApi } from '@/api/youtube';

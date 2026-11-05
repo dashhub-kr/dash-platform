@@ -400,6 +400,7 @@
 </template>
 
 <script setup>
+import { escapeHtml } from '@/utils/sanitize';
 import { ref, watch, computed, nextTick } from 'vue';
 import { ExternalLink, ChevronDown, Bot, Bug, Send, Loader2, Activity, LayoutList, Lightbulb, Tag, MessageSquare, Wand2, CheckCircle2, BookOpen, Footprints, HelpCircle, Trophy, Copy, Key, Sparkles, MessageCircle, Brain, Zap } from 'lucide-vue-next';
 import { aiApi } from '@/api/ai'; 
@@ -711,7 +712,7 @@ const highlightCode = (code, language) => {
         try {
             return hljs.highlightAuto(code).value;
         } catch (e) {
-            return code;
+            return escapeHtml(code);
         }
     }
 };

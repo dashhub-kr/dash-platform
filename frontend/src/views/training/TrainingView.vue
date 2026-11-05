@@ -142,8 +142,9 @@
 </template>
 
 <script setup>
+import { sanitizeHtml } from '@/utils/sanitize';
 import { ref, computed, onMounted, nextTick, watch } from 'vue';
-import { useRoute } from 'vue-router'; // useRoute 추가
+import { useRoute } from 'vue-router';
 import { 
     RefreshCw, Trophy, Swords, Play,
     Search, Loader2, Send, RotateCcw, LayoutGrid,
@@ -237,7 +238,7 @@ const chartTags = computed(() => {
 const searchKeyword = ref('');
 const recommendedKeywords = ref(['Dynamic Programming', 'BFS', 'Dijkstra', 'Greedy']);
 const videos = ref([]);
-const recommendedProblems = ref([]); // 추천 문제 상태 추가
+const recommendedProblems = ref([]);
 
 const route = useRoute(); // 라우트 인스턴스
 
@@ -425,7 +426,7 @@ const closeLectureModal = () => {
 
 
 
-const renderMarkdown = (text) => marked(text || '');
+const renderMarkdown = (text) => sanitizeHtml(marked(text || ''));
 
 const formatDate = (isoString) => {
     if (!isoString) return '';

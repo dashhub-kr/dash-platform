@@ -565,6 +565,7 @@
 </template>
 
 <script setup>
+import { sanitizeHtml, escapeHtml } from '@/utils/sanitize';
 import { ref, onMounted, onUnmounted, computed, watch, nextTick } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
 import { dashboardApi } from '@/api/dashboard';
@@ -1040,11 +1041,7 @@ const activeMissions = computed(() => {
             deadline.setHours(23, 59, 59, 999);
             const notExpired = deadline >= today;
             
-            // 모든 스터디원이 완료했는지 확인 (memberProgressList가 있는 경우)
-            // const allMembersCompleted = m.memberProgressList?.length > 0 && 
-            //     m.memberProgressList.every(member => member.allCompleted);
-            
-            // 완료되어도 마감일이 지나지 않았으면 계속 표시 (유저 피드백 반영)
+            // 완료되어도 마감일이 지나지 않았으면 계속 표시
             return notExpired;
         })
         .sort((a, b) => a.week - b.week);  // 낮은 주차부터 표시
@@ -1414,7 +1411,7 @@ const formatMissionDate = (dateString) => {
 // Markdown Renderer
 const renderMarkdown = (text) => {
     if (!text) return '';
-    return marked.parse(text);
+    return sanitizeHtml(marked.parse(text));
 };
 
 const highlightCodeContent = (code, lang = 'java') => {
@@ -1425,7 +1422,7 @@ const highlightCodeContent = (code, lang = 'java') => {
         try {
              return hljs.highlightAuto(code).value;
         } catch (e2) {
-             return code;
+             return escapeHtml(code);
         }
     }
 };
