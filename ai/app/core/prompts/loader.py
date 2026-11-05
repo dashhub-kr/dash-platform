@@ -18,7 +18,7 @@ class PromptLoader:
     Example:
         loader = PromptLoader()
         prompt = loader.get("review")
-        formatted = loader.format("hint", level=1, problem="...")
+        formatted = loader.format("review", code="...")
     """
     
     def __init__(self, templates_dir: str | Path | None = None):

@@ -15,11 +15,9 @@ class Settings(BaseSettings):
     
     # API Keys
     gemini_api_key: str = Field(..., description="Google Gemini API Key")
-    openai_api_key: str | None = Field(None, description="OpenAI API Key (optional)")
     
     # LLM Configuration
     default_model: str = Field("gemini-3-flash-preview", description="기본 LLM 모델")
-    llm_provider: Literal["gemini", "openai"] = Field("gemini", description="LLM 제공자")
     max_tokens: int = Field(16384, description="최대 토큰 수")
     thinking_level: Literal["minimal", "low", "medium", "high"] | None = Field("high", description="Gemini 3 사고 수준")
     
