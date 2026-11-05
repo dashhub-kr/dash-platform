@@ -39,8 +39,10 @@ public class NotificationController {
 
     @PostMapping("/{id}/read")
     @Operation(summary = "알림 읽음 처리", description = "특정 알림을 읽음 상태로 변경합니다.")
-    public ResponseEntity<Void> markAsRead(@PathVariable Long id) {
-        notificationService.markAsRead(id);
+    public ResponseEntity<Void> markAsRead(
+            @AuthenticationPrincipal CustomOAuth2User principal,
+            @PathVariable Long id) {
+        notificationService.markAsRead(id, principal.getUserId());
         return ResponseEntity.ok().build();
     }
 
@@ -55,6 +57,7 @@ public class NotificationController {
     @PostMapping("/{id}/update")
     @Operation(summary = "알림 업데이트", description = "알림의 내용이나 타입을 업데이트합니다.")
     public ResponseEntity<Void> updateNotification(
+            @AuthenticationPrincipal CustomOAuth2User principal,
             @PathVariable Long id,
             @org.springframework.web.bind.annotation.RequestBody java.util.Map<String, String> payload) {
         String content = payload.get("content");
@@ -62,7 +65,7 @@ public class NotificationController {
         com.ssafy.dash.notification.domain.NotificationType type = typeStr != null
                 ? com.ssafy.dash.notification.domain.NotificationType.valueOf(typeStr)
                 : null;
-        notificationService.update(id, content, type);
+        notificationService.update(id, principal.getUserId(), content, type);
         return ResponseEntity.ok().build();
     }
 }

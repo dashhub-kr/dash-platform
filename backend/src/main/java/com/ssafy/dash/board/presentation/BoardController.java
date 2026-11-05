@@ -22,6 +22,7 @@ import com.ssafy.dash.board.application.BoardService;
 import com.ssafy.dash.board.presentation.dto.request.BoardCreateRequest;
 import com.ssafy.dash.board.presentation.dto.request.BoardUpdateRequest;
 import com.ssafy.dash.board.presentation.dto.response.BoardResponse;
+import com.ssafy.dash.oauth.presentation.security.AuthenticatedUsers;
 import com.ssafy.dash.oauth.presentation.security.CustomOAuth2User;
 
 import io.swagger.v3.oas.annotations.Parameter;
@@ -153,14 +154,11 @@ public class BoardController {
         if (principal instanceof CustomOAuth2User customUser) {
             return customUser.getUserId();
         }
-        return null; // Guest or not authenticated properly
+        return null;
     }
 
     private Long extractUserId(OAuth2User principal) {
-        if (principal instanceof CustomOAuth2User customUser) {
-            return customUser.getUserId();
-        }
-        return 1L; // Fallback for testing
+        return AuthenticatedUsers.requireUserId(principal);
     }
 
 }

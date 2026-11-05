@@ -19,6 +19,7 @@ import com.ssafy.dash.comment.application.CommentService;
 import com.ssafy.dash.comment.presentation.dto.request.CommentCreateRequest;
 import com.ssafy.dash.comment.presentation.dto.request.CommentUpdateRequest;
 import com.ssafy.dash.comment.presentation.dto.response.CommentResponse;
+import com.ssafy.dash.oauth.presentation.security.AuthenticatedUsers;
 import com.ssafy.dash.oauth.presentation.security.CustomOAuth2User;
 
 import io.swagger.v3.oas.annotations.Parameter;
@@ -42,10 +43,7 @@ public class CommentController {
             @Parameter(hidden = true) @AuthenticationPrincipal OAuth2User principal,
             @RequestBody CommentCreateRequest request) {
 
-        Long userId = 1L;
-        if (principal instanceof CustomOAuth2User customUser) {
-            userId = customUser.getUserId();
-        }
+        Long userId = AuthenticatedUsers.requireUserId(principal);
 
         CommentResponse response = CommentResponse.from(
                 commentService.create(request.toCommand(boardId, userId)));
@@ -76,10 +74,12 @@ public class CommentController {
     public ResponseEntity<CommentResponse> update(
             @PathVariable Long boardId,
             @PathVariable Long commentId,
+            @Parameter(hidden = true) @AuthenticationPrincipal OAuth2User principal,
             @RequestBody CommentUpdateRequest request) {
+        Long userId = AuthenticatedUsers.requireUserId(principal);
 
         CommentResponse response = CommentResponse.from(
-                commentService.update(commentId, request.toCommand()));
+                commentService.update(commentId, request.toCommand(), userId));
 
         return ResponseEntity.ok(response);
     }
@@ -87,9 +87,11 @@ public class CommentController {
     @DeleteMapping("/{commentId}")
     public ResponseEntity<Void> delete(
             @PathVariable Long boardId,
-            @PathVariable Long commentId) {
+            @PathVariable Long commentId,
+            @Parameter(hidden = true) @AuthenticationPrincipal OAuth2User principal) {
+        Long userId = AuthenticatedUsers.requireUserId(principal);
 
-        commentService.delete(commentId);
+        commentService.delete(commentId, userId);
 
         return ResponseEntity.noContent().build();
     }

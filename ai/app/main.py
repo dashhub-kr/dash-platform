@@ -1,7 +1,5 @@
 """
 Dash AI Server - FastAPI 애플리케이션 진입점
-
-리팩토링된 클린 아키텍처 버전 (v2.0)
 """
 
 import logging
@@ -30,13 +28,13 @@ def create_app() -> FastAPI:
         redoc_url="/redoc",
     )
     
-    # CORS 설정
+    # 내부 서비스(백엔드)만 호출하므로 브라우저 교차 출처 요청은 허용하지 않는다
     app.add_middleware(
         CORSMiddleware,
-        allow_origins=["*"],
-        allow_credentials=True,
-        allow_methods=["*"],
-        allow_headers=["*"],
+        allow_origins=[],
+        allow_credentials=False,
+        allow_methods=["GET", "POST"],
+        allow_headers=["Content-Type"],
     )
     
     # 라우터 등록

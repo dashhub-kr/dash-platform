@@ -9,11 +9,15 @@ import com.ssafy.dash.analytics.domain.UserClassStatRepository;
 import com.ssafy.dash.analytics.domain.UserTagStat;
 import com.ssafy.dash.analytics.domain.UserTagStatRepository;
 import com.ssafy.dash.analytics.domain.UserFamilyStat;
+import com.ssafy.dash.oauth.presentation.security.AuthenticatedUsers;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -39,8 +43,10 @@ public class SolvedacStatsController {
     @RateLimit(capacity = 5, refillTokens = 5, refillDurationSeconds = 60)
     @PostMapping
     public ResponseEntity<Map<String, String>> registerHandle(
+            @Parameter(hidden = true) @AuthenticationPrincipal OAuth2User principal,
             @PathVariable Long userId,
             @RequestBody @Valid RegisterHandleRequest request) {
+        AuthenticatedUsers.requireSelf(principal, userId);
         syncService.registerSolvedacHandle(userId, request.getHandle(), request.getProfileImageUrl());
         return ResponseEntity.ok(Map.of(
                 "message", "Solved.ac 핸들이 성공적으로 등록되었습니다",
@@ -87,7 +93,10 @@ public class SolvedacStatsController {
     @Operation(summary = "통계 재동기화", description = "사용자의 Solved.ac 통계를 최신 데이터로 재동기화합니다")
     @RateLimit(capacity = 3, refillTokens = 3, refillDurationSeconds = 60)
     @PostMapping("/sync")
-    public ResponseEntity<Map<String, String>> resyncStats(@PathVariable Long userId) {
+    public ResponseEntity<Map<String, String>> resyncStats(
+            @Parameter(hidden = true) @AuthenticationPrincipal OAuth2User principal,
+            @PathVariable Long userId) {
+        AuthenticatedUsers.requireSelf(principal, userId);
         syncService.resyncAllStats(userId);
         return ResponseEntity.ok(Map.of("message", "통계가 성공적으로 동기화되었습니다"));
     }

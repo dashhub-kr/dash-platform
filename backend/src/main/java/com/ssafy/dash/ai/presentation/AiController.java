@@ -17,6 +17,7 @@ import com.ssafy.dash.ai.presentation.dto.LearningDashboardResponse;
 import com.ssafy.dash.ai.presentation.dto.request.CodeReviewRequest;
 import com.ssafy.dash.ai.presentation.dto.request.HintChatRequestDto;
 import com.ssafy.dash.ai.presentation.dto.response.HintChatResponseDto;
+import com.ssafy.dash.oauth.presentation.security.AuthenticatedUsers;
 import com.ssafy.dash.oauth.presentation.security.CustomOAuth2User;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -97,8 +98,11 @@ public class AiController {
 
         @Operation(summary = "AI 튜터 대화", description = "맞은 문제/틀린 문제 모두 지원하는 대화형 AI 튜터")
         @PostMapping("/tutor/chat")
-        public ResponseEntity<HintChatResponseDto> hintChat(@RequestBody HintChatRequestDto request) {
-                // recordId가 있으면 DB에서 조회, 없으면 기존 방식 사용
+        public ResponseEntity<HintChatResponseDto> hintChat(
+                        @Parameter(hidden = true) @AuthenticationPrincipal OAuth2User principal,
+                        @RequestBody HintChatRequestDto request) {
+                Long userId = AuthenticatedUsers.requireUserId(principal);
+                // recordId가 있으면 저장된 풀이 기록을 기준으로 대화
                 HintChatResponse response;
                 if (request.recordId() != null) {
                         List<HintChatRequest.ChatMessage> history = request.history() != null
@@ -111,14 +115,14 @@ public class AiController {
                                         : List.of();
 
                         response = tutorChatService.hintChatWithRecord(
-                                        request.userId(),
+                                        userId,
                                         request.recordId(),
                                         request.message(),
                                         request.solveStatus(),
                                         request.wrongReason(),
                                         history);
                 } else {
-                        // Fallback: 기존 방식 (deprecated)
+                        // recordId 없이 요청 본문의 코드로 대화
                         HintChatRequest aiRequest = HintChatRequest.builder()
                                         .message(request.message())
                                         .problemNumber(request.problemNumber())
@@ -147,21 +151,28 @@ public class AiController {
         @Operation(summary = "튜터 대화 내역 조회", description = "특정 기록에 대한 튜터 대화 내역을 조회합니다")
         @GetMapping("/tutor/history/{recordId}")
         public ResponseEntity<List<HintChatRequest.ChatMessage>> getTutorHistory(
-                        @PathVariable Long recordId,
-                        @RequestParam Long userId) {
+                        @Parameter(hidden = true) @AuthenticationPrincipal OAuth2User principal,
+                        @PathVariable Long recordId) {
+                Long userId = AuthenticatedUsers.requireUserId(principal);
                 return ResponseEntity.ok(tutorChatService.getChatHistory(userId, recordId));
         }
 
         @Operation(summary = "AI 학습 경로", description = "분석 데이터 기반 개인화 학습 경로를 생성합니다")
         @GetMapping("/learning-path/{userId}")
-        public ResponseEntity<LearningDashboardResponse> getLearningPath(@PathVariable Long userId) {
+        public ResponseEntity<LearningDashboardResponse> getLearningPath(
+                        @Parameter(hidden = true) @AuthenticationPrincipal OAuth2User principal,
+                        @PathVariable Long userId) {
+                AuthenticatedUsers.requireSelf(principal, userId);
                 LearningDashboardResponse response = learningPathService.generateAiLearningPath(userId);
                 return ResponseEntity.ok(response);
         }
 
         @Operation(summary = "코딩 스타일 분석", description = "사용자의 코드 패턴을 분석하여 MBTI 스타일 결과를 생성합니다")
         @GetMapping("/coding-style/{userId}")
-        public ResponseEntity<CodingStyleResponse> getCodingStyle(@PathVariable Long userId) {
+        public ResponseEntity<CodingStyleResponse> getCodingStyle(
+                        @Parameter(hidden = true) @AuthenticationPrincipal OAuth2User principal,
+                        @PathVariable Long userId) {
+                AuthenticatedUsers.requireSelf(principal, userId);
                 CodingStyleResponse response = codingStyleService.analyzeCodingStyle(userId);
                 return ResponseEntity.ok(response);
         }

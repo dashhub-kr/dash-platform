@@ -6,6 +6,7 @@ import com.ssafy.dash.problem.presentation.dto.SkillGraphResponse;
 import com.ssafy.dash.problem.presentation.dto.SkillTreeResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 /**
@@ -40,6 +41,7 @@ public class TagController {
     /**
      * 기본 선수 관계 데이터 초기화 (개발용)
      */
+    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("/prerequisites/init")
     public ResponseEntity<String> initPrerequisites() {
         prerequisiteService.initializeDefaultPrerequisites();

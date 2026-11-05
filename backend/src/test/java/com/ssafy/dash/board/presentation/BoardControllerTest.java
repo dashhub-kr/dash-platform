@@ -1,5 +1,15 @@
 package com.ssafy.dash.board.presentation;
 
+import com.ssafy.dash.oauth.application.dto.result.OAuthLoginResult;
+import com.ssafy.dash.oauth.domain.AuthFlowType;
+import com.ssafy.dash.oauth.presentation.security.CustomOAuth2User;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
+import org.springframework.security.oauth2.core.user.DefaultOAuth2User;
+import org.springframework.security.oauth2.core.user.OAuth2User;
+import java.util.Collections;
+import java.util.Map;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ssafy.dash.board.application.BoardService;
 import com.ssafy.dash.board.application.dto.command.BoardCreateCommand;
@@ -67,11 +77,24 @@ class BoardControllerTest {
         void setUp() {
                 user = TestFixtures.createUser();
                 boardResult = TestFixtures.createBoardResult(user);
+                authenticate(user);
         }
 
         @AfterEach
         void tearDown() {
                 Mockito.reset(boardService);
+                SecurityContextHolder.clearContext();
+        }
+
+        private void authenticate(User loginUser) {
+                OAuth2User delegate = new DefaultOAuth2User(
+                                Collections.singleton(new SimpleGrantedAuthority("ROLE_USER")),
+                                Map.of("id", TestFixtures.TEST_PROVIDER_ID),
+                                "id");
+                CustomOAuth2User customUser = new CustomOAuth2User(delegate,
+                                new OAuthLoginResult(loginUser, AuthFlowType.SIGN_UP));
+                SecurityContextHolder.getContext().setAuthentication(new OAuth2AuthenticationToken(customUser,
+                                customUser.getAuthorities(), TestFixtures.TEST_PROVIDER));
         }
 
         @Test

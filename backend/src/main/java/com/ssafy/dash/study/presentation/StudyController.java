@@ -1,5 +1,6 @@
 package com.ssafy.dash.study.presentation;
 
+import com.ssafy.dash.oauth.presentation.security.AuthenticatedUsers;
 import com.ssafy.dash.oauth.presentation.security.CustomOAuth2User;
 import com.ssafy.dash.study.application.StudyAnalysisService;
 import com.ssafy.dash.study.application.StudyMissionService;
@@ -242,36 +243,19 @@ public class StudyController {
     public ResponseEntity<List<MissionWithProgressResult>> getMissions(
             @Parameter(hidden = true) @AuthenticationPrincipal OAuth2User principal,
             @PathVariable Long studyId) {
-        if (principal instanceof CustomOAuth2User customUser) {
-            // Admin can access any study's missions
-            boolean isAdmin = customUser.getAuthorities().stream()
-                    .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
+        Long userId = AuthenticatedUsers.requireUserId(principal);
+        studyService.requireMemberOrAdmin(userId, studyId);
 
-            if (isAdmin) {
-                return ResponseEntity.ok(studyMissionService.getMissions(studyId, customUser.getUserId()));
-            }
-
-            // Regular user: Member check is implicitly done by studyMissionService logic or
-            // we should check it here?
-            // Currently studyMissionService.getMissions returns all members' progress.
-            // But usually we want to ensure the requester is a member.
-            // Existing code didn't explicitly check membership here because it relied on
-            // frontend sending correct studyId
-            // and maybe service handles it? actually service just queries by studyId.
-            // Ideally we should check membership for non-admins, but for now I'm just
-            // adding the admin bypass
-            // which effectively allows the "observation" flow.
-
-            return ResponseEntity.ok(studyMissionService.getMissions(studyId, customUser.getUserId()));
-        }
-        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        return ResponseEntity.ok(studyMissionService.getMissions(studyId, userId));
     }
 
     @Operation(summary = "미션 생성 (직접 입력)", description = "문제 번호를 직접 입력하여 미션을 생성합니다.")
     @PostMapping("/{studyId}/missions")
     public ResponseEntity<Void> createMission(
+            @Parameter(hidden = true) @AuthenticationPrincipal OAuth2User principal,
             @PathVariable Long studyId,
             @RequestBody CreateMissionRequest request) {
+        requireLeader(principal, studyId, null);
         studyMissionService.createMissionManual(
                 studyId, request.week(), request.title(), request.problemIds(), request.deadline());
         return ResponseEntity.ok().build();
@@ -280,17 +264,22 @@ public class StudyController {
     @Operation(summary = "미션 진행 현황", description = "미션별 멤버들의 제출 현황을 조회합니다.")
     @GetMapping("/{studyId}/missions/{missionId}/progress")
     public ResponseEntity<List<MemberProgressResult>> getMissionProgress(
+            @Parameter(hidden = true) @AuthenticationPrincipal OAuth2User principal,
             @PathVariable Long studyId,
             @PathVariable Long missionId) {
+        studyService.requireMemberOrAdmin(AuthenticatedUsers.requireUserId(principal), studyId);
+        studyMissionService.requireMissionInStudy(missionId, studyId);
         return ResponseEntity.ok(studyMissionService.getMissionProgress(missionId));
     }
 
     @Operation(summary = "미션 문제 추가", description = "기존 미션에 문제를 추가합니다.")
     @PutMapping("/{studyId}/missions/{missionId}/problems")
     public ResponseEntity<Void> addMissionProblems(
+            @Parameter(hidden = true) @AuthenticationPrincipal OAuth2User principal,
             @PathVariable Long studyId,
             @PathVariable Long missionId,
             @RequestBody AddMissionProblemsRequest request) {
+        requireLeader(principal, studyId, missionId);
         studyMissionService.addProblemsToMission(missionId, request.problemIds());
         return ResponseEntity.ok().build();
     }
@@ -298,9 +287,11 @@ public class StudyController {
     @Operation(summary = "미션 정보 수정", description = "미션의 제목이나 마감일을 수정합니다.")
     @PatchMapping("/{studyId}/missions/{missionId}")
     public ResponseEntity<Void> updateMission(
+            @Parameter(hidden = true) @AuthenticationPrincipal OAuth2User principal,
             @PathVariable Long studyId,
             @PathVariable Long missionId,
             @RequestBody UpdateMissionRequest request) {
+        requireLeader(principal, studyId, missionId);
         studyMissionService.updateMission(missionId, request.title(), request.deadline(), request.problemIds());
         return ResponseEntity.ok().build();
     }
@@ -308,9 +299,11 @@ public class StudyController {
     @Operation(summary = "미션 문제 삭제", description = "미션에서 특정 문제를 삭제합니다.")
     @DeleteMapping("/{studyId}/missions/{missionId}/problems/{problemId}")
     public ResponseEntity<Void> deleteMissionProblem(
+            @Parameter(hidden = true) @AuthenticationPrincipal OAuth2User principal,
             @PathVariable Long studyId,
             @PathVariable Long missionId,
             @PathVariable Integer problemId) {
+        requireLeader(principal, studyId, missionId);
         studyMissionService.removeProblemFromMission(missionId, problemId);
         return ResponseEntity.ok().build();
     }
@@ -318,8 +311,10 @@ public class StudyController {
     @Operation(summary = "미션 삭제", description = "미션을 삭제합니다.")
     @DeleteMapping("/{studyId}/missions/{missionId}")
     public ResponseEntity<Void> deleteMission(
+            @Parameter(hidden = true) @AuthenticationPrincipal OAuth2User principal,
             @PathVariable Long studyId,
             @PathVariable Long missionId) {
+        requireLeader(principal, studyId, missionId);
         studyMissionService.deleteMission(missionId);
         return ResponseEntity.ok().build();
     }
@@ -341,9 +336,11 @@ public class StudyController {
     @Operation(summary = "미션 상태 강제 변경 (완료 처리)", description = "스터디장이 미션을 강제로 완료(종료) 처리합니다.")
     @PatchMapping("/{studyId}/missions/{missionId}/status")
     public ResponseEntity<Void> updateMissionStatus(
+            @Parameter(hidden = true) @AuthenticationPrincipal OAuth2User principal,
             @PathVariable Long studyId,
             @PathVariable Long missionId,
             @RequestBody UpdateMissionStatusRequest request) {
+        requireLeader(principal, studyId, missionId);
         if ("COMPLETED".equals(request.status())) {
             studyMissionService.completeMission(missionId);
         }
@@ -396,4 +393,13 @@ public class StudyController {
         }
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
     }
+
+    private void requireLeader(OAuth2User principal, Long studyId, Long missionId) {
+        Long userId = AuthenticatedUsers.requireUserId(principal);
+        studyService.requireLeaderOrAdmin(userId, studyId);
+        if (missionId != null) {
+            studyMissionService.requireMissionInStudy(missionId, studyId);
+        }
+    }
+
 }

@@ -1,5 +1,7 @@
 package com.ssafy.dash.battle.application;
 
+import com.ssafy.dash.common.exception.BusinessException;
+import com.ssafy.dash.common.exception.ErrorCode;
 import com.ssafy.dash.algorithm.domain.AlgorithmRecordRepository;
 import com.ssafy.dash.battle.domain.*;
 import com.ssafy.dash.defense.domain.DefenseProblemBank;
@@ -86,7 +88,18 @@ public class BattleService {
     /**
      * 배틀 시작 (수동)
      */
-    public void startBattle(Long battleId) {
+    public void startBattle(Long battleId, Long requestUserId) {
+        Battle battle = battleRepository.findById(battleId)
+                .orElseThrow(() -> new IllegalArgumentException("배틀을 찾을 수 없습니다"));
+
+        if (!java.util.Objects.equals(battle.getCreatorId(), requestUserId)) {
+            throw new BusinessException(ErrorCode.UNAUTHORIZED_ACCESS, "방장만 배틀을 시작할 수 있습니다.");
+        }
+
+        startBattle(battleId);
+    }
+
+    private void startBattle(Long battleId) {
         Battle battle = battleRepository.findById(battleId)
                 .orElseThrow(() -> new IllegalArgumentException("배틀을 찾을 수 없습니다"));
 
