@@ -28,9 +28,9 @@ Algorithm, Board, User, OAuth, Onboarding, GitHub)은 동일한 규칙을 공유
 
 ArchUnit 실행:
 
-```powershell
+```bash
 cd backend
-..\mvnw.cmd -pl backend -Dtest=ArchitectureTest test
+./mvnw -Dtest=ArchitectureTest test
 ```
 
 ## 3. 모듈 설계 스냅샷

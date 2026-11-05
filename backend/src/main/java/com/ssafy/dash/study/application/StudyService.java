@@ -408,6 +408,36 @@ public class StudyService {
         studyRepository.update(study);
     }
 
+    /**
+     * 스터디 멤버 또는 관리자인지 확인한다.
+     */
+    @Transactional(readOnly = true)
+    public void requireMemberOrAdmin(Long userId, Long studyId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new UserNotFoundException(userId));
+
+        boolean isAdmin = "ROLE_ADMIN".equals(user.getRole());
+        if (!Objects.equals(user.getStudyId(), studyId) && !isAdmin) {
+            throw new BusinessException(ErrorCode.UNAUTHORIZED_ACCESS);
+        }
+    }
+
+    /**
+     * 스터디장 또는 관리자인지 확인한다.
+     */
+    @Transactional(readOnly = true)
+    public void requireLeaderOrAdmin(Long userId, Long studyId) {
+        Study study = studyRepository.findById(studyId)
+                .orElseThrow(() -> new BusinessException(ErrorCode.RESOURCE_NOT_FOUND));
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new UserNotFoundException(userId));
+
+        boolean isAdmin = "ROLE_ADMIN".equals(user.getRole());
+        if (!Objects.equals(study.getCreatorId(), userId) && !isAdmin) {
+            throw new BusinessException(ErrorCode.UNAUTHORIZED_ACCESS);
+        }
+    }
+
     @Transactional
     public void deleteStudy(Long userId, Long studyId) {
         Study study = studyRepository.findById(studyId)

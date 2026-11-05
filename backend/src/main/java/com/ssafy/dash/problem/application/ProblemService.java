@@ -31,12 +31,7 @@ public class ProblemService {
             int jsonCount = rootNode.size();
             int dbCount = problemMapper.countProblems();
 
-            // DB 개수와 JSON 개수가 같더라도 내용이 변경되었을 수 있으므로 항상 업데이트 시도 (UPSERT 동작)
-            // if (dbCount >= jsonCount) {
-            // log.info("문제 데이터가 이미 최신 상태입니다 (DB: {}, JSON: {}). 초기화를 건너뜁니다.", dbCount,
-            // jsonCount);
-            // return;
-            // }
+            // 내용 변경 가능성이 있어 개수와 관계없이 항상 UPSERT
 
             log.info("문제 데이터 초기화 시작... (DB: {}, JSON: {})", dbCount, jsonCount);
 

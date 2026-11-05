@@ -57,24 +57,26 @@
 - Spring Test: `MockMvc`, `@WebMvcTest`, 필요 시 `@SpringBootTest`.
 - 실행 명령
 
-```powershell
+```bash
 cd backend
-..\mvnw.cmd test  # 전체 테스트
-..\mvnw.cmd -Dtest=AlgorithmRecordServiceTest test
+./mvnw test  # 전체 테스트
+./mvnw -Dtest=AlgorithmRecordServiceTest test
 ```
 
 ### 6. 모듈별 커버리지 매트릭스
 
-| 모듈         | Controller/Adapter                                          | Service                                         | Domain                | 특이 사항                          |
-|------------|-------------------------------------------------------------|-------------------------------------------------|-----------------------|--------------------------------|
-| Algorithm  | `AlgorithmRecordControllerTest`                             | `AlgorithmRecordServiceTest`                    | `AlgorithmRecordTest` | Multipart 업로드, OAuth 사용자 ID 추출 |
-| Board      | `BoardControllerTest`                                       | `BoardServiceTest`                              | `BoardTest`           | 작성자 조회, 풀이 연결, 추천 수 |
-| Comment    | `CommentControllerTest` (TODO)                              | `CommentServiceTest` (TODO)                     | `CommentTest` (TODO)  | 대댓글 1단계 제한, 라인 댓글, 트리 구조 |
-| Like       | `LikeController` (LikeService에 통합)                        | `LikeServiceTest` (TODO)                        | -                     | Board/Comment 추천, likeCount 캐시 |
-| User       | `UserControllerIntegrationTest`                             | `UserServiceTest`                               | `UserTest`            | CRUD + `/me` 엔드포인트 포함          |
-| OAuth      | `OAuthSessionControllerTest`, `CustomOAuth2UserServiceTest` | `OAuthUserServiceTest`, `OAuthTokenServiceTest` | `UserOAuthTokenTest`  | Security 어댑터/Access Token 갱신   |
-| Onboarding | `OnboardingControllerTest`                                  | `OnboardingServiceTest`                         | `OnboardingTest`      | GitHub Webhook/토큰 경로 필수        |
-| Analytics  | -                                                           | `UserSkillAnalysisServiceTest`, `BalanceAnalysisServiceTest`, `DifficultyAnalysisServiceTest`, `GrowthAnalysisServiceTest` | - | Solved.ac 연동 분석 (28 tests) |
+| 모듈 | Controller/Adapter | Service | Domain | 비고 |
+|:---|:---|:---|:---|:---|
+| Algorithm | `AlgorithmRecordControllerTest` | `AlgorithmRecordServiceTest` | `AlgorithmRecordTest` | Multipart 업로드 |
+| Board | `BoardControllerTest` | `BoardServiceTest` | `BoardTest` | 작성자 조회, 풀이 연결, 추천 수 |
+| Comment | - | `CommentServiceTest` | `CommentTest` | 대댓글, 라인 댓글, 작성자 권한 |
+| User | `UserControllerIntegrationTest` | `UserServiceTest` | `UserTest` | CRUD, `/me` |
+| OAuth | `OAuthSessionControllerTest`, `CustomOAuth2UserServiceTest` | `OAuthUserServiceTest`, `OAuthTokenServiceTest` | `UserOAuthTokenTest` | 토큰 저장소 헬스 체크 |
+| Onboarding | `OnboardingControllerTest` | `OnboardingServiceTest` | `OnboardingTest` | |
+| GitHub | `GitHubWebhookHealthIndicatorTest` | `GitHubPushServiceTest` | `GitHubSubmissionMetadataExtractorTest` | 웹훅, 제출 메타데이터 |
+| Acorn | - | `AcornServiceTest` | - | |
+| Common | `ClientIpResolverTest` | - | `AesEncryptorTest` | IP 판별, 암호화 |
+| Config | `SecurityConfigCsrfTest` | - | - | CSRF, 인증 필요 경로 |
 
 신규 모듈도 Controller + Service + Domain 세 축을 기본선으로 삼고, 별도 어댑터(Security, GitHub 등)가 있다면 전용 테스트 클래스를 추가한다.
 

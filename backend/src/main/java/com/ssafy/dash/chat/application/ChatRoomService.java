@@ -21,6 +21,8 @@ public class ChatRoomService {
 
     private final ChatRoomRepository chatRoomRepository;
     private final NotificationService notificationService;
+    private static final String UNREADABLE_MESSAGE = "읽을 수 없는 메시지입니다.";
+
     private final AesEncryptor aesEncryptor;
 
     /**
@@ -93,12 +95,8 @@ public class ChatRoomService {
                 .map(room -> {
                     String decryptedLastMessage = null;
                     if (room.getLastMessage() != null) {
-                        try {
-                            decryptedLastMessage = aesEncryptor.decrypt(room.getLastMessage());
-                        } catch (Exception e) {
-                            // 기존 평문 메시지 호환성
-                            decryptedLastMessage = room.getLastMessage();
-                        }
+                        decryptedLastMessage = aesEncryptor.decryptAllowingPlaintext(
+                                room.getLastMessage(), UNREADABLE_MESSAGE);
                     }
                     return new ChatRoomListResult(
                             room.getId(),
@@ -153,13 +151,8 @@ public class ChatRoomService {
 
         return chatRoomRepository.findMessagesByRoomId(roomId, size, page * size).stream()
                 .map(m -> {
-                    String decryptedContent;
-                    try {
-                        decryptedContent = aesEncryptor.decrypt(m.getContent());
-                    } catch (Exception e) {
-                        // 기존 평문 메시지 호환성
-                        decryptedContent = m.getContent();
-                    }
+                    String decryptedContent = aesEncryptor.decryptAllowingPlaintext(
+                            m.getContent(), UNREADABLE_MESSAGE);
                     return new ChatRoomMessageResult(
                             m.getId(),
                             m.getSenderId(),

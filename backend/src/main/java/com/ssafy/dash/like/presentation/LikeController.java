@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.ssafy.dash.like.application.LikeService;
 import com.ssafy.dash.like.presentation.dto.response.LikeResponse;
+import com.ssafy.dash.oauth.presentation.security.AuthenticatedUsers;
 import com.ssafy.dash.oauth.presentation.security.CustomOAuth2User;
 
 import io.swagger.v3.oas.annotations.Parameter;
@@ -50,10 +51,7 @@ public class LikeController {
     }
 
     private Long extractUserId(OAuth2User principal) {
-        if (principal instanceof CustomOAuth2User customUser) {
-            return customUser.getUserId();
-        }
-        return 1L;
+        return AuthenticatedUsers.requireUserId(principal);
     }
 
 }

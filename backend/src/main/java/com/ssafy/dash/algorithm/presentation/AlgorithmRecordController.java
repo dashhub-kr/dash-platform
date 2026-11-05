@@ -3,14 +3,19 @@ package com.ssafy.dash.algorithm.presentation;
 import com.ssafy.dash.algorithm.application.AlgorithmRecordService;
 import com.ssafy.dash.algorithm.presentation.dto.request.AlgorithmRecordUpdateRequest;
 import com.ssafy.dash.algorithm.presentation.dto.response.AlgorithmRecordResponse;
+import com.ssafy.dash.oauth.presentation.security.AuthenticatedUsers;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -25,6 +30,7 @@ public class AlgorithmRecordController {
 
     private final AlgorithmRecordService algorithmRecordService;
 
+    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping
     public ResponseEntity<List<AlgorithmRecordResponse>> findAll() {
         List<AlgorithmRecordResponse> responses = algorithmRecordService.findAll().stream()
@@ -61,8 +67,10 @@ public class AlgorithmRecordController {
 
     @PutMapping(value = "/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<AlgorithmRecordResponse> update(
+            @Parameter(hidden = true) @AuthenticationPrincipal OAuth2User principal,
             @PathVariable Long id,
             @ModelAttribute AlgorithmRecordUpdateRequest req) throws IOException {
+        requireOwner(principal, id);
         AlgorithmRecordResponse response = AlgorithmRecordResponse
                 .from(algorithmRecordService.update(id, req.toCommand()));
 
@@ -70,10 +78,18 @@ public class AlgorithmRecordController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> delete(@PathVariable Long id) {
+    public ResponseEntity<Void> delete(
+            @Parameter(hidden = true) @AuthenticationPrincipal OAuth2User principal,
+            @PathVariable Long id) {
+        requireOwner(principal, id);
         algorithmRecordService.delete(id);
 
         return ResponseEntity.noContent().build();
+    }
+
+    private void requireOwner(OAuth2User principal, Long recordId) {
+        Long ownerId = algorithmRecordService.findById(recordId).userId();
+        AuthenticatedUsers.requireSelf(principal, ownerId);
     }
 
 }

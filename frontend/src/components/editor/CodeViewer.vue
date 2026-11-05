@@ -193,6 +193,7 @@
 </template>
 
 <script setup>
+import { escapeHtml } from '@/utils/sanitize';
 import { ref, computed } from 'vue';
 import { Copy, MessageSquare } from 'lucide-vue-next';
 import NicknameRenderer from '@/components/common/NicknameRenderer.vue';
@@ -307,7 +308,7 @@ const highlightLine = (line) => {
     try {
         return hljs.highlight(line || ' ', { language: props.language }).value;
     } catch (e) {
-        return line;
+        return escapeHtml(line);
     }
 };
 

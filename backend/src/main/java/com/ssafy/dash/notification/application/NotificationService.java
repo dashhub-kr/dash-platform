@@ -36,8 +36,10 @@ public class NotificationService {
                 .collect(Collectors.toList());
     }
 
-    public void markAsRead(Long notificationId) {
-        notificationRepository.findById(notificationId).ifPresent(notification -> {
+    public void markAsRead(Long notificationId, Long receiverId) {
+        notificationRepository.findById(notificationId)
+                .filter(notification -> java.util.Objects.equals(notification.getReceiverId(), receiverId))
+                .ifPresent(notification -> {
             notification.markAsRead();
             notificationRepository.update(notification);
         });
@@ -47,8 +49,10 @@ public class NotificationService {
         notificationRepository.markAllAsRead(receiverId);
     }
 
-    public void update(Long id, String content, NotificationType type) {
-        notificationRepository.findById(id).ifPresent(notification -> {
+    public void update(Long id, Long receiverId, String content, NotificationType type) {
+        notificationRepository.findById(id)
+                .filter(notification -> java.util.Objects.equals(notification.getReceiverId(), receiverId))
+                .ifPresent(notification -> {
             notification.updateContent(content, type);
             notificationRepository.update(notification);
         });

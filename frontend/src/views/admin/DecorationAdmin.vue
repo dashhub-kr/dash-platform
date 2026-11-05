@@ -180,11 +180,7 @@ const openGrantModal = (effect) => {
 const grantEffect = async () => {
     if (!grantTargetUsername.value) return;
     try {
-        // 사용자 이름으로 사용자 ID 찾기 필요? 또는 API가 사용자 이름을 받나?
-        // 현재 API: /admin/decorations/grant -> body { userId, decorationId }
-        // 조회 필요. 일단 사용자를 먼저 검색한다고 가정.
-        
-        // 단순화: 사용자 이름으로 ID 검색
+        // grant API는 userId를 받으므로 사용자 이름으로 먼저 검색
         const userRes = await userApi.list({ keyword: grantTargetUsername.value });
         if (!userRes.data || userRes.data.length === 0) {
             alert('User not found');

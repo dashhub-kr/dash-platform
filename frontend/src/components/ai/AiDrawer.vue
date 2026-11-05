@@ -329,6 +329,7 @@
 </template>
 
 <script setup>
+import { sanitizeHtml, escapeHtml } from '@/utils/sanitize';
 import { ref, watch, nextTick } from 'vue';
 import { 
   X, Bot, Bug, Lightbulb, Copy, Check,
@@ -510,9 +511,9 @@ const renderMarkdown = (text) => {
             }
             return match;
         });
-        return marked(processed);
+        return sanitizeHtml(marked(processed));
     } catch (err) {
-        return text;
+        return escapeHtml(text);
     }
 };
 

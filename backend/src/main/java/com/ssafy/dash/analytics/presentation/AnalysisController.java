@@ -7,10 +7,14 @@ import com.ssafy.dash.analytics.application.GrowthAnalysisService;
 import com.ssafy.dash.analytics.application.StatsSnapshotService;
 import com.ssafy.dash.analytics.application.UserSkillAnalysisService;
 import com.ssafy.dash.analytics.application.dto.response.*;
+import com.ssafy.dash.oauth.presentation.security.AuthenticatedUsers;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -104,7 +108,10 @@ public class AnalysisController {
 
     @Operation(summary = "스냅샷 생성", description = "현재 통계의 스냅샷을 생성합니다 (성장 추세 분석용).")
     @PostMapping("/snapshot")
-    public ResponseEntity<String> createSnapshot(@PathVariable Long userId) {
+    public ResponseEntity<String> createSnapshot(
+            @Parameter(hidden = true) @AuthenticationPrincipal OAuth2User principal,
+            @PathVariable Long userId) {
+        AuthenticatedUsers.requireSelf(principal, userId);
         snapshotService.createSnapshot(userId);
         return ResponseEntity.ok("스냅샷이 생성되었습니다.");
     }

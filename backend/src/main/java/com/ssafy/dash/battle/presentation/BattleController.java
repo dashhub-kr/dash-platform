@@ -98,8 +98,10 @@ public class BattleController {
      * 배틀 시작
      */
     @PostMapping("/{battleId}/start")
-    public ResponseEntity<Void> startBattle(@PathVariable Long battleId) {
-        battleService.startBattle(battleId);
+    public ResponseEntity<Void> startBattle(
+            @AuthenticationPrincipal CustomOAuth2User user,
+            @PathVariable Long battleId) {
+        battleService.startBattle(battleId, user.getUserId());
         return ResponseEntity.ok().build();
     }
 

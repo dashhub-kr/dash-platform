@@ -3,16 +3,17 @@ package com.ssafy.dash.config;
 import com.ssafy.dash.oauth.presentation.security.CustomOAuth2UserService;
 import com.ssafy.dash.oauth.presentation.security.OAuth2AuthenticationFailureHandler;
 import com.ssafy.dash.common.ratelimit.GlobalRateLimitFilter;
+import com.ssafy.dash.config.csrf.SpaCsrfTokenRequestHandler;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.HttpStatusEntryPoint;
+import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
@@ -46,7 +47,11 @@ public class SecurityConfig {
                                 .addFilterBefore(globalRateLimitFilter,
                                                 org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter.class)
                                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
-                                .csrf(AbstractHttpConfigurer::disable)
+                                // 세션 쿠키 인증이므로 CSRF 토큰 검증 (GitHub 웹훅은 서명으로 검증)
+                                .csrf(csrf -> csrf
+                                                .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
+                                                .csrfTokenRequestHandler(new SpaCsrfTokenRequestHandler())
+                                                .ignoringRequestMatchers("/api/webhooks/github"))
                                 .authorizeHttpRequests(auth -> auth
                                                 .requestMatchers(
                                                                 "/",
@@ -61,13 +66,7 @@ public class SecurityConfig {
                                                                 "/api/webhooks/github",
                                                                 "/actuator/health",
                                                                 "/actuator/health/**",
-                                                                "/api/users/*/solvedac/**", // Solved.ac API endpoints
-                                                                "/api/users/*/analysis/**", // Analysis API endpoints
-                                                                                            // for
-                                                                                            // testing
-                                                                "/api/ai/**", // AI endpoints for testing
-                                                                "/api/onboarding/solvedac/verify" // Solvedac handle
-                                                                                                  // verification
+                                                                "/api/onboarding/solvedac/verify"
                                                 ).permitAll()
                                                 .anyRequest().authenticated())
                                 .exceptionHandling(exception -> exception
@@ -77,7 +76,7 @@ public class SecurityConfig {
                                                 .userInfoEndpoint(userInfo -> userInfo
                                                                 .userService(customOAuth2UserService))
                                                 .defaultSuccessUrl(frontendUrl + "/oauth2/redirect", true)
-                                                .failureHandler(oAuth2AuthenticationFailureHandler)) // 실패 핸들러 추가
+                                                .failureHandler(oAuth2AuthenticationFailureHandler))
                                 .logout(logout -> logout
                                                 .logoutUrl("/api/logout")
                                                 .invalidateHttpSession(true)
@@ -96,8 +95,7 @@ public class SecurityConfig {
         public CorsConfigurationSource corsConfigurationSource() {
                 CorsConfiguration configuration = new CorsConfiguration();
                 configuration.setAllowedOrigins(
-                                Arrays.asList("http://localhost:5173", "http://localhost:8080", frontendUrl)); // 로컬 +
-                                                                                                               // 운영
+                                Arrays.asList("http://localhost:5173", "http://localhost:8080", frontendUrl));
                 configuration.setAllowedMethods(Collections.singletonList("*"));
                 configuration.setAllowedHeaders(Collections.singletonList("*"));
                 configuration.setAllowCredentials(true);

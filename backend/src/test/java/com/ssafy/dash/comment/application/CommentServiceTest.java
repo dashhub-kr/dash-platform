@@ -1,5 +1,6 @@
 package com.ssafy.dash.comment.application;
 
+import com.ssafy.dash.common.exception.BusinessException;
 import com.ssafy.dash.comment.application.dto.command.CommentCreateCommand;
 import com.ssafy.dash.comment.application.dto.command.CommentUpdateCommand;
 import com.ssafy.dash.comment.application.dto.result.CommentResult;
@@ -173,7 +174,7 @@ class CommentServiceTest {
             given(commentRepository.findById(comment.getId())).willReturn(Optional.of(comment));
             given(userRepository.findById(comment.getUserId())).willReturn(Optional.of(user));
 
-            CommentResult result = commentService.update(comment.getId(), command);
+            CommentResult result = commentService.update(comment.getId(), command, comment.getUserId());
 
             assertThat(result.content()).isEqualTo(command.content());
             verify(commentRepository).update(any(Comment.class));
@@ -185,7 +186,7 @@ class CommentServiceTest {
             CommentUpdateCommand command = CommentFixtures.createCommentUpdateCommand();
             given(commentRepository.findById(999L)).willReturn(Optional.empty());
 
-            assertThatThrownBy(() -> commentService.update(999L, command))
+            assertThatThrownBy(() -> commentService.update(999L, command, comment.getUserId()))
                     .isInstanceOf(CommentNotFoundException.class);
 
             verify(commentRepository, never()).update(any(Comment.class));
@@ -200,10 +201,26 @@ class CommentServiceTest {
         @DisplayName("존재하는 댓글을 삭제할 수 있다")
         void delete_WhenExists_ShouldDelete() {
             given(commentRepository.findById(comment.getId())).willReturn(Optional.of(comment));
+            given(userRepository.findById(comment.getUserId())).willReturn(Optional.of(user));
 
-            commentService.delete(comment.getId());
+            commentService.delete(comment.getId(), comment.getUserId());
 
             verify(commentRepository).delete(comment.getId());
+        }
+
+        @Test
+        @DisplayName("작성자가 아니면 댓글을 삭제할 수 없다")
+        void delete_WhenNotOwner_ShouldThrowException() {
+            Long otherUserId = comment.getUserId() + 1;
+            User other = org.mockito.Mockito.mock(User.class);
+            given(other.getRole()).willReturn("ROLE_USER");
+            given(commentRepository.findById(comment.getId())).willReturn(Optional.of(comment));
+            given(userRepository.findById(otherUserId)).willReturn(Optional.of(other));
+
+            assertThatThrownBy(() -> commentService.delete(comment.getId(), otherUserId))
+                    .isInstanceOf(BusinessException.class);
+
+            verify(commentRepository, never()).delete(comment.getId());
         }
 
         @Test
@@ -211,7 +228,7 @@ class CommentServiceTest {
         void delete_WhenNotExists_ShouldThrowException() {
             given(commentRepository.findById(999L)).willReturn(Optional.empty());
 
-            assertThatThrownBy(() -> commentService.delete(999L))
+            assertThatThrownBy(() -> commentService.delete(999L, comment.getUserId()))
                     .isInstanceOf(CommentNotFoundException.class);
 
             verify(commentRepository, never()).delete(999L);

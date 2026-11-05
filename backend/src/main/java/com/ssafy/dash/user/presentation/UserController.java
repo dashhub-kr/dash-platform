@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -16,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.ssafy.dash.oauth.presentation.security.AuthenticatedUsers;
 import com.ssafy.dash.oauth.presentation.security.CustomOAuth2User;
 import com.ssafy.dash.user.application.UserService;
 import com.ssafy.dash.user.presentation.dto.request.UserCreateRequest;
@@ -35,6 +37,7 @@ public class UserController {
         this.service = service;
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping
     public ResponseEntity<UserResponse> create(@RequestBody UserCreateRequest req) {
         UserResponse created = UserResponse.from(service.create(req.toCommand()));
@@ -77,13 +80,20 @@ public class UserController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<UserResponse> update(@PathVariable Long id, @RequestBody UserUpdateRequest req) {
+    public ResponseEntity<UserResponse> update(
+            @Parameter(hidden = true) @AuthenticationPrincipal OAuth2User principal,
+            @PathVariable Long id,
+            @RequestBody UserUpdateRequest req) {
+        AuthenticatedUsers.requireSelf(principal, id);
 
         return ResponseEntity.ok(UserResponse.from(service.update(id, req.toCommand())));
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> delete(@PathVariable Long id) {
+    public ResponseEntity<Void> delete(
+            @Parameter(hidden = true) @AuthenticationPrincipal OAuth2User principal,
+            @PathVariable Long id) {
+        AuthenticatedUsers.requireSelf(principal, id);
         service.delete(id);
 
         return ResponseEntity.noContent().build();

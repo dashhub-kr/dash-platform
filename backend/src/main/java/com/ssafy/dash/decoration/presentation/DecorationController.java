@@ -30,6 +30,7 @@ public class DecorationController {
         return ResponseEntity.ok(d);
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/admin/decorations")
     public ResponseEntity<List<Decoration>> getAllDecorations() {
         return ResponseEntity.ok(decorationService.findAll());

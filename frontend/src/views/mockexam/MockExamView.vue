@@ -472,17 +472,7 @@ const refreshStatus = async () => {
 const finishExam = async (success = false) => {
     try {
         await axios.post('/api/mockexam/finish'); // 명시적 종료 API 필요 시 구현, 혹은 cancel 사용
-        // 여기서는 편의상 로컬 상태 업데이트 및 성공 모달 띄우기
-        // 실제로는 백엔드에서 finish 처리를 해야 기록이 남음.
-        // 기존 cancelExam은 '포기'이므로, '완료' 처리를 위한 별도 호출이 낫지만
-        // 현재 스펙상으로는 status 체크로 자동 종료되거나, 시간 초과로 종료됨.
-        // A형 1솔 종료를 위해 /finish 엔드포인트가 있다고 가정하거나, 
-        // /cancel을 '완료'로 처리할 수 있게 백엔드 수정이 필요할 수 있음.
-        // 우선은 cancelExam 대신 별도 처리를 하거나 cancel을 호출하되 메시지를 다르게 처리.
-        // *가정*: 여기서는 일단 로컬 상태만 변경하고 성공 모달을 띄움. 
-        // 실제 종료는 백엔드 타이머나 명시적 요청 필요.
-        
-        // 간단히: 성공 모달 띄우고, 확인 누르면 홈으로.
+        // 성공 모달을 띄우고 확인 시 홈으로 이동 (시험 종료는 백엔드 타이머가 처리)
         showSuccessModal.value = true;
     } catch (e) {
         console.error(e);

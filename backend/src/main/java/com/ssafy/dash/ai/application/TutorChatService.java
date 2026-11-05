@@ -161,7 +161,7 @@ public class TutorChatService {
         }
 
         /**
-         * 힌트 대화 (직접 요청 - deprecated, hintChatWithRecord 사용 권장)
+         * 힌트 대화 (요청 본문의 코드 기준)
          */
         public HintChatResponse hintChat(HintChatRequest request) {
                 log.info("Hint chat for problem: {}", request.getProblemNumber());

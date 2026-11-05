@@ -6,7 +6,10 @@ import com.ssafy.dash.comment.application.dto.result.CommentResult;
 import com.ssafy.dash.comment.domain.Comment;
 import com.ssafy.dash.comment.domain.CommentRepository;
 import com.ssafy.dash.comment.domain.exception.CommentNotFoundException;
+import com.ssafy.dash.common.exception.BusinessException;
+import com.ssafy.dash.common.exception.ErrorCode;
 import com.ssafy.dash.user.domain.User;
+import com.ssafy.dash.user.domain.exception.UserNotFoundException;
 import com.ssafy.dash.user.domain.UserRepository;
 import com.ssafy.dash.notification.application.NotificationService;
 import com.ssafy.dash.notification.domain.NotificationType;
@@ -100,9 +103,11 @@ public class CommentService {
     }
 
     @Transactional
-    public CommentResult update(Long id, CommentUpdateCommand command) {
+    public CommentResult update(Long id, CommentUpdateCommand command, Long requestUserId) {
         Comment comment = commentRepository.findById(id)
                 .orElseThrow(() -> new CommentNotFoundException(id));
+
+        validateOwnership(comment, requestUserId);
 
         LocalDateTime now = LocalDateTime.now();
         comment.applyUpdate(command.content(), now);
@@ -113,11 +118,28 @@ public class CommentService {
     }
 
     @Transactional
-    public void delete(Long id) {
-        if (commentRepository.findById(id).isEmpty()) {
-            throw new CommentNotFoundException(id);
-        }
+    public void delete(Long id, Long requestUserId) {
+        Comment comment = commentRepository.findById(id)
+                .orElseThrow(() -> new CommentNotFoundException(id));
+
+        validateOwnership(comment, requestUserId);
+
         commentRepository.delete(id);
+    }
+
+    private void validateOwnership(Comment comment, Long requestUserId) {
+        User requestUser = userRepository.findById(requestUserId)
+                .orElseThrow(() -> new UserNotFoundException(requestUserId));
+
+        if ("ROLE_ADMIN".equals(requestUser.getRole())) {
+            return;
+        }
+
+        if (!comment.getUserId().equals(requestUserId)) {
+            throw new BusinessException(ErrorCode.UNAUTHORIZED_ACCESS,
+                    String.format("User %d is not authorized to modify Comment with id %d", requestUserId,
+                            comment.getId()));
+        }
     }
 
     /**

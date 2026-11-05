@@ -12,7 +12,7 @@ services:
       MYSQL_PASSWORD: ${MYSQL_PASSWORD}
       TZ: Asia/Seoul
     ports:
-      - "3306:3306"
+      - "127.0.0.1:3306:3306"
     volumes:
       - mysql_data:/var/lib/mysql
     networks:
@@ -38,6 +38,7 @@ services:
       GITHUB_WEBHOOK_SECRET: ${GITHUB_WEBHOOK_SECRET}
       GITHUB_WEBHOOK_URL: ${GITHUB_WEBHOOK_URL}
       YOUTUBE_API_KEY: ${YOUTUBE_API_KEY}
+      DASH_ENCRYPT_SECRET_KEY: ${DASH_ENCRYPT_SECRET_KEY}
     depends_on:
       - mysql
       - ai
@@ -51,7 +52,7 @@ services:
     environment:
       GEMINI_API_KEY: ${GEMINI_API_KEY}
     ports:
-      - "8000:8000"
+      - "127.0.0.1:8000:8000"
     networks:
       - dash-network
 

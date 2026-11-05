@@ -325,12 +325,11 @@ sequenceDiagram
 | :--- | :--- | :--- | :--- |
 | **AI** | `POST` | `/api/ai/review` | 코드 분석 요청 |
 | **AI** | `GET` | `/api/ai/review/{algorithmRecordId}` | 분석 결과 조회 |
-| **AI** | `POST` | `/api/ai/hint` | 레벨별 맞춤 힌트 생성 |
 | **AI** | `GET` | `/api/ai/learning-path/{userId}` | AI 개인화 학습 경로 |
 | **AI** | `GET` | `/api/ai/coding-style/{userId}` | MBTI 스타일 코딩 분석 |
 | **AI** | `POST` | `/api/ai/tutor/chat` | 대화형 AI 튜터 |
 
-> **상세 문서**: AI 모듈의 상세 명세는 [AI_MODULE.md](./AI_MODULE.md)를 참고하세요.
+> AI 기능 상세는 [AI 기능 기술 분석](./AI_ANALYSIS_REPORT.md)을 참고하세요.
 
 ---
 

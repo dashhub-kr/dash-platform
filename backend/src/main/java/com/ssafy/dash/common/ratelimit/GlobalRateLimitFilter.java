@@ -1,5 +1,7 @@
 package com.ssafy.dash.common.ratelimit;
 
+import com.github.benmanes.caffeine.cache.Cache;
+import com.github.benmanes.caffeine.cache.Caffeine;
 import io.github.bucket4j.Bandwidth;
 import io.github.bucket4j.Bucket;
 import io.github.bucket4j.Refill;
@@ -14,8 +16,6 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 import java.time.Duration;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Global DoS Protection Filter
@@ -26,12 +26,17 @@ import java.util.concurrent.ConcurrentHashMap;
 @Component
 public class GlobalRateLimitFilter extends OncePerRequestFilter {
 
-    private final Map<String, Bucket> buckets = new ConcurrentHashMap<>();
-
     // IP당 분당 100회 요청 허용 (일반적인 API 사용량 고려)
     private static final int CAPACITY = 100;
     private static final int REFILL_TOKENS = 100;
     private static final int REFILL_DURATION_SECONDS = 60;
+    private static final long MAX_TRACKED_CLIENTS = 100_000;
+
+    // 오래 쓰지 않은 버킷은 만료시켜 IP가 늘어나도 메모리가 무한히 커지지 않게 한다
+    private final Cache<String, Bucket> buckets = Caffeine.newBuilder()
+            .maximumSize(MAX_TRACKED_CLIENTS)
+            .expireAfterAccess(Duration.ofMinutes(10))
+            .build();
 
     @Override
     protected void doFilterInternal(@org.springframework.lang.NonNull HttpServletRequest request,
@@ -39,8 +44,8 @@ public class GlobalRateLimitFilter extends OncePerRequestFilter {
             @org.springframework.lang.NonNull FilterChain filterChain)
             throws ServletException, IOException {
 
-        String clientIp = resolveClientIp(request);
-        Bucket bucket = buckets.computeIfAbsent(clientIp, this::createNewBucket);
+        String clientIp = ClientIpResolver.resolve(request);
+        Bucket bucket = buckets.get(clientIp, this::createNewBucket);
 
         if (bucket.tryConsume(1)) {
             filterChain.doFilter(request, response);
@@ -57,13 +62,5 @@ public class GlobalRateLimitFilter extends OncePerRequestFilter {
         return Bucket.builder()
                 .addLimit(limit)
                 .build();
-    }
-
-    private String resolveClientIp(HttpServletRequest request) {
-        String xForwardedFor = request.getHeader("X-Forwarded-For");
-        if (xForwardedFor != null && !xForwardedFor.isEmpty()) {
-            return xForwardedFor.split(",")[0].trim();
-        }
-        return request.getRemoteAddr();
     }
 }

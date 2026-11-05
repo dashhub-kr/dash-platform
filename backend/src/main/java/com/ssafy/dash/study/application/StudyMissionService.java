@@ -1,6 +1,7 @@
 package com.ssafy.dash.study.application;
 
 import java.time.LocalDate;
+import java.util.Objects;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -11,6 +12,8 @@ import org.springframework.transaction.annotation.Transactional;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.ssafy.dash.common.exception.BusinessException;
+import com.ssafy.dash.common.exception.ErrorCode;
 import com.ssafy.dash.study.domain.StudyMission;
 import com.ssafy.dash.study.domain.StudyMission.MissionStatus;
 import com.ssafy.dash.study.domain.StudyMissionRepository;
@@ -46,6 +49,18 @@ public class StudyMissionService {
     private final NotificationService notificationService;
     private final ProblemMapper problemMapper;
     private final TagService tagService;
+
+    /**
+     * 미션이 해당 스터디에 속하는지 확인한다 (다른 스터디 미션 조작 방지).
+     */
+    @Transactional(readOnly = true)
+    public void requireMissionInStudy(Long missionId, Long studyId) {
+        StudyMission mission = missionRepository.findById(missionId)
+                .orElseThrow(() -> new BusinessException(ErrorCode.RESOURCE_NOT_FOUND));
+        if (!Objects.equals(mission.getStudyId(), studyId)) {
+            throw new BusinessException(ErrorCode.UNAUTHORIZED_ACCESS);
+        }
+    }
 
     /**
      * 미션 생성 (직접 입력)
