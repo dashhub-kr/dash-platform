@@ -452,6 +452,10 @@ const record = computed(() => mergedRecord.value);
 watch(
     () => props.record,
     async (newRecord) => {
+        const currentRecordId = mergedRecord.value?.id;
+        const isSameRecord = currentRecordId != null && currentRecordId === newRecord?.id;
+        const preservedAnalysis = isSameRecord ? mapAnalysisToRecord(mergedRecord.value || {}) : {};
+
         activeTab.value = 'overview';
         tutorMessages.value = [];
         showTrace.value = false;
@@ -465,7 +469,10 @@ watch(
             return;
         }
 
-        mergedRecord.value = { ...newRecord };
+        mergedRecord.value = {
+            ...newRecord,
+            ...(hasExistingAnalysis(newRecord) ? {} : preservedAnalysis)
+        };
         if (newRecord.counterExampleInput) {
             aiData.value = {
                 input: newRecord.counterExampleInput,
@@ -477,7 +484,7 @@ watch(
             aiData.value = null;
         }
 
-        if (hasExistingAnalysis(newRecord)) {
+        if (hasExistingAnalysis(mergedRecord.value)) {
             analysisStatus.value = 'ready';
             return;
         }
@@ -523,6 +530,15 @@ const applyAnalysisToRecord = (analysis) => {
     return nextRecord;
 };
 
+const finalizeAnalysis = (analysis) => {
+    const nextRecord = applyAnalysisToRecord(analysis);
+    if (hasExistingAnalysis(nextRecord)) {
+        analysisStatus.value = 'ready';
+        return true;
+    }
+    return false;
+};
+
 const ensureAnalysisLoaded = async ({ force = false } = {}) => {
     if (!record.value?.id) return;
     const requestId = ++currentAnalysisRequestId.value;
@@ -547,8 +563,14 @@ const ensureAnalysisLoaded = async ({ force = false } = {}) => {
         }
 
         if (requestId !== currentAnalysisRequestId.value) return;
-        applyAnalysisToRecord(analysis);
-        analysisStatus.value = 'ready';
+        if (!finalizeAnalysis(analysis)) {
+            const latest = await aiApi.getAnalysisResult(record.value.id);
+            if (requestId !== currentAnalysisRequestId.value) return;
+            if (!finalizeAnalysis(latest?.data ?? null)) {
+                analysisError.value = '분석 결과를 불러오지 못했습니다.';
+                analysisStatus.value = 'error';
+            }
+        }
     } catch (error) {
         if (requestId !== currentAnalysisRequestId.value) return;
 
@@ -558,8 +580,14 @@ const ensureAnalysisLoaded = async ({ force = false } = {}) => {
                     algorithmRecordId: record.value.id
                 });
                 if (requestId !== currentAnalysisRequestId.value) return;
-                applyAnalysisToRecord(created?.data || {});
-                analysisStatus.value = 'ready';
+                if (!finalizeAnalysis(created?.data || null)) {
+                    const latest = await aiApi.getAnalysisResult(record.value.id);
+                    if (requestId !== currentAnalysisRequestId.value) return;
+                    if (!finalizeAnalysis(latest?.data ?? null)) {
+                        analysisError.value = '분석 결과를 불러오지 못했습니다.';
+                        analysisStatus.value = 'error';
+                    }
+                }
                 return;
             } catch (createError) {
                 analysisError.value = createError?.response?.data?.message || '분석 생성 요청에 실패했습니다.';
